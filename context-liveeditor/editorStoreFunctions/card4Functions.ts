@@ -8,7 +8,7 @@ import { updateDataByPath } from "./types";
 export const getDefaultCard4Data = (): ComponentData => ({
   visible: true,
   ThemeTwo: "card4",
-  
+
   // Property data
   property: {
     ThemeTwo: "property",
@@ -47,7 +47,7 @@ export const getDefaultCard4Data = (): ComponentData => ({
     featured: false,
     url: "#",
   },
-  
+
   // Styling
   styling: {
     ThemeTwo: "styling",
@@ -76,7 +76,7 @@ export const getDefaultCard4Data = (): ComponentData => ({
     priceBackgroundColor: "#896042",
     priceTextColor: "#ffffff",
   },
-  
+
   // Typography
   typography: {
     ThemeTwo: "typography",
@@ -117,7 +117,7 @@ export const getDefaultCard4Data = (): ComponentData => ({
       fontFamily: "Tajawal",
     },
   },
-  
+
   // Responsive
   responsive: {
     ThemeTwo: "responsive",
@@ -137,7 +137,7 @@ export const getDefaultCard4Data = (): ComponentData => ({
 export const card4Functions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -149,46 +149,46 @@ export const card4Functions = {
       state.card4States[variantId] &&
       Object.keys(state.card4States[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data
     const defaultData = getDefaultCard4Data();
-    
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      card4States: { ...state.card4States, [variantId]: data }
+      card4States: { ...state.card4States, [variantId]: data },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
     state.card4States[variantId] || getDefaultCard4Data(),
-  
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    card4States: { ...state.card4States, [variantId]: data }
+    card4States: { ...state.card4States, [variantId]: data },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "property.title")
@@ -198,10 +198,9 @@ export const card4Functions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.card4States[variantId] || getDefaultCard4Data();
     const newData = updateDataByPath(source, path, value);
-    
-    return {
-      card4States: { ...state.card4States, [variantId]: newData }
-    } as any;
-  }
-};
 
+    return {
+      card4States: { ...state.card4States, [variantId]: newData },
+    } as any;
+  },
+};

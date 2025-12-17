@@ -1,2 +1,1 @@
-export { default } from './getStartedPage';
-
+export { default } from "./getStartedPage";

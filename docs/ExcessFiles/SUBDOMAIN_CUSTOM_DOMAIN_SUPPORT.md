@@ -15,8 +15,9 @@ const extractTenantId = (host: string): string | null => {
 ### ✅ منطق الاستخراج
 
 #### 1. التحقق من Base Domain
+
 ```javascript
-const isOnBaseDomain = isDevelopment 
+const isOnBaseDomain = isDevelopment
   ? host === localDomain || host === `${localDomain}:3000`
   : host === productionDomain || host === `www.${productionDomain}`;
 
@@ -26,6 +27,7 @@ if (isOnBaseDomain) {
 ```
 
 #### 2. Subdomain في التطوير المحلي
+
 ```javascript
 // tenant1.localhost:3000 -> tenant1
 if (isDevelopment && host.includes(localDomain)) {
@@ -40,6 +42,7 @@ if (isDevelopment && host.includes(localDomain)) {
 ```
 
 #### 3. Subdomain في الإنتاج
+
 ```javascript
 // tenant1.taearif.com -> tenant1
 if (!isDevelopment && host.includes(productionDomain)) {
@@ -47,7 +50,7 @@ if (!isDevelopment && host.includes(productionDomain)) {
   if (parts.length > 2) {
     const potentialTenantId = parts[0];
     const domainPart = parts.slice(1).join(".");
-    
+
     if (domainPart === productionDomain) {
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
         return potentialTenantId;
@@ -58,9 +61,13 @@ if (!isDevelopment && host.includes(productionDomain)) {
 ```
 
 #### 4. Custom Domain
+
 ```javascript
 // custom-domain.com -> custom-domain.com
-const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+const isCustomDomain =
+  /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+    host,
+  );
 
 if (isCustomDomain) {
   return host; // إرجاع الـ host نفسه كـ tenant ID
@@ -83,21 +90,25 @@ if (tenantId) {
 ## أمثلة على الاستخراج
 
 ### ✅ Subdomain في التطوير المحلي:
+
 - `lira.localhost` → tenant ID = "lira"
 - `tenant1.localhost:3000` → tenant ID = "tenant1"
 - `localhost` → tenant ID = null (base domain)
 
 ### ✅ Subdomain في الإنتاج:
+
 - `lira.taearif.com` → tenant ID = "lira"
 - `tenant1.taearif.com` → tenant ID = "tenant1"
 - `taearif.com` → tenant ID = null (base domain)
 
 ### ✅ Custom Domain:
+
 - `custom-domain.com` → tenant ID = "custom-domain.com"
 - `mywebsite.net` → tenant ID = "mywebsite.net"
 - `company.org` → tenant ID = "company.org"
 
 ### ❌ الكلمات المحجوزة:
+
 - `www.taearif.com` → tenant ID = null
 - `api.taearif.com` → tenant ID = null
 - `admin.taearif.com` → tenant ID = null
@@ -105,6 +116,7 @@ if (tenantId) {
 ## Console Output
 
 ### ✅ مع Subdomain:
+
 ```
 🔍 Dashboard: Checking host: lira.localhost
 🔍 Dashboard: Is development: true
@@ -115,6 +127,7 @@ Tenant Data from getTenant API: { ... }
 ```
 
 ### ✅ مع Custom Domain:
+
 ```
 🔍 Dashboard: Checking host: custom-domain.com
 🔍 Dashboard: Is development: false
@@ -124,6 +137,7 @@ Tenant Data from getTenant API: { ... }
 ```
 
 ### ❌ Base Domain:
+
 ```
 🔍 Dashboard: Checking host: localhost
 🔍 Dashboard: Is development: true
@@ -135,19 +149,23 @@ No tenant ID found, skipping tenant data fetch
 ## المزايا
 
 ### ✅ متوافق مع Middleware
+
 - يستخدم نفس منطق استخراج tenant ID
 - متسق مع باقي النظام
 
 ### ✅ دعم شامل
+
 - Subdomain في التطوير والإنتاج
 - Custom Domain
 - التعامل مع الكلمات المحجوزة
 
 ### ✅ تتبع واضح
+
 - Console logs مفصلة لكل خطوة
 - سهولة debugging
 
 ### ✅ مرونة
+
 - يعمل مع أي hostname
 - يتعامل مع جميع الحالات
 

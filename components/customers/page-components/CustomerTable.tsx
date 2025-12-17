@@ -79,10 +79,13 @@ export const CustomerTable = ({
   const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] =
     useState<any>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-  
+
   // Custom Dialog State
   const [showCustomDialog, setShowCustomDialog] = useState(false);
   const [customerDetails, setCustomerDetails] = useState<any>(null);
@@ -97,12 +100,14 @@ export const CustomerTable = ({
   const fetchCustomerDetails = async (customerId: string) => {
     setLoadingDetails(true);
     try {
-      const response = await axiosInstance.get(`/customers/${customerId}/with-inquiries`);
-      if (response.data.status === 'success') {
+      const response = await axiosInstance.get(
+        `/customers/${customerId}/with-inquiries`,
+      );
+      if (response.data.status === "success") {
         setCustomerDetails(response.data.data);
       }
     } catch (error) {
-      console.error('Error fetching customer details:', error);
+      console.error("Error fetching customer details:", error);
     } finally {
       setLoadingDetails(false);
     }
@@ -124,33 +129,33 @@ export const CustomerTable = ({
   const calculateDropdownPosition = useCallback((customerId: string) => {
     const button = buttonRefs.current[customerId];
     if (!button) return;
-    
+
     const rect = button.getBoundingClientRect();
     const dropdownWidth = 224; // w-56 = 14rem = 224px
     const dropdownHeight = 350; // تقريبي
     const padding = 8;
-    
+
     // حساب الموقع الأفقي (من اليمين لأننا RTL)
     // نريد أن يظهر الـ dropdown بجانب الزر من جهة اليمين
     let left = rect.left - dropdownWidth + rect.width;
-    
+
     // إذا خرج من الجهة اليسرى، اجعله يبدأ من اليسار
     if (left < padding) {
       left = rect.left;
     }
-    
+
     // إذا خرج من الجهة اليمنى، اجعله بالقرب من الحافة اليمنى
     if (left + dropdownWidth > window.innerWidth - padding) {
       left = window.innerWidth - dropdownWidth - padding;
     }
-    
+
     // حساب الموقع العمودي
     let top = rect.bottom + padding;
-    
+
     // التحقق من الحدود السفلية
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
-    
+
     if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
       // اعرضه فوق الزر
       top = rect.top - dropdownHeight - padding;
@@ -159,21 +164,24 @@ export const CustomerTable = ({
         top = padding;
       }
     }
-    
+
     // تأكد من أن القمة لا تخرج من الشاشة
     if (top < padding) {
       top = padding;
     }
-    
+
     setDropdownPosition({ top, left });
   }, []);
 
   // إغلاق الـ dropdown عند الضغط خارجه أو السكرول
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         const isButton = Object.values(buttonRefs.current).some(
-          button => button && button.contains(event.target as Node)
+          (button) => button && button.contains(event.target as Node),
         );
         if (!isButton) {
           setOpenDropdownId(null);
@@ -199,13 +207,13 @@ export const CustomerTable = ({
     };
 
     if (openDropdownId) {
-      document.addEventListener('mousedown', handleClickOutside);
-      window.addEventListener('scroll', handleScroll, true); // true للـ capture phase
-      window.addEventListener('resize', handleResize);
+      document.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleScroll, true); // true للـ capture phase
+      window.addEventListener("resize", handleResize);
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-        window.removeEventListener('scroll', handleScroll, true);
-        window.removeEventListener('resize', handleResize);
+        document.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("scroll", handleScroll, true);
+        window.removeEventListener("resize", handleResize);
       };
     }
   }, [openDropdownId, calculateDropdownPosition]);
@@ -332,7 +340,7 @@ export const CustomerTable = ({
             </TableHeader>
             <TableBody>
               {filteredAndSortedCustomers.map((customer: any) => (
-                <TableRow 
+                <TableRow
                   key={customer.id}
                   className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   onClick={() => handleRowClick(customer.id)}
@@ -412,7 +420,7 @@ export const CustomerTable = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="max-w-[300px] min-w-[200px] sm:max-w-40 ">
-                      {customer.inquiry?.message || "غير محدد"}
+                    {customer.inquiry?.message || "غير محدد"}
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
@@ -438,10 +446,12 @@ export const CustomerTable = ({
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      
+
                       {/* Custom Dropdown Menu */}
                       <Button
-                        ref={(el) => { buttonRefs.current[customer.id] = el; }}
+                        ref={(el) => {
+                          buttonRefs.current[customer.id] = el;
+                        }}
                         variant="ghost"
                         size="icon"
                         onClick={(e) => {
@@ -460,128 +470,134 @@ export const CustomerTable = ({
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
-                      
+
                       {/* Dropdown Menu using Portal */}
-                      {openDropdownId === customer.id && dropdownPosition && typeof window !== 'undefined' && createPortal(
-                        <div 
-                          ref={dropdownRef}
-                          className="w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 max-h-[calc(100vh-16px)] overflow-y-auto"
-                          style={{ 
-                            position: 'fixed',
-                            top: `${dropdownPosition.top}px`,
-                            left: `${dropdownPosition.left}px`,
-                            zIndex: 9999,
-                            direction: 'rtl'
-                          }}
-                        >
-                          {/* تعديل العميل */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                              openEditDialog(customer);
+                      {openDropdownId === customer.id &&
+                        dropdownPosition &&
+                        typeof window !== "undefined" &&
+                        createPortal(
+                          <div
+                            ref={dropdownRef}
+                            className="w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 max-h-[calc(100vh-16px)] overflow-y-auto"
+                            style={{
+                              position: "fixed",
+                              top: `${dropdownPosition.top}px`,
+                              left: `${dropdownPosition.left}px`,
+                              zIndex: 9999,
+                              direction: "rtl",
                             }}
                           >
-                            <Edit className="ml-2 h-4 w-4" />
-                            تعديل العميل
-                          </button>
-
-                          {/* تعيين المرحلة */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                              setSelectedCustomerForStage(customer);
-                              setShowStageDialog(true);
-                            }}
-                          >
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                            تعيين المرحلة
-                          </button>
-
-                          {/* سجل النشاطات */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                            onClick={() => {
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                              const url = `/dashboard/activity-logs/customer/${customer.id}`;
-                              window.open(url, "_blank");
-                            }}
-                          >
-                            <Activity className="ml-2 h-4 w-4" />
-                            سجل النشاطات
-                          </button>
-
-                          {/* Separator */}
-                          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-
-                          {/* إرسال واتساب */}
-                          {hasValidWhatsAppChannel() && (
+                            {/* تعديل العميل */}
                             <button
                               className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
                               onClick={(e) => {
                                 e.preventDefault();
-                                e.stopPropagation();
                                 setOpenDropdownId(null);
                                 setDropdownPosition(null);
-                                setSelectedCustomerForWhatsApp(customer);
-                                setTimeout(() => setShowWhatsAppDialog(true), 50);
+                                openEditDialog(customer);
                               }}
                             >
-                              <MessageSquare className="ml-2 h-4 w-4" />
-                              إرسال واتساب
+                              <Edit className="ml-2 h-4 w-4" />
+                              تعديل العميل
                             </button>
-                          )}
 
-                          {/* اتصال هاتفي */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                            onClick={() => {
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                            }}
-                          >
-                            <Phone className="ml-2 h-4 w-4" />
-                            اتصال هاتفي
-                          </button>
+                            {/* تعيين المرحلة */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                setSelectedCustomerForStage(customer);
+                                setShowStageDialog(true);
+                              }}
+                            >
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                              تعيين المرحلة
+                            </button>
 
-                          {/* إرسال بريد إلكتروني */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                            onClick={() => {
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                            }}
-                          >
-                            <Mail className="ml-2 h-4 w-4" />
-                            إرسال بريد إلكتروني
-                          </button>
+                            {/* سجل النشاطات */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                                window.open(url, "_blank");
+                              }}
+                            >
+                              <Activity className="ml-2 h-4 w-4" />
+                              سجل النشاطات
+                            </button>
 
-                          {/* Separator */}
-                          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+                            {/* Separator */}
+                            <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
 
-                          {/* حذف */}
-                          <button
-                            className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
-                            onClick={() => {
-                              setOpenDropdownId(null);
-                              setDropdownPosition(null);
-                              handleDelete(customer.id);
-                            }}
-                          >
-                            <Trash2 className="ml-2 h-4 w-4" />
-                            حذف
-                          </button>
-                        </div>,
-                        document.body
-                      )}
+                            {/* إرسال واتساب */}
+                            {hasValidWhatsAppChannel() && (
+                              <button
+                                className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setOpenDropdownId(null);
+                                  setDropdownPosition(null);
+                                  setSelectedCustomerForWhatsApp(customer);
+                                  setTimeout(
+                                    () => setShowWhatsAppDialog(true),
+                                    50,
+                                  );
+                                }}
+                              >
+                                <MessageSquare className="ml-2 h-4 w-4" />
+                                إرسال واتساب
+                              </button>
+                            )}
+
+                            {/* اتصال هاتفي */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                              }}
+                            >
+                              <Phone className="ml-2 h-4 w-4" />
+                              اتصال هاتفي
+                            </button>
+
+                            {/* إرسال بريد إلكتروني */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                              }}
+                            >
+                              <Mail className="ml-2 h-4 w-4" />
+                              إرسال بريد إلكتروني
+                            </button>
+
+                            {/* Separator */}
+                            <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+
+                            {/* حذف */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                handleDelete(customer.id);
+                              }}
+                            >
+                              <Trash2 className="ml-2 h-4 w-4" />
+                              حذف
+                            </button>
+                          </div>,
+                          document.body,
+                        )}
                     </div>
-                    
+
                     {/* Dialog للتعديل */}
                     {formData && (
                       <Dialog open={open} onOpenChange={setOpen}>
@@ -669,278 +685,321 @@ export const CustomerTable = ({
       />
 
       {/* Custom Customer Details Dialog */}
-      {showCustomDialog && typeof window !== 'undefined' && createPortal(
-        <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={handleCloseCustomDialog}
-        >
-          <div 
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto m-4"
-            onClick={(e) => e.stopPropagation()}
-            style={{ direction: 'rtl' }}
+      {showCustomDialog &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+            onClick={handleCloseCustomDialog}
           >
-            {/* Header */}
-            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                تفاصيل العميل
-              </h2>
-              <button
-                onClick={handleCloseCustomDialog}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
+            <div
+              className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto m-4"
+              onClick={(e) => e.stopPropagation()}
+              style={{ direction: "rtl" }}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  تفاصيل العميل
+                </h2>
+                <button
+                  onClick={handleCloseCustomDialog}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
 
-            {/* Content */}
-            <div className="p-6">
-              {loadingDetails ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-              ) : customerDetails ? (
-                <div className="space-y-6">
-                  {/* Customer Info Section */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                      <Activity className="ml-2 h-5 w-5 text-blue-600" />
-                      معلومات العميل
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Name */}
-                      {customerDetails.customer?.name && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                            <Activity className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">الاسم</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.name}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Email */}
-                      {customerDetails.customer?.email && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                            <Mail className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">البريد الإلكتروني</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.email}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Phone */}
-                      {customerDetails.customer?.phone_number && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                            <Phone className="h-4 w-4 text-green-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">رقم الهاتف</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.phone_number}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* District */}
-                      {customerDetails.customer?.district?.name_ar && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-purple-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">الحي</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.district.name_ar}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* City */}
-                      {customerDetails.customer?.district?.city_name_ar && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-orange-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">المدينة</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.district.city_name_ar}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Type */}
-                      {customerDetails.customer?.type && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-indigo-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">النوع</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.type?.name || customerDetails.customer.type}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Stage */}
-                      {customerDetails.customer?.stage && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-pink-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">المرحلة</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.stage?.name || customerDetails.customer.stage}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Priority */}
-                      {customerDetails.customer?.priority && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-red-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">الأولوية</p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.priority?.name || customerDetails.customer.priority}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+              {/* Content */}
+              <div className="p-6">
+                {loadingDetails ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                   </div>
-
-                  {/* Inquiries Section */}
-                  {customerDetails.inquiries && customerDetails.inquiries.length > 0 && (
-                    <div>
+                ) : customerDetails ? (
+                  <div className="space-y-6">
+                    {/* Customer Info Section */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6">
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <MessageSquare className="ml-2 h-5 w-5 text-indigo-600" />
-                        الاستفسارات ({customerDetails.inquiries.length})
+                        <Activity className="ml-2 h-5 w-5 text-blue-600" />
+                        معلومات العميل
                       </h3>
-                      <div className="space-y-4">
-                        {customerDetails.inquiries.map((inquiry: any, index: number) => (
-                          <div 
-                            key={inquiry.id || index}
-                            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
-                          >
-                            <div className="space-y-3">
-                              {/* Message */}
-                              {inquiry.message && (
-                                <div>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">الرسالة</p>
-                                  <p className="text-base text-gray-900 dark:text-white">
-                                    {inquiry.message}
-                                  </p>
-                                </div>
-                              )}
-
-                              {/* Inquiry Details in Grid */}
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                {/* Inquiry Type */}
-                                {inquiry.inquiry_type && (
-                                  <div className="flex items-center">
-                                    <Badge variant="outline" className="border-blue-500 text-blue-700">
-                                      {inquiry.inquiry_type}
-                                    </Badge>
-                                  </div>
-                                )}
-
-                                {/* Property Type */}
-                                {inquiry.property_type && (
-                                  <div className="flex items-center">
-                                    <Badge variant="outline" className="border-green-500 text-green-700">
-                                      {inquiry.property_type}
-                                    </Badge>
-                                  </div>
-                                )}
-
-                                {/* Budget */}
-                                {inquiry.budget && (
-                                  <div className="text-sm">
-                                    <span className="text-gray-500 dark:text-gray-400">الميزانية: </span>
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                      {inquiry.budget} {inquiry.currency || ''}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {/* Location */}
-                                {inquiry.location && (
-                                  <div className="text-sm">
-                                    <span className="text-gray-500 dark:text-gray-400">الموقع: </span>
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                      {inquiry.location}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {/* City */}
-                                {inquiry.city && (
-                                  <div className="text-sm">
-                                    <span className="text-gray-500 dark:text-gray-400">المدينة: </span>
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                      {inquiry.city}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {/* District */}
-                                {inquiry.district && (
-                                  <div className="text-sm">
-                                    <span className="text-gray-500 dark:text-gray-400">الحي: </span>
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                      {inquiry.district}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Name */}
+                        {customerDetails.customer?.name && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                              <Activity className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                الاسم
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.name}
+                              </p>
                             </div>
                           </div>
-                        ))}
+                        )}
+
+                        {/* Email */}
+                        {customerDetails.customer?.email && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                              <Mail className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                البريد الإلكتروني
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.email}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Phone */}
+                        {customerDetails.customer?.phone_number && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                              <Phone className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                رقم الهاتف
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.phone_number}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* District */}
+                        {customerDetails.customer?.district?.name_ar && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                              <Tag className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                الحي
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.district.name_ar}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* City */}
+                        {customerDetails.customer?.district?.city_name_ar && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                              <Tag className="h-4 w-4 text-orange-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                المدينة
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.district.city_name_ar}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Type */}
+                        {customerDetails.customer?.type && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                              <Tag className="h-4 w-4 text-indigo-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                النوع
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.type?.name ||
+                                  customerDetails.customer.type}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Stage */}
+                        {customerDetails.customer?.stage && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center">
+                              <Tag className="h-4 w-4 text-pink-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                المرحلة
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.stage?.name ||
+                                  customerDetails.customer.stage}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Priority */}
+                        {customerDetails.customer?.priority && (
+                          <div className="flex items-start space-x-3 space-x-reverse">
+                            <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                              <Tag className="h-4 w-4 text-red-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                الأولوية
+                              </p>
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {customerDetails.customer.priority?.name ||
+                                  customerDetails.customer.priority}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 dark:text-gray-400">لا توجد بيانات متاحة</p>
-                </div>
-              )}
-            </div>
 
-            {/* Footer */}
-            <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
-              <button
-                onClick={handleCloseCustomDialog}
-                className="w-full sm:w-auto px-6 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors font-medium"
-              >
-                إغلاق
-              </button>
+                    {/* Inquiries Section */}
+                    {customerDetails.inquiries &&
+                      customerDetails.inquiries.length > 0 && (
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <MessageSquare className="ml-2 h-5 w-5 text-indigo-600" />
+                            الاستفسارات ({customerDetails.inquiries.length})
+                          </h3>
+                          <div className="space-y-4">
+                            {customerDetails.inquiries.map(
+                              (inquiry: any, index: number) => (
+                                <div
+                                  key={inquiry.id || index}
+                                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                                >
+                                  <div className="space-y-3">
+                                    {/* Message */}
+                                    {inquiry.message && (
+                                      <div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                          الرسالة
+                                        </p>
+                                        <p className="text-base text-gray-900 dark:text-white">
+                                          {inquiry.message}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Inquiry Details in Grid */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                      {/* Inquiry Type */}
+                                      {inquiry.inquiry_type && (
+                                        <div className="flex items-center">
+                                          <Badge
+                                            variant="outline"
+                                            className="border-blue-500 text-blue-700"
+                                          >
+                                            {inquiry.inquiry_type}
+                                          </Badge>
+                                        </div>
+                                      )}
+
+                                      {/* Property Type */}
+                                      {inquiry.property_type && (
+                                        <div className="flex items-center">
+                                          <Badge
+                                            variant="outline"
+                                            className="border-green-500 text-green-700"
+                                          >
+                                            {inquiry.property_type}
+                                          </Badge>
+                                        </div>
+                                      )}
+
+                                      {/* Budget */}
+                                      {inquiry.budget && (
+                                        <div className="text-sm">
+                                          <span className="text-gray-500 dark:text-gray-400">
+                                            الميزانية:{" "}
+                                          </span>
+                                          <span className="font-semibold text-gray-900 dark:text-white">
+                                            {inquiry.budget}{" "}
+                                            {inquiry.currency || ""}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {/* Location */}
+                                      {inquiry.location && (
+                                        <div className="text-sm">
+                                          <span className="text-gray-500 dark:text-gray-400">
+                                            الموقع:{" "}
+                                          </span>
+                                          <span className="font-semibold text-gray-900 dark:text-white">
+                                            {inquiry.location}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {/* City */}
+                                      {inquiry.city && (
+                                        <div className="text-sm">
+                                          <span className="text-gray-500 dark:text-gray-400">
+                                            المدينة:{" "}
+                                          </span>
+                                          <span className="font-semibold text-gray-900 dark:text-white">
+                                            {inquiry.city}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {/* District */}
+                                      {inquiry.district && (
+                                        <div className="text-sm">
+                                          <span className="text-gray-500 dark:text-gray-400">
+                                            الحي:{" "}
+                                          </span>
+                                          <span className="font-semibold text-gray-900 dark:text-white">
+                                            {inquiry.district}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      لا توجد بيانات متاحة
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+                <button
+                  onClick={handleCloseCustomDialog}
+                  className="w-full sm:w-auto px-6 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors font-medium"
+                >
+                  إغلاق
+                </button>
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

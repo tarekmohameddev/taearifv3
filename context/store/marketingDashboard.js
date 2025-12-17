@@ -19,14 +19,14 @@ export default (set, get) => ({
 
   fetchMarketingChannels: async () => {
     const state = get();
-  
+
     // ====== Anti-Spam Lock ======
     if (state.marketingChannels._fetchedOnce) return;
     // ============================
-  
+
     const token = useAuthStore.getState().userData?.token;
     if (!token) return;
-  
+
     set((s) => ({
       marketingChannels: {
         ...s.marketingChannels,
@@ -35,16 +35,15 @@ export default (set, get) => ({
         _fetchedOnce: true, // أول مرة فقط
       },
     }));
-  
-  
+
     try {
       const res = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels`,
       );
-  
+
       const whatsappChannels =
         res.data.data?.filter((c) => c.type === "whatsapp") || [];
-  
+
       set((s) => ({
         marketingChannels: {
           ...s.marketingChannels,
@@ -53,7 +52,6 @@ export default (set, get) => ({
           _fetchedOnce: true,
         },
       }));
-  
     } catch (err) {
       set((s) => ({
         marketingChannels: {
@@ -65,7 +63,6 @@ export default (set, get) => ({
       }));
     }
   },
-  
 
   setMarketingChannels: (updates) =>
     set((state) => ({

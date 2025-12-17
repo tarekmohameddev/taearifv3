@@ -22,6 +22,7 @@ GOOGLE_CLIENT_SECRET=(من Google Cloud Console)
 ```
 
 **كيف:**
+
 1. Vercel Dashboard → Your Project
 2. Settings → Environment Variables
 3. Add → أضف المتغيرات الثلاثة
@@ -34,6 +35,7 @@ GOOGLE_CLIENT_SECRET=(من Google Cloud Console)
 [console.cloud.google.com](https://console.cloud.google.com/) → APIs & Services → Credentials
 
 **Authorized redirect URIs:**
+
 ```
 ✅ https://www.taearif.com/api/auth/callback/google
                               ^^^^^^^^ ^^^^^^
@@ -41,6 +43,7 @@ GOOGLE_CLIENT_SECRET=(من Google Cloud Console)
 ```
 
 **❌ ليس:**
+
 ```
 ❌ https://www.taearif.com/api/auth/google/callback
 ```
@@ -60,18 +63,21 @@ git push origin main
 ## 🎯 النقاط الحرجة
 
 ### ⚠️ مهم جداً #1: ترتيب الكلمات
+
 ```
 ❌ /api/auth/google/callback    (google أولاً)
 ✅ /api/auth/callback/google    (callback أولاً)
 ```
 
 ### ⚠️ مهم جداً #2: https و www
+
 ```env
 ❌ NEXTAUTH_URL=http://taearif.com
 ✅ NEXTAUTH_URL=https://www.taearif.com
 ```
 
 ### ⚠️ مهم جداً #3: التطابق التام
+
 ```
 Google Console Redirect URI:
 https://www.taearif.com/api/auth/callback/google
@@ -93,6 +99,7 @@ https://www.taearif.com/api/auth/callback/google
 ### التفسير:
 
 NextAuth.js يصنع تلقائياً route pattern:
+
 ```
 /api/auth/[action]/[provider]
           ^^^^^^^^ ^^^^^^^^^^
@@ -105,6 +112,7 @@ NextAuth.js يصنع تلقائياً route pattern:
 ```
 
 عندما تفتح `/api/auth/google/callback`، NextAuth يحاول قراءتها كـ:
+
 ```
 /api/auth/google/callback
           ^^^^^^ ^^^^^^^^
@@ -134,12 +142,10 @@ provider = "callback" ← ليس provider صحيح!
 
 6. **املأ:**
    - Name: "Taearif Production"
-   
    - **Authorized JavaScript origins:**
      ```
      https://www.taearif.com
      ```
-   
    - **Authorized redirect URIs:**
      ```
      https://www.taearif.com/api/auth/callback/google
@@ -168,6 +174,7 @@ provider = "callback" ← ليس provider صحيح!
 ## 🐛 إذا استمرت المشكلة
 
 ### خطأ: "redirect_uri_mismatch"
+
 ```
 ✅ تأكد: NEXTAUTH_URL = https://www.taearif.com
 ✅ تأكد: Google Redirect URI = https://www.taearif.com/api/auth/callback/google
@@ -175,6 +182,7 @@ provider = "callback" ← ليس provider صحيح!
 ```
 
 ### خطأ: "Invalid client"
+
 ```
 ✅ راجع GOOGLE_CLIENT_ID
 ✅ راجع GOOGLE_CLIENT_SECRET
@@ -182,6 +190,7 @@ provider = "callback" ← ليس provider صحيح!
 ```
 
 ### خطأ: "This action with HTTP GET is not supported"
+
 ```
 ✅ لا تفتح callback URL مباشرة
 ✅ استخدم signIn("google") بدلاً من ذلك
@@ -203,11 +212,13 @@ provider = "callback" ← ليس provider صحيح!
 **لا تحاول فتح callback URL مباشرة في المتصفح!**
 
 ❌ خاطئ:
+
 ```
 window.location.href = "https://www.taearif.com/api/auth/callback/google?code=..."
 ```
 
 ✅ صحيح:
+
 ```typescript
 import { signIn } from "next-auth/react";
 signIn("google");
@@ -230,11 +241,10 @@ signIn("google");
 ✅ Google OAuth يعمل بشكل صحيح  
 ✅ تسجيل دخول سلس  
 ✅ لا أخطاء  
-✅ تجربة مستخدم ممتازة  
+✅ تجربة مستخدم ممتازة
 
 ---
 
 **الحالة:** ✅ جاهز للتطبيق  
 **آخر تحديث:** 24 أكتوبر 2025  
 **المدة:** 20-25 دقيقة
-

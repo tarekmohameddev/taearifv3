@@ -167,11 +167,13 @@ interface CrmStore {
       iconName: string;
     }>,
   ) => void;
-  setNewDealData: (data: {
-    customer_name?: string;
-    customer_phone?: string;
-    stage_id?: string;
-  } | null) => void;
+  setNewDealData: (
+    data: {
+      customer_name?: string;
+      customer_phone?: string;
+      stage_id?: string;
+    } | null,
+  ) => void;
   clearNewDealData: () => void;
 }
 

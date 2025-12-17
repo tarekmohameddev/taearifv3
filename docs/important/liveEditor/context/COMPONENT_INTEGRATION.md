@@ -46,7 +46,7 @@ This document explains how `components/tenant/*` integrate with `context-liveedi
    ↓
    const heroStates = useEditorStore(s => s.heroStates)
    const storeData = heroStates[uniqueId]
-   
+
 4. DATA MERGING
    ↓
    const mergedData = {
@@ -100,7 +100,7 @@ interface HeroProps {
   visible?: boolean;
   height?: { desktop?: string; tablet?: string; mobile?: string };
   // ... all component-specific props
-  
+
   // Editor props
   variant?: string;
   useStore?: boolean;
@@ -111,13 +111,13 @@ interface HeroProps {
 // 3. COMPONENT FUNCTION
 // ═══════════════════════════════════════════════════════════
 export default function Hero1(props: HeroProps) {
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.1 EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "hero1";
   const uniqueId = props.id || variantId;
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.2 CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
@@ -125,9 +125,9 @@ export default function Hero1(props: HeroProps) {
   const getComponentData = useEditorStore(s => s.getComponentData);
   const heroStates = useEditorStore(s => s.heroStates);
   const globalHeaderData = useEditorStore(s => s.globalHeaderData);
-  
+
   const tenantData = useTenantStore(s => s.tenantData);
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.3 INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -138,18 +138,18 @@ export default function Hero1(props: HeroProps) {
         ...getDefaultHeroData(),
         ...props
       };
-      
+
       // Initialize in store
       ensureComponentVariant("hero", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore]);
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.4 RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = heroStates[uniqueId];
   const currentStoreData = getComponentData("hero", uniqueId);
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.5 MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
@@ -159,7 +159,7 @@ export default function Hero1(props: HeroProps) {
     ...currentStoreData,         // 3. Current store data
     ...props                     // 4. Props (highest priority)
   };
-  
+
   // ─────────────────────────────────────────────────────────
   // 3.6 RENDER
   // ─────────────────────────────────────────────────────────
@@ -189,7 +189,7 @@ USER ADDS COMPONENT TO PAGE
    └─ component.componentName = "hero1"
 
 2. Component mounts with props:
-   <Hero1 
+   <Hero1
      id="abc-123-def-456"
      variant="hero1"
      useStore={true}
@@ -425,11 +425,11 @@ export default function Hero1(props) {
   // Unique ID
   const variantId = props.variant || "hero1";
   const uniqueId = props.id || variantId;
-  
+
   // Store connections
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const heroStates = useEditorStore(s => s.heroStates);
-  
+
   // Initialize
   useEffect(() => {
     if (props.useStore) {
@@ -439,21 +439,21 @@ export default function Hero1(props) {
       });
     }
   }, [uniqueId, props.useStore]);
-  
+
   // Retrieve data
   const storeData = heroStates[uniqueId];
-  
+
   // Merge
   const mergedData = {
     ...getDefaultHeroData(),
     ...storeData,
     ...props
   };
-  
+
   // Render
   return (
-    <section 
-      style={{ 
+    <section
+      style={{
         height: mergedData.height?.desktop,
         backgroundImage: `url(${mergedData.background?.image})`
       }}
@@ -501,12 +501,12 @@ import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/
 
 export default function Header1(props) {
   const uniqueId = props.id || "header1";
-  
+
   // Store connections
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const headerStates = useEditorStore(s => s.headerStates);
   const globalHeaderData = useEditorStore(s => s.globalHeaderData);
-  
+
   // Initialize
   useEffect(() => {
     if (props.useStore) {
@@ -516,10 +516,10 @@ export default function Header1(props) {
       });
     }
   }, [uniqueId, props.useStore]);
-  
+
   // Retrieve data
   const storeData = headerStates[uniqueId];
-  
+
   // Merge (with global data priority)
   const mergedData = {
     ...getDefaultHeaderData(),
@@ -527,7 +527,7 @@ export default function Header1(props) {
     ...globalHeaderData,  // ← GLOBAL DATA PRIORITY
     ...props
   };
-  
+
   // Render
   return (
     <header style={{ background: mergedData.background?.colors?.from }}>
@@ -570,11 +570,11 @@ import { getDefaultHalfTextHalfImageData } from "@/context-liveeditor/editorStor
 
 export default function HalfTextHalfImage1(props) {
   const uniqueId = props.id || "halfTextHalfImage1";
-  
+
   // Store connections
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const halfTextHalfImageStates = useEditorStore(s => s.halfTextHalfImageStates);
-  
+
   // Initialize
   useEffect(() => {
     if (props.useStore) {
@@ -584,17 +584,17 @@ export default function HalfTextHalfImage1(props) {
       });
     }
   }, [uniqueId, props.useStore]);
-  
+
   // Retrieve data
   const storeData = halfTextHalfImageStates[uniqueId];
-  
+
   // Merge
   const mergedData = {
     ...getDefaultHalfTextHalfImageData(),
     ...storeData,
     ...props
   };
-  
+
   // Render
   return (
     <section>
@@ -623,11 +623,12 @@ halfTextHalfImage3.tsx → getDefaultHalfTextHalfImage3Data()
 
 ```typescript
 // In halfTextHalfImageFunctions.ensureVariant
-const defaultData = variantId === "halfTextHalfImage2"
-  ? getDefaultHalfTextHalfImage2Data()
-  : variantId === "halfTextHalfImage3"
-  ? getDefaultHalfTextHalfImage3Data()
-  : getDefaultHalfTextHalfImageData();
+const defaultData =
+  variantId === "halfTextHalfImage2"
+    ? getDefaultHalfTextHalfImage2Data()
+    : variantId === "halfTextHalfImage3"
+      ? getDefaultHalfTextHalfImage3Data()
+      : getDefaultHalfTextHalfImageData();
 ```
 
 ---
@@ -636,27 +637,27 @@ const defaultData = variantId === "halfTextHalfImage2"
 
 ### Complete Mapping Table
 
-| Component Directory | Component Type | Functions File | Store Property | Variants |
-|---------------------|----------------|----------------|----------------|----------|
-| components/tenant/hero | hero | heroFunctions.ts | heroStates | 2 |
-| components/tenant/header | header | headerFunctions.ts | headerStates, globalHeaderData | 1 |
-| components/tenant/footer | footer | footerFunctions.ts | footerStates, globalFooterData | 1 |
-| components/tenant/halfTextHalfImage | halfTextHalfImage | halfTextHalfImageFunctions.ts | halfTextHalfImageStates | 3 |
-| components/tenant/propertySlider | propertySlider | propertySliderFunctions.ts | propertySliderStates | 1 |
-| components/tenant/ctaValuation | ctaValuation | ctaValuationFunctions.ts | ctaValuationStates | 1 |
-| components/tenant/stepsSection | stepsSection | stepsSectionFunctions.ts | stepsSectionStates | 1 |
-| components/tenant/testimonials | testimonials | testimonialsFunctions.ts | testimonialsStates | 1 |
-| components/tenant/whyChooseUs | whyChooseUs | whyChooseUsFunctions.ts | whyChooseUsStates | 1 |
-| components/tenant/contactMapSection | contactMapSection | contactMapSectionFunctions.ts | contactMapSectionStates | 1 |
-| components/tenant/grid | grid | gridFunctions.ts | gridStates | 1 |
-| components/tenant/filterButtons | filterButtons | filterButtonsFunctions.ts | filterButtonsStates | 1 |
-| components/tenant/propertyFilter | propertyFilter | propertyFilterFunctions.ts | propertyFilterStates | 1 |
-| components/tenant/mapSection | mapSection | mapSectionFunctions.ts | mapSectionStates | 1 |
-| components/tenant/contactFormSection | contactFormSection | contactFormSectionFunctions.ts | contactFormSectionStates | 1 |
-| components/tenant/contactCards | contactCards | contactCardsFunctions.ts | contactCardsStates | 1 |
-| components/tenant/inputs | inputs | inputsFunctions.ts | inputsStates | 1 |
-| components/tenant/inputs2 | inputs2 | inputs2Functions.ts | inputs2States | 1 |
-| components/tenant/property/applicationForm | applicationForm | applicationFormFunctions.ts | applicationFormStates | 1 |
+| Component Directory                        | Component Type     | Functions File                 | Store Property                 | Variants |
+| ------------------------------------------ | ------------------ | ------------------------------ | ------------------------------ | -------- |
+| components/tenant/hero                     | hero               | heroFunctions.ts               | heroStates                     | 2        |
+| components/tenant/header                   | header             | headerFunctions.ts             | headerStates, globalHeaderData | 1        |
+| components/tenant/footer                   | footer             | footerFunctions.ts             | footerStates, globalFooterData | 1        |
+| components/tenant/halfTextHalfImage        | halfTextHalfImage  | halfTextHalfImageFunctions.ts  | halfTextHalfImageStates        | 3        |
+| components/tenant/propertySlider           | propertySlider     | propertySliderFunctions.ts     | propertySliderStates           | 1        |
+| components/tenant/ctaValuation             | ctaValuation       | ctaValuationFunctions.ts       | ctaValuationStates             | 1        |
+| components/tenant/stepsSection             | stepsSection       | stepsSectionFunctions.ts       | stepsSectionStates             | 1        |
+| components/tenant/testimonials             | testimonials       | testimonialsFunctions.ts       | testimonialsStates             | 1        |
+| components/tenant/whyChooseUs              | whyChooseUs        | whyChooseUsFunctions.ts        | whyChooseUsStates              | 1        |
+| components/tenant/contactMapSection        | contactMapSection  | contactMapSectionFunctions.ts  | contactMapSectionStates        | 1        |
+| components/tenant/grid                     | grid               | gridFunctions.ts               | gridStates                     | 1        |
+| components/tenant/filterButtons            | filterButtons      | filterButtonsFunctions.ts      | filterButtonsStates            | 1        |
+| components/tenant/propertyFilter           | propertyFilter     | propertyFilterFunctions.ts     | propertyFilterStates           | 1        |
+| components/tenant/mapSection               | mapSection         | mapSectionFunctions.ts         | mapSectionStates               | 1        |
+| components/tenant/contactFormSection       | contactFormSection | contactFormSectionFunctions.ts | contactFormSectionStates       | 1        |
+| components/tenant/contactCards             | contactCards       | contactCardsFunctions.ts       | contactCardsStates             | 1        |
+| components/tenant/inputs                   | inputs             | inputsFunctions.ts             | inputsStates                   | 1        |
+| components/tenant/inputs2                  | inputs2            | inputs2Functions.ts            | inputs2States                  | 1        |
+| components/tenant/property/applicationForm | applicationForm    | applicationFormFunctions.ts    | applicationFormStates          | 1        |
 
 ---
 
@@ -667,29 +668,33 @@ const defaultData = variantId === "halfTextHalfImage2"
 **Behavior**: Shared across ALL pages
 
 **Store Properties**:
+
 - `globalHeaderData` - Current global header
 - `globalFooterData` - Current global footer
 - `globalComponentsData.header` - Unified header
 - `globalComponentsData.footer` - Unified footer
 
 **Update Functions**:
+
 ```typescript
-updateGlobalHeaderByPath(path, value)
-updateGlobalFooterByPath(path, value)
-updateGlobalComponentByPath("header", path, value)
+updateGlobalHeaderByPath(path, value);
+updateGlobalFooterByPath(path, value);
+updateGlobalComponentByPath("header", path, value);
 ```
 
 **Merge Priority in Component**:
+
 ```typescript
 const mergedData = {
   ...getDefaultHeaderData(),
   ...storeData,
-  ...globalHeaderData,  // ← Global data overrides
-  ...props
+  ...globalHeaderData, // ← Global data overrides
+  ...props,
 };
 ```
 
 **Save Payload**:
+
 ```json
 {
   "globalComponentsData": {
@@ -705,26 +710,29 @@ const mergedData = {
 ### Case 2: Multiple Variants (Hero, HalfTextHalfImage)
 
 **Hero Variants**:
+
 - `hero1` - Full hero with search form
 - `hero2` - Simple hero for interior pages
 
 **HalfTextHalfImage Variants**:
+
 - `halfTextHalfImage1` - Basic text/image split
 - `halfTextHalfImage2` - With stats counters
 - `halfTextHalfImage3` - Simplified for about pages
 
 **Variant Detection**:
+
 ```typescript
 // In component
 const variantId = props.variant || "hero1";
 
 // In functions
-const defaultData = variantId === "hero2"
-  ? getDefaultHero2Data()
-  : getDefaultHeroData();
+const defaultData =
+  variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
 ```
 
 **Store Structure**:
+
 ```typescript
 heroStates: {
   "abc-hero1-instance": { ... hero1 data ... },
@@ -740,11 +748,11 @@ heroStates: {
 
 ```typescript
 // contactCardsFunctions has 20+ helper functions
-addContactCard(currentData, card)
-removeContactCard(currentData, index)
-updateContactCard(currentData, index, updates)
-validate(data) // Returns { isValid, errors }
-reorderCards(currentData, fromIndex, toIndex)
+addContactCard(currentData, card);
+removeContactCard(currentData, index);
+updateContactCard(currentData, index, updates);
+validate(data); // Returns { isValid, errors }
+reorderCards(currentData, fromIndex, toIndex);
 ```
 
 **Usage in EditorSidebar**:
@@ -782,7 +790,7 @@ logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
   existingData: state.halfTextHalfImageStates[variantId]
     ? Object.keys(state.halfTextHalfImageStates[variantId])
     : [],
-  allVariants: Object.keys(state.halfTextHalfImageStates)
+  allVariants: Object.keys(state.halfTextHalfImageStates),
 });
 ```
 
@@ -790,10 +798,10 @@ logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
 
 ```javascript
 // In browser console
-localStorage.getItem("editor-debug-logs")
+localStorage.getItem("editor-debug-logs");
 // Or
-window.debugLogger.getAllLogs()
-window.debugLogger.getChangeLogsAsString()
+window.debugLogger.getAllLogs();
+window.debugLogger.getChangeLogsAsString();
 ```
 
 ---
@@ -804,11 +812,11 @@ window.debugLogger.getChangeLogsAsString()
 
 ```typescript
 const mergedData = {
-  ...getDefaultData(),        // 1. Component defaults (lowest)
-  ...storeData,               // 2. Store state
-  ...currentStoreData,        // 3. Current store data
-  ...globalData,              // 4. Global data (header/footer only)
-  ...props                    // 5. Props (highest priority)
+  ...getDefaultData(), // 1. Component defaults (lowest)
+  ...storeData, // 2. Store state
+  ...currentStoreData, // 3. Current store data
+  ...globalData, // 4. Global data (header/footer only)
+  ...props, // 5. Props (highest priority)
 };
 ```
 
@@ -822,9 +830,9 @@ const finalData = deepMerge(globalComponentsData.header, tempData);
 const deepMerge = (target, source) => {
   if (!source || typeof source !== "object") return target || source;
   if (!target || typeof target !== "object") return source;
-  
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
       if (
@@ -838,7 +846,7 @@ const deepMerge = (target, source) => {
       }
     }
   }
-  
+
   return result;
 };
 ```
@@ -849,14 +857,14 @@ const deepMerge = (target, source) => {
 
 ```typescript
 // Without deep merge
-target = { content: { title: "Old", subtitle: "Keep" } }
-source = { content: { title: "New" } }
-result = { content: { title: "New" } }  // ❌ Lost subtitle!
+target = { content: { title: "Old", subtitle: "Keep" } };
+source = { content: { title: "New" } };
+result = { content: { title: "New" } }; // ❌ Lost subtitle!
 
 // With deep merge
-target = { content: { title: "Old", subtitle: "Keep" } }
-source = { content: { title: "New" } }
-result = { content: { title: "New", subtitle: "Keep" } }  // ✅ Preserved!
+target = { content: { title: "Old", subtitle: "Keep" } };
+source = { content: { title: "New" } };
+result = { content: { title: "New", subtitle: "Keep" } }; // ✅ Preserved!
 ```
 
 ---
@@ -897,4 +905,3 @@ result = { content: { title: "New", subtitle: "Keep" } }  // ✅ Preserved!
 ---
 
 **For AI**: Understand this integration pattern and you'll understand how ALL components work in the Live Editor system.
-

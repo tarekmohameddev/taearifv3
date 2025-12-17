@@ -12,15 +12,17 @@ import * as ReactIconsMd from "react-icons/md";
 import type { IconType } from "react-icons";
 
 // Function to get icon component based on type or name
-const getStepIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+const getStepIcon = (
+  typeOrName: string,
+): LucideIcon | IconType | React.ComponentType<any> => {
   // Legacy icon mapping for backward compatibility
   const legacyIconMap: Record<string, LucideIcon> = {
-    step1: LucideIcons.Search,        // Property Inspection
-    step2: LucideIcons.FileText,      // Property Description
-    step3: LucideIcons.Camera,        // Professional Photography
-    step4: LucideIcons.Megaphone,     // Marketing Strategy
-    step5: LucideIcons.Globe,         // Online Listing
-    step6: LucideIcons.Users,         // Client Communication
+    step1: LucideIcons.Search, // Property Inspection
+    step2: LucideIcons.FileText, // Property Description
+    step3: LucideIcons.Camera, // Professional Photography
+    step4: LucideIcons.Megaphone, // Marketing Strategy
+    step5: LucideIcons.Globe, // Online Listing
+    step6: LucideIcons.Users, // Client Communication
   };
 
   // Check legacy icons first
@@ -406,46 +408,48 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#f2fbf9", // light background default
   };
 
   // Helper function to get color based on useDefaultColor and globalColorType
-  const getColor = (
-    fieldPath: string,
-    defaultColor?: string
-  ): string => {
+  const getColor = (fieldPath: string, defaultColor?: string): string => {
     // Use primary color as default, fallback to #059669 if primary not available
-    const effectiveDefaultColor = defaultColor || brandingColors.primary || "#059669";
+    const effectiveDefaultColor =
+      defaultColor || brandingColors.primary || "#059669";
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "background.color", "icon.color")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
-    
+
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check in background, iconStyle, titleStyle, descriptionStyle directly
     // First check styling.icon.color, then iconStyle.color
     if (fieldPath === "icon.color") {
@@ -468,71 +472,115 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     } else if (fieldPath === "header.title.color") {
       // Check styling.header.title.color first, then header.title.color
       const stylingHeaderTitleColor = mergedData?.styling?.header?.title?.color;
-      if (stylingHeaderTitleColor !== undefined && stylingHeaderTitleColor !== null) {
+      if (
+        stylingHeaderTitleColor !== undefined &&
+        stylingHeaderTitleColor !== null
+      ) {
         fieldData = stylingHeaderTitleColor;
       } else {
         fieldData = mergedData?.header?.title?.color;
       }
     } else if (fieldPath === "title.color") {
       // Check in steps array for titleStyle.color, then styling.title.color
-      fieldData = mergedData?.steps?.[0]?.titleStyle?.color || mergedData?.styling?.title?.color;
+      fieldData =
+        mergedData?.steps?.[0]?.titleStyle?.color ||
+        mergedData?.styling?.title?.color;
     } else if (fieldPath === "description.color") {
       // Check in steps array for descriptionStyle.color, then styling.description.color
-      fieldData = mergedData?.steps?.[0]?.descriptionStyle?.color || mergedData?.styling?.description?.color;
-    } else if (!fieldData || (typeof fieldData === 'object' && !fieldData.value && !fieldData.useDefaultColor)) {
+      fieldData =
+        mergedData?.steps?.[0]?.descriptionStyle?.color ||
+        mergedData?.styling?.description?.color;
+    } else if (
+      !fieldData ||
+      (typeof fieldData === "object" &&
+        !fieldData.value &&
+        !fieldData.useDefaultColor)
+    ) {
       // For other paths, try to get from mergedData directly
       if (fieldPath === "background.color") {
         fieldData = mergedData?.background?.color;
       }
     }
-    
+
     // Check if fieldData is a custom color (string starting with #)
     // If it is, return it directly (useDefaultColor is false)
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
       // If object has useDefaultColor property set to false, use the value
-      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.useDefaultColor === false &&
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
       // If object has value but useDefaultColor is true or undefined, still check value first
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         // Check if useDefaultColor is explicitly false
         if (fieldData.useDefaultColor === false) {
           return fieldData.value;
         }
       }
     }
-    
+
     // If no custom color found, use branding color (useDefaultColor is true by default)
     // Determine globalColorType based on field path
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("background") || fieldPath.includes("Background")) {
       defaultGlobalColorType = "primary"; // Background uses primary color (with opacity applied separately)
-    } else if (fieldPath.includes("header.title") || fieldPath.includes("Header.Title")) {
+    } else if (
+      fieldPath.includes("header.title") ||
+      fieldPath.includes("Header.Title")
+    ) {
       // Header title uses primary color
       defaultGlobalColorType = "primary";
-    } else if (fieldPath === "title.color" || (fieldPath.includes("title") && !fieldPath.includes("header"))) {
+    } else if (
+      fieldPath === "title.color" ||
+      (fieldPath.includes("title") && !fieldPath.includes("header"))
+    ) {
       // Step titles use primary color (not header titles)
       defaultGlobalColorType = "primary";
-    } else if (fieldPath.includes("Title") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+    } else if (
+      fieldPath.includes("Title") ||
+      fieldPath.includes("textColor") ||
+      fieldPath.includes("Text")
+    ) {
       defaultGlobalColorType = "secondary";
-    } else if (fieldPath.includes("description") || fieldPath.includes("Description")) {
+    } else if (
+      fieldPath.includes("description") ||
+      fieldPath.includes("Description")
+    ) {
       defaultGlobalColorType = "secondary";
     } else if (fieldPath.includes("icon") || fieldPath.includes("Icon")) {
       defaultGlobalColorType = "primary";
     }
-    
+
     // If fieldData is an object with globalColorType, use it
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData) &&
+      fieldData.globalColorType
+    ) {
       defaultGlobalColorType = fieldData.globalColorType;
     }
-    
+
     // Use primary color as default, fallback to #059669 if primary not available
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors];
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors];
     // If branding color exists and is valid, use it; otherwise use effectiveDefaultColor
     if (brandingColor && brandingColor.trim() !== "") {
       return brandingColor;
@@ -545,9 +593,9 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   const getColorWithOpacity = (hex: string, opacity: number = 0.1): string => {
     // Use primary color as default if hex is invalid
     const defaultColor = brandingColors.primary || "#059669";
-    if (!hex || !hex.startsWith('#')) {
+    if (!hex || !hex.startsWith("#")) {
       // Parse default color
-      const cleanDefaultHex = defaultColor.replace('#', '');
+      const cleanDefaultHex = defaultColor.replace("#", "");
       if (cleanDefaultHex.length === 6) {
         const r = parseInt(cleanDefaultHex.substr(0, 2), 16);
         const g = parseInt(cleanDefaultHex.substr(2, 2), 16);
@@ -556,11 +604,11 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
       }
       return `rgba(5, 150, 105, ${opacity})`; // emerald-600 fallback
     }
-    
-    const cleanHex = hex.replace('#', '');
+
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) {
       // Parse default color
-      const cleanDefaultHex = defaultColor.replace('#', '');
+      const cleanDefaultHex = defaultColor.replace("#", "");
       if (cleanDefaultHex.length === 6) {
         const r = parseInt(cleanDefaultHex.substr(0, 2), 16);
         const g = parseInt(cleanDefaultHex.substr(2, 2), 16);
@@ -569,11 +617,11 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
       }
       return `rgba(5, 150, 105, ${opacity})`;
     }
-    
+
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
@@ -588,18 +636,28 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   // Don't pass defaultColor to getColor, let it use primary as default internally
   const backgroundBaseColor = getColor("background.color");
   // Ensure we have a valid hex color, use primary as default, fallback to #059669 if primary not available
-  const validBackgroundColor = (backgroundBaseColor && backgroundBaseColor.startsWith('#')) 
-    ? backgroundBaseColor 
-    : (brandingColors.primary && brandingColors.primary.trim() !== "" ? brandingColors.primary : "#059669");
-  const backgroundColor = getColorWithOpacity(getColor("icon.color", brandingColors.primary), 0.2);
+  const validBackgroundColor =
+    backgroundBaseColor && backgroundBaseColor.startsWith("#")
+      ? backgroundBaseColor
+      : brandingColors.primary && brandingColors.primary.trim() !== ""
+        ? brandingColors.primary
+        : "#059669";
+  const backgroundColor = getColorWithOpacity(
+    getColor("icon.color", brandingColors.primary),
+    0.2,
+  );
   const iconColor = getColor("icon.color", brandingColors.primary);
   const titleColor = getColor("title.color", brandingColors.primary); // Step titles use primary color
-  const descriptionColor = getColor("description.color", brandingColors.secondary);
+  const descriptionColor = getColor(
+    "description.color",
+    brandingColors.secondary,
+  );
   // Get header title color - check styling.header.title.color first, then use primary color
-  const headerTitleColor = getColor("header.title.color", brandingColors.primary) ||
-                          mergedData?.styling?.header?.title?.color || 
-                          mergedData?.header?.title?.color || 
-                          brandingColors.primary;
+  const headerTitleColor =
+    getColor("header.title.color", brandingColors.primary) ||
+    mergedData?.styling?.header?.title?.color ||
+    mergedData?.header?.title?.color ||
+    brandingColors.primary;
 
   return (
     <section className="w-full bg-background sm:py-16 ">
@@ -646,41 +704,45 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
               <div className="mt-1 shrink-0" style={{ color: iconColor }}>
                 {(() => {
                   // Priority: name > type > default
-                  const iconNameOrType = typeof step.image === "object" && step.image !== null
-                    ? (step.image.name || step.image.type || "step1")
-                    : "step1";
+                  const iconNameOrType =
+                    typeof step.image === "object" && step.image !== null
+                      ? step.image.name || step.image.type || "step1"
+                      : "step1";
                   const IconComponent = getStepIcon(iconNameOrType);
-                  
+
                   // Get icon size
-                  const iconSize = typeof step.image === "object" && step.image !== null
-                    ? (typeof step.image.size === "number" 
-                        ? step.image.size 
-                        : parseInt(step.image.size || "80"))
-                    : 80;
-                  
+                  const iconSize =
+                    typeof step.image === "object" && step.image !== null
+                      ? typeof step.image.size === "number"
+                        ? step.image.size
+                        : parseInt(step.image.size || "80")
+                      : 80;
+
                   // Get icon className
-                  const iconClassName = typeof step.image === "object" && step.image !== null
-                    ? (step.image.className || "w-20 h-20")
-                    : "w-20 h-20";
-                  
+                  const iconClassName =
+                    typeof step.image === "object" && step.image !== null
+                      ? step.image.className || "w-20 h-20"
+                      : "w-20 h-20";
+
                   // Check if it's a React Icon (from react-icons) by checking the icon name pattern
-                  const isReactIcon = iconNameOrType.startsWith('Fa') || 
-                                     iconNameOrType.startsWith('Md') || 
-                                     iconNameOrType.startsWith('Io') ||
-                                     iconNameOrType.startsWith('Bi') ||
-                                     iconNameOrType.startsWith('Bs') ||
-                                     iconNameOrType.startsWith('Hi') ||
-                                     iconNameOrType.startsWith('Ai') ||
-                                     iconNameOrType.startsWith('Ti') ||
-                                     iconNameOrType.startsWith('Gi') ||
-                                     iconNameOrType.startsWith('Si') ||
-                                     iconNameOrType.startsWith('Ri') ||
-                                     iconNameOrType.startsWith('Tb') ||
-                                     iconNameOrType.startsWith('Vsc') ||
-                                     iconNameOrType.startsWith('Wi') ||
-                                     iconNameOrType.startsWith('Di') ||
-                                     iconNameOrType.startsWith('Im');
-                  
+                  const isReactIcon =
+                    iconNameOrType.startsWith("Fa") ||
+                    iconNameOrType.startsWith("Md") ||
+                    iconNameOrType.startsWith("Io") ||
+                    iconNameOrType.startsWith("Bi") ||
+                    iconNameOrType.startsWith("Bs") ||
+                    iconNameOrType.startsWith("Hi") ||
+                    iconNameOrType.startsWith("Ai") ||
+                    iconNameOrType.startsWith("Ti") ||
+                    iconNameOrType.startsWith("Gi") ||
+                    iconNameOrType.startsWith("Si") ||
+                    iconNameOrType.startsWith("Ri") ||
+                    iconNameOrType.startsWith("Tb") ||
+                    iconNameOrType.startsWith("Vsc") ||
+                    iconNameOrType.startsWith("Wi") ||
+                    iconNameOrType.startsWith("Di") ||
+                    iconNameOrType.startsWith("Im");
+
                   // For React Icons, use style with fontSize
                   if (isReactIcon) {
                     return (
@@ -695,7 +757,7 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
                       />
                     );
                   }
-                  
+
                   // For Lucide icons, use size prop
                   return (
                     <IconComponent
@@ -709,7 +771,7 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
                 })()}
               </div>
               <div>
-                <h3 
+                <h3
                   className="text-lg sm:text-2xl"
                   style={{
                     color: step.titleStyle?.color || titleColor,
@@ -719,7 +781,7 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
                 >
                   {step.title}
                 </h3>
-                <p 
+                <p
                   className="sm:mt-2 text-sm sm:text-md leading-7"
                   style={{
                     color: step.descriptionStyle?.color || descriptionColor,

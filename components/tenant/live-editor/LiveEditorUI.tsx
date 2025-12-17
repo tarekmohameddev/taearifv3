@@ -105,7 +105,9 @@ const loadHeaderComponent = (componentName: string) => {
 
   if (headerComponentMap[componentName]) {
     // Wrap in lazy for Suspense compatibility
-    const component = lazy(() => Promise.resolve({ default: headerComponentMap[componentName] }));
+    const component = lazy(() =>
+      Promise.resolve({ default: headerComponentMap[componentName] }),
+    );
     headerComponentsCache.set(componentName, component);
     return component;
   }
@@ -117,30 +119,36 @@ const loadHeaderComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(`[Header Component] No subPath found for baseName: ${baseName}`);
+    console.warn(
+      `[Header Component] No subPath found for baseName: ${baseName}`,
+    );
     return null;
   }
 
   const fullPath = `${subPath}/${componentName}`;
-  
+
   // Debug log (can be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[LiveEditorUI Header Import Debug]', {
+  if (process.env.NODE_ENV === "development") {
+    console.log("[LiveEditorUI Header Import Debug]", {
       baseName,
       subPath,
       fullPath,
-      'Import path': `@/components/tenant/${fullPath}`
+      "Import path": `@/components/tenant/${fullPath}`,
     });
   }
-  
+
   const component = dynamic(
-    () => import(`@/components/tenant/${fullPath}`).catch((error) => {
-      console.error(`[Header Import Error] Failed to load ${fullPath}:`, error);
-      return { default: StaticHeader1 };
-    }),
-    { ssr: false }
+    () =>
+      import(`@/components/tenant/${fullPath}`).catch((error) => {
+        console.error(
+          `[Header Import Error] Failed to load ${fullPath}:`,
+          error,
+        );
+        return { default: StaticHeader1 };
+      }),
+    { ssr: false },
   );
-  
+
   // ⭐ Cache the component
   headerComponentsCache.set(componentName, component);
   return component;
@@ -173,7 +181,9 @@ const loadFooterComponent = (componentName: string) => {
   };
 
   if (footerComponentMap[componentName]) {
-    const component = lazy(() => Promise.resolve({ default: footerComponentMap[componentName] }));
+    const component = lazy(() =>
+      Promise.resolve({ default: footerComponentMap[componentName] }),
+    );
     footerComponentsCache.set(componentName, component);
     return component;
   }
@@ -185,20 +195,26 @@ const loadFooterComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(`[Footer Component] No subPath found for baseName: ${baseName}`);
+    console.warn(
+      `[Footer Component] No subPath found for baseName: ${baseName}`,
+    );
     return null;
   }
 
   const fullPath = `${subPath}/${componentName}`;
-  
+
   const component = dynamic(
-    () => import(`@/components/tenant/${fullPath}`).catch((error) => {
-      console.error(`[Footer Import Error] Failed to load ${fullPath}:`, error);
-      return { default: StaticFooter1 };
-    }),
-    { ssr: false }
+    () =>
+      import(`@/components/tenant/${fullPath}`).catch((error) => {
+        console.error(
+          `[Footer Import Error] Failed to load ${fullPath}:`,
+          error,
+        );
+        return { default: StaticFooter1 };
+      }),
+    { ssr: false },
   );
-  
+
   footerComponentsCache.set(componentName, component);
   return component;
 };
@@ -476,8 +492,12 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // Get global components data from parent store
   const globalHeaderData = useEditorStore((s) => s.globalHeaderData);
   const globalFooterData = useEditorStore((s) => s.globalFooterData);
-  const globalHeaderVariantFromStore = useEditorStore((s) => s.globalHeaderVariant);
-  const globalFooterVariantFromStore = useEditorStore((s) => s.globalFooterVariant);
+  const globalHeaderVariantFromStore = useEditorStore(
+    (s) => s.globalHeaderVariant,
+  );
+  const globalFooterVariantFromStore = useEditorStore(
+    (s) => s.globalFooterVariant,
+  );
   const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
@@ -486,53 +506,64 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
   // Get tenantData for globalHeaderVariant (same priority as TenantPageWrapper)
   const tenantData = useTenantStore((s) => s.tenantData);
-  
+
   // Get global header variant with smart priority logic
   // ⭐ IMPORTANT: Use tenantData/globalHeaderData on initial load, but use store for immediate updates
   const globalHeaderVariant = useMemo(() => {
     // If globalHeaderVariantFromStore is the default value, prioritize tenantData/globalHeaderData
     // This handles the case when Live Editor first opens
     const isDefaultVariant = globalHeaderVariantFromStore === "StaticHeader1";
-    
+
     // Priority logic:
     // 1. If store variant is NOT default, use it (for immediate updates)
     // 2. Otherwise, use tenantData/globalHeaderData (for initial load)
-    const variant = 
-      (!isDefaultVariant && globalHeaderVariantFromStore) ||  // ⭐ Use store if not default
+    const variant =
+      (!isDefaultVariant && globalHeaderVariantFromStore) || // ⭐ Use store if not default
       globalHeaderData?.variant ||
       tenantData?.globalComponentsData?.globalHeaderVariant ||
-      globalHeaderVariantFromStore ||  // Fallback to store
+      globalHeaderVariantFromStore || // Fallback to store
       "StaticHeader1";
-    
+
     // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[LiveEditorUI] Header Variant Debug:', {
-        'globalHeaderVariantFromStore': globalHeaderVariantFromStore,
-        'isDefaultVariant': isDefaultVariant,
-        'globalHeaderData?.variant': globalHeaderData?.variant,
-        'tenantData?.globalComponentsData?.globalHeaderVariant': tenantData?.globalComponentsData?.globalHeaderVariant,
-        'resolved variant': variant,
-        'tenantData exists': !!tenantData,
-        'globalComponentsData exists': !!tenantData?.globalComponentsData,
+    if (process.env.NODE_ENV === "development") {
+      console.log("[LiveEditorUI] Header Variant Debug:", {
+        globalHeaderVariantFromStore: globalHeaderVariantFromStore,
+        isDefaultVariant: isDefaultVariant,
+        "globalHeaderData?.variant": globalHeaderData?.variant,
+        "tenantData?.globalComponentsData?.globalHeaderVariant":
+          tenantData?.globalComponentsData?.globalHeaderVariant,
+        "resolved variant": variant,
+        "tenantData exists": !!tenantData,
+        "globalComponentsData exists": !!tenantData?.globalComponentsData,
       });
     }
-    
+
     return variant;
-  }, [globalHeaderVariantFromStore, globalHeaderData?.variant, tenantData?.globalComponentsData?.globalHeaderVariant, tenantData]);
+  }, [
+    globalHeaderVariantFromStore,
+    globalHeaderData?.variant,
+    tenantData?.globalComponentsData?.globalHeaderVariant,
+    tenantData,
+  ]);
 
   // Get global footer variant with smart priority logic
   const globalFooterVariant = useMemo(() => {
     const isDefaultVariant = globalFooterVariantFromStore === "StaticFooter1";
-    
-    const variant = 
+
+    const variant =
       (!isDefaultVariant && globalFooterVariantFromStore) ||
       globalFooterData?.variant ||
       tenantData?.globalComponentsData?.globalFooterVariant ||
       globalFooterVariantFromStore ||
       "StaticFooter1";
-    
+
     return variant;
-  }, [globalFooterVariantFromStore, globalFooterData?.variant, tenantData?.globalComponentsData?.globalFooterVariant, tenantData]);
+  }, [
+    globalFooterVariantFromStore,
+    globalFooterData?.variant,
+    tenantData?.globalComponentsData?.globalFooterVariant,
+    tenantData,
+  ]);
 
   // Initialize data immediately if not exists
   if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
@@ -609,20 +640,22 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     };
 
     const componentName = componentMap[globalHeaderVariant] || "StaticHeader1";
-    
+
     // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[LiveEditorUI] Header Component Debug:', {
-        'globalHeaderVariant': globalHeaderVariant,
-        'componentName': componentName,
-        'componentMap[globalHeaderVariant]': componentMap[globalHeaderVariant],
+    if (process.env.NODE_ENV === "development") {
+      console.log("[LiveEditorUI] Header Component Debug:", {
+        globalHeaderVariant: globalHeaderVariant,
+        componentName: componentName,
+        "componentMap[globalHeaderVariant]": componentMap[globalHeaderVariant],
       });
     }
-    
+
     const HeaderComponent = loadHeaderComponent(componentName);
 
     if (!HeaderComponent) {
-      console.warn('[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1');
+      console.warn(
+        "[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1",
+      );
       return StaticHeader1;
     }
 
@@ -638,11 +671,13 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     };
 
     const componentName = componentMap[globalFooterVariant] || "StaticFooter1";
-    
+
     const FooterComponent = loadFooterComponent(componentName);
 
     if (!FooterComponent) {
-      console.warn('[LiveEditorUI] FooterComponent is null, falling back to StaticFooter1');
+      console.warn(
+        "[LiveEditorUI] FooterComponent is null, falling back to StaticFooter1",
+      );
       return StaticFooter1;
     }
 
@@ -1056,21 +1091,25 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           }}
         >
           <div style={{ pointerEvents: "none" }}>
-            <Suspense
-              fallback={<SkeletonLoader componentName="header" />}
-            >
+            <Suspense fallback={<SkeletonLoader componentName="header" />}>
               {(() => {
                 // Remove variant from data before passing to component (same as TenantPageWrapper)
-                const headerDataWithoutVariant = globalHeaderData ? (() => {
-                  const { variant: _variant, ...data } = globalHeaderData;
-                  return data;
-                })() : {};
+                const headerDataWithoutVariant = globalHeaderData
+                  ? (() => {
+                      const { variant: _variant, ...data } = globalHeaderData;
+                      return data;
+                    })()
+                  : {};
 
                 if (!HeaderComponent) {
-                  console.warn('[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1');
-                  return <StaticHeader1 overrideData={headerDataWithoutVariant} />;
+                  console.warn(
+                    "[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1",
+                  );
+                  return (
+                    <StaticHeader1 overrideData={headerDataWithoutVariant} />
+                  );
                 }
- 
+
                 // ⭐ IMPORTANT: Add key prop to force re-render when variant or data changes
                 // This ensures the header updates immediately when theme changes
                 const headerKey = `global-header-${globalHeaderVariant}-${JSON.stringify(headerDataWithoutVariant)}`;
@@ -1132,7 +1171,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 storeData && Object.keys(storeData).length > 0
                   ? storeData
                   : component.data;
-
 
               return (
                 <motion.div
@@ -1217,13 +1255,17 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             <Suspense fallback={<SkeletonLoader componentName="footer" />}>
               {(() => {
                 // Remove variant from data before passing to component
-                const footerDataWithoutVariant = globalFooterData ? (() => {
-                  const { variant: _variant, ...data } = globalFooterData;
-                  return data;
-                })() : {};
+                const footerDataWithoutVariant = globalFooterData
+                  ? (() => {
+                      const { variant: _variant, ...data } = globalFooterData;
+                      return data;
+                    })()
+                  : {};
 
                 if (!FooterComponent) {
-                  return <StaticFooter1 overrideData={footerDataWithoutVariant} />;
+                  return (
+                    <StaticFooter1 overrideData={footerDataWithoutVariant} />
+                  );
                 }
 
                 const footerKey = `global-footer-${globalFooterVariant}-${JSON.stringify(footerDataWithoutVariant)}`;
@@ -2197,8 +2239,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             if (!open) {
               setTimeout(() => {
                 const body = document.body;
-                if (body.style.pointerEvents === 'none') {
-                  body.style.pointerEvents = '';
+                if (body.style.pointerEvents === "none") {
+                  body.style.pointerEvents = "";
                 }
               }, 100); // Small delay to ensure Radix UI cleanup is done
             }

@@ -36,14 +36,11 @@ export default function HalfAnHalf3({
             <div className="w-full md:w-[60%] bg-[#f5f0e8] flex flex-col justify-center px-6 md:px-8 lg:px-10 py-8 md:py-12 text-right order-2 md:order-1">
               {/* Heading */}
               <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-black leading-tight">
-                <span className="">
-                  {titleUnderlined}
-                  
-                </span>
-                
+                <span className="">{titleUnderlined}</span>
+
                 {title.replace(titleUnderlined, "")}
               </h3>
-                <div className="w-24 h-[2px] bg-[#8b5f46] mb-4 ml-auto"></div>
+              <div className="w-24 h-[2px] bg-[#8b5f46] mb-4 ml-auto"></div>
 
               {/* Paragraph Text */}
               <p className="text-sm md:text-base lg:text-lg text-black leading-relaxed">
@@ -56,4 +53,3 @@ export default function HalfAnHalf3({
     </section>
   );
 }
-

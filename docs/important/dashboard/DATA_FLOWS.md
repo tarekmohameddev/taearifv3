@@ -383,7 +383,7 @@ Component checks subscription:
 If free plan AND feature not included:
   ↓
   Show upgrade prompt:
-    <UpgradeCard 
+    <UpgradeCard
       feature="Advanced Analytics"
       requiredPlan="Pro"
     />
@@ -514,7 +514,7 @@ Live editor loads correct website
 ---
 
 **See Also:**
+
 - [MODULES.md](./MODULES.md) - Individual module details
 - [CORE_INFRASTRUCTURE.md](./CORE_INFRASTRUCTURE.md) - Store architecture
 - [AUTHENTICATION.md](./AUTHENTICATION.md) - Auth flows
-

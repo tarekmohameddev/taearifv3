@@ -17,16 +17,19 @@ await fetchTenantData(currentHost);
 ## كيفية العمل
 
 ### 1. استخراج Hostname
+
 ```javascript
 const currentHost = window.location.hostname;
 ```
 
 ### 2. استخدام Hostname كـ Tenant ID
+
 ```javascript
 await fetchTenantData(currentHost);
 ```
 
 ### 3. Console Log للتتبع
+
 ```javascript
 console.log("Using hostname for tenant data:", currentHost);
 ```
@@ -34,11 +37,13 @@ console.log("Using hostname for tenant data:", currentHost);
 ## أمثلة على Hostname
 
 ### في التطوير المحلي:
+
 - `tenant1.localhost` → tenant ID = "tenant1"
 - `lira.localhost` → tenant ID = "lira"
 - `localhost` → tenant ID = "localhost"
 
 ### في الإنتاج:
+
 - `tenant1.taearif.com` → tenant ID = "tenant1"
 - `lira.taearif.com` → tenant ID = "lira"
 - `custom-domain.com` → tenant ID = "custom-domain.com"
@@ -46,6 +51,7 @@ console.log("Using hostname for tenant data:", currentHost);
 ## API Request Details
 
 ### Request Body:
+
 ```json
 {
   "websiteName": "current-hostname"
@@ -53,6 +59,7 @@ console.log("Using hostname for tenant data:", currentHost);
 ```
 
 ### أمثلة:
+
 ```json
 // للتطوير المحلي
 {
@@ -89,14 +96,17 @@ Tenant Data from getTenant API: {
 ## المزايا
 
 ### ✅ ديناميكي
+
 - يستخدم hostname الحالي تلقائياً
 - يعمل مع أي tenant أو custom domain
 
 ### ✅ متوافق مع Middleware
+
 - يستخدم نفس منطق استخراج tenant ID من middleware
 - متوافق مع subdomain و custom domain
 
 ### ✅ تتبع أفضل
+
 - console log يوضح hostname المستخدم
 - سهولة debugging
 

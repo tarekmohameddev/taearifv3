@@ -135,10 +135,11 @@ export const headerFunctions = {
     }
 
     // Determine default data based on variant
-    const defaultData = variantId === "header2"
-      ? getDefaultHeader2Data()
-      : getDefaultHeaderData();
-    
+    const defaultData =
+      variantId === "header2"
+        ? getDefaultHeader2Data()
+        : getDefaultHeaderData();
+
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {

@@ -73,7 +73,8 @@ export default (set, get) => ({
               last_page: response.data.data.last_page,
               from: response.data.data.from,
               to: response.data.data.to,
-              has_more_pages: response.data.data.current_page < response.data.data.last_page,
+              has_more_pages:
+                response.data.data.current_page < response.data.data.last_page,
               next_page_url: response.data.data.next_page_url,
               prev_page_url: response.data.data.prev_page_url,
             },
@@ -88,7 +89,8 @@ export default (set, get) => ({
         rentalOwnerDashboard: {
           ...state.rentalOwnerDashboard,
           loading: false,
-          error: error.response?.data?.message || "Failed to fetch owner rentals",
+          error:
+            error.response?.data?.message || "Failed to fetch owner rentals",
         },
       }));
     }
@@ -106,7 +108,7 @@ export default (set, get) => ({
 
     try {
       const response = await axiosInstance.get(
-        `/v1/user/owner-rentals/${ownerRentalId}`
+        `/v1/user/owner-rentals/${ownerRentalId}`,
       );
 
       if (response.data.success) {
@@ -147,10 +149,14 @@ export default (set, get) => ({
           exclude_assigned: true,
         },
       });
-      
+
       // البيانات موجودة في response.data.data.data (array من العقارات)
-      const properties = response.data.data.data || response.data.data.properties || response.data.data || [];
-      
+      const properties =
+        response.data.data.data ||
+        response.data.data.properties ||
+        response.data.data ||
+        [];
+
       set((state) => ({
         rentalOwnerDashboard: {
           ...state.rentalOwnerDashboard,
@@ -175,7 +181,7 @@ export default (set, get) => ({
     try {
       const response = await axiosInstance.post(
         `/v1/user/owner-rentals/${ownerRentalId}/properties`,
-        { property_ids: propertyIds }
+        { property_ids: propertyIds },
       );
 
       if (response.data.success) {
@@ -208,14 +214,14 @@ export default (set, get) => ({
     try {
       const response = await axiosInstance.put(
         `/v1/user/owner-rentals/${ownerRentalId}`,
-        updateData
+        updateData,
       );
 
       if (response.data.success) {
         // Update the owner in the list
         const state = get();
         const updatedOwners = state.rentalOwnerDashboard.owners.map((owner) =>
-          owner.id === ownerRentalId ? response.data.data : owner
+          owner.id === ownerRentalId ? response.data.data : owner,
         );
 
         set((state) => ({
@@ -254,7 +260,7 @@ export default (set, get) => ({
     try {
       const response = await axiosInstance.put(
         `/v1/user/owner-rentals/${ownerRentalId}`,
-        { password }
+        { password },
       );
 
       if (response.data.success) {
@@ -287,7 +293,7 @@ export default (set, get) => ({
             per_page: perPage,
             page,
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -315,7 +321,8 @@ export default (set, get) => ({
           assignedProperties: [],
           loadingAssignedProperties: false,
           assignedPropertiesError:
-            error.response?.data?.message || "Failed to fetch assigned properties",
+            error.response?.data?.message ||
+            "Failed to fetch assigned properties",
         },
       }));
     }
@@ -323,20 +330,25 @@ export default (set, get) => ({
 
   // Remove property from owner rental
   removePropertyFromOwner: async (ownerRentalId, propertyId) => {
-    console.log("Store: removePropertyFromOwner called with:", ownerRentalId, propertyId);
+    console.log(
+      "Store: removePropertyFromOwner called with:",
+      ownerRentalId,
+      propertyId,
+    );
     try {
       const response = await axiosInstance.delete(
-        `/v1/user/owner-rentals/${ownerRentalId}/properties/${propertyId}`
+        `/v1/user/owner-rentals/${ownerRentalId}/properties/${propertyId}`,
       );
-      
+
       console.log("Store: API response:", response.data);
 
       if (response.data.success) {
         // Remove property from the assigned properties list
         const state = get();
-        const updatedProperties = state.rentalOwnerDashboard.assignedProperties.filter(
-          (property) => property.id !== propertyId
-        );
+        const updatedProperties =
+          state.rentalOwnerDashboard.assignedProperties.filter(
+            (property) => property.id !== propertyId,
+          );
 
         set((state) => ({
           rentalOwnerDashboard: {
@@ -347,7 +359,7 @@ export default (set, get) => ({
 
         return { success: true, data: response.data };
       }
-      
+
       return { success: false, error: "Unknown error" };
     } catch (error) {
       console.error("Error removing property from owner:", error);
@@ -362,14 +374,14 @@ export default (set, get) => ({
   deleteOwnerRental: async (ownerRentalId) => {
     try {
       const response = await axiosInstance.delete(
-        `/v1/user/owner-rentals/${ownerRentalId}`
+        `/v1/user/owner-rentals/${ownerRentalId}`,
       );
 
       if (response.data.success) {
         // Remove owner from the list
         const state = get();
         const updatedOwners = state.rentalOwnerDashboard.owners.filter(
-          (owner) => owner.id !== ownerRentalId
+          (owner) => owner.id !== ownerRentalId,
         );
 
         set((state) => ({
@@ -395,7 +407,7 @@ export default (set, get) => ({
     try {
       const response = await axiosInstance.post(
         `/v1/user/owner-rentals`,
-        ownerData
+        ownerData,
       );
 
       if (response.data.success) {

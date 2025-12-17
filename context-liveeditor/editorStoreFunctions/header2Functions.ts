@@ -9,7 +9,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
   const data = {
     visible: true,
     ThemeTwo: "header2",
-    
+
     // Position and layout
     position: {
       ThemeTwo: "position",
@@ -17,14 +17,14 @@ export const getDefaultHeader2Data = (): ComponentData => {
       top: 0,
       zIndex: 50,
     },
-    
+
     // Background
     background: {
       ThemeTwo: "background",
       color: "#8b5f46",
       opacity: 1,
     },
-    
+
     // Logo
     logo: {
       ThemeTwo: "logo",
@@ -34,7 +34,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
       width: 96, // w-24
       height: 80, // h-20
     },
-    
+
     // Navigation links
     links: [
       {
@@ -68,7 +68,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
         path: "/contact-us",
       },
     ],
-    
+
     // Actions
     actions: {
       ThemeTwo: "actions",
@@ -88,7 +88,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
         },
       },
     },
-    
+
     // Mobile menu
     mobileMenu: {
       ThemeTwo: "mobileMenu",
@@ -100,7 +100,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
       showLanguageToggle: true,
       showLogout: true,
     },
-    
+
     // Styling
     styling: {
       ThemeTwo: "styling",
@@ -115,7 +115,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
       languageButtonColor: "#ffffff",
       languageButtonHoverColor: "#000000",
     },
-    
+
     // Responsive
     responsive: {
       ThemeTwo: "responsive",
@@ -126,7 +126,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
         horizontal: "1.75rem", // px-7
       },
     },
-    
+
     // Animations
     animations: {
       ThemeTwo: "animations",
@@ -174,7 +174,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
 export const header2Functions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -186,48 +186,49 @@ export const header2Functions = {
       state.headerStates[variantId] &&
       Object.keys(state.headerStates[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data based on variant
-    const defaultData = variantId === "header2"
-      ? getDefaultHeader2Data()
-      : getDefaultHeader2Data(); // Default to header2 for now
-    
+    const defaultData =
+      variantId === "header2"
+        ? getDefaultHeader2Data()
+        : getDefaultHeader2Data(); // Default to header2 for now
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      headerStates: { ...state.headerStates, [variantId]: data }
+      headerStates: { ...state.headerStates, [variantId]: data },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
     state.headerStates[variantId] || getDefaultHeader2Data(),
-  
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    headerStates: { ...state.headerStates, [variantId]: data }
+    headerStates: { ...state.headerStates, [variantId]: data },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "logo.image")
@@ -237,11 +238,9 @@ export const header2Functions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.headerStates[variantId] || getDefaultHeader2Data();
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
-      headerStates: { ...state.headerStates, [variantId]: newData }
+      headerStates: { ...state.headerStates, [variantId]: newData },
     } as any;
-  }
+  },
 };
-
-

@@ -8,12 +8,7 @@ import useStore from "@/context/Store";
 
 export function MatchingCustomersExample() {
   const {
-    matchingPage: {
-      customers,
-      loading,
-      customerStats,
-      error,
-    },
+    matchingPage: { customers, loading, customerStats, error },
     fetchCustomers,
     fetchCustomerStats,
   } = useStore();
@@ -33,37 +28,51 @@ export function MatchingCustomersExample() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي العملاء</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                إجمالي العملاء
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{customerStats.totalCustomers}</div>
+              <div className="text-2xl font-bold">
+                {customerStats.totalCustomers}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                إجمالي الطلبات
+              </CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{customerStats.totalRequests}</div>
+              <div className="text-2xl font-bold">
+                {customerStats.totalRequests}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">العقارات المتطابقة</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                العقارات المتطابقة
+              </CardTitle>
               <Home className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{customerStats.totalMatchingProperties}</div>
+              <div className="text-2xl font-bold">
+                {customerStats.totalMatchingProperties}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">متوسط العقارات للعميل</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                متوسط العقارات للعميل
+              </CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -99,16 +108,14 @@ export function MatchingCustomersExample() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">عدد الطلبات:</span>
-                  <Badge variant="secondary">
-                    {customer.totalPurchases}
-                  </Badge>
+                  <Badge variant="secondary">{customer.totalPurchases}</Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">العقارات المتطابقة:</span>
-                  <Badge variant="outline">
-                    {customer.matchingProperties}
-                  </Badge>
+                  <span className="text-sm font-medium">
+                    العقارات المتطابقة:
+                  </span>
+                  <Badge variant="outline">{customer.matchingProperties}</Badge>
                 </div>
 
                 <div className="flex items-center justify-between">

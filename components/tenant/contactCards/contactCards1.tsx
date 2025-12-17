@@ -10,7 +10,9 @@ import * as ReactIconsMd from "react-icons/md";
 import type { IconType } from "react-icons";
 
 // Function to get icon component based on type or name
-const getContactCardIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+const getContactCardIcon = (
+  typeOrName: string,
+): LucideIcon | IconType | React.ComponentType<any> => {
   // Try lucide-react icons
   const lucideIcon = (LucideIcons as any)[typeOrName];
   if (lucideIcon) {
@@ -435,18 +437,18 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -455,63 +457,91 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "icon.color")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
-    
+
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Check if fieldData is a custom color (string starting with #)
     // If it is, return it directly (useDefaultColor is false)
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
       // If object has useDefaultColor property set to false, use the value
-      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.useDefaultColor === false &&
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
       // If object has value but useDefaultColor is true or undefined, still check value first
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         // Check if useDefaultColor is explicitly false
         if (fieldData.useDefaultColor === false) {
           return fieldData.value;
         }
       }
     }
-    
+
     // If no custom color found, use branding color (useDefaultColor is true by default)
     // Determine globalColorType based on field path
     let defaultGlobalColorType = "primary";
-    if (fieldPath.includes("title") || fieldPath.includes("content") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+    if (
+      fieldPath.includes("title") ||
+      fieldPath.includes("content") ||
+      fieldPath.includes("textColor") ||
+      fieldPath.includes("Text")
+    ) {
       defaultGlobalColorType = "secondary";
     } else if (fieldPath.includes("icon") || fieldPath.includes("Icon")) {
       defaultGlobalColorType = "primary";
     }
-    
+
     // If fieldData is an object with globalColorType, use it
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData) &&
+      fieldData.globalColorType
+    ) {
       defaultGlobalColorType = fieldData.globalColorType;
     }
-    
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
-
 
   // Check if we have any data from API/stores first
   const hasApiData =
@@ -577,7 +607,8 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
         type: card.icon?.type || "MapPin",
         name: card.icon?.name,
         size: card.icon?.size || 40,
-        className: card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
+        className:
+          card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
       },
       cardStyle: {
         ...defaultData.cards[0]?.cardStyle,
@@ -606,35 +637,40 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
           >
             {(() => {
               // Priority: name > type > default
-              const iconNameOrType = card.icon?.name || card.icon?.type || "MapPin";
+              const iconNameOrType =
+                card.icon?.name || card.icon?.type || "MapPin";
               const IconComponent = getContactCardIcon(iconNameOrType);
-              
+
               // Get icon size
-              const iconSize = typeof card.icon?.size === "number" 
-                ? card.icon.size 
-                : parseInt(card.icon?.size || "40");
-              
+              const iconSize =
+                typeof card.icon?.size === "number"
+                  ? card.icon.size
+                  : parseInt(card.icon?.size || "40");
+
               // Get icon className
-              const iconClassName = card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]";
-              
+              const iconClassName =
+                card.icon?.className ||
+                "w-[40px] h-[40px] md:w-[60px] md:h-[60px]";
+
               // Check if it's a React Icon (from react-icons) by checking the icon name pattern
-              const isReactIcon = iconNameOrType.startsWith('Fa') || 
-                                 iconNameOrType.startsWith('Md') || 
-                                 iconNameOrType.startsWith('Io') ||
-                                 iconNameOrType.startsWith('Bi') ||
-                                 iconNameOrType.startsWith('Bs') ||
-                                 iconNameOrType.startsWith('Hi') ||
-                                 iconNameOrType.startsWith('Ai') ||
-                                 iconNameOrType.startsWith('Ti') ||
-                                 iconNameOrType.startsWith('Gi') ||
-                                 iconNameOrType.startsWith('Si') ||
-                                 iconNameOrType.startsWith('Ri') ||
-                                 iconNameOrType.startsWith('Tb') ||
-                                 iconNameOrType.startsWith('Vsc') ||
-                                 iconNameOrType.startsWith('Wi') ||
-                                 iconNameOrType.startsWith('Di') ||
-                                 iconNameOrType.startsWith('Im');
-              
+              const isReactIcon =
+                iconNameOrType.startsWith("Fa") ||
+                iconNameOrType.startsWith("Md") ||
+                iconNameOrType.startsWith("Io") ||
+                iconNameOrType.startsWith("Bi") ||
+                iconNameOrType.startsWith("Bs") ||
+                iconNameOrType.startsWith("Hi") ||
+                iconNameOrType.startsWith("Ai") ||
+                iconNameOrType.startsWith("Ti") ||
+                iconNameOrType.startsWith("Gi") ||
+                iconNameOrType.startsWith("Si") ||
+                iconNameOrType.startsWith("Ri") ||
+                iconNameOrType.startsWith("Tb") ||
+                iconNameOrType.startsWith("Vsc") ||
+                iconNameOrType.startsWith("Wi") ||
+                iconNameOrType.startsWith("Di") ||
+                iconNameOrType.startsWith("Im");
+
               // For React Icons, use style with fontSize
               if (isReactIcon) {
                 return (
@@ -649,7 +685,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
                   />
                 );
               }
-              
+
               // For Lucide icons, use size prop
               return (
                 <IconComponent

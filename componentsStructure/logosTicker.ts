@@ -10,12 +10,12 @@ export const logosTickerStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -28,7 +28,7 @@ export const logosTickerStructure: ComponentStructure = {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "1600px"
+              placeholder: "1600px",
             },
             {
               key: "padding",
@@ -39,19 +39,19 @@ export const logosTickerStructure: ComponentStructure = {
                   key: "top",
                   label: "Top Padding",
                   type: "text",
-                  placeholder: "4rem"
+                  placeholder: "4rem",
                 },
                 {
                   key: "bottom",
                   label: "Bottom Padding",
                   type: "text",
-                  placeholder: "4rem"
-                }
-              ]
-            }
-          ]
+                  placeholder: "4rem",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CONTENT
         // ═══════════════════════════════════════════════════════════
@@ -64,17 +64,17 @@ export const logosTickerStructure: ComponentStructure = {
               key: "title",
               label: "Section Title",
               type: "text",
-              placeholder: "موثوق بنا من قبل الفرق الطموحة التي تبني المستقبل"
+              placeholder: "موثوق بنا من قبل الفرق الطموحة التي تبني المستقبل",
             },
             {
               key: "subtitle",
               label: "Section Subtitle",
               type: "text",
-              placeholder: "من الشركات الناشئة إلى الشركات الكبرى..."
-            }
-          ]
+              placeholder: "من الشركات الناشئة إلى الشركات الكبرى...",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LOGOS ARRAY - Dynamic Images
         // ═══════════════════════════════════════════════════════════
@@ -89,22 +89,22 @@ export const logosTickerStructure: ComponentStructure = {
               key: "id",
               label: "Logo ID",
               type: "text",
-              placeholder: "1"
+              placeholder: "1",
             },
             {
               key: "src",
               label: "Logo Image",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Client Logo"
-            }
-          ]
+              placeholder: "Client Logo",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // DISPLAY MODE
         // ═══════════════════════════════════════════════════════════
@@ -115,11 +115,11 @@ export const logosTickerStructure: ComponentStructure = {
           options: [
             { value: "both", label: "Both (Forward & Reverse)" },
             { value: "forward", label: "Forward Only" },
-            { value: "reverse", label: "Reverse Only" }
+            { value: "reverse", label: "Reverse Only" },
           ],
-          defaultValue: "both"
+          defaultValue: "both",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // ANIMATION SETTINGS
         // ═══════════════════════════════════════════════════════════
@@ -132,16 +132,16 @@ export const logosTickerStructure: ComponentStructure = {
               key: "speed",
               label: "Animation Speed (seconds)",
               type: "number",
-              placeholder: "40"
+              placeholder: "40",
             },
             {
               key: "pauseOnHover",
               label: "Pause on Hover",
-              type: "boolean"
-            }
-          ]
+              type: "boolean",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -153,7 +153,7 @@ export const logosTickerStructure: ComponentStructure = {
             {
               key: "backgroundColor",
               label: "Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "titleColor",
@@ -165,23 +165,23 @@ export const logosTickerStructure: ComponentStructure = {
             {
               key: "subtitleColor",
               label: "Subtitle Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "logoOpacity",
               label: "Logo Opacity",
               type: "number",
-              placeholder: "0.6"
+              placeholder: "0.6",
             },
             {
               key: "logoHoverOpacity",
               label: "Logo Hover Opacity",
               type: "number",
-              placeholder: "1.0"
-            }
-          ]
+              placeholder: "1.0",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // TYPOGRAPHY
         // ═══════════════════════════════════════════════════════════
@@ -204,35 +204,35 @@ export const logosTickerStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "xl"
+                      placeholder: "xl",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "2xl"
+                      placeholder: "2xl",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "3xl"
-                    }
-                  ]
+                      placeholder: "3xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold"
+                  placeholder: "bold",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
-                }
-              ]
+                  placeholder: "Tajawal",
+                },
+              ],
             },
             {
               key: "subtitle",
@@ -248,40 +248,40 @@ export const logosTickerStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "sm"
+                      placeholder: "sm",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "base"
+                      placeholder: "base",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "lg"
-                    }
-                  ]
+                      placeholder: "lg",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal"
+                  placeholder: "normal",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
-                }
-              ]
-            }
-          ]
-        }
+                  placeholder: "Tajawal",
+                },
+              ],
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
@@ -300,20 +300,20 @@ export const logosTickerStructure: ComponentStructure = {
               key: "id",
               label: "Logo ID",
               type: "text",
-              placeholder: "1"
+              placeholder: "1",
             },
             {
               key: "src",
               label: "Logo Image",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Client Logo"
-            }
-          ]
+              placeholder: "Client Logo",
+            },
+          ],
         },
         {
           key: "displayMode",
@@ -322,12 +322,11 @@ export const logosTickerStructure: ComponentStructure = {
           options: [
             { value: "both", label: "Both (Forward & Reverse)" },
             { value: "forward", label: "Forward Only" },
-            { value: "reverse", label: "Reverse Only" }
+            { value: "reverse", label: "Reverse Only" },
           ],
-          defaultValue: "both"
-        }
-      ]
-    }
-  ]
+          defaultValue: "both",
+        },
+      ],
+    },
+  ],
 };
-

@@ -1,6 +1,7 @@
 # API Reference - Complete Function Documentation
 
 ## Table of Contents
+
 1. [editorStore API](#editorstore-api)
 2. [tenantStore API](#tenantstore-api)
 3. [Component Functions API](#component-functions-api)
@@ -17,30 +18,31 @@
 #### Component Type States
 
 ```typescript
-heroStates: Record<string, ComponentData>
-headerStates: Record<string, ComponentData>
-footerStates: Record<string, ComponentData>
-halfTextHalfImageStates: Record<string, ComponentData>
-propertySliderStates: Record<string, ComponentData>
-ctaValuationStates: Record<string, ComponentData>
-stepsSectionStates: Record<string, ComponentData>
-testimonialsStates: Record<string, ComponentData>
-whyChooseUsStates: Record<string, ComponentData>
-contactMapSectionStates: Record<string, ComponentData>
-gridStates: Record<string, ComponentData>
-filterButtonsStates: Record<string, ComponentData>
-propertyFilterStates: Record<string, ComponentData>
-mapSectionStates: Record<string, ComponentData>
-contactFormSectionStates: Record<string, ComponentData>
-contactCardsStates: Record<string, ComponentData>
-applicationFormStates: Record<string, ComponentData>
-inputsStates: Record<string, ComponentData>
-inputs2States: Record<string, ComponentData>
+heroStates: Record<string, ComponentData>;
+headerStates: Record<string, ComponentData>;
+footerStates: Record<string, ComponentData>;
+halfTextHalfImageStates: Record<string, ComponentData>;
+propertySliderStates: Record<string, ComponentData>;
+ctaValuationStates: Record<string, ComponentData>;
+stepsSectionStates: Record<string, ComponentData>;
+testimonialsStates: Record<string, ComponentData>;
+whyChooseUsStates: Record<string, ComponentData>;
+contactMapSectionStates: Record<string, ComponentData>;
+gridStates: Record<string, ComponentData>;
+filterButtonsStates: Record<string, ComponentData>;
+propertyFilterStates: Record<string, ComponentData>;
+mapSectionStates: Record<string, ComponentData>;
+contactFormSectionStates: Record<string, ComponentData>;
+contactCardsStates: Record<string, ComponentData>;
+applicationFormStates: Record<string, ComponentData>;
+inputsStates: Record<string, ComponentData>;
+inputs2States: Record<string, ComponentData>;
 ```
 
 **Structure**: `{ [componentId]: ComponentData }`
 
 **Example**:
+
 ```typescript
 {
   "uuid-abc": {
@@ -57,8 +59,8 @@ inputs2States: Record<string, ComponentData>
 #### Global Components
 
 ```typescript
-globalHeaderData: ComponentData
-globalFooterData: ComponentData
+globalHeaderData: ComponentData;
+globalFooterData: ComponentData;
 globalComponentsData: {
   header: ComponentData;
   footer: ComponentData;
@@ -68,16 +70,16 @@ globalComponentsData: {
 #### Page Management
 
 ```typescript
-pageComponentsByPage: Record<string, ComponentInstance[]>
-currentPage: string
+pageComponentsByPage: Record<string, ComponentInstance[]>;
+currentPage: string;
 ```
 
 #### Temporary State
 
 ```typescript
-tempData: ComponentData
-hasChangesMade: boolean
-showDialog: boolean
+tempData: ComponentData;
+hasChangesMade: boolean;
+showDialog: boolean;
 ```
 
 ---
@@ -89,6 +91,7 @@ showDialog: boolean
 **Purpose**: Initialize component in store if not exists
 
 **Signature**:
+
 ```typescript
 ensureComponentVariant: (
   componentType: string,
@@ -98,25 +101,24 @@ ensureComponentVariant: (
 ```
 
 **Parameters**:
+
 - `componentType`: Component type ("hero", "header", etc.)
 - `variantId`: Component UUID (component.id)
 - `initial`: Optional initial data
 
 **Example**:
+
 ```typescript
 const store = useEditorStore.getState();
 
-store.ensureComponentVariant(
-  "hero",
-  "uuid-123",
-  {
-    visible: true,
-    content: { title: "Welcome" }
-  }
-);
+store.ensureComponentVariant("hero", "uuid-123", {
+  visible: true,
+  content: { title: "Welcome" },
+});
 ```
 
 **Behavior**:
+
 - If component exists with data: No changes
 - If component missing: Initialize with initial data or defaults
 - If initial provided: ALWAYS use it (even if exists)
@@ -128,20 +130,20 @@ store.ensureComponentVariant(
 **Purpose**: Retrieve component data from store
 
 **Signature**:
+
 ```typescript
-getComponentData: (
-  componentType: string,
-  variantId: string
-) => ComponentData
+getComponentData: (componentType: string, variantId: string) => ComponentData;
 ```
 
 **Parameters**:
+
 - `componentType`: Component type
 - `variantId`: Component UUID
 
 **Returns**: ComponentData or empty object {}
 
 **Example**:
+
 ```typescript
 const data = store.getComponentData("hero", "uuid-123");
 console.log("Hero data:", data);
@@ -157,6 +159,7 @@ const title = data.content?.title || "Default";
 **Purpose**: Set/replace component data completely
 
 **Signature**:
+
 ```typescript
 setComponentData: (
   componentType: string,
@@ -166,26 +169,25 @@ setComponentData: (
 ```
 
 **Parameters**:
+
 - `componentType`: Component type
 - `variantId`: Component UUID
 - `data`: New component data
 
 **Example**:
+
 ```typescript
-store.setComponentData(
-  "hero",
-  "uuid-123",
-  {
-    visible: true,
-    content: {
-      title: "New Title",
-      subtitle: "New Subtitle"
-    }
-  }
-);
+store.setComponentData("hero", "uuid-123", {
+  visible: true,
+  content: {
+    title: "New Title",
+    subtitle: "New Subtitle",
+  },
+});
 ```
 
 **Side Effects**:
+
 - Updates component type state (heroStates[id])
 - Updates pageComponentsByPage[currentPage][index].data
 
@@ -196,6 +198,7 @@ store.setComponentData(
 **Purpose**: Update specific field via dot-notation path
 
 **Signature**:
+
 ```typescript
 updateComponentByPath: (
   componentType: string,
@@ -206,39 +209,32 @@ updateComponentByPath: (
 ```
 
 **Parameters**:
+
 - `componentType`: Component type
 - `variantId`: Component UUID
 - `path`: Dot-notation path ("content.title")
 - `value`: New value
 
 **Example**:
+
 ```typescript
 // Update title
-store.updateComponentByPath(
-  "hero",
-  "uuid-123",
-  "content.title",
-  "New Title"
-);
+store.updateComponentByPath("hero", "uuid-123", "content.title", "New Title");
 
 // Update nested field
 store.updateComponentByPath(
   "hero",
   "uuid-123",
   "background.overlay.opacity",
-  "0.5"
+  "0.5",
 );
 
 // Update array element
-store.updateComponentByPath(
-  "header",
-  "uuid-456",
-  "menu[0].text",
-  "Home"
-);
+store.updateComponentByPath("header", "uuid-456", "menu[0].text", "Home");
 ```
 
 **Side Effects**:
+
 - Updates component type state
 - Updates pageComponentsByPage
 - Creates intermediate structures if missing
@@ -250,11 +246,13 @@ store.updateComponentByPath(
 #### updateGlobalHeaderByPath
 
 **Signature**:
+
 ```typescript
 updateGlobalHeaderByPath: (path: string, value: any) => void
 ```
 
 **Example**:
+
 ```typescript
 store.updateGlobalHeaderByPath("logo.text", "My Company");
 store.updateGlobalHeaderByPath("menu[0].url", "/home");
@@ -263,11 +261,13 @@ store.updateGlobalHeaderByPath("menu[0].url", "/home");
 #### updateGlobalFooterByPath
 
 **Signature**:
+
 ```typescript
 updateGlobalFooterByPath: (path: string, value: any) => void
 ```
 
 **Example**:
+
 ```typescript
 store.updateGlobalFooterByPath("content.copyright", "© 2025");
 ```
@@ -275,6 +275,7 @@ store.updateGlobalFooterByPath("content.copyright", "© 2025");
 #### updateGlobalComponentByPath
 
 **Signature**:
+
 ```typescript
 updateGlobalComponentByPath: (
   componentType: "header" | "footer",
@@ -284,6 +285,7 @@ updateGlobalComponentByPath: (
 ```
 
 **Example**:
+
 ```typescript
 store.updateGlobalComponentByPath("header", "visible", true);
 store.updateGlobalComponentByPath("footer", "background.color", "#000");
@@ -298,6 +300,7 @@ store.updateGlobalComponentByPath("footer", "background.color", "#000");
 **Purpose**: Set all components for a page
 
 **Signature**:
+
 ```typescript
 setPageComponentsForPage: (
   page: string,
@@ -306,6 +309,7 @@ setPageComponentsForPage: (
 ```
 
 **Example**:
+
 ```typescript
 store.setPageComponentsForPage("homepage", [
   {
@@ -326,6 +330,7 @@ store.setPageComponentsForPage("homepage", [
 ```
 
 **Side Effects**:
+
 - Adds position property to each component
 - Updates pageComponentsByPage[page]
 
@@ -336,6 +341,7 @@ store.setPageComponentsForPage("homepage", [
 **Purpose**: Update page components (without adding positions)
 
 **Signature**:
+
 ```typescript
 forceUpdatePageComponents: (
   slug: string,
@@ -344,15 +350,17 @@ forceUpdatePageComponents: (
 ```
 
 **Example**:
+
 ```typescript
-const updated = pageComponents.map(c =>
-  c.id === targetId ? { ...c, data: newData } : c
+const updated = pageComponents.map((c) =>
+  c.id === targetId ? { ...c, data: newData } : c,
 );
 
 store.forceUpdatePageComponents("homepage", updated);
 ```
 
 **Difference from setPageComponentsForPage**:
+
 - Does NOT add position property
 - Expects components to already have positions
 - Direct replacement of page components array
@@ -366,17 +374,20 @@ store.forceUpdatePageComponents("homepage", updated);
 **Purpose**: Load tenant data into all stores
 
 **Signature**:
+
 ```typescript
 loadFromDatabase: (tenantData: any) => void
 ```
 
 **Example**:
+
 ```typescript
 const tenantData = await fetchTenantData(tenantId);
 store.loadFromDatabase(tenantData);
 ```
 
 **Side Effects**:
+
 - Loads globalHeaderData, globalFooterData, globalComponentsData
 - Loads all page components into pageComponentsByPage
 - Loads component data into component type states (heroStates, etc.)
@@ -390,17 +401,20 @@ store.loadFromDatabase(tenantData);
 **Purpose**: Update tempData via path
 
 **Signature**:
+
 ```typescript
 updateByPath: (path: string, value: any) => void
 ```
 
 **Example**:
+
 ```typescript
 // Used during editing in EditorSidebar
 store.updateByPath("content.title", "New Title");
 ```
 
 **Behavior**:
+
 - Updates ONLY tempData
 - Does NOT update component states
 - Merges with global data if editing global component
@@ -414,20 +428,22 @@ store.updateByPath("content.title", "New Title");
 **Purpose**: Register save function
 
 **Signature**:
+
 ```typescript
 setOpenSaveDialog: (fn: () => void) => void
 ```
 
 **Example**:
+
 ```typescript
 // In LiveEditorEffects
 useEffect(() => {
   const saveFn = () => {
     store.forceUpdatePageComponents(slug, pageComponents);
   };
-  
+
   store.setOpenSaveDialog(saveFn);
-  
+
   return () => {
     store.setOpenSaveDialog(() => {});
   };
@@ -437,11 +453,13 @@ useEffect(() => {
 #### requestSave
 
 **Signature**:
+
 ```typescript
 requestSave: () => void
 ```
 
 **Example**:
+
 ```typescript
 // Trigger save dialog
 store.requestSave();
@@ -450,6 +468,7 @@ store.requestSave();
 #### closeDialog
 
 **Signature**:
+
 ```typescript
 closeDialog: () => void
 ```
@@ -461,13 +480,13 @@ closeDialog: () => void
 ### State Properties
 
 ```typescript
-tenantData: TenantData | null
-loadingTenantData: boolean
-loading: boolean  // Alias for loadingTenantData
-error: string | null
-tenant: any | null
-tenantId: string | null
-lastFetchedWebsite: string | null
+tenantData: TenantData | null;
+loadingTenantData: boolean;
+loading: boolean; // Alias for loadingTenantData
+error: string | null;
+tenant: any | null;
+tenantId: string | null;
+lastFetchedWebsite: string | null;
 ```
 
 ### Functions
@@ -477,11 +496,13 @@ lastFetchedWebsite: string | null
 **Purpose**: Fetch tenant data from API
 
 **Signature**:
+
 ```typescript
-fetchTenantData: (websiteName: string) => Promise<void>
+fetchTenantData: (websiteName: string) => Promise<void>;
 ```
 
 **Example**:
+
 ```typescript
 const { fetchTenantData } = useTenantStore();
 
@@ -492,6 +513,7 @@ const data = useTenantStore.getState().tenantData;
 ```
 
 **Behavior**:
+
 - Checks cache first (prevents duplicate requests)
 - Sets loading state
 - Fetches from API
@@ -501,11 +523,13 @@ const data = useTenantStore.getState().tenantData;
 #### setTenantId
 
 **Signature**:
+
 ```typescript
 setTenantId: (tenantId: string) => void
 ```
 
 **Example**:
+
 ```typescript
 const { setTenantId } = useTenantStore();
 setTenantId("tenant123");
@@ -536,13 +560,14 @@ export const {type}Functions = {
 
 ```typescript
 heroFunctions.ensureVariant(
-  state,           // Current store state
-  "uuid-123",      // Component UUID
-  {                // Initial data
+  state, // Current store state
+  "uuid-123", // Component UUID
+  {
+    // Initial data
     visible: true,
-    content: { title: "Welcome" }
-  }
-)
+    content: { title: "Welcome" },
+  },
+);
 
 // Returns: { heroStates: {...} }
 ```
@@ -558,14 +583,10 @@ const data = heroFunctions.getData(state, "uuid-123");
 #### setData
 
 ```typescript
-heroFunctions.setData(
-  state,
-  "uuid-123",
-  {
-    visible: true,
-    content: { title: "Updated" }
-  }
-)
+heroFunctions.setData(state, "uuid-123", {
+  visible: true,
+  content: { title: "Updated" },
+});
 
 // Returns:
 // {
@@ -577,12 +598,7 @@ heroFunctions.setData(
 #### updateByPath
 
 ```typescript
-heroFunctions.updateByPath(
-  state,
-  "uuid-123",
-  "content.title",
-  "New Title"
-)
+heroFunctions.updateByPath(state, "uuid-123", "content.title", "New Title");
 
 // Returns:
 // {
@@ -600,24 +616,28 @@ heroFunctions.updateByPath(
 #### getComponentById
 
 **Signature**:
+
 ```typescript
-getComponentById: (id: string) => ComponentType | undefined
+getComponentById: (id: string) => ComponentType | undefined;
 ```
 
 **Example**:
+
 ```typescript
 const hero = getComponentById("hero");
-console.log(hero.displayName);  // "Hero"
+console.log(hero.displayName); // "Hero"
 ```
 
 #### getComponentsBySection
 
 **Signature**:
+
 ```typescript
 getComponentsBySection: (sectionId: string) => ComponentType[]
 ```
 
 **Example**:
+
 ```typescript
 const homepageComponents = getComponentsBySection("homepage");
 // Returns all components for homepage
@@ -626,11 +646,13 @@ const homepageComponents = getComponentsBySection("homepage");
 #### getComponentsByCategory
 
 **Signature**:
+
 ```typescript
 getComponentsByCategory: (category: string) => ComponentType[]
 ```
 
 **Example**:
+
 ```typescript
 const contentComponents = getComponentsByCategory("content");
 // Returns: halfTextHalfImage, propertySlider, etc.
@@ -639,11 +661,13 @@ const contentComponents = getComponentsByCategory("content");
 #### isValidComponentType
 
 **Signature**:
+
 ```typescript
-isValidComponentType: (type: string) => boolean
+isValidComponentType: (type: string) => boolean;
 ```
 
 **Example**:
+
 ```typescript
 if (isValidComponentType("hero")) {
   // Component type exists
@@ -653,11 +677,13 @@ if (isValidComponentType("hero")) {
 #### getComponentDefaultTheme
 
 **Signature**:
+
 ```typescript
-getComponentDefaultTheme: (type: string) => string
+getComponentDefaultTheme: (type: string) => string;
 ```
 
 **Example**:
+
 ```typescript
 const theme = getComponentDefaultTheme("hero");
 // Returns: "hero1"
@@ -668,33 +694,35 @@ const theme = getComponentDefaultTheme("hero");
 #### getComponents
 
 **Signature**:
+
 ```typescript
-getComponents: (t: (key: string) => string) => Record<string, ComponentType>
+getComponents: (t: (key: string) => string) => Record<string, ComponentType>;
 ```
 
 **Example**:
+
 ```typescript
 const t = useEditorT();
 const components = getComponents(t);
 
-console.log(components.hero.displayName);  // Translated!
+console.log(components.hero.displayName); // Translated!
 ```
 
 #### getComponentByIdTranslated
 
 **Signature**:
+
 ```typescript
-getComponentByIdTranslated: (
-  id: string,
-  t: (key: string) => string
-) => ComponentType | undefined
+getComponentByIdTranslated: (id: string, t: (key: string) => string) =>
+  ComponentType | undefined;
 ```
 
 **Example**:
+
 ```typescript
 const t = useEditorT();
 const hero = getComponentByIdTranslated("hero", t);
-console.log(hero.displayName);  // "بانر رئيسي" (Arabic)
+console.log(hero.displayName); // "بانر رئيسي" (Arabic)
 ```
 
 ---
@@ -708,14 +736,16 @@ console.log(hero.displayName);  // "بانر رئيسي" (Arabic)
 **Purpose**: Normalize dot-notation paths
 
 **Signature**:
+
 ```typescript
-normalizePath: (path: string) => string
+normalizePath: (path: string) => string;
 ```
 
 **Example**:
+
 ```typescript
-normalizePath("menu.[0].text")     // "menu.0.text"
-normalizePath("content..title")    // "content.title"
+normalizePath("menu.[0].text"); // "menu.0.text"
+normalizePath("content..title"); // "content.title"
 ```
 
 #### getValueByPath
@@ -723,23 +753,25 @@ normalizePath("content..title")    // "content.title"
 **Purpose**: Get value from nested object via path
 
 **Signature**:
+
 ```typescript
-getValueByPath: (obj: any, path: string) => any
+getValueByPath: (obj: any, path: string) => any;
 ```
 
 **Example**:
+
 ```typescript
 const data = {
   content: {
     title: "Welcome",
     stats: {
-      stat1: { value: "100+" }
-    }
-  }
+      stat1: { value: "100+" },
+    },
+  },
 };
 
-getValueByPath(data, "content.title");           // "Welcome"
-getValueByPath(data, "content.stats.stat1.value");  // "100+"
+getValueByPath(data, "content.title"); // "Welcome"
+getValueByPath(data, "content.stats.stat1.value"); // "100+"
 ```
 
 #### updateValueByPath
@@ -747,11 +779,13 @@ getValueByPath(data, "content.stats.stat1.value");  // "100+"
 **Purpose**: Set value in nested object via path
 
 **Signature**:
+
 ```typescript
-updateValueByPath: (obj: any, path: string, value: any) => any
+updateValueByPath: (obj: any, path: string, value: any) => any;
 ```
 
 **Example**:
+
 ```typescript
 const data = { content: { title: "Old" } };
 
@@ -768,14 +802,13 @@ const updated = updateValueByPath(data, "content.title", "New");
 **Purpose**: Generate default data for component type
 
 **Signature**:
+
 ```typescript
-createDefaultData: (
-  type: string,
-  componentName?: string
-) => ComponentData
+createDefaultData: (type: string, componentName?: string) => ComponentData;
 ```
 
 **Example**:
+
 ```typescript
 const data = createDefaultData("hero", "hero1");
 // Returns complete default hero1 data
@@ -789,11 +822,13 @@ const data2 = createDefaultData("hero", "hero2");
 **Purpose**: Deep merge objects
 
 **Signature**:
+
 ```typescript
-deepMerge: (target: any, source: any) => any
+deepMerge: (target: any, source: any) => any;
 ```
 
 **Example**:
+
 ```typescript
 const a = { content: { title: "A", subtitle: "Sub" } };
 const b = { content: { title: "B" } };
@@ -812,6 +847,7 @@ const merged = deepMerge(a, b);
 #### debugLogger.log
 
 **Signature**:
+
 ```typescript
 log: (
   source: string,
@@ -826,6 +862,7 @@ log: (
 ```
 
 **Example**:
+
 ```typescript
 debugLogger.log(
   "SIDEBAR",
@@ -834,14 +871,15 @@ debugLogger.log(
   {
     componentId: "uuid-123",
     componentName: "hero1",
-    componentType: "hero"
-  }
+    componentType: "hero",
+  },
 );
 ```
 
 #### debugLogger.logChange
 
 **Signature**:
+
 ```typescript
 logChange: (
   componentId: string,
@@ -853,26 +891,27 @@ logChange: (
 ```
 
 **Example**:
+
 ```typescript
 debugLogger.logChange(
   "uuid-123",
   "hero1",
   "hero",
   mergedData,
-  "COMPONENT_UPDATE"
+  "COMPONENT_UPDATE",
 );
 ```
 
 ### Helper Functions
 
 ```typescript
-logComponentAdd(componentId, componentName, componentType, data)
-logComponentChange(componentId, oldName, newName, data)
-logEditorStore(action, componentId, componentName, data)
-logTenantStore(action, componentId, componentName, data)
-logComponentRender(componentId, componentName, componentType, data)
-logSidebar(action, componentId, componentName, data)
-logUserAction(action, componentId, componentName, data)
+logComponentAdd(componentId, componentName, componentType, data);
+logComponentChange(componentId, oldName, newName, data);
+logEditorStore(action, componentId, componentName, data);
+logTenantStore(action, componentId, componentName, data);
+logComponentRender(componentId, componentName, componentType, data);
+logSidebar(action, componentId, componentName, data);
+logUserAction(action, componentId, componentName, data);
 ```
 
 ### Log Retrieval
@@ -908,7 +947,7 @@ import {
   getChangeLogsAsString,
   getAllChangeLogs,
   clearChangeLogs,
-  downloadDebugLog
+  downloadDebugLog,
 } from "@/lib-liveeditor/debugLogger";
 ```
 
@@ -922,7 +961,7 @@ import {
   updateValueByPath,
   getSectionIcon,
   getAvailableSectionsTranslated,
-  translateComponentStructure
+  translateComponentStructure,
 } from "@/components/tenant/live-editor/EditorSidebar/utils";
 ```
 
@@ -941,12 +980,12 @@ import {
   isValidComponentType,
   getComponentDisplayName,
   getComponentDefaultTheme,
-  
+
   // Translated versions
   getComponents,
   getComponentByIdTranslated,
   getComponentsBySectionTranslated,
-  getAllComponentsTranslated
+  getAllComponentsTranslated,
 } from "@/lib-liveeditor/ComponentsList";
 ```
 
@@ -957,14 +996,15 @@ import {
 ### useEditorStore
 
 **Usage**:
+
 ```typescript
 // Get specific property
-const tempData = useEditorStore(s => s.tempData);
+const tempData = useEditorStore((s) => s.tempData);
 
 // Get multiple properties
-const { hasChangesMade, currentPage } = useEditorStore(s => ({
+const { hasChangesMade, currentPage } = useEditorStore((s) => ({
   hasChangesMade: s.hasChangesMade,
-  currentPage: s.currentPage
+  currentPage: s.currentPage,
 }));
 
 // Get entire store (avoid in components - causes re-renders)
@@ -974,12 +1014,13 @@ const store = useEditorStore.getState();
 ### useTenantStore
 
 **Usage**:
+
 ```typescript
 // Get property
-const tenantData = useTenantStore(s => s.tenantData);
+const tenantData = useTenantStore((s) => s.tenantData);
 
 // Get function
-const fetchTenantData = useTenantStore(s => s.fetchTenantData);
+const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
 
 // Get entire store
 const store = useTenantStore.getState();
@@ -988,6 +1029,7 @@ const store = useTenantStore.getState();
 ### useEditorI18nStore
 
 **Usage**:
+
 ```typescript
 // Translation function
 const t = useEditorT();
@@ -1027,10 +1069,7 @@ const existingData = component.data;
 const tempData = store.tempData;
 
 // 2. Merge
-const merged = deepMerge(
-  deepMerge(existingData, storeData),
-  tempData
-);
+const merged = deepMerge(deepMerge(existingData, storeData), tempData);
 
 // 3. Save
 store.setComponentData(type, id, merged);
@@ -1075,19 +1114,19 @@ updateComponentByPath: (type, id, path, value) => {
     console.error("Invalid type:", type);
     return;
   }
-  
+
   // Validate id
   if (!id || typeof id !== "string") {
     console.error("Invalid id:", id);
     return;
   }
-  
+
   // Validate path
   if (!path || typeof path !== "string" || path.trim() === "") {
     console.error("Invalid path:", path);
     return;
   }
-  
+
   // Proceed with update...
 };
 ```
@@ -1100,7 +1139,7 @@ TypeScript provides compile-time validation:
 // ✅ CORRECT - TypeScript validates
 store.setComponentData("hero", "uuid-123", {
   visible: true,
-  content: { title: "Welcome" }
+  content: { title: "Welcome" },
 });
 
 // ❌ WRONG - TypeScript error
@@ -1159,6 +1198,7 @@ The API reference provides:
 6. **Common combinations**: Frequent usage patterns
 
 **Key APIs**:
+
 - **editorStore**: Main state management
 - **tenantStore**: API and database integration
 - **Component Functions**: Per-component CRUD operations
@@ -1167,6 +1207,7 @@ The API reference provides:
 - **Debug Logger**: Logging and tracking
 
 **For AI**:
+
 - Use as reference when calling functions
 - Verify parameter types and order
 - Check return values
@@ -1174,9 +1215,9 @@ The API reference provides:
 - Follow usage examples
 
 **For Development**:
+
 - Quick reference for function signatures
 - Parameter documentation
 - Return value types
 - Usage patterns
 - Integration examples
-

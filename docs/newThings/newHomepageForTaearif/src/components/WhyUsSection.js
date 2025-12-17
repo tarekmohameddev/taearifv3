@@ -69,36 +69,35 @@ const WhyUsSection = () => {
               />
             </div>
 
-
             {/* Text Box */}
-            <motion.div 
+            <motion.div
               className="absolute left-0 bottom-0 sm:bottom-8 sm:left-8 bg-white p-4 rounded-lg shadow-lg border border-gray-100 z-[99] max-w-[300px]"
-              animate={{ 
-                y: [0, -10, 0]
+              animate={{
+                y: [0, -10, 0],
               }}
-              transition={{ 
+              transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
-            <motion.div 
-              className="absolute -top-8 -right-0 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg z-[1]"
-              animate={{ 
-                y: [0, -8, 0],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ 
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <Flag className="w-7 h-7 text-white" />
-            </motion.div>
+              <motion.div
+                className="absolute -top-8 -right-0 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg z-[1]"
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <Flag className="w-7 h-7 text-white" />
+              </motion.div>
               <p className="text-sm sm:text-md text-gray-700 max-w-xs">
-                سوينا تعاريف عشان نساعد المسوّقين والمكاتب العقارية في
-                السعودية بتقنية تشتغل لخدمتهم، مو تعقّد شغلهم.
+                سوينا تعاريف عشان نساعد المسوّقين والمكاتب العقارية في السعودية
+                بتقنية تشتغل لخدمتهم، مو تعقّد شغلهم.
               </p>
             </motion.div>
           </div>
@@ -108,7 +107,7 @@ const WhyUsSection = () => {
             {/* Title */}
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                              <span>لماذا نحن { ' ' }</span>
+                <span>لماذا نحن </span>
 
                 <span className="relative inline-block">
                   <span className="relative z-10 text-black">
@@ -143,19 +142,21 @@ const WhyUsSection = () => {
                   <button
                     onClick={() => toggleAccordion(index)}
                     className={`w-full px-6 py-4 text-right transition-all duration-300 flex items-center justify-between cursor-pointer hover:shadow-md hover:scale-[1.02] ${
-                      openAccordion === index ? "bg-[#EFFEF6]" : "bg-white hover:bg-gray-50"
+                      openAccordion === index
+                        ? "bg-[#EFFEF6]"
+                        : "bg-white hover:bg-gray-50"
                     }`}
                   >
                     <span className="text-lg font-medium text-[#7D7D83]">
                       {item.title}
                     </span>
-                     <div className="shrink-0 ml-4">
-                       <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-lg cursor-pointer">
-                         <span className="text-lg font-bold text-black transition-colors duration-200">
-                           {openAccordion === index ? "−" : "+"}
-                         </span>
-                       </div>
-                     </div>
+                    <div className="shrink-0 ml-4">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-lg cursor-pointer">
+                        <span className="text-lg font-bold text-black transition-colors duration-200">
+                          {openAccordion === index ? "−" : "+"}
+                        </span>
+                      </div>
+                    </div>
                   </button>
 
                   <div
@@ -177,23 +178,36 @@ const WhyUsSection = () => {
 
             {/* CTA Button */}
             <div className="flex items-center gap-4 justify-center sm:justify-end">
-                <button 
-                  className="relative bg-black text-white px-8 py-4 rounded-lg font-medium transition-colors duration-300 hover:bg-[#FA8923] overflow-hidden flex items-center gap-3"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
+              <button
+                className="relative bg-black text-white px-8 py-4 rounded-lg font-medium transition-colors duration-300 hover:bg-[#FA8923] overflow-hidden flex items-center gap-3"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
                 >
-                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-                   </svg>
-                  <span className={`block transition-all duration-300 ${isHovered ? '-translate-y-full  opacity-0' : 'translate-y-0'}`}>
-اكتشف المزيد
-                  </span>
-                  <span className={`block transition-transform duration-300 ${isHovered ? 'translate-y-0 ' : 'translate-y-full '} absolute top-0 right-4 w-full h-full flex items-center justify-center gap-3`}>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                <span
+                  className={`block transition-all duration-300 ${isHovered ? "-translate-y-full  opacity-0" : "translate-y-0"}`}
+                >
                   اكتشف المزيد
-                  </span>
-
-                </button>
-              </div>
+                </span>
+                <span
+                  className={`block transition-transform duration-300 ${isHovered ? "translate-y-0 " : "translate-y-full "} absolute top-0 right-4 w-full h-full flex items-center justify-center gap-3`}
+                >
+                  اكتشف المزيد
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

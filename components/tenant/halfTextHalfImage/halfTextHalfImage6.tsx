@@ -130,7 +130,7 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     if (props.useStore) {
       // Get tenant component data inside useEffect to avoid infinite loops
       const tenantComponentData = getTenantComponentData();
-      
+
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -188,8 +188,7 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     <section
       className="w-full flex items-center justify-center"
       style={{
-        backgroundColor:
-          mergedData.styling?.backgroundColor || "#f5f0e8",
+        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
         paddingTop: mergedData.spacing?.padding?.top || "5rem",
         paddingBottom: mergedData.spacing?.padding?.bottom || "3rem",
       }}
@@ -233,7 +232,7 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
                 </span>
                 {mergedData.content?.title?.replace(
                   mergedData.content?.titleUnderlined || "",
-                  ""
+                  "",
                 )}
               </h3>
               <div
@@ -261,5 +260,3 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     </section>
   );
 }
-
-

@@ -211,7 +211,8 @@ export const getDefaultHero3Data = (): ComponentData => ({
   },
   content: {
     title: "مع باهية... اجعل حلمك السكني استثمارا يدوم",
-    subtitle: "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
+    subtitle:
+      "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
     font: {
       title: {
         family: "Tajawal",
@@ -247,13 +248,29 @@ export const getDefaultHero3Data = (): ComponentData => ({
         enabled: true,
         placeholder: "نوع العقار",
         icon: "Home",
-        options: ["الكل", "شقق", "فلل", "اراضي", "ادوار", "عمائر", "تاون هاوس", "أبراج"],
+        options: [
+          "الكل",
+          "شقق",
+          "فلل",
+          "اراضي",
+          "ادوار",
+          "عمائر",
+          "تاون هاوس",
+          "أبراج",
+        ],
       },
       city: {
         enabled: true,
         placeholder: "موقع العقار",
         icon: "MapPin",
-        options: ["اختر المدينة", "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام"],
+        options: [
+          "اختر المدينة",
+          "الرياض",
+          "جدة",
+          "مكة المكرمة",
+          "المدينة المنورة",
+          "الدمام",
+        ],
       },
       status: {
         enabled: true,
@@ -357,10 +374,10 @@ export const heroFunctions = {
       variantId === "hero2"
         ? getDefaultHero2Data()
         : variantId === "hero3"
-        ? getDefaultHero3Data()
-        : variantId === "hero4"
-        ? getDefaultHero4Data()
-        : getDefaultHeroData();
+          ? getDefaultHero3Data()
+          : variantId === "hero4"
+            ? getDefaultHero4Data()
+            : getDefaultHeroData();
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {

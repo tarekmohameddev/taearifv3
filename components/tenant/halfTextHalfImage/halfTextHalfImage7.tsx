@@ -280,8 +280,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     <section
       className="w-full flex items-center justify-center py-12 md:py-16"
       style={{
-        backgroundColor:
-          mergedData.styling?.backgroundColor || "#f5f0e8",
+        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
         paddingTop: mergedData.spacing?.padding?.top || "3rem",
         paddingBottom: mergedData.spacing?.padding?.bottom || "4rem",
         paddingLeft: mergedData.spacing?.padding?.left || "1rem",
@@ -349,7 +348,10 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
               {/* Icon Boxes */}
               <div className="space-y-6 md:space-y-8">
                 {(mergedData.content?.features || []).map((feature, index) => (
-                  <div key={feature.id || index} className="flex items-start gap-4">
+                  <div
+                    key={feature.id || index}
+                    className="flex items-start gap-4"
+                  >
                     <div
                       className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
@@ -390,5 +392,3 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     </section>
   );
 }
-
-

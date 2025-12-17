@@ -8,9 +8,11 @@ export function ReCaptchaWrapper({ children }: { children: ReactNode }) {
     // تنظيف ReCAPTCHA badge عند unmount إذا لزم الأمر
     return () => {
       // إزالة أي scripts قديمة من ReCAPTCHA عند unmount
-      const recaptchaScripts = document.querySelectorAll('script[src*="recaptcha"]');
-      const recaptchaBadges = document.querySelectorAll('.grecaptcha-badge');
-      
+      const recaptchaScripts = document.querySelectorAll(
+        'script[src*="recaptcha"]',
+      );
+      const recaptchaBadges = document.querySelectorAll(".grecaptcha-badge");
+
       // لا نقوم بإزالة الـ scripts والـ badges هنا لأن ReCAPTCHA تحتاجها
       // فقط نترك التنظيف للمكتبة نفسها
     };
@@ -27,8 +29,8 @@ export function ReCaptchaWrapper({ children }: { children: ReactNode }) {
       }}
       container={{
         parameters: {
-          badge: 'bottomright',
-          theme: 'light',
+          badge: "bottomright",
+          theme: "light",
         },
       }}
     >

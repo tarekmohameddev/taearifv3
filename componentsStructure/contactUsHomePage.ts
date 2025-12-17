@@ -10,49 +10,51 @@ export const contactUsHomePageStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
-        },// ═══════════════════════════════════════════════════════════
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
+        }, // ═══════════════════════════════════════════════════════════
         // BACKGROUND CONFIGURATION
         // ═══════════════════════════════════════════════════════════
         {
           key: "background",
           label: "Background",
           type: "object",
-          fields: [{
+          fields: [
+            {
               key: "image",
               label: "Background Image",
               type: "image",
-              placeholder: "https://example.com/image.jpg"
+              placeholder: "https://example.com/image.jpg",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "خلفية"
+              placeholder: "خلفية",
             },
             {
               key: "overlay",
               label: "Overlay",
               type: "object",
-              fields: [{
+              fields: [
+                {
                   key: "enabled",
                   label: "Enabled",
-                  type: "boolean"
+                  type: "boolean",
                 },
                 {
                   key: "color",
                   label: "Overlay Color",
                   type: "color",
-                  placeholder: "rgba(139, 95, 70, 0.8)"
-                }
-              ]
-            }
-          ]
+                  placeholder: "rgba(139, 95, 70, 0.8)",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // HEADER TEXT
         // ═══════════════════════════════════════════════════════════
@@ -60,15 +62,16 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "header",
           label: "Header Text",
           type: "object",
-          fields: [{
+          fields: [
+            {
               key: "text",
               label: "Header Text",
               type: "textarea",
-              placeholder: "سنعثر لك على مستأجر موثوق..."
-            }
-          ]
+              placeholder: "سنعثر لك على مستأجر موثوق...",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // FORM CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -76,81 +79,88 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "form",
           label: "Form Configuration",
           type: "object",
-          fields: [{
+          fields: [
+            {
               key: "submitButton",
               label: "Submit Button",
               type: "object",
-              fields: [{
+              fields: [
+                {
                   key: "text",
                   label: "Button Text",
                   type: "text",
-                  placeholder: "اشترك الآن"
+                  placeholder: "اشترك الآن",
                 },
                 {
                   key: "loadingText",
                   label: "Loading Text",
                   type: "text",
-                  placeholder: "جاري الإرسال..."
+                  placeholder: "جاري الإرسال...",
                 },
                 {
                   key: "backgroundColor",
                   label: "Background Color",
                   type: "color",
-                  placeholder: "#c9a882"
+                  placeholder: "#c9a882",
                 },
                 {
                   key: "hoverColor",
                   label: "Hover Color",
                   type: "color",
-                  placeholder: "#b8966f"
+                  placeholder: "#b8966f",
                 },
                 {
                   key: "textColor",
                   label: "Text Color",
                   type: "color",
-                  placeholder: "#ffffff"
-                }
-              ]
+                  placeholder: "#ffffff",
+                },
+              ],
             },
             {
               key: "fields",
               label: "Form Fields",
               type: "object",
-              fields: [{
+              fields: [
+                {
                   key: "fullName",
                   label: "Full Name Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
-                    { key: "type", label: "Type", type: "text" }
-                  ]
+                    { key: "type", label: "Type", type: "text" },
+                  ],
                 },
                 {
                   key: "whatsappNumber",
                   label: "WhatsApp Number Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
-                    { key: "type", label: "Type", type: "text" }
-                  ]
+                    { key: "type", label: "Type", type: "text" },
+                  ],
                 },
                 {
                   key: "email",
                   label: "Email Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
-                    { key: "type", label: "Type", type: "text" }
-                  ]
+                    { key: "type", label: "Type", type: "text" },
+                  ],
                 },
                 {
                   key: "paymentMethod",
                   label: "Payment Method Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -160,17 +170,19 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" },
-                        { key: "label", label: "Label", type: "text" }
-                      ]
-                    }
-                  ]
+                      of: [
+                        { key: "value", label: "Value", type: "text" },
+                        { key: "label", label: "Label", type: "text" },
+                      ],
+                    },
+                  ],
                 },
                 {
                   key: "city",
                   label: "City Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -180,17 +192,19 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" },
-                        { key: "label", label: "Label", type: "text" }
-                      ]
-                    }
-                  ]
+                      of: [
+                        { key: "value", label: "Value", type: "text" },
+                        { key: "label", label: "Label", type: "text" },
+                      ],
+                    },
+                  ],
                 },
                 {
                   key: "unitType",
                   label: "Unit Type Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -200,38 +214,41 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" },
-                        { key: "label", label: "Label", type: "text" }
-                      ]
-                    }
-                  ]
+                      of: [
+                        { key: "value", label: "Value", type: "text" },
+                        { key: "label", label: "Label", type: "text" },
+                      ],
+                    },
+                  ],
                 },
                 {
                   key: "budget",
                   label: "Budget Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
-                    { key: "type", label: "Type", type: "text" }
-                  ]
+                    { key: "type", label: "Type", type: "text" },
+                  ],
                 },
                 {
                   key: "message",
                   label: "Message Field",
                   type: "object",
-                  fields: [{ key: "label", label: "Label", type: "text" },
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
-                    { key: "rows", label: "Rows", type: "number" }
-                  ]
-                }
-              ]
-            }
-          ]
+                    { key: "rows", label: "Rows", type: "number" },
+                  ],
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -239,51 +256,52 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "styling",
           label: "Styling",
           type: "object",
-          fields: [{
+          fields: [
+            {
               key: "inputBackground",
               label: "Input Background Color",
               type: "color",
-              placeholder: "#f5f0e8"
+              placeholder: "#f5f0e8",
             },
             {
               key: "inputBorder",
               label: "Input Border Color",
               type: "color",
-              placeholder: "#c4b5a0"
+              placeholder: "#c4b5a0",
             },
             {
               key: "inputText",
               label: "Input Text Color",
               type: "color",
-              placeholder: "#ffffff"
+              placeholder: "#ffffff",
             },
             {
               key: "inputPlaceholder",
               label: "Input Placeholder Color",
               type: "color",
-              placeholder: "#8b7a6a"
+              placeholder: "#8b7a6a",
             },
             {
               key: "inputFocus",
               label: "Input Focus Color",
               type: "color",
-              placeholder: "#8b5f46"
+              placeholder: "#8b5f46",
             },
             {
               key: "labelColor",
               label: "Label Color",
               type: "color",
-              placeholder: "#ffffff"
+              placeholder: "#ffffff",
             },
             {
               key: "errorColor",
               label: "Error Color",
               type: "color",
-              placeholder: "#ef4444"
-            }
-          ]
+              placeholder: "#ef4444",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT
         // ═══════════════════════════════════════════════════════════
@@ -291,74 +309,80 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "layout",
           label: "Layout",
           type: "object",
-          fields: [{
+          fields: [
+            {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "4xl"
+              placeholder: "4xl",
             },
             {
               key: "padding",
               label: "Padding",
               type: "object",
-              fields: [{
+              fields: [
+                {
                   key: "mobile",
                   label: "Mobile Padding",
                   type: "text",
-                  placeholder: "1rem"
+                  placeholder: "1rem",
                 },
                 {
                   key: "tablet",
                   label: "Tablet Padding",
                   type: "text",
-                  placeholder: "2rem"
+                  placeholder: "2rem",
                 },
                 {
                   key: "desktop",
                   label: "Desktop Padding",
                   type: "text",
-                  placeholder: "3rem"
-                }
-              ]
+                  placeholder: "3rem",
+                },
+              ],
             },
             {
               key: "gap",
               label: "Gap",
               type: "object",
-              fields: [{
+              fields: [
+                {
                   key: "mobile",
                   label: "Mobile Gap",
                   type: "text",
-                  placeholder: "1rem"
+                  placeholder: "1rem",
                 },
                 {
                   key: "tablet",
                   label: "Tablet Gap",
                   type: "text",
-                  placeholder: "1.5rem"
+                  placeholder: "1.5rem",
                 },
                 {
                   key: "desktop",
                   label: "Desktop Gap",
                   type: "text",
-                  placeholder: "1.5rem"
-                }
-              ]
-            }
-          ]
-        }
+                  placeholder: "1.5rem",
+                },
+              ],
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "header.text", label: "Header Text", type: "textarea" },
-        { key: "form.submitButton.text", label: "Submit Button Text", type: "text" },
-        { key: "background.image", label: "Background Image", type: "image" }
-      ]
-    }
-  ]
+        {
+          key: "form.submitButton.text",
+          label: "Submit Button Text",
+          type: "text",
+        },
+        { key: "background.image", label: "Background Image", type: "image" },
+      ],
+    },
+  ],
 };
-

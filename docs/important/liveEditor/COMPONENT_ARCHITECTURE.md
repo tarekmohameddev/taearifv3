@@ -1,6 +1,7 @@
 # Component Architecture - Complete Reference
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Component Registry System](#component-registry-system)
 3. [Component Structure Definitions](#component-structure-definitions)
@@ -13,6 +14,7 @@
 ## Overview
 
 The Live Editor uses a **registry-based architecture** where all component types are centrally managed. This provides:
+
 - **Single source of truth**: ComponentsList.tsx defines all components
 - **Consistent patterns**: All components follow same structure
 - **Easy extensibility**: Add new components by following pattern
@@ -63,18 +65,18 @@ The Live Editor uses a **registry-based architecture** where all component types
 ```typescript
 // Component type definition
 export interface ComponentType {
-  id: string;              // "hero"
-  name: string;            // "hero"
-  displayName: string;     // "Hero"
-  description: string;     // "Main banner section..."
-  category: string;        // "banner"
-  section: string;         // "homepage"
-  subPath: string;         // "hero"
-  variants: any[];         // From structure
-  icon: string;            // "🌟"
-  hasStore?: boolean;      // (optional) has dedicated store
-  hasStructure?: boolean;  // (optional) has structure definition
-  defaultTheme?: string;   // "hero1"
+  id: string; // "hero"
+  name: string; // "hero"
+  displayName: string; // "Hero"
+  description: string; // "Main banner section..."
+  category: string; // "banner"
+  section: string; // "homepage"
+  subPath: string; // "hero"
+  variants: any[]; // From structure
+  icon: string; // "🌟"
+  hasStore?: boolean; // (optional) has dedicated store
+  hasStructure?: boolean; // (optional) has structure definition
+  defaultTheme?: string; // "hero1"
 }
 
 // Main registry
@@ -83,15 +85,16 @@ export const COMPONENTS: Record<string, ComponentType> = {
     id: "hero",
     name: "hero",
     displayName: "Hero",
-    description: "Main banner section with compelling headline and call-to-action",
+    description:
+      "Main banner section with compelling headline and call-to-action",
     category: "banner",
     section: "homepage",
     subPath: "hero",
     icon: "🌟",
     defaultTheme: "hero1",
-    ...heroStructure  // Spreads variants and other structure data
+    ...heroStructure, // Spreads variants and other structure data
   },
-  
+
   header: {
     id: "header",
     name: "header",
@@ -101,9 +104,9 @@ export const COMPONENTS: Record<string, ComponentType> = {
     section: "homepage",
     subPath: "header",
     icon: "📄",
-    ...headerStructure
+    ...headerStructure,
   },
-  
+
   halfTextHalfImage: {
     id: "halfTextHalfImage",
     name: "halfTextHalfImage",
@@ -113,9 +116,9 @@ export const COMPONENTS: Record<string, ComponentType> = {
     section: "homepage",
     subPath: "halfTextHalfImage",
     icon: "🖼️",
-    ...halfTextHalfImageStructure
+    ...halfTextHalfImageStructure,
   },
-  
+
   // ... more components
 };
 ```
@@ -130,7 +133,7 @@ export const getComponentById = (id: string): ComponentType | undefined => {
 
 // Get all components for a section
 export const getComponentsBySection = (sectionId: string): ComponentType[] => {
-  return Object.values(COMPONENTS).filter(comp => comp.section === sectionId);
+  return Object.values(COMPONENTS).filter((comp) => comp.section === sectionId);
 };
 
 // Get display name
@@ -156,7 +159,7 @@ export const isValidComponentType = (type: string): boolean => {
 ```typescript
 // Get components with translations
 export const getComponents = (
-  t: (key: string) => string
+  t: (key: string) => string,
 ): Record<string, ComponentType> => ({
   hero: {
     id: "hero",
@@ -167,7 +170,7 @@ export const getComponents = (
     section: "homepage",
     subPath: "hero",
     icon: "🌟",
-    ...heroStructure
+    ...heroStructure,
   },
   // ... more components with translations
 });
@@ -175,7 +178,7 @@ export const getComponents = (
 // Get translated component by ID
 export const getComponentByIdTranslated = (
   id: string,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): ComponentType | undefined => {
   const components = getComponents(t);
   return components[id];
@@ -197,7 +200,7 @@ import { ComponentStructure } from "./types";
 
 export const heroStructure: ComponentStructure = {
   componentType: "hero",
-  
+
   variants: [
     // ═══════════════════════════════════════════════════════════
     // VARIANT 1: Hero with Search Form
@@ -207,13 +210,13 @@ export const heroStructure: ComponentStructure = {
       name: "Hero with Search Form",
       description: "Full-height hero with background and search form",
       componentPath: "components/tenant/hero/hero1.tsx",
-      
+
       // All editable fields
       fields: [
         {
           key: "visible",
           label: "Visible",
-          type: "boolean"
+          type: "boolean",
         },
         {
           key: "height",
@@ -224,21 +227,21 @@ export const heroStructure: ComponentStructure = {
               key: "desktop",
               label: "Desktop Height",
               type: "text",
-              placeholder: "90vh"
+              placeholder: "90vh",
             },
             {
               key: "tablet",
               label: "Tablet Height",
               type: "text",
-              placeholder: "90vh"
+              placeholder: "90vh",
             },
             {
               key: "mobile",
               label: "Mobile Height",
               type: "text",
-              placeholder: "90vh"
-            }
-          ]
+              placeholder: "90vh",
+            },
+          ],
         },
         {
           key: "background",
@@ -248,7 +251,7 @@ export const heroStructure: ComponentStructure = {
             {
               key: "image",
               label: "Background Image",
-              type: "image"
+              type: "image",
             },
             {
               key: "overlay",
@@ -258,22 +261,22 @@ export const heroStructure: ComponentStructure = {
                 {
                   key: "enabled",
                   label: "Enable Overlay",
-                  type: "boolean"
+                  type: "boolean",
                 },
                 {
                   key: "opacity",
                   label: "Opacity",
                   type: "text",
-                  placeholder: "0.45"
+                  placeholder: "0.45",
                 },
                 {
                   key: "color",
                   label: "Overlay Color",
-                  type: "color"
-                }
-              ]
-            }
-          ]
+                  type: "color",
+                },
+              ],
+            },
+          ],
         },
         {
           key: "content",
@@ -286,45 +289,45 @@ export const heroStructure: ComponentStructure = {
               type: "text",
               placeholder: "Discover Your Perfect Property",
               min: 10,
-              max: 100
+              max: 100,
             },
             {
               key: "subtitle",
               label: "Subtitle",
               type: "textarea",
               placeholder: "We offer the best...",
-              max: 200
-            }
-          ]
-        }
+              max: 200,
+            },
+          ],
+        },
         // ... more fields
       ],
-      
+
       // Simplified fields for "Simple" mode
       simpleFields: [
         {
           key: "visible",
           label: "Visible",
-          type: "boolean"
+          type: "boolean",
         },
         {
           key: "content.title",
           label: "Title",
-          type: "text"
+          type: "text",
         },
         {
           key: "content.subtitle",
           label: "Subtitle",
-          type: "textarea"
+          type: "textarea",
         },
         {
           key: "background.image",
           label: "Background Image",
-          type: "image"
-        }
-      ]
+          type: "image",
+        },
+      ],
     },
-    
+
     // ═══════════════════════════════════════════════════════════
     // VARIANT 2: Simple Hero Banner
     // ═══════════════════════════════════════════════════════════
@@ -333,16 +336,16 @@ export const heroStructure: ComponentStructure = {
       name: "Simple Hero Banner",
       description: "Fixed-height hero banner without search form",
       componentPath: "components/tenant/hero/hero2.tsx",
-      
+
       fields: [
         // Different field set for hero2
       ],
-      
+
       simpleFields: [
         // Simplified fields for hero2
-      ]
-    }
-  ]
+      ],
+    },
+  ],
 };
 ```
 
@@ -415,15 +418,15 @@ export const getDefaultHeroData = (): ComponentData => ({
   height: {
     desktop: "90vh",
     tablet: "90vh",
-    mobile: "90vh"
+    mobile: "90vh",
   },
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     overlay: {
       enabled: true,
       opacity: "0.45",
-      color: "#000000"
-    }
+      color: "#000000",
+    },
   },
   content: {
     title: "Discover Your Perfect Property",
@@ -433,9 +436,9 @@ export const getDefaultHeroData = (): ComponentData => ({
         family: "Tajawal",
         size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
         weight: "extrabold",
-        color: "#ffffff"
-      }
-    }
+        color: "#ffffff",
+      },
+    },
   },
   searchForm: {
     enabled: true,
@@ -444,8 +447,8 @@ export const getDefaultHeroData = (): ComponentData => ({
   },
   animations: {
     title: { enabled: true, type: "fade-up", duration: 600 },
-    subtitle: { enabled: true, type: "fade-up", duration: 600 }
-  }
+    subtitle: { enabled: true, type: "fade-up", duration: 600 },
+  },
 });
 
 // Variant-specific defaults
@@ -454,12 +457,12 @@ export const getDefaultHero2Data = (): ComponentData => ({
   height: { desktop: "229px", tablet: "229px", mobile: "229px" },
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
-    overlay: { enabled: true, opacity: "0.6", color: "#000000" }
+    overlay: { enabled: true, opacity: "0.6", color: "#000000" },
   },
   content: {
     title: "About Us",
-    description: "Your trusted partner in real estate"
-  }
+    description: "Your trusted partner in real estate",
+  },
   // ... hero2-specific structure
 });
 
@@ -471,69 +474,59 @@ export const heroFunctions = {
   // ─────────────────────────────────────────────────────────
   // ENSURE VARIANT: Initialize component if not exists
   // ─────────────────────────────────────────────────────────
-  ensureVariant: (
-    state: any,
-    variantId: string,
-    initial?: ComponentData
-  ) => {
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     console.log("🔍 heroFunctions.ensureVariant called:", {
       variantId,
       hasInitial: !!initial,
-      existingData: state.heroStates[variantId]
+      existingData: state.heroStates[variantId],
     });
-    
+
     // Priority 1: Use initial data if provided
     if (initial && Object.keys(initial).length > 0) {
       return {
         heroStates: {
           ...state.heroStates,
-          [variantId]: initial
-        }
+          [variantId]: initial,
+        },
       };
     }
-    
+
     // Priority 2: Component already exists
     if (
       state.heroStates[variantId] &&
       Object.keys(state.heroStates[variantId]).length > 0
     ) {
-      return {};  // No changes needed
+      return {}; // No changes needed
     }
-    
+
     // Priority 3: Create with defaults
-    const defaultData = variantId === "hero2"
-      ? getDefaultHero2Data()
-      : getDefaultHeroData();
-    
+    const defaultData =
+      variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
+
     const data = initial || state.tempData || defaultData;
-    
+
     return {
       heroStates: {
         ...state.heroStates,
-        [variantId]: data
-      }
+        [variantId]: data,
+      },
     };
   },
-  
+
   // ─────────────────────────────────────────────────────────
   // GET DATA: Retrieve component data
   // ─────────────────────────────────────────────────────────
   getData: (state: any, variantId: string) => {
     return state.heroStates[variantId] || {};
   },
-  
+
   // ─────────────────────────────────────────────────────────
   // SET DATA: Set/replace component data
   // ─────────────────────────────────────────────────────────
-  setData: (
-    state: any,
-    variantId: string,
-    data: ComponentData
-  ) => {
+  setData: (state: any, variantId: string, data: ComponentData) => {
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
-      state.pageComponentsByPage[currentPage] || [];
-    
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
     // Update page components to keep in sync
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "hero" && comp.id === variantId) {
@@ -541,53 +534,47 @@ export const heroFunctions = {
       }
       return comp;
     });
-    
+
     return {
       heroStates: {
         ...state.heroStates,
-        [variantId]: data
+        [variantId]: data,
       },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents
-      }
+        [currentPage]: updatedComponents,
+      },
     };
   },
-  
+
   // ─────────────────────────────────────────────────────────
   // UPDATE BY PATH: Update specific field via path
   // ─────────────────────────────────────────────────────────
-  updateByPath: (
-    state: any,
-    variantId: string,
-    path: string,
-    value: any
-  ) => {
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.heroStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
-      state.pageComponentsByPage[currentPage] || [];
-    
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "hero" && comp.id === variantId) {
         return { ...comp, data: newData };
       }
       return comp;
     });
-    
+
     return {
       heroStates: {
         ...state.heroStates,
-        [variantId]: newData
+        [variantId]: newData,
       },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents
-      }
+        [currentPage]: updatedComponents,
+      },
     };
-  }
+  },
 };
 ```
 
@@ -605,15 +592,15 @@ ensureComponentVariant: (componentType, variantId, initial) =>
     switch (componentType) {
       case "hero":
         return heroFunctions.ensureVariant(state, variantId, initial);
-      
+
       case "header":
         return headerFunctions.ensureVariant(state, variantId, initial);
-      
+
       case "halfTextHalfImage":
         return halfTextHalfImageFunctions.ensureVariant(state, variantId, initial);
-      
+
       // ... more component types
-      
+
       default:
         // Fallback for unknown types
         const defaultData = createDefaultData(componentType);
@@ -632,16 +619,16 @@ ensureComponentVariant: (componentType, variantId, initial) =>
 // Similar routing for getData, setData, updateByPath
 getComponentData: (componentType, variantId) => {
   const state = get();
-  
+
   switch (componentType) {
     case "hero":
       return heroFunctions.getData(state, variantId);
-    
+
     case "header":
       return headerFunctions.getData(state, variantId);
-    
+
     // ... more cases
-    
+
     default:
       return state.componentStates[componentType]?.[variantId] || {};
   }
@@ -650,14 +637,14 @@ getComponentData: (componentType, variantId) => {
 setComponentData: (componentType, variantId, data) =>
   set((state) => {
     let newState;
-    
+
     switch (componentType) {
       case "hero":
         newState = heroFunctions.setData(state, variantId, data);
         break;
-      
+
       // ... more cases
-      
+
       default:
         newState = {
           componentStates: {
@@ -669,10 +656,10 @@ setComponentData: (componentType, variantId, data) =>
           }
         };
     }
-    
+
     // Update pageComponents
     const updatedComponents = updatePageComponents(state, componentType, variantId, data);
-    
+
     return {
       ...newState,
       pageComponentsByPage: {
@@ -685,15 +672,15 @@ setComponentData: (componentType, variantId, data) =>
 updateComponentByPath: (componentType, variantId, path, value) =>
   set((state) => {
     let newState;
-    
+
     switch (componentType) {
       case "hero":
         newState = heroFunctions.updateByPath(state, variantId, path, value);
         break;
-      
+
       // ... more cases
     }
-    
+
     return newState;
   })
 ```
@@ -730,18 +717,18 @@ export default function Hero1(props: HeroProps = {}) {
   // ═══════════════════════════════════════════════════════════
   const variantId = props.variant || "hero1";
   const uniqueId = props.id || variantId;
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 2: Connect to Stores
   // ═══════════════════════════════════════════════════════════
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const heroStates = useEditorStore(s => s.heroStates);
-  
+
   const tenantData = useTenantStore(s => s.tenantData);
   const tenantId = useTenantStore(s => s.tenantId);
   const fetchTenantData = useTenantStore(s => s.fetchTenantData);
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 3: Initialize in Store
   // ═══════════════════════════════════════════════════════════
@@ -751,11 +738,11 @@ export default function Hero1(props: HeroProps = {}) {
         ...getDefaultHeroData(),  // Defaults
         ...props                  // Override with props
       };
-      
+
       ensureComponentVariant("hero", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant]);
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 4: Fetch Tenant Data (if needed)
   // ═══════════════════════════════════════════════════════════
@@ -764,13 +751,13 @@ export default function Hero1(props: HeroProps = {}) {
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 5: Extract Tenant Component Data
   // ═══════════════════════════════════════════════════════════
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) return {};
-    
+
     // Search in all pages
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings
@@ -789,35 +776,35 @@ export default function Hero1(props: HeroProps = {}) {
         }
       }
     }
-    
+
     return {};
   };
-  
+
   const tenantComponentData = getTenantComponentData();
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 6: Get Store Data
   // ═══════════════════════════════════════════════════════════
   const storeData = props.useStore
     ? getComponentData("hero", uniqueId) || {}
     : {};
-  
+
   const currentStoreData = props.useStore
     ? heroStates[uniqueId] || {}
     : {};
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 7: Merge Data (Priority System)
   // ═══════════════════════════════════════════════════════════
   const defaultData = getDefaultHeroData();
-  
+
   const mergedData = {
     ...defaultData,           // Priority 1 (lowest)
     ...props,                 // Priority 2
     ...tenantComponentData,   // Priority 3
     ...storeData,             // Priority 4
     ...currentStoreData,      // Priority 5 (highest)
-    
+
     // Deep merge nested objects
     content: {
       ...defaultData.content,
@@ -825,7 +812,7 @@ export default function Hero1(props: HeroProps = {}) {
       ...(tenantComponentData.content || {}),
       ...(storeData.content || {}),
       ...(currentStoreData.content || {}),
-      
+
       font: {
         ...defaultData.content?.font,
         ...(props.content?.font || {}),
@@ -834,7 +821,7 @@ export default function Hero1(props: HeroProps = {}) {
         ...(currentStoreData.content?.font || {})
       }
     },
-    
+
     background: {
       ...defaultData.background,
       ...(props.background || {}),
@@ -842,10 +829,10 @@ export default function Hero1(props: HeroProps = {}) {
       ...(storeData.background || {}),
       ...(currentStoreData.background || {})
     }
-    
+
     // ... more nested merges
   };
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 8: Render Component
   // ═══════════════════════════════════════════════════════════
@@ -862,7 +849,7 @@ export default function Hero1(props: HeroProps = {}) {
         opacity: mergedData.background?.overlay?.opacity || 0.45,
         backgroundColor: mergedData.background?.overlay?.color || "#000000"
       }} />
-      
+
       <div className="hero-content">
         <h1 style={{
           fontFamily: mergedData.content?.font?.title?.family,
@@ -871,7 +858,7 @@ export default function Hero1(props: HeroProps = {}) {
         }}>
           {mergedData.content?.title || "Default Title"}
         </h1>
-        
+
         <p style={{
           fontFamily: mergedData.content?.font?.subtitle?.family,
           fontSize: mergedData.content?.font?.subtitle?.size?.desktop,
@@ -879,7 +866,7 @@ export default function Hero1(props: HeroProps = {}) {
         }}>
           {mergedData.content?.subtitle || "Default Subtitle"}
         </p>
-        
+
         {mergedData.searchForm?.enabled && (
           <SearchForm {...mergedData.searchForm} />
         )}
@@ -916,7 +903,7 @@ import { ComponentStructure } from "./types";
 
 export const testimonialsStructure: ComponentStructure = {
   componentType: "testimonials",
-  
+
   variants: [
     {
       id: "testimonials1",
@@ -980,7 +967,7 @@ export const testimonialsStructure: ComponentStructure = {
           ]
         }
       ],
-      
+
       simpleFields: [
         {
           key: "visible",
@@ -1052,10 +1039,10 @@ export const testimonialsFunctions = {
     ) {
       return {};
     }
-    
+
     const defaultData = getDefaultTestimonialsData();
     const data = initial || state.tempData || defaultData;
-    
+
     return {
       testimonialsStates: {
         ...state.testimonialsStates,
@@ -1063,23 +1050,23 @@ export const testimonialsFunctions = {
       }
     };
   },
-  
+
   getData: (state, variantId) => {
     return state.testimonialsStates[variantId] || {};
   },
-  
+
   setData: (state, variantId, data) => {
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
+    const updatedPageComponents =
       state.pageComponentsByPage[currentPage] || [];
-    
+
     const updatedComponents = updatedPageComponents.map(comp => {
       if (comp.type === "testimonials" && comp.id === variantId) {
         return { ...comp, data };
       }
       return comp;
     });
-    
+
     return {
       testimonialsStates: {
         ...state.testimonialsStates,
@@ -1091,22 +1078,22 @@ export const testimonialsFunctions = {
       }
     };
   },
-  
+
   updateByPath: (state, variantId, path, value) => {
     const source = state.testimonialsStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
+    const updatedPageComponents =
       state.pageComponentsByPage[currentPage] || [];
-    
+
     const updatedComponents = updatedPageComponents.map(comp => {
       if (comp.type === "testimonials" && comp.id === variantId) {
         return { ...comp, data: newData };
       }
       return comp;
     });
-    
+
     return {
       testimonialsStates: {
         ...state.testimonialsStates,
@@ -1132,7 +1119,7 @@ import { testimonialsStructure } from "@/componentsStructure/testimonials";
 // Add to interface
 interface EditorStore {
   // ... existing properties
-  
+
   // Testimonials states
   testimonialsStates: Record<string, ComponentData>;
   ensureTestimonialsVariant: (variantId, initial?) => void;
@@ -1144,50 +1131,50 @@ interface EditorStore {
 // Add to initial state
 export const useEditorStore = create<EditorStore>((set, get) => ({
   // ... existing state
-  
+
   testimonialsStates: {},
-  
+
   // Add to switch statements
   ensureComponentVariant: (type, id, initial) =>
     set((state) => {
       switch (type) {
         // ... existing cases
-        
+
         case "testimonials":
           return testimonialsFunctions.ensureVariant(state, id, initial);
-        
+
         default:
           // Fallback...
       }
     }),
-  
+
   getComponentData: (type, id) => {
     const state = get();
     switch (type) {
       // ... existing cases
-      
+
       case "testimonials":
         return testimonialsFunctions.getData(state, id);
-      
+
       default:
         // Fallback...
     }
   },
-  
+
   // Similar for setComponentData and updateComponentByPath
-  
+
   // Legacy specific functions (for direct access)
   ensureTestimonialsVariant: (id, initial) =>
     set(state => testimonialsFunctions.ensureVariant(state, id, initial)),
-  
+
   getTestimonialsData: (id) => {
     const state = get();
     return testimonialsFunctions.getData(state, id);
   },
-  
+
   setTestimonialsData: (id, data) =>
     set(state => testimonialsFunctions.setData(state, id, data)),
-  
+
   updateTestimonialsByPath: (id, path, value) =>
     set(state => testimonialsFunctions.updateByPath(state, id, path, value))
 }));
@@ -1201,7 +1188,7 @@ import { testimonialsStructure } from "@/componentsStructure/testimonials";
 
 export const COMPONENTS: Record<string, ComponentType> = {
   // ... existing components
-  
+
   testimonials: {
     id: "testimonials",
     name: "testimonials",
@@ -1223,12 +1210,12 @@ File: components/tenant/testimonials/testimonials1.tsx
 export default function Testimonials1(props: TestimonialsProps = {}) {
   const variantId = props.variant || "testimonials1";
   const uniqueId = props.id || variantId;
-  
+
   // Connect to stores
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const testimonialsStates = useEditorStore(s => s.testimonialsStates);
-  
+
   // Initialize
   useEffect(() => {
     if (props.useStore) {
@@ -1239,19 +1226,19 @@ export default function Testimonials1(props: TestimonialsProps = {}) {
       ensureComponentVariant("testimonials", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore]);
-  
+
   // Merge data
   const defaultData = getDefaultTestimonialsData();
   const storeData = props.useStore
     ? getComponentData("testimonials", uniqueId) || {}
     : {};
-  
+
   const mergedData = {
     ...defaultData,
     ...props,
     ...storeData
   };
-  
+
   // Render
   return (
     <section className="testimonials-section">
@@ -1259,7 +1246,7 @@ export default function Testimonials1(props: TestimonialsProps = {}) {
         <h2>{mergedData.header?.title}</h2>
         <p>{mergedData.header?.subtitle}</p>
       </div>
-      
+
       <div className="carousel">
         {mergedData.testimonials?.map((testimonial, index) => (
           <div key={index} className="testimonial-card">
@@ -1285,10 +1272,10 @@ import { getDefaultTestimonialsData } from "@/context-liveeditor/editorStoreFunc
 export const createDefaultData = (type, componentName?) => {
   switch (type) {
     // ... existing cases
-    
+
     case "testimonials":
       return getDefaultTestimonialsData();
-    
+
     default:
       // Fallback...
   }
@@ -1302,9 +1289,9 @@ File: context-liveeditor/editorStore.ts
 loadFromDatabase: (tenantData) =>
   set((state) => {
     const newState = { ...state };
-    
+
     // ... existing loading logic
-    
+
     // Load testimonials data
     Object.entries(tenantData.componentSettings).forEach(
       ([page, pageSettings]) => {
@@ -1313,9 +1300,9 @@ loadFromDatabase: (tenantData) =>
             if (comp.data && comp.componentName) {
               switch (comp.type) {
                 // ... existing cases
-                
+
                 case "testimonials":
-                  newState.testimonialsStates = 
+                  newState.testimonialsStates =
                     testimonialsFunctions.setData(
                       newState,
                       comp.id,        // Use comp.id!
@@ -1328,7 +1315,7 @@ loadFromDatabase: (tenantData) =>
         }
       }
     );
-    
+
     return newState;
   })
 
@@ -1382,11 +1369,12 @@ export const heroStructure = {
 4. **Different React components**: hero1.tsx vs hero2.tsx
 
 **Switching Variants**:
+
 ```typescript
 handleComponentThemeChange(id, "hero2") {
   // Get hero2 default data
   const newData = createDefaultData("hero", "hero2");
-  
+
   // Update component
   return {
     ...component,
@@ -1414,6 +1402,7 @@ Categories:
 ```
 
 **Get by Category**:
+
 ```typescript
 const contentComponents = getComponentsByCategory("content");
 // Returns: [halfTextHalfImage, propertySlider, testimonials, ...]
@@ -1444,6 +1433,7 @@ Sections:
 ```
 
 **Get by Section**:
+
 ```typescript
 const homepageComponents = getComponentsBySection("homepage");
 // Returns all components available for homepage
@@ -1473,14 +1463,15 @@ When creating a new component:
 ### Common Patterns
 
 **Pattern 1**: Component with multiple variants
+
 ```typescript
 // Use variant-specific default data
-const defaultData = componentName === "hero2"
-  ? getDefaultHero2Data()
-  : getDefaultHeroData();
+const defaultData =
+  componentName === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
 ```
 
 **Pattern 2**: Component with nested arrays
+
 ```typescript
 // Support recursive field rendering
 {
@@ -1499,6 +1490,7 @@ const defaultData = componentName === "hero2"
 ```
 
 **Pattern 3**: Component with conditional fields
+
 ```typescript
 // Show field only when condition met
 {
@@ -1535,6 +1527,7 @@ The component architecture provides:
 7. **Easy extension**: Follow pattern to add new types
 
 **Key Files**:
+
 - `ComponentsList.tsx`: Registry
 - `componentsStructure/{type}.ts`: Structure definition
 - `editorStoreFunctions/{type}Functions.ts`: Store functions
@@ -1542,9 +1535,9 @@ The component architecture provides:
 - `editorStore.ts`: Store integration
 
 Understanding this architecture enables:
+
 - Adding new component types
 - Creating component variants
 - Modifying component behavior
 - Debugging component issues
 - Optimizing component performance
-

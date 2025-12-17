@@ -16,29 +16,26 @@ export default async function RootLayout({
   const tenantId = headersList.get("x-tenant-id");
   const pathname = headersList.get("x-pathname") || "";
   const locale = headersList.get("x-locale") || "";
-  
+
   // تحديد الصفحات التي تحتاج dir ديناميكي
   const landingPages = [
     "/", // الصفحة الرئيسية
     "/solutions",
-    "/updates", 
+    "/updates",
     "/landing",
-    "/about-us"
+    "/about-us",
   ];
-  
+
   const isLandingPage = landingPages.includes(pathname);
-  
+
   // تحديد dir بناءً على اللغة للصفحات المحددة فقط
   const dir = isLandingPage ? (locale === "ar" ? "rtl" : "ltr") : "rtl";
 
   // إعادة التوجيه من الإنجليزية إلى العربية (استثناء live-editor وصفحات landing)
-  const isLiveEditorPage = pathname === "/live-editor" || pathname.startsWith("/live-editor/");
+  const isLiveEditorPage =
+    pathname === "/live-editor" || pathname.startsWith("/live-editor/");
 
-  if (
-    locale === "en" &&
-    !isLiveEditorPage &&
-    !isLandingPage
-  ) {
+  if (locale === "en" && !isLiveEditorPage && !isLandingPage) {
     const redirectUrl = `/ar${pathname}`;
     redirect(redirectUrl);
   }

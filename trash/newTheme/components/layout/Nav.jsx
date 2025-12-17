@@ -236,13 +236,9 @@ const Nav = () => {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
           >
             {isMenuOpen ? (
-              <FiX
-                className={`text-gray-200`}
-              />
+              <FiX className={`text-gray-200`} />
             ) : (
-              <FiMenu
-                className={`text-gray-200`}
-              />
+              <FiMenu className={`text-gray-200`} />
             )}
           </motion.button>
         ) : null}

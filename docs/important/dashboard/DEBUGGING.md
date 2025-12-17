@@ -11,11 +11,13 @@ Complete troubleshooting guide for common Dashboard issues with debug commands a
 ### Issue 1: "Redirected to login constantly"
 
 **Symptoms:**
+
 - Can't access dashboard pages
 - Immediately redirected to /login
 - Login seems successful but redirect happens again
 
 **Causes:**
+
 - Token expired or invalid
 - Cookie not being set properly
 - Token validation failing
@@ -30,8 +32,8 @@ console.log("User token:", user?.token);
 console.log("User email:", user?.email);
 
 // 2. Check authToken cookie
-const cookies = document.cookie.split(';');
-const authCookie = cookies.find(c => c.includes('authToken'));
+const cookies = document.cookie.split(";");
+const authCookie = cookies.find((c) => c.includes("authToken"));
 console.log("Auth cookie:", authCookie);
 
 // 3. Check AuthStore state
@@ -41,7 +43,7 @@ console.log("User data:", authState.userData);
 
 // 4. Manually validate token
 const response = await fetch("https://api.taearif.com/api/user", {
-  headers: { Authorization: `Bearer ${user.token}` }
+  headers: { Authorization: `Bearer ${user.token}` },
 });
 console.log("Token validation status:", response.status);
 console.log("Token validation response:", await response.json());
@@ -52,11 +54,14 @@ console.log("Axios locked:", isAxiosLocked());
 ```
 
 **Solutions:**
+
 1. Clear all cookies and localStorage:
    ```javascript
    localStorage.clear();
-   document.cookie.split(";").forEach(c => {
-     document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+   document.cookie.split(";").forEach((c) => {
+     document.cookie =
+       c.trim().split("=")[0] +
+       "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
    });
    ```
 2. Re-login fresh
@@ -69,11 +74,13 @@ console.log("Axios locked:", isAxiosLocked());
 ### Issue 2: "Dashboard shows on tenant domain"
 
 **Symptoms:**
+
 - Can access `/ar/dashboard` on tenant1.localhost:3000
 - Dashboard loads but may have issues
 - Domain validation not blocking access
 
 **Cause:**
+
 - Domain validation logic not working
 - Layout validation bypassed
 - Environment variables incorrect
@@ -86,7 +93,8 @@ const hostname = window.location.hostname;
 console.log("Current hostname:", hostname);
 
 // Check domain validation logic
-const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+const productionDomain =
+  process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
 const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -94,7 +102,7 @@ console.log("Production domain:", productionDomain);
 console.log("Local domain:", localDomain);
 console.log("Is development:", isDevelopment);
 
-const isBaseDomain = isDevelopment 
+const isBaseDomain = isDevelopment
   ? hostname === localDomain || hostname === `${localDomain}:3000`
   : hostname === productionDomain || hostname === `www.${productionDomain}`;
 
@@ -105,6 +113,7 @@ console.log("Is base domain:", isBaseDomain);
 ```
 
 **Solutions:**
+
 - Dashboard should ONLY work on base domain
 - Add console.log in `app/dashboard/layout.tsx` domain check (line 48)
 - Verify environment variables are set correctly
@@ -115,12 +124,14 @@ console.log("Is base domain:", isBaseDomain);
 ### Issue 3: "Menu items not showing in sidebar"
 
 **Symptoms:**
+
 - Sidebar loads but shows no menu items
 - Loading spinner stuck
 - Empty menu
 - Sidebar blank
 
 **Causes:**
+
 - API request failing (404, 500)
 - No token in request headers
 - Backend `/dashboard/menu` endpoint down
@@ -152,13 +163,14 @@ console.log("Has token:", !!userData?.token);
 
 // 5. Test API directly
 const response = await fetch("https://api.taearif.com/api/dashboard/menu", {
-  headers: { Authorization: `Bearer ${userData.token}` }
+  headers: { Authorization: `Bearer ${userData.token}` },
 });
 console.log("API response:", response.status);
 console.log("API data:", await response.json());
 ```
 
 **Solutions:**
+
 1. Ensure user has valid token in AuthStore
 2. Check backend `/dashboard/menu` endpoint is working
 3. Verify user has at least ONE permission
@@ -171,12 +183,14 @@ console.log("API data:", await response.json());
 ### Issue 4: "Permission denied on all pages"
 
 **Symptoms:**
+
 - Can login successfully
 - Dashboard loads fine
 - Every page shows "ليس لديك صلاحية للوصول"
 - Sidebar shows but pages are blocked
 
 **Causes:**
+
 - User has NO permissions assigned
 - PermissionWrapper always returning false
 - UserStore not fetching data
@@ -193,11 +207,20 @@ console.log("Is initialized:", userStoreState.isInitialized);
 console.log("Loading:", userStoreState.loading);
 
 // 2. Test permission check
-console.log("Has access to properties:", userStoreState.hasAccessToPage("properties"));
-console.log("Has access to analytics:", userStoreState.hasAccessToPage("analytics"));
+console.log(
+  "Has access to properties:",
+  userStoreState.hasAccessToPage("properties"),
+);
+console.log(
+  "Has access to analytics:",
+  userStoreState.hasAccessToPage("analytics"),
+);
 
 // 3. Check specific permission
-console.log("Has properties.view:", userStoreState.checkPermission("properties.view"));
+console.log(
+  "Has properties.view:",
+  userStoreState.checkPermission("properties.view"),
+);
 
 // 4. Check account type
 console.log("Account type:", userStoreState.userData?.account_type);
@@ -214,6 +237,7 @@ console.log("usePermissions result:", { hasPermission, loading, error });
 ```
 
 **Solutions:**
+
 1. Contact admin to assign permissions in database
 2. Verify user role and permissions in backend
 3. Check if account_type is "tenant" (full access)
@@ -226,12 +250,14 @@ console.log("usePermissions result:", { hasPermission, loading, error });
 ### Issue 5: "RTL not working / Layout broken"
 
 **Symptoms:**
+
 - Dashboard shows LTR (left-to-right) layout
 - Text alignment wrong
 - Menus on wrong side
 - Layout looks reversed
 
 **Causes:**
+
 - RTL CSS not applied
 - Dashboard layout not loading correctly
 - Conflicting CSS from other components
@@ -260,6 +286,7 @@ console.log("Has /ar/ prefix:", pathname.includes("/ar/"));
 ```
 
 **Solutions:**
+
 1. Refresh page (Ctrl+F5 / Cmd+Shift+R)
 2. Check you're on `/ar/dashboard` not `/en/dashboard`
 3. Verify `app/dashboard/layout.tsx` RTL enforcement code (lines 86-111)
@@ -271,12 +298,14 @@ console.log("Has /ar/ prefix:", pathname.includes("/ar/"));
 ### Issue 6: "Subscription features not working"
 
 **Symptoms:**
+
 - Feature shows as locked even with paid plan
 - Property/project limits incorrect
 - Upgrade prompts appearing when shouldn't
 - Days remaining shows wrong number
 
 **Causes:**
+
 - Subscription data not fetched from `/user` endpoint
 - `is_free_plan` set incorrectly
 - `package_features` array empty
@@ -306,6 +335,7 @@ console.log("Membership:", response.data.data.membership);
 ```
 
 **Solutions:**
+
 1. Call `useAuthStore.getState().fetchUserData()` to refresh
 2. Verify backend returns correct subscription in `/user` endpoint
 3. Check if subscription actually expired
@@ -317,11 +347,13 @@ console.log("Membership:", response.data.data.membership);
 ### Issue 7: "axios requests returning 401"
 
 **Symptoms:**
+
 - API calls fail with 401 Unauthorized
 - Can login but subsequent requests fail
 - Token not being sent with requests
 
 **Causes:**
+
 - Token not in AuthStore
 - axios interceptor not working
 - Token format incorrect
@@ -341,7 +373,7 @@ console.log("Token from AuthStore:", token);
 
 // 3. Test manual request with token
 const response = await fetch("https://api.taearif.com/api/user", {
-  headers: { Authorization: `Bearer ${token}` }
+  headers: { Authorization: `Bearer ${token}` },
 });
 console.log("Manual request status:", response.status);
 
@@ -359,6 +391,7 @@ try {
 ```
 
 **Solutions:**
+
 1. Call `unlockAxios()` if axios is locked
 2. Ensure token exists in AuthStore
 3. Re-login to get fresh token
@@ -422,6 +455,7 @@ http://localhost:3000/ar/dashboard
 **Create test accounts with different roles:**
 
 **1. Admin Account (Full Access):**
+
 ```sql
 -- Database
 account_type = 'admin'
@@ -429,39 +463,46 @@ permissions = []  -- Gets full access regardless
 ```
 
 **Test:**
+
 - Can access ALL modules
 - Can manage users in /dashboard/access-control
 - Sidebar shows all items
 
 **2. Tenant Account (Owner):**
+
 ```sql
 account_type = 'tenant'
 permissions = []  -- Gets full access
 ```
 
 **Test:**
+
 - Can access all pages except access-control
 - Full dashboard functionality
 
 **3. Manager Account (Limited):**
+
 ```sql
 account_type = 'manager'
 permissions = ['properties.view', 'analytics.view', 'customers.view']
 ```
 
 **Test:**
+
 - Can access: properties, analytics, customers
 - Cannot access: settings, crm, marketing
 - Sidebar shows only permitted items
 
 **4. Editor Account (Content Only):**
+
 ```sql
 account_type = 'editor'
 permissions = ['blogs.view']
 ```
 
 **Test:**
-- Can access: /dashboard/content/*, /dashboard/blogs
+
+- Can access: /dashboard/content/\*, /dashboard/blogs
 - Cannot access: anything else
 - Very limited sidebar
 
@@ -481,17 +522,20 @@ const testPermissions = async () => {
   for (const user of users) {
     // 1. Login
     await login(user.email, "password", recaptchaToken);
-    
+
     // 2. Check sidebar items
     const { sidebarData } = useStore.getState();
-    console.log(`${user.email} sees:`, sidebarData.mainNavItems.map(i => i.id));
-    
+    console.log(
+      `${user.email} sees:`,
+      sidebarData.mainNavItems.map((i) => i.id),
+    );
+
     // 3. Try accessing each page
     for (const page of ["properties", "analytics", "crm", "settings"]) {
       const hasAccess = useUserStore.getState().hasAccessToPage(page);
       console.log(`${user.email} access to ${page}:`, hasAccess);
     }
-    
+
     // 4. Logout
     await logout();
   }
@@ -507,6 +551,7 @@ testPermissions();
 ### Initial Load Time
 
 **Dashboard loads multiple resources:**
+
 1. User authentication validation (400-800ms)
 2. Subscription data fetch (300-600ms)
 3. Sidebar menu fetch (200-400ms)
@@ -518,6 +563,7 @@ testPermissions();
 **Optimization Strategies:**
 
 1. **Parallel Loading:**
+
 ```typescript
 Promise.all([
   fetchUserData(),
@@ -527,15 +573,18 @@ Promise.all([
 ```
 
 2. **Caching:**
+
 - UserStore caches for 5 minutes
 - Prevents repeated `/user` calls
 
 3. **Lazy Loading:**
+
 ```typescript
 const HeavyComponent = lazy(() => import("@/components/heavy"));
 ```
 
 4. **GTM Strategy:**
+
 ```typescript
 <Script strategy="afterInteractive" />
 // Loads after page is interactive
@@ -544,6 +593,7 @@ const HeavyComponent = lazy(() => import("@/components/heavy"));
 ### Memory Management
 
 **Zustand Stores in Memory:**
+
 - `AuthStore` - ~50KB (session data)
 - `Store` - ~100KB (UI state, menu)
 - `UserStore` - ~20KB (permissions)
@@ -554,23 +604,24 @@ const HeavyComponent = lazy(() => import("@/components/heavy"));
 logout: async () => {
   // 1. Clear AuthStore
   set({ UserIslogged: false, userData: null });
-  
+
   // 2. Clear localStorage
   localStorage.removeItem("user");
   localStorage.removeItem("user-store");
-  
+
   // 3. Clear cookies (via API)
   await fetch("/api/user/logout", { method: "POST" });
-  
+
   // 4. Clear UserStore
   useUserStore.getState().clearUserData();
-  
+
   // 5. Redirect
   window.location.href = "/login";
-}
+};
 ```
 
 **Memory Leaks to Avoid:**
+
 - ❌ Not cleaning up event listeners
 - ❌ Keeping refs to old data
 - ❌ Not canceling pending requests
@@ -587,67 +638,69 @@ logout: async () => {
 // ============================================
 
 // Check login status
-useAuthStore.getState().UserIslogged
+useAuthStore.getState().UserIslogged;
 
 // Get user data
-useAuthStore.getState().userData
+useAuthStore.getState().userData;
 
 // Get token
-useAuthStore.getState().userData?.token
+useAuthStore.getState().userData?.token;
 
 // Check permissions
-useUserStore.getState().userData?.permissions
+useUserStore.getState().userData?.permissions;
 
 // Force logout
-await useAuthStore.getState().logout()
+await useAuthStore.getState().logout();
 
 // Force login (if you have credentials)
-await useAuthStore.getState().login("email@test.com", "password", "recaptcha_token")
+await useAuthStore
+  .getState()
+  .login("email@test.com", "password", "recaptcha_token");
 
 // ============================================
 // STORE DEBUGGING
 // ============================================
 
 // Check sidebar data
-useStore.getState().sidebarData
+useStore.getState().sidebarData;
 
 // Refetch menu
-await useStore.getState().fetchSideMenus()
+await useStore.getState().fetchSideMenus();
 
 // Check homepage data
-useStore.getState().homepage
+useStore.getState().homepage;
 
 // ============================================
 // PERMISSION DEBUGGING
 // ============================================
 
 // Check if user can access page
-useUserStore.getState().hasAccessToPage("properties")
-useUserStore.getState().hasAccessToPage("analytics")
-useUserStore.getState().hasAccessToPage("settings")
+useUserStore.getState().hasAccessToPage("properties");
+useUserStore.getState().hasAccessToPage("analytics");
+useUserStore.getState().hasAccessToPage("settings");
 
 // Check specific permission
-useUserStore.getState().checkPermission("properties.view")
+useUserStore.getState().checkPermission("properties.view");
 
 // Refresh user data
-await useUserStore.getState().refreshUserData()
+await useUserStore.getState().refreshUserData();
 
 // ============================================
 // TOKEN DEBUGGING
 // ============================================
 
 // Get all cookies
-document.cookie.split(';').forEach(c => console.log(c.trim()))
+document.cookie.split(";").forEach((c) => console.log(c.trim()));
 
 // Get authToken specifically
-document.cookie.split(';').find(c => c.includes('authToken'))
+document.cookie.split(";").find((c) => c.includes("authToken"));
 
 // Get localStorage user
-JSON.parse(localStorage.getItem("user"))
+JSON.parse(localStorage.getItem("user"));
 
 // Check axios lock status
-import { isAxiosLocked } from "@/lib/axiosInstance"
-isAxiosLocked()
+import { isAxiosLocked } from "@/lib/axiosInstance";
+isAxiosLocked();
 
 // ============================================
 // NETWORK DEBUGGING
@@ -655,13 +708,15 @@ isAxiosLocked()
 
 // Test API endpoint manually
 await fetch("https://api.taearif.com/api/user", {
-  headers: { 
-    Authorization: `Bearer ${useAuthStore.getState().userData?.token}` 
-  }
-}).then(r => r.json()).then(console.log)
+  headers: {
+    Authorization: `Bearer ${useAuthStore.getState().userData?.token}`,
+  },
+})
+  .then((r) => r.json())
+  .then(console.log);
 
 // Test with axiosInstance
-await axiosInstance.get("/user").then(r => console.log(r.data))
+await axiosInstance.get("/user").then((r) => console.log(r.data));
 ```
 
 ---
@@ -673,17 +728,15 @@ await axiosInstance.get("/user").then(r => console.log(r.data))
 **Add to `lib/axiosInstance.js`:**
 
 ```javascript
-axiosInstance.interceptors.request.use(
-  (config) => {
-    console.log("🔵 axios REQUEST:", {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data,
-    });
-    return config;
-  }
-);
+axiosInstance.interceptors.request.use((config) => {
+  console.log("🔵 axios REQUEST:", {
+    url: config.url,
+    method: config.method,
+    headers: config.headers,
+    data: config.data,
+  });
+  return config;
+});
 
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -702,7 +755,7 @@ axiosInstance.interceptors.response.use(
       data: error.response?.data,
     });
     return Promise.reject(error);
-  }
+  },
 );
 ```
 
@@ -750,11 +803,11 @@ describe("Dashboard Authentication", () => {
   it("should redirect to login if not authenticated", () => {
     // Test code
   });
-  
+
   it("should allow access if authenticated", () => {
     // Test code
   });
-  
+
   it("should block tenant domains", () => {
     // Test code
   });
@@ -764,11 +817,11 @@ describe("Dashboard Permissions", () => {
   it("should show only permitted menu items", () => {
     // Test code
   });
-  
+
   it("should block access to restricted pages", () => {
     // Test code
   });
-  
+
   it("should grant full access to tenant account type", () => {
     // Test code
   });
@@ -782,6 +835,7 @@ describe("Dashboard Permissions", () => {
 ### Browser Extensions
 
 **Recommended:**
+
 1. **React Developer Tools** - Inspect component state
 2. **Redux DevTools** - Works with Zustand
 3. **Network Monitor** - Track API calls
@@ -790,6 +844,7 @@ describe("Dashboard Permissions", () => {
 ### Network Tab Analysis
 
 **Check for:**
+
 - Failed API requests (red in Network tab)
 - Missing Authorization headers
 - 401/403 status codes
@@ -817,7 +872,7 @@ Error: Invalid token.
 ---
 
 **See Also:**
+
 - [CORE_INFRASTRUCTURE.md](./CORE_INFRASTRUCTURE.md) - Store internals
 - [AUTHENTICATION.md](./AUTHENTICATION.md) - Auth flows
 - [DATA_FLOWS.md](./DATA_FLOWS.md) - Integration flows
-

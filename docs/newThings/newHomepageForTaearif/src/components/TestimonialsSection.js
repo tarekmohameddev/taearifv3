@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function TestimonialsSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,64 +11,73 @@ export default function TestimonialsSection() {
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 2,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 3,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 4,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 5,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 6,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 7,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 8,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
     },
     {
       id: 9,
       text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
       name: "خالد المطيري",
       title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    }
+      image:
+        "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg",
+    },
   ];
 
   useEffect(() => {
@@ -78,10 +87,10 @@ export default function TestimonialsSection() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
-    const element = document.getElementById('testimonials');
+    const element = document.getElementById("testimonials");
     if (element) {
       observer.observe(element);
     }
@@ -98,10 +107,14 @@ export default function TestimonialsSection() {
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-16">
-          <h6 className={`text-sm font-medium text-[#FF8C24] mb-4 transition-all duration-1000 delay-160 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <h6
+            className={`text-sm font-medium text-[#FF8C24] mb-4 transition-all duration-1000 delay-160 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          >
             آراء عملاؤنا
           </h6>
-          <h2 className={`text-4xl lg:text-5xl font-bold text-black transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <h2
+            className={`text-4xl lg:text-5xl font-bold text-black transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          >
             ما قاله مستخدمينا عنا
           </h2>
         </div>
@@ -111,7 +124,7 @@ export default function TestimonialsSection() {
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.id}
-              className={`bg-white rounded-lg p-6 border border-gray-200 transition-all duration-1000 delay-${index * 100} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              className={`bg-white rounded-lg p-6 border border-gray-200 transition-all duration-1000 delay-${index * 100} ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
               {/* Testimonial text */}
               <blockquote className="text-gray-700 leading-relaxed mb-6 text-right">
@@ -129,9 +142,7 @@ export default function TestimonialsSection() {
                   <h5 className="text-lg font-bold text-black">
                     {testimonial.name}
                   </h5>
-                  <p className="text-sm text-gray-600">
-                    {testimonial.title}
-                  </p>
+                  <p className="text-sm text-gray-600">{testimonial.title}</p>
                 </div>
               </div>
             </div>

@@ -41,13 +41,14 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Get current pathname
   const pathname = usePathname();
-  
+
   // Debug: Log component mount and URL
   useEffect(() => {
     console.log("🏗️  Grid1 mounted! URL:", {
       pathname,
-      windowSearch: typeof window !== "undefined" ? window.location.search : "N/A",
-      fullURL: typeof window !== "undefined" ? window.location.href : "N/A"
+      windowSearch:
+        typeof window !== "undefined" ? window.location.search : "N/A",
+      fullURL: typeof window !== "undefined" ? window.location.href : "N/A",
     });
   }, [pathname]);
 
@@ -96,38 +97,47 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default (fallback)
 
   // Helper function to create lighter color (for badges and backgrounds)
   const getLighterColor = (hex: string, opacity: number = 0.2): string => {
-    if (!hex || !hex.startsWith('#')) return `${primaryColor}33`; // 20% opacity default
+    if (!hex || !hex.startsWith("#")) return `${primaryColor}33`; // 20% opacity default
     // Return hex color with opacity using rgba
-    const cleanHex = hex.replace('#', '');
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return `${primaryColor}33`;
-    
+
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   // Helper function to create darker color for text on light backgrounds
   const getDarkerColor = (hex: string, amount: number = 40): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   const primaryColorLight = getLighterColor(primaryColor, 0.15); // 15% opacity for badge backgrounds
@@ -431,13 +441,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Determine if we're on projects page
   const isProjectsPage = pathname?.includes("/projects");
   const isProjectsApi = mergedData.dataSource?.apiUrl?.includes("/projects");
-  
+
   // Always prioritize store data (filteredProperties) over API data
   // EXCEPT when we're on projects page or using projects API
   // In that case, use apiProperties directly since store calls /properties API
   const properties =
     useApiData && currentTenantId
-      ? (isProjectsPage || isProjectsApi)
+      ? isProjectsPage || isProjectsApi
         ? apiProperties // Use API data directly for projects
         : filteredProperties // Use store data for properties
       : useApiData
@@ -448,54 +458,54 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const convertPropertyForCard4And5 = (property: any) => {
     // Parse price - handle both string and number formats
     const parsePrice = (priceStr: string | number) => {
-      if (typeof priceStr === 'number') {
+      if (typeof priceStr === "number") {
         return { min: priceStr, max: priceStr };
       }
-      if (!priceStr || typeof priceStr !== 'string') {
+      if (!priceStr || typeof priceStr !== "string") {
         return { min: 0, max: 0 };
       }
       // Remove non-numeric characters except dashes and spaces
-      const cleaned = priceStr.replace(/[^\d\s-]/g, '').trim();
+      const cleaned = priceStr.replace(/[^\d\s-]/g, "").trim();
       // Try to extract range (e.g., "100000 - 200000" or "100000-200000")
       const rangeMatch = cleaned.match(/(\d+)\s*-\s*(\d+)/);
       if (rangeMatch) {
         return {
-          min: parseInt(rangeMatch[1].replace(/\s/g, ''), 10) || 0,
-          max: parseInt(rangeMatch[2].replace(/\s/g, ''), 10) || 0,
+          min: parseInt(rangeMatch[1].replace(/\s/g, ""), 10) || 0,
+          max: parseInt(rangeMatch[2].replace(/\s/g, ""), 10) || 0,
         };
       }
       // Single price
-      const singlePrice = parseInt(cleaned.replace(/\s/g, ''), 10) || 0;
+      const singlePrice = parseInt(cleaned.replace(/\s/g, ""), 10) || 0;
       return { min: singlePrice, max: singlePrice };
     };
 
     // Parse area - handle both string and number formats
     const parseArea = (areaStr: string | number) => {
-      if (typeof areaStr === 'number') {
+      if (typeof areaStr === "number") {
         return { min: areaStr, max: areaStr };
       }
-      if (!areaStr || typeof areaStr !== 'string') {
+      if (!areaStr || typeof areaStr !== "string") {
         return { min: 0, max: 0 };
       }
       // Remove non-numeric characters except dashes, spaces, and م²
-      const cleaned = areaStr.replace(/[^\d\s-م²]/g, '').trim();
+      const cleaned = areaStr.replace(/[^\d\s-م²]/g, "").trim();
       const rangeMatch = cleaned.match(/(\d+)\s*-\s*(\d+)/);
       if (rangeMatch) {
         return {
-          min: parseInt(rangeMatch[1].replace(/\s/g, ''), 10) || 0,
-          max: parseInt(rangeMatch[2].replace(/\s/g, ''), 10) || 0,
+          min: parseInt(rangeMatch[1].replace(/\s/g, ""), 10) || 0,
+          max: parseInt(rangeMatch[2].replace(/\s/g, ""), 10) || 0,
         };
       }
-      const singleArea = parseInt(cleaned.replace(/\s/g, ''), 10) || 0;
+      const singleArea = parseInt(cleaned.replace(/\s/g, ""), 10) || 0;
       return { min: singleArea, max: singleArea };
     };
 
     // Parse bedrooms/rooms
     const parseRooms = (rooms: number | string | undefined) => {
-      if (typeof rooms === 'number') {
+      if (typeof rooms === "number") {
         return { min: rooms, max: rooms };
       }
-      if (typeof rooms === 'string') {
+      if (typeof rooms === "string") {
         const num = parseInt(rooms, 10) || 0;
         return { min: num, max: num };
       }
@@ -504,10 +514,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
     // Parse bathrooms
     const parseBathrooms = (bathrooms: number | string | undefined) => {
-      if (typeof bathrooms === 'number') {
+      if (typeof bathrooms === "number") {
         return { min: bathrooms, max: bathrooms };
       }
-      if (typeof bathrooms === 'string') {
+      if (typeof bathrooms === "string") {
         const num = parseInt(bathrooms, 10) || 0;
         return { min: num, max: num };
       }
@@ -516,10 +526,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
     // Parse floors
     const parseFloors = (floors: number | string | undefined) => {
-      if (typeof floors === 'number') {
+      if (typeof floors === "number") {
         return { min: floors, max: floors };
       }
-      if (typeof floors === 'string') {
+      if (typeof floors === "string") {
         const num = parseInt(floors, 10) || 0;
         return { min: num, max: num };
       }
@@ -527,23 +537,26 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     };
 
     return {
-      id: property.id || property._id || '',
-      image: property.image || property.images?.[0] || '',
-      title: property.title || '',
-      city: property.city || property.location?.city || property.district?.split(',')[0] || '',
-      district: property.district || property.location?.address || '',
-      status: property.status || '',
+      id: property.id || property._id || "",
+      image: property.image || property.images?.[0] || "",
+      title: property.title || "",
+      city:
+        property.city ||
+        property.location?.city ||
+        property.district?.split(",")[0] ||
+        "",
+      district: property.district || property.location?.address || "",
+      status: property.status || "",
       area: parseArea(property.area),
       rooms: parseRooms(property.bedrooms || property.rooms),
       floors: parseFloors(property.floors),
       price: parsePrice(property.price),
       bathrooms: parseBathrooms(property.bathrooms),
       featured: property.featured || false,
-      url: property.slug ? `/${property.slug}` : property.url || '',
+      url: property.slug ? `/${property.slug}` : property.url || "",
       units: property.units || 0, // For card4
     };
   };
-
 
   // Check if component should be visible
   if (!mergedData.visible) {
@@ -556,7 +569,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       <section className="w-full bg-background py-8">
         <div className="mx-auto max-w-[1600px] px-4">
           <div className="text-center py-12">
-            <div 
+            <div
               className="inline-block animate-spin rounded-full h-8 w-8 border-b-2"
               style={{ borderBottomColor: primaryColor }}
             ></div>
@@ -656,7 +669,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         {loading || storeLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div 
+              <div
                 className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                 style={{ borderBottomColor: primaryColor }}
               ></div>
@@ -690,7 +703,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
                 // Handle card4 and card5 which need different prop structure
                 if (theme === "card4") {
-                  const convertedProperty = convertPropertyForCard4And5(property);
+                  const convertedProperty =
+                    convertPropertyForCard4And5(property);
                   return (
                     <Card4
                       key={property.id || property._id}
@@ -699,7 +713,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                     />
                   );
                 } else if (theme === "card5") {
-                  const convertedProperty = convertPropertyForCard4And5(property);
+                  const convertedProperty =
+                    convertPropertyForCard4And5(property);
                   return (
                     <Card5
                       key={property.id || property._id}
@@ -740,8 +755,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                   onPreviousPage={handlePreviousPage}
                   totalItems={pagination.total || properties.length}
                   itemsPerPage={
-                    pagination.per_page ||
-                    Math.max(properties.length, 1)
+                    pagination.per_page || Math.max(properties.length, 1)
                   }
                   showingFrom={pagination.from || 0}
                   showingTo={pagination.to || properties.length}
@@ -780,7 +794,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 <p className="text-sm text-gray-600 mb-2">الفلاتر النشطة:</p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {search && (
-                    <span 
+                    <span
                       className="px-2 py-1 rounded-full text-xs"
                       style={{
                         backgroundColor: primaryColorLight,
@@ -791,7 +805,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                     </span>
                   )}
                   {propertyType && (
-                    <span 
+                    <span
                       className="px-2 py-1 rounded-full text-xs"
                       style={{
                         backgroundColor: primaryColorLight,

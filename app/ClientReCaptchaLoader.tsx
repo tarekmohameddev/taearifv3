@@ -8,9 +8,11 @@ interface ClientReCaptchaLoaderProps {
   children: ReactNode;
 }
 
-export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) {
+export function ClientReCaptchaLoader({
+  children,
+}: ClientReCaptchaLoaderProps) {
   const pathname = usePathname(); // Client-side pathname (updates on navigation)
-  
+
   // List of pages that need reCAPTCHA
   const recaptchaPages = [
     "/dashboard/affiliate",
@@ -44,28 +46,27 @@ export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) 
     "/landing",
     "/get-started",
   ];
-  
+
   // Determine if current page needs reCAPTCHA
   const shouldLoadReCaptcha = useMemo(() => {
     let cleanPathname = pathname;
-    
+
     // Remove locale prefix if present (/ar/ or /en/)
     const localePattern = /^\/(en|ar)\//;
     if (localePattern.test(pathname)) {
       cleanPathname = pathname.replace(/^\/(en|ar)/, "");
     }
-    
+
     // Check if current path matches any reCAPTCHA page
     return recaptchaPages.some((page) => {
       return cleanPathname === page || cleanPathname.startsWith(page + "/");
     });
   }, [pathname]);
-  
+
   // Conditionally wrap children in DynamicReCaptcha
   if (shouldLoadReCaptcha) {
     return <DynamicReCaptcha>{children}</DynamicReCaptcha>;
   }
-  
+
   return <>{children}</>;
 }
-

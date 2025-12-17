@@ -55,7 +55,7 @@ interface Partners2Props {
     paginationInactive?: string;
   };
   typography?: any;
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -141,16 +141,17 @@ export default function Partners2(props: Partners2Props = {}) {
   useEffect(() => {
     if (props.useStore) {
       // If we have tenant data, use it; otherwise use props or defaults
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultPartners2Data(),
-            ...tenantComponentData,
-            ...props,
-          }
-        : {
-            ...getDefaultPartners2Data(),
-            ...props,
-          };
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPartners2Data(),
+              ...tenantComponentData,
+              ...props,
+            }
+          : {
+              ...getDefaultPartners2Data(),
+              ...props,
+            };
       ensureComponentVariant("partners", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
@@ -159,24 +160,22 @@ export default function Partners2(props: Partners2Props = {}) {
   const storeData = props.useStore
     ? getComponentData("partners", uniqueId) || {}
     : {};
-  const currentStoreData = props.useStore
-    ? partnersStates[uniqueId] || {}
-    : {};
-  
+  const currentStoreData = props.useStore ? partnersStates[uniqueId] || {} : {};
+
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669",
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669",
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669",
@@ -262,90 +261,122 @@ export default function Partners2(props: Partners2Props = {}) {
       },
     },
     // Partners array - use the one with highest priority
-    partners: props?.partners || 
-              tenantComponentData?.partners || 
-              storeData?.partners || 
-              currentStoreData?.partners || 
-              defaultData.partners,
+    partners:
+      props?.partners ||
+      tenantComponentData?.partners ||
+      storeData?.partners ||
+      currentStoreData?.partners ||
+      defaultData.partners,
   };
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     const styling = mergedData?.styling || {};
     const colors = styling?.colors || mergedData?.colors || {};
-    
-    const pathParts = fieldPath.split('.');
+
+    const pathParts = fieldPath.split(".");
     let fieldData = colors;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = colors;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = colors;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     if (useDefaultColor) {
       let defaultGlobalColorType = "primary";
       if (fieldPath.includes("titleColor")) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("subtitleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+      } else if (
+        fieldPath.includes("subtitleColor") ||
+        fieldPath.includes("descriptionColor") ||
+        fieldPath.includes("textColor")
+      ) {
         defaultGlobalColorType = "secondary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("titleColor")) {
       defaultGlobalColorType = "primary";
-    } else if (fieldPath.includes("subtitleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+    } else if (
+      fieldPath.includes("subtitleColor") ||
+      fieldPath.includes("descriptionColor") ||
+      fieldPath.includes("textColor")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
@@ -356,7 +387,9 @@ export default function Partners2(props: Partners2Props = {}) {
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [cardsPerSlide, setCardsPerSlide] = useState(mergedData.layout?.cardsPerSlide || 16);
+  const [cardsPerSlide, setCardsPerSlide] = useState(
+    mergedData.layout?.cardsPerSlide || 16,
+  );
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const { theme } = useTheme();
@@ -385,7 +418,7 @@ export default function Partners2(props: Partners2Props = {}) {
 
   // Use partners from merged data
   const allPartners = mergedData.partners || [];
-  
+
   // Ensure we have at least 4 partners for the slider
   const partners: Array<{
     id?: string;
@@ -394,19 +427,20 @@ export default function Partners2(props: Partners2Props = {}) {
     logoDark?: string;
     logoLight?: string;
     link?: string;
-  }> = allPartners.length >= 4
-    ? allPartners
-    : Array.from(
-        { length: Math.max(4, allPartners.length || 32) },
-        (_, i) => ({
-          id: allPartners[i]?.id || `partner-${i + 1}`,
-          src: allPartners[i]?.src || `/images/placeholder.svg`,
-          alt: allPartners[i]?.alt || `Partner Logo ${i + 1}`,
-          logoDark: allPartners[i]?.logoDark,
-          logoLight: allPartners[i]?.logoLight,
-          link: allPartners[i]?.link,
-        }),
-      );
+  }> =
+    allPartners.length >= 4
+      ? allPartners
+      : Array.from(
+          { length: Math.max(4, allPartners.length || 32) },
+          (_, i) => ({
+            id: allPartners[i]?.id || `partner-${i + 1}`,
+            src: allPartners[i]?.src || `/images/placeholder.svg`,
+            alt: allPartners[i]?.alt || `Partner Logo ${i + 1}`,
+            logoDark: allPartners[i]?.logoDark,
+            logoLight: allPartners[i]?.logoLight,
+            link: allPartners[i]?.link,
+          }),
+        );
 
   // Split into slides based on cardsPerSlide
   const partnerSlides: Array<typeof partners> = [];
@@ -522,7 +556,10 @@ export default function Partners2(props: Partners2Props = {}) {
   const handleMouseLeave = () => handleEnd();
 
   // Render slide content
-  const renderSlide = (slide: Array<typeof partners[number]>, slideIndex: number) => {
+  const renderSlide = (
+    slide: Array<(typeof partners)[number]>,
+    slideIndex: number,
+  ) => {
     const isDark = theme === "dark";
 
     // Dynamic grid classes based on layout settings
@@ -568,10 +605,7 @@ export default function Partners2(props: Partners2Props = {}) {
               </div>
             );
 
-            if (
-              mergedData.settings?.animation &&
-              slideIndex === currentSlide
-            ) {
+            if (mergedData.settings?.animation && slideIndex === currentSlide) {
               return (
                 <motion.div
                   key={logoIndex}
@@ -602,7 +636,8 @@ export default function Partners2(props: Partners2Props = {}) {
   const subtitleColor = mergedData.styling?.subtitleColor || "#2F2E0C";
   const badgeColor = mergedData.styling?.badgeColor || "#004B4B";
   const paginationActive = mergedData.styling?.paginationActive || "#00D1D1";
-  const paginationInactive = mergedData.styling?.paginationInactive || "#6B7280";
+  const paginationInactive =
+    mergedData.styling?.paginationInactive || "#6B7280";
   const backgroundColor = mergedData.styling?.backgroundColor || "transparent";
 
   const headerContent = (
@@ -620,11 +655,11 @@ export default function Partners2(props: Partners2Props = {}) {
 
       <h2
         className="text-2xl sm:text-3xl heading font-bold mb-2"
-        style={{ 
+        style={{
           color: titleColor,
           fontWeight: mergedData.typography?.title?.fontWeight || "bold",
           fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
-          lineHeight: mergedData.typography?.title?.lineHeight || "tight"
+          lineHeight: mergedData.typography?.title?.lineHeight || "tight",
         }}
       >
         <span>{mergedData.content?.title || "عملاءنا"}</span>
@@ -632,11 +667,11 @@ export default function Partners2(props: Partners2Props = {}) {
 
       <p
         className="font-normal subheading"
-        style={{ 
+        style={{
           color: subtitleColor,
           fontWeight: mergedData.typography?.subtitle?.fontWeight || "normal",
           fontFamily: mergedData.typography?.subtitle?.fontFamily || "Tajawal",
-          lineHeight: mergedData.typography?.subtitle?.lineHeight || "relaxed"
+          lineHeight: mergedData.typography?.subtitle?.lineHeight || "relaxed",
         }}
       >
         {mergedData.content?.subtitle ||
@@ -704,15 +739,16 @@ export default function Partners2(props: Partners2Props = {}) {
         }
         dir={isRTL ? "rtl" : "ltr"}
         style={{
-          backgroundColor: backgroundColor === "transparent" ? "transparent" : backgroundColor,
+          backgroundColor:
+            backgroundColor === "transparent" ? "transparent" : backgroundColor,
           paddingTop: mergedData.layout?.padding?.top || "5rem",
-          paddingBottom: mergedData.layout?.padding?.bottom || "5rem"
+          paddingBottom: mergedData.layout?.padding?.bottom || "5rem",
         }}
       >
-        <div 
+        <div
           className="container mx-auto px-4"
           style={{
-            maxWidth: mergedData.layout?.maxWidth || "1600px"
+            maxWidth: mergedData.layout?.maxWidth || "1600px",
           }}
         >
           <motion.div
@@ -745,15 +781,16 @@ export default function Partners2(props: Partners2Props = {}) {
       }
       dir={isRTL ? "rtl" : "ltr"}
       style={{
-        backgroundColor: backgroundColor === "transparent" ? "transparent" : backgroundColor,
+        backgroundColor:
+          backgroundColor === "transparent" ? "transparent" : backgroundColor,
         paddingTop: mergedData.layout?.padding?.top || "5rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "5rem"
+        paddingBottom: mergedData.layout?.padding?.bottom || "5rem",
       }}
     >
-      <div 
+      <div
         className="container mx-auto px-4"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1600px"
+          maxWidth: mergedData.layout?.maxWidth || "1600px",
         }}
       >
         {headerContent}

@@ -26,16 +26,19 @@ const useOwnerAuthStore = create((set, get) => ({
     set({ isLoading: true, errorLogin: null });
 
     try {
-      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://api.taearif.com/api/v1/owner-rental/login",
+        {
+          email,
+          password,
+        },
+      );
 
       const { success, data } = response.data;
-      
+
       if (success && data && data.token && data.owner_rental) {
         const { owner_rental: user, token } = data;
-        
+
         // Set cookie with JWT token
         const cookieOptions = {
           path: "/",
@@ -43,15 +46,15 @@ const useOwnerAuthStore = create((set, get) => ({
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         };
-        
+
         document.cookie = `owner_token=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
         document.cookie = `ownerRentalToken=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
 
         const safeOwnerData = {
           email: user.email,
           token: token,
-          first_name: user.name ? user.name.split(' ')[0] : null,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : null,
+          first_name: user.name ? user.name.split(" ")[0] : null,
+          last_name: user.name ? user.name.split(" ").slice(1).join(" ") : null,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -78,7 +81,7 @@ const useOwnerAuthStore = create((set, get) => ({
       }
     } catch (error) {
       let errorMessage = "فشل تسجيل الدخول";
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.status === 401) {
@@ -101,19 +104,22 @@ const useOwnerAuthStore = create((set, get) => ({
     set({ isLoading: true, errorRegister: null });
 
     try {
-      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/register", {
-        email,
-        password,
-        first_name: firstName,
-        last_name: lastName,
-        phone,
-      });
+      const response = await axios.post(
+        "https://api.taearif.com/api/v1/owner-rental/register",
+        {
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+        },
+      );
 
       const { success, data } = response.data;
-      
+
       if (success && data && data.token && data.owner_rental) {
         const { owner_rental: user, token } = data;
-        
+
         // Set cookie with JWT token
         const cookieOptions = {
           path: "/",
@@ -121,15 +127,17 @@ const useOwnerAuthStore = create((set, get) => ({
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         };
-        
+
         document.cookie = `owner_token=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
         document.cookie = `ownerRentalToken=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
 
         const safeOwnerData = {
           email: user.email,
           token: token,
-          first_name: user.name ? user.name.split(' ')[0] : firstName,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : lastName,
+          first_name: user.name ? user.name.split(" ")[0] : firstName,
+          last_name: user.name
+            ? user.name.split(" ").slice(1).join(" ")
+            : lastName,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -156,7 +164,7 @@ const useOwnerAuthStore = create((set, get) => ({
       }
     } catch (error) {
       let errorMessage = "فشل التسجيل";
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.status === 400) {
@@ -178,12 +186,14 @@ const useOwnerAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       // Clear cookies
-      document.cookie = "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      
+      document.cookie =
+        "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
       // Clear localStorage
       localStorage.removeItem("owner_user");
-      
+
       // Clear store
       set({
         ownerIsLogged: false,
@@ -215,13 +225,13 @@ const useOwnerAuthStore = create((set, get) => ({
 
     try {
       const response = await fetch("/api/owner/getOwnerInfo");
-      
+
       if (!response.ok) {
         throw new Error("فشل في جلب بيانات المالك");
       }
 
       const ownerData = await response.json();
-      
+
       const safeOwnerData = {
         email: ownerData.email,
         token: ownerData.token,
@@ -264,12 +274,16 @@ const useOwnerAuthStore = create((set, get) => ({
       const storedOwner = localStorage.getItem("owner_user");
       if (storedOwner) {
         const ownerData = JSON.parse(storedOwner);
-        
+
         // Check if token exists in cookie
         const token = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('owner_token=') || row.startsWith('ownerRentalToken='))
-          ?.split('=')[1];
+          .split("; ")
+          .find(
+            (row) =>
+              row.startsWith("owner_token=") ||
+              row.startsWith("ownerRentalToken="),
+          )
+          ?.split("=")[1];
 
         if (token) {
           set({
@@ -324,16 +338,19 @@ export const OwnerAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://api.taearif.com/api/v1/owner-rental/login",
+        {
+          email,
+          password,
+        },
+      );
 
       const { success, data } = response.data;
-      
+
       if (success && data && data.token && data.owner_rental) {
         const { owner_rental: user, token } = data;
-        
+
         // Set cookie with JWT token
         const cookieOptions = {
           path: "/",
@@ -341,15 +358,15 @@ export const OwnerAuthProvider = ({ children }) => {
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         };
-        
+
         document.cookie = `owner_token=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
         document.cookie = `ownerRentalToken=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
 
         const ownerData = {
           email: user.email,
           token: token,
-          first_name: user.name ? user.name.split(' ')[0] : null,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : null,
+          first_name: user.name ? user.name.split(" ")[0] : null,
+          last_name: user.name ? user.name.split(" ").slice(1).join(" ") : null,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -372,19 +389,22 @@ export const OwnerAuthProvider = ({ children }) => {
   const register = async (email, password, firstName, lastName, phone) => {
     try {
       setLoading(true);
-      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/register", {
-        email,
-        password,
-        first_name: firstName,
-        last_name: lastName,
-        phone,
-      });
+      const response = await axios.post(
+        "https://api.taearif.com/api/v1/owner-rental/register",
+        {
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+        },
+      );
 
       const { success, data } = response.data;
-      
+
       if (success && data && data.token && data.owner_rental) {
         const { owner_rental: user, token } = data;
-        
+
         // Set cookie with JWT token
         const cookieOptions = {
           path: "/",
@@ -392,15 +412,17 @@ export const OwnerAuthProvider = ({ children }) => {
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         };
-        
+
         document.cookie = `owner_token=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
         document.cookie = `ownerRentalToken=${token}; path=${cookieOptions.path}; max-age=${cookieOptions.maxAge}; secure=${cookieOptions.secure}; samesite=${cookieOptions.sameSite}`;
 
         const ownerData = {
           email: user.email,
           token: token,
-          first_name: user.name ? user.name.split(' ')[0] : firstName,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : lastName,
+          first_name: user.name ? user.name.split(" ")[0] : firstName,
+          last_name: user.name
+            ? user.name.split(" ").slice(1).join(" ")
+            : lastName,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -424,8 +446,10 @@ export const OwnerAuthProvider = ({ children }) => {
     try {
       setLoading(true);
       // Clear cookies
-      document.cookie = "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       // Clear localStorage
       localStorage.removeItem("owner_user");
       setOwner(null);

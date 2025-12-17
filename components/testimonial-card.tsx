@@ -10,7 +10,13 @@ type Testimonial = {
   rating?: number; // 1-5
 };
 
-export function TestimonialCard({ t, quoteIconColor }: { t: Testimonial; quoteIconColor?: string }) {
+export function TestimonialCard({
+  t,
+  quoteIconColor,
+}: {
+  t: Testimonial;
+  quoteIconColor?: string;
+}) {
   const rating = Math.max(0, Math.min(5, t.rating ?? 5));
   return (
     <div className="flex h-full w-full items-center justify-center p-4">
@@ -18,8 +24,8 @@ export function TestimonialCard({ t, quoteIconColor }: { t: Testimonial; quoteIc
       <div className="relative flex w-full max-w-xl flex-col rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-black/5 h-[200px]">
         {/* علامة الاقتباس خارج البطاقة */}
         <div className="absolute h-[27px] w-[34px] z-20 top-[-15px] left-0 flex justify-center items-center">
-          <Quote 
-            className="w-full h-full" 
+          <Quote
+            className="w-full h-full"
             style={{ color: quoteIconColor || "#059669" }}
           />
         </div>

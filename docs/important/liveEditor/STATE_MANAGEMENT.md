@@ -1,6 +1,7 @@
 # State Management - Deep Dive
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Store Architecture](#store-architecture)
 3. [State Types](#state-types)
@@ -51,19 +52,19 @@ interface EditorStore {
   setOpenSaveDialog: (fn: OpenDialogFn) => void;
   requestSave: () => void;
   closeDialog: () => void;
-  
+
   // =================================================================
   // CHANGE TRACKING
   // =================================================================
   hasChangesMade: boolean;
   setHasChangesMade: (hasChanges: boolean) => void;
-  
+
   // =================================================================
   // CURRENT PAGE TRACKING
   // =================================================================
-  currentPage: string;  // e.g., "homepage", "about-us", "global-header"
+  currentPage: string; // e.g., "homepage", "about-us", "global-header"
   setCurrentPage: (page: string) => void;
-  
+
   // =================================================================
   // TEMPORARY EDITING STATE
   // =================================================================
@@ -71,7 +72,7 @@ interface EditorStore {
   setTempData: (data: ComponentData) => void;
   updateTempField: (field, key, value) => void;
   updateByPath: (path: string, value: any) => void;
-  
+
   // =================================================================
   // GLOBAL COMPONENTS (Header & Footer)
   // =================================================================
@@ -81,7 +82,7 @@ interface EditorStore {
   setGlobalFooterData: (data: ComponentData) => void;
   updateGlobalHeaderByPath: (path: string, value: any) => void;
   updateGlobalFooterByPath: (path: string, value: any) => void;
-  
+
   // Unified global components data
   globalComponentsData: {
     header: ComponentData;
@@ -89,7 +90,7 @@ interface EditorStore {
   };
   setGlobalComponentsData: (data) => void;
   updateGlobalComponentByPath: (type, path, value) => void;
-  
+
   // =================================================================
   // COMPONENT TYPE STATES (One per component type)
   // =================================================================
@@ -101,7 +102,7 @@ interface EditorStore {
   ctaValuationStates: Record<string, ComponentData>;
   testimonialsStates: Record<string, ComponentData>;
   // ... and more
-  
+
   // =================================================================
   // GENERIC COMPONENT FUNCTIONS
   // =================================================================
@@ -109,7 +110,7 @@ interface EditorStore {
   getComponentData: (type, variantId) => ComponentData;
   setComponentData: (type, variantId, data) => void;
   updateComponentByPath: (type, variantId, path, value) => void;
-  
+
   // =================================================================
   // SPECIFIC COMPONENT FUNCTIONS (Legacy, but still used)
   // =================================================================
@@ -118,26 +119,26 @@ interface EditorStore {
   setHeroData: (variantId, data) => void;
   updateHeroByPath: (variantId, path, value) => void;
   // ... repeated for each component type
-  
+
   // =================================================================
   // PAGE AGGREGATION
   // =================================================================
   pageComponentsByPage: Record<string, ComponentInstance[]>;
   setPageComponentsForPage: (page, components) => void;
   forceUpdatePageComponents: (slug, components) => void;
-  
+
   // =================================================================
   // DATABASE OPERATIONS
   // =================================================================
   loadFromDatabase: (tenantData) => void;
-  
+
   // =================================================================
   // PAGE MANAGEMENT
   // =================================================================
   createPage: (pageData) => void;
   getAllPages: () => string[];
   deletePage: (slug) => void;
-  
+
   // =================================================================
   // META TAGS / SEO
   // =================================================================
@@ -167,6 +168,7 @@ interface EditorStore {
 **Purpose**: Store data for each component instance, grouped by component type
 
 **Structure**:
+
 ```typescript
 heroStates: {
   "uuid-1234": {           // Component instance ID (UUID)
@@ -186,6 +188,7 @@ heroStates: {
 ```
 
 **Key Points**:
+
 - Key is component.id (UUID), NOT componentName
 - Each instance has completely independent data
 - Multiple instances of same type can exist on same page
@@ -196,6 +199,7 @@ heroStates: {
 **Purpose**: Store header and footer data shared across ALL pages
 
 **Structure**:
+
 ```typescript
 globalHeaderData: {
   visible: true,
@@ -223,6 +227,7 @@ globalFooterData: {
 ```
 
 **Key Points**:
+
 - NOT stored in pageComponentsByPage
 - Edited with special IDs: `"global-header"` and `"global-footer"`
 - Saved separately in API payload
@@ -233,6 +238,7 @@ globalFooterData: {
 **Purpose**: Aggregate all components for each page for database persistence
 
 **Structure**:
+
 ```typescript
 pageComponentsByPage: {
   "homepage": [
@@ -265,6 +271,7 @@ pageComponentsByPage: {
 ```
 
 **Key Points**:
+
 - Keys are page slugs ("homepage", "about-us", etc.)
 - Values are arrays of component instances
 - Position property indicates render order
@@ -276,6 +283,7 @@ pageComponentsByPage: {
 **Purpose**: Hold draft changes while editing, before saving
 
 **Lifecycle**:
+
 1. User clicks component to edit
 2. tempData initialized with component's current data
 3. User makes changes → tempData updated
@@ -283,6 +291,7 @@ pageComponentsByPage: {
 5. User clicks "Cancel" → tempData discarded
 
 **Usage**:
+
 ```typescript
 // Initialize when opening editor
 setTempData(currentComponentData);
@@ -308,10 +317,10 @@ Each component type has 4 core functions:
 
 ```typescript
 export const heroFunctions = {
-  ensureVariant,  // Initialize if not exists
-  getData,        // Retrieve data
-  setData,        // Set/replace data
-  updateByPath    // Update specific field
+  ensureVariant, // Initialize if not exists
+  getData, // Retrieve data
+  setData, // Set/replace data
+  updateByPath, // Update specific field
 };
 ```
 
@@ -320,15 +329,14 @@ export const heroFunctions = {
 **Purpose**: Ensure component exists in store with proper initialization
 
 **Signature**:
+
 ```typescript
-ensureVariant: (
-  state: any,
-  variantId: string,
-  initial?: ComponentData
-) => Partial<EditorStore>
+ensureVariant: (state: any, variantId: string, initial?: ComponentData) =>
+  Partial<EditorStore>;
 ```
 
 **Logic**:
+
 ```typescript
 ensureVariant: (state, variantId, initial?) => {
   // Priority 1: If initial data provided, ALWAYS use it
@@ -336,11 +344,11 @@ ensureVariant: (state, variantId, initial?) => {
     return {
       heroStates: {
         ...state.heroStates,
-        [variantId]: initial
-      }
+        [variantId]: initial,
+      },
     };
   }
-  
+
   // Priority 2: If variant already exists, do nothing
   if (
     state.heroStates[variantId] &&
@@ -348,27 +356,29 @@ ensureVariant: (state, variantId, initial?) => {
   ) {
     return {}; // No changes needed
   }
-  
+
   // Priority 3: Create with default data
   const defaultData = getDefaultHeroData();
   const data = initial || state.tempData || defaultData;
-  
+
   return {
     heroStates: {
       ...state.heroStates,
-      [variantId]: data
-    }
+      [variantId]: data,
+    },
   };
-}
+};
 ```
 
 **When Called**:
+
 - Component first render with `useStore={true}`
 - Opening EditorSidebar for a component
 - Adding new component to page
 - Loading from database
 
 **Important**:
+
 - variantId is component.id (UUID), not componentName
 - Always returns partial state (only fields that changed)
 - Never mutates existing state
@@ -378,23 +388,27 @@ ensureVariant: (state, variantId, initial?) => {
 **Purpose**: Retrieve component data from store
 
 **Signature**:
+
 ```typescript
-getData: (state: any, variantId: string) => ComponentData
+getData: (state: any, variantId: string) => ComponentData;
 ```
 
 **Logic**:
+
 ```typescript
 getData: (state, variantId) => {
   return state.heroStates[variantId] || {};
-}
+};
 ```
 
 **When Called**:
+
 - Component rendering to get current data
 - EditorSidebar loading data for editing
 - Merging data from multiple sources
 
 **Important**:
+
 - Returns empty object if not found (never undefined)
 - Does NOT initialize missing variants
 - Fast, synchronous operation
@@ -404,21 +418,19 @@ getData: (state, variantId) => {
 **Purpose**: Set/replace component data completely
 
 **Signature**:
+
 ```typescript
-setData: (
-  state: any,
-  variantId: string,
-  data: ComponentData
-) => Partial<EditorStore>
+setData: (state: any, variantId: string, data: ComponentData) =>
+  Partial<EditorStore>;
 ```
 
 **Logic**:
+
 ```typescript
 setData: (state, variantId, data) => {
   const currentPage = state.currentPage;
-  const updatedPageComponents = 
-    state.pageComponentsByPage[currentPage] || [];
-  
+  const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
   // Update page components to keep in sync
   const updatedComponents = updatedPageComponents.map((comp) => {
     if (comp.type === "hero" && comp.id === variantId) {
@@ -426,27 +438,29 @@ setData: (state, variantId, data) => {
     }
     return comp;
   });
-  
+
   return {
     heroStates: {
       ...state.heroStates,
-      [variantId]: data
+      [variantId]: data,
     },
     pageComponentsByPage: {
       ...state.pageComponentsByPage,
-      [currentPage]: updatedComponents
-    }
+      [currentPage]: updatedComponents,
+    },
   };
-}
+};
 ```
 
 **When Called**:
+
 - Saving changes from EditorSidebar
 - Resetting component to defaults
 - Changing component theme
 - Loading from database
 
 **Important**:
+
 - Completely replaces component data
 - Updates BOTH component state AND pageComponentsByPage
 - Synchronizes page components array
@@ -456,59 +470,59 @@ setData: (state, variantId, data) => {
 **Purpose**: Update a specific field via dot-notation path
 
 **Signature**:
+
 ```typescript
-updateByPath: (
-  state: any,
-  variantId: string,
-  path: string,
-  value: any
-) => Partial<EditorStore>
+updateByPath: (state: any, variantId: string, path: string, value: any) =>
+  Partial<EditorStore>;
 ```
 
 **Logic**:
+
 ```typescript
 updateByPath: (state, variantId, path, value) => {
   const source = state.heroStates[variantId] || {};
   const newData = updateDataByPath(source, path, value);
-  
+
   const currentPage = state.currentPage;
-  const updatedPageComponents = 
-    state.pageComponentsByPage[currentPage] || [];
-  
+  const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
   const updatedComponents = updatedPageComponents.map((comp) => {
     if (comp.type === "hero" && comp.id === variantId) {
       return { ...comp, data: newData };
     }
     return comp;
   });
-  
+
   return {
     heroStates: {
       ...state.heroStates,
-      [variantId]: newData
+      [variantId]: newData,
     },
     pageComponentsByPage: {
       ...state.pageComponentsByPage,
-      [currentPage]: updatedComponents
-    }
+      [currentPage]: updatedComponents,
+    },
   };
-}
+};
 ```
 
 **Path Examples**:
+
 ```typescript
-"content.title"                    // Simple nested path
-"menu[0].text"                    // Array element
-"background.overlay.opacity"      // Deep nesting
-"content.stats.stat1.value"       // Multiple levels
+"content.title"; // Simple nested path
+"menu[0].text"; // Array element
+"background.overlay.opacity"; // Deep nesting
+"content.stats.stat1.value"; // Multiple levels
 ```
 
 **When Called**:
+
 - User typing in EditorSidebar fields
 - Real-time updates during editing
 - Programmatic field updates
 
 **Important**:
+
 - Uses updateDataByPath() helper for path parsing
 - Handles arrays with bracket notation: `[0]`, `[1]`
 - Creates missing intermediate objects/arrays
@@ -521,6 +535,7 @@ updateByPath: (state, variantId, path, value) => {
 ### Why Special Handling?
 
 Global components (header/footer) are unique:
+
 - Shared across ALL pages
 - Do NOT belong to any specific page
 - NOT included in `pageComponentsByPage`
@@ -554,41 +569,42 @@ updateGlobalHeaderByPath: (path, value) =>
       .replace(/\[(\d+)\]/g, ".$1")
       .split(".")
       .filter(Boolean);
-    
+
     // Get current data or use defaults
     let currentData = state.globalHeaderData;
     if (!currentData || Object.keys(currentData).length === 0) {
       currentData = getDefaultHeaderData();
     }
-    
+
     // Deep clone to avoid mutations
     let newData = { ...currentData };
     let cursor = newData;
-    
+
     // Navigate to target path
     for (let i = 0; i < segments.length - 1; i++) {
       const key = segments[i];
       const nextIsIndex = !isNaN(Number(segments[i + 1]));
-      
+
       // Create structure as needed
       if (cursor[key] == null) {
         cursor[key] = nextIsIndex ? [] : {};
       }
       cursor = cursor[key];
     }
-    
+
     // Set final value
     const lastKey = segments[segments.length - 1];
     cursor[lastKey] = value;
-    
+
     // Force new reference for React re-render
     return {
-      globalHeaderData: JSON.parse(JSON.stringify(newData))
+      globalHeaderData: JSON.parse(JSON.stringify(newData)),
     };
-  })
+  });
 ```
 
 **Key Points**:
+
 - Uses default data if current data empty
 - Deep clones to avoid mutations
 - Creates intermediate structures automatically
@@ -603,38 +619,39 @@ updateGlobalComponentByPath: (componentType, path, value) =>
       .replace(/\[(\d+)\]/g, ".$1")
       .split(".")
       .filter(Boolean);
-    
+
     // Get current data or defaults
     let currentData = state.globalComponentsData[componentType];
     if (!currentData || Object.keys(currentData).length === 0) {
-      currentData = componentType === "header"
-        ? getDefaultHeaderData()
-        : getDefaultFooterData();
+      currentData =
+        componentType === "header"
+          ? getDefaultHeaderData()
+          : getDefaultFooterData();
     }
-    
+
     // Deep clone and navigate
     let newData = JSON.parse(JSON.stringify(currentData));
     let cursor = newData;
-    
+
     for (let i = 0; i < segments.length - 1; i++) {
       const key = segments[i];
       const nextIsIndex = !isNaN(Number(segments[i + 1]));
-      
+
       if (cursor[key] == null) {
         cursor[key] = nextIsIndex ? [] : {};
       }
       cursor = cursor[key];
     }
-    
+
     cursor[segments[segments.length - 1]] = value;
-    
+
     return {
       globalComponentsData: {
         ...state.globalComponentsData,
-        [componentType]: newData
-      }
+        [componentType]: newData,
+      },
     };
-  })
+  });
 ```
 
 ### Editing Flow for Global Components
@@ -672,6 +689,7 @@ updateGlobalComponentByPath: (componentType, path, value) =>
 **Purpose**: Track all components for each page
 
 **Structure**:
+
 ```typescript
 {
   "homepage": [
@@ -703,19 +721,20 @@ setPageComponentsForPage: (page, components) =>
   set((state) => {
     const withPositions = components.map((c, index) => ({
       ...c,
-      position: index
+      position: index,
     }));
-    
+
     return {
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [page]: withPositions
-      }
+        [page]: withPositions,
+      },
     };
-  })
+  });
 ```
 
 **When Called**:
+
 - Initial page load
 - After drag & drop reordering
 - After adding/deleting components
@@ -728,19 +747,21 @@ forceUpdatePageComponents: (slug, components) =>
     return {
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [slug]: components
-      }
+        [slug]: components,
+      },
     };
-  })
+  });
 ```
 
 **When Called**:
+
 - Save button in EditorSidebar
 - Component theme change
 - Component reset
 - Drag & drop completion
 
 **Difference from setPageComponentsForPage**:
+
 - Does NOT add position property
 - Directly uses provided components array
 - Used when components already have correct positions
@@ -784,10 +805,10 @@ updateByPath: (path, value) =>
       .replace(/\[(\d+)\]/g, ".$1")
       .split(".")
       .filter(Boolean);
-    
+
     // Initialize with current data
     let newData = { ...(state.tempData || {}) };
-    
+
     // Special handling for global components
     if (state.currentPage === "global-header") {
       // Merge with globalHeaderData to preserve existing fields
@@ -795,26 +816,27 @@ updateByPath: (path, value) =>
     } else if (state.currentPage === "global-footer") {
       newData = deepMerge(state.globalFooterData, state.tempData);
     }
-    
+
     // Navigate and update
     let cursor = newData;
     for (let i = 0; i < segments.length - 1; i++) {
       const key = segments[i];
       const nextIsIndex = !isNaN(Number(segments[i + 1]));
-      
+
       if (cursor[key] == null) {
         cursor[key] = nextIsIndex ? [] : {};
       }
       cursor = cursor[key];
     }
-    
+
     cursor[segments[segments.length - 1]] = value;
-    
+
     return { tempData: newData };
-  })
+  });
 ```
 
 **Key Points**:
+
 - Only updates tempData, not component states
 - Deep merges with global data for global components
 - Creates intermediate structures automatically
@@ -827,6 +849,7 @@ updateByPath: (path, value) =>
 ### The Synchronization Challenge
 
 The system maintains consistency between:
+
 1. Component type states (heroStates, headerStates, etc.)
 2. pageComponentsByPage
 3. Local React state (pageComponents in LiveEditor)
@@ -864,20 +887,20 @@ When user clicks "Save Changes" in EditorSidebar:
 handleSave() {
   const store = useEditorStore.getState();
   const storeData = store.getComponentData(type, id);
-  
+
   // Merge all data sources
   const mergedData = deepMerge(
     existingComponent.data,  // Old data
     storeData,              // Store updates
     tempData                // Latest edits
   );
-  
+
   // Update store
   store.setComponentData(type, id, mergedData);
-  
+
   // Update pageComponentsByPage
   store.forceUpdatePageComponents(currentPage, updatedComponents);
-  
+
   // Update local state
   onComponentUpdate(id, mergedData);
 }
@@ -891,13 +914,13 @@ When user reorders components:
 handleDragEndLocal(event) {
   setPageComponents((current) => {
     const newComponents = applyDragDropLogic(current);
-    
+
     // Update store immediately
     setTimeout(() => {
       const store = useEditorStore.getState();
       store.forceUpdatePageComponents(slug, newComponents);
     }, 0);
-    
+
     return newComponents;
   });
 }
@@ -917,10 +940,10 @@ handleAddSection(type) {
     componentName: `${type}1`,
     data: createDefaultData(type)
   };
-  
+
   // Add to local state
   setPageComponents([...current, newComponent]);
-  
+
   // Sync with store (deferred to avoid render cycles)
   setTimeout(() => {
     const store = useEditorStore.getState();
@@ -959,6 +982,7 @@ handleClick() {
 ### Loading from Database
 
 #### Flow:
+
 ```
 1. User logs in and navigates to /live-editor/homepage
    ↓
@@ -989,51 +1013,49 @@ handleClick() {
 loadFromDatabase: (tenantData) =>
   set((state) => {
     const newState = { ...state };
-    
+
     // Load global components
     if (tenantData.globalHeaderData) {
       newState.globalHeaderData = tenantData.globalHeaderData;
     }
-    
+
     if (tenantData.globalFooterData) {
       newState.globalFooterData = tenantData.globalFooterData;
     }
-    
+
     if (tenantData.globalComponentsData) {
       newState.globalComponentsData = tenantData.globalComponentsData;
     }
-    
+
     // Load page components
     Object.entries(tenantData.componentSettings).forEach(
       ([page, pageSettings]) => {
-        const components = Object.entries(pageSettings).map(
-          ([id, comp]) => ({
-            id,
-            ...comp,
-            position: comp.position ?? 0
-          })
-        );
-        
+        const components = Object.entries(pageSettings).map(([id, comp]) => ({
+          id,
+          ...comp,
+          position: comp.position ?? 0,
+        }));
+
         newState.pageComponentsByPage[page] = components;
-        
+
         // Load into component type stores
         components.forEach((comp) => {
           switch (comp.type) {
             case "hero":
               newState.heroStates = heroFunctions.setData(
                 newState,
-                comp.id,      // ✅ Use comp.id, not componentName
-                comp.data
+                comp.id, // ✅ Use comp.id, not componentName
+                comp.data,
               ).heroStates;
               break;
             // ... repeat for all component types
           }
         });
-      }
+      },
     );
-    
+
     return newState;
-  })
+  });
 ```
 
 **Critical**: Uses `comp.id` as variant identifier, NOT `comp.componentName`
@@ -1041,6 +1063,7 @@ loadFromDatabase: (tenantData) =>
 ### Saving to Database
 
 #### Flow:
+
 ```
 1. User makes changes (edits, adds, deletes components)
    ↓
@@ -1075,13 +1098,12 @@ loadFromDatabase: (tenantData) =>
 useEffect(() => {
   const saveFn = () => {
     // Force update store with current state
-    useEditorStore.getState()
-      .forceUpdatePageComponents(slug, pageComponents);
+    useEditorStore.getState().forceUpdatePageComponents(slug, pageComponents);
   };
-  
+
   // Register save function
   useEditorStore.getState().setOpenSaveDialog(saveFn);
-  
+
   // Cleanup on unmount
   return () => {
     useEditorStore.getState().setOpenSaveDialog(() => {});
@@ -1103,9 +1125,9 @@ useEffect(() => {
   if (props.useStore) {
     const initialData = {
       ...getDefaultHeroData(),
-      ...props
+      ...props,
     };
-    
+
     ensureComponentVariant("hero", uniqueId, initialData);
   }
 }, [uniqueId, props.useStore]);
@@ -1128,10 +1150,10 @@ return <Hero {...mergedData} />;
 ```typescript
 // Update title field
 useEditorStore.getState().updateComponentByPath(
-  "hero",               // type
-  "uuid-1234",          // component ID
-  "content.title",      // path
-  "New Title"           // value
+  "hero", // type
+  "uuid-1234", // component ID
+  "content.title", // path
+  "New Title", // value
 );
 
 // This updates:
@@ -1147,13 +1169,13 @@ handleComponentThemeChange(id, newTheme) {
     current.map((c) => {
       if (c.id === id) {
         const newDefaultData = createDefaultData(c.type, newTheme);
-        
+
         // Update store asynchronously
         setTimeout(() => {
           store.setComponentData(c.type, c.id, newDefaultData);
           store.forceUpdatePageComponents(currentPage, updatedComponents);
         }, 0);
-        
+
         return {
           ...c,
           componentName: newTheme,
@@ -1174,13 +1196,13 @@ handleComponentReset(id) {
     current.map((c) => {
       if (c.id === id) {
         const defaultData = createDefaultData(c.type, c.componentName);
-        
+
         // Update store asynchronously
         setTimeout(() => {
           store.setComponentData(c.type, id, defaultData);
           store.forceUpdatePageComponents(currentPage, updatedComponents);
         }, 0);
-        
+
         return {
           ...c,
           data: defaultData
@@ -1197,14 +1219,15 @@ handleComponentReset(id) {
 ## Important Rules for AI
 
 ### Rule 1: Always Use component.id as Identifier
+
 ```typescript
 // ✅ CORRECT
-getComponentData("hero", component.id)
-updateComponentByPath("hero", component.id, path, value)
+getComponentData("hero", component.id);
+updateComponentByPath("hero", component.id, path, value);
 
 // ❌ WRONG
-getComponentData("hero", component.componentName)
-updateComponentByPath("hero", "hero1", path, value)
+getComponentData("hero", component.componentName);
+updateComponentByPath("hero", "hero1", path, value);
 ```
 
 **Why**: Multiple instances can have same componentName but different IDs
@@ -1225,9 +1248,9 @@ setData: (state, variantId, data) => ({
   heroStates: { ...state.heroStates, [variantId]: data },
   pageComponentsByPage: {
     ...state.pageComponentsByPage,
-    [state.currentPage]: updatedComponents
-  }
-})
+    [state.currentPage]: updatedComponents,
+  },
+});
 ```
 
 ### Rule 3: Use setTimeout for Store Updates from Handlers
@@ -1244,16 +1267,13 @@ setTimeout(() => {
 
 ```typescript
 // ✅ CORRECT - Deep merge
-const mergedData = deepMerge(
-  deepMerge(existingData, storeData),
-  tempData
-);
+const mergedData = deepMerge(deepMerge(existingData, storeData), tempData);
 
 // ❌ WRONG - Shallow merge (loses nested data)
 const mergedData = {
   ...existingData,
   ...storeData,
-  ...tempData
+  ...tempData,
 };
 ```
 
@@ -1314,16 +1334,19 @@ console.log("🔍 [Save] Merging data:", { existing, store, temp, merged });
 ### Common Issues
 
 **Issue**: Component not updating in iframe
+
 - **Check**: Is component state being updated?
 - **Check**: Is pageComponentsByPage being updated?
 - **Check**: Is component re-rendering (check key prop)?
 
 **Issue**: Data lost after save
+
 - **Check**: Is deep merge used (not shallow)?
 - **Check**: Are all stores updated (not just one)?
 - **Check**: Is tempData being merged into final data?
 
 **Issue**: Global component changes not persisting
+
 - **Check**: Is globalComponentsData being updated?
 - **Check**: Is save payload including globalComponentsData?
 - **Check**: Is component ID "global-header" or "global-footer"?
@@ -1343,4 +1366,3 @@ The Live Editor state management system is complex but follows consistent patter
 7. **Database operations use pageComponentsByPage** (source of truth)
 
 Understanding these principles is essential for working with the Live Editor effectively.
-

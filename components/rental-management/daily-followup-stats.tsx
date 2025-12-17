@@ -44,14 +44,12 @@ function StatCard({
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-600">{title}</p>
             <p className={`text-2xl font-bold ${color}`}>
-              {loading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                value
-              )}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : value}
             </p>
           </div>
-          <div className={`h-12 w-12 ${bgColor} rounded-lg flex items-center justify-center`}>
+          <div
+            className={`h-12 w-12 ${bgColor} rounded-lg flex items-center justify-center`}
+          >
             <Icon className={`h-6 w-6 ${color}`} />
           </div>
         </div>
@@ -59,7 +57,6 @@ function StatCard({
     </Card>
   );
 }
-
 
 // المكون الرئيسي
 export function DailyFollowupStats() {
@@ -69,7 +66,7 @@ export function DailyFollowupStats() {
     loading,
     error,
     fetchDailyFollowupData,
-    formatCurrency
+    formatCurrency,
   } = useDailyFollowupStore();
 
   useEffect(() => {
@@ -77,7 +74,6 @@ export function DailyFollowupStats() {
       fetchDailyFollowupData();
     }
   }, [userData?.token]);
-
 
   if (error) {
     return (

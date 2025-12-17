@@ -169,7 +169,7 @@ export function PaymentCollectionDialog() {
           body.style.pointerEvents = "";
         }
       }, 100);
-      
+
       // Reset state when dialog closes
       setSelectedPayments([]);
       setSelectedFees([]);
@@ -199,7 +199,7 @@ export function PaymentCollectionDialog() {
     ) {
       // Find first unpaid payment
       const firstUnpaidPayment = data.payment_details.items.find(
-        (payment) => payment.status !== "paid"
+        (payment) => payment.status !== "paid",
       );
 
       if (firstUnpaidPayment && firstUnpaidPayment.remaining_amount > 0) {
@@ -861,7 +861,6 @@ export function PaymentCollectionDialog() {
               </CardContent>
             </Card>
 
-
             {/* Payment Type Selection */}
             {/* مختفي فقط ولا اريد ازالته */}
             {/* <Card className="border-2 border-gray-200 shadow-lg">
@@ -1260,7 +1259,7 @@ export function PaymentCollectionDialog() {
                       dir="rtl"
                     />
                   </div>
-                  
+
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
                       المبلغ المتاح للدفع:{" "}
@@ -1406,7 +1405,7 @@ export function PaymentCollectionDialog() {
                           </p>
                         </div>
 
-                        {/* Full Payment Items */} 
+                        {/* Full Payment Items */}
                         {/* {fullPaymentItems.length > 0 && ( 
                           <div className="space-y-2">
                             <h4 className="text-md font-bold text-gray-900 text-center">

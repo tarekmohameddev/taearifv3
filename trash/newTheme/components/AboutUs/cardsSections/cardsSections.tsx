@@ -22,23 +22,29 @@ export default function CardsSections({
   paragraph2 = "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
   cards = [
     {
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "حلول عقارية سريعة وموثوقة",
-      description: "نقدّم لك خدمات عقارية متكاملة بمرونة وسرعة، مع فريق يتمتع بالكفاءة والخبرة لتلبية جميع احتياجاتك بسهولة واحترافية",
+      description:
+        "نقدّم لك خدمات عقارية متكاملة بمرونة وسرعة، مع فريق يتمتع بالكفاءة والخبرة لتلبية جميع احتياجاتك بسهولة واحترافية",
       readMoreUrl: "#",
       date: "مايو 29, 2023",
     },
     {
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "استثمر بثقة… وابدأ حياة جديدة",
-      description: "في باهية للعقارات، نضع بين يديك مجموعة مختارة من العقارات بعناية فائقة، لنمنحك تجربة فريدة ومضمونة من البداية حتى التملّك.",
+      description:
+        "في باهية للعقارات، نضع بين يديك مجموعة مختارة من العقارات بعناية فائقة، لنمنحك تجربة فريدة ومضمونة من البداية حتى التملّك.",
       readMoreUrl: "#",
       date: "يوليو 9, 2025",
     },
     {
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "اختيارك الأول للسكن والاستثمار",
-      description: "سواء كنت تبحث عن منزل الأحلام أو فرصة استثمارية رابحة، فريقنا المختص يساعدك في اتخاذ القرار الصحيح بكل شفافية ومصداقية",
+      description:
+        "سواء كنت تبحث عن منزل الأحلام أو فرصة استثمارية رابحة، فريقنا المختص يساعدك في اتخاذ القرار الصحيح بكل شفافية ومصداقية",
       readMoreUrl: "#",
       date: "يوليو 9, 2025",
     },
@@ -55,7 +61,7 @@ export default function CardsSections({
               {paragraph1}
             </p>
           </div>
-          
+
           {/* Second Paragraph - 50% */}
           <div className="w-full md:w-1/2">
             <p className="text-sm md:text-base text-white/90 leading-relaxed">
@@ -91,11 +97,13 @@ export default function CardsSections({
               <div className="p-6">
                 {/* Title */}
                 <Link href={card.readMoreUrl}>
-                  <h3 className={`text-lg md:text-xl font-bold mb-3 transition-colors ${
-                    card.title === "اختيارك الأول للسكن والاستثمار" 
-                      ? "text-[#8b5f46]" 
-                      : "text-gray-800 hover:text-[#8b5f46]"
-                  }`}>
+                  <h3
+                    className={`text-lg md:text-xl font-bold mb-3 transition-colors ${
+                      card.title === "اختيارك الأول للسكن والاستثمار"
+                        ? "text-[#8b5f46]"
+                        : "text-gray-800 hover:text-[#8b5f46]"
+                    }`}
+                  >
                     {card.title}
                   </h3>
                 </Link>
@@ -127,4 +135,3 @@ export default function CardsSections({
     </section>
   );
 }
-

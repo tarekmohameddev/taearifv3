@@ -564,10 +564,9 @@ export default function CrmSettingsDialog({
 
     try {
       // Send API request
-      const response = await axiosInstance.post(
-        `/crm/stages/${itemId}/move`,
-        { direction },
-      );
+      const response = await axiosInstance.post(`/crm/stages/${itemId}/move`, {
+        direction,
+      });
 
       if (response.data.status === "success") {
         // If server returns updated data, use it
@@ -585,9 +584,10 @@ export default function CrmSettingsDialog({
       console.error("Error moving stage:", err);
       // Revert to original order on error
       setPipelineStages(originalStages);
-      
+
       // Handle specific error messages from API
-      const errorMessage = err.response?.data?.message || "فشل في تحديث ترتيب المرحلة";
+      const errorMessage =
+        err.response?.data?.message || "فشل في تحديث ترتيب المرحلة";
       setError(translateErrorMessage(errorMessage));
     } finally {
       setIsMoving(null);
@@ -672,7 +672,8 @@ export default function CrmSettingsDialog({
                   size="icon"
                   onClick={() => handleMoveItem(item.id, "down", endpoint)}
                   disabled={
-                    index === items.length - 1 || isMoving === item.id.toString()
+                    index === items.length - 1 ||
+                    isMoving === item.id.toString()
                   }
                   className="text-muted-foreground hover:text-foreground h-8 w-8"
                 >
@@ -782,7 +783,8 @@ export default function CrmSettingsDialog({
                   size="icon"
                   onClick={() => handleMoveItem(item.id, "down", endpoint)}
                   disabled={
-                    index === items.length - 1 || isMoving === item.id.toString()
+                    index === items.length - 1 ||
+                    isMoving === item.id.toString()
                   }
                   className="text-muted-foreground hover:text-foreground"
                 >

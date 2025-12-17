@@ -115,7 +115,7 @@ export default function DealDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DealDetailsData | null>(null);
-  
+
   // States for cards/activities (from popup)
   const [cards, setCards] = useState<CrmCard[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -169,38 +169,51 @@ export default function DealDetailsPage() {
           ]);
 
           // Merge cards from API details with cards from cards endpoint
-          const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
-            id: card.id,
-            user_id: card.user_id,
-            card_customer_id: card.card_customer_id,
-            card_request_id: card.card_request_id || data.request.id,
-            card_content: card.card_content || "",
-            card_procedure: card.card_procedure || "note",
-            card_project: card.card_project ?? null,
-            card_property: card.card_property ?? null,
-            card_date: card.card_date || card.created_at || new Date().toISOString(),
-            created_at: card.created_at,
-            updated_at: card.updated_at,
-            deleted_at: card.deleted_at,
-          })) : [];
-          
-          const cardsFromEndpoint = cardsRes.data.status === "success" || cardsRes.data.status === true
-            ? (cardsRes.data.data?.cards || cardsRes.data.data || []).map((card: any): CrmCard => ({
-              id: card.id,
-              user_id: card.user_id,
-              card_customer_id: card.card_customer_id,
-              card_request_id: card.card_request_id || data.request.id,
-              card_content: card.card_content || "",
-              card_procedure: card.card_procedure || "note",
-              card_project: card.card_project ?? null,
-              card_property: card.card_property ?? null,
-              card_date: card.card_date || card.created_at || new Date().toISOString(),
-              created_at: card.created_at,
-              updated_at: card.updated_at,
-              deleted_at: card.deleted_at,
-            }))
+          const cardsFromApi = Array.isArray(data.cards)
+            ? data.cards.map(
+                (card: any): CrmCard => ({
+                  id: card.id,
+                  user_id: card.user_id,
+                  card_customer_id: card.card_customer_id,
+                  card_request_id: card.card_request_id || data.request.id,
+                  card_content: card.card_content || "",
+                  card_procedure: card.card_procedure || "note",
+                  card_project: card.card_project ?? null,
+                  card_property: card.card_property ?? null,
+                  card_date:
+                    card.card_date ||
+                    card.created_at ||
+                    new Date().toISOString(),
+                  created_at: card.created_at,
+                  updated_at: card.updated_at,
+                  deleted_at: card.deleted_at,
+                }),
+              )
             : [];
-          
+
+          const cardsFromEndpoint =
+            cardsRes.data.status === "success" || cardsRes.data.status === true
+              ? (cardsRes.data.data?.cards || cardsRes.data.data || []).map(
+                  (card: any): CrmCard => ({
+                    id: card.id,
+                    user_id: card.user_id,
+                    card_customer_id: card.card_customer_id,
+                    card_request_id: card.card_request_id || data.request.id,
+                    card_content: card.card_content || "",
+                    card_procedure: card.card_procedure || "note",
+                    card_project: card.card_project ?? null,
+                    card_property: card.card_property ?? null,
+                    card_date:
+                      card.card_date ||
+                      card.created_at ||
+                      new Date().toISOString(),
+                    created_at: card.created_at,
+                    updated_at: card.updated_at,
+                    deleted_at: card.deleted_at,
+                  }),
+                )
+              : [];
+
           // Merge and remove duplicates based on id
           const mergedCards = [...cardsFromApi];
           cardsFromEndpoint.forEach((card: CrmCard) => {
@@ -208,32 +221,45 @@ export default function DealDetailsPage() {
               mergedCards.push(card);
             }
           });
-          
+
           setCards(mergedCards);
-          
+
           if (projectsRes.data.status === "success") {
-            setProjects(projectsRes.data.data?.projects || projectsRes.data.data || []);
+            setProjects(
+              projectsRes.data.data?.projects || projectsRes.data.data || [],
+            );
           }
           if (propertiesRes.data.status === "success") {
-            setProperties(propertiesRes.data.data?.properties || propertiesRes.data.data || []);
+            setProperties(
+              propertiesRes.data.data?.properties ||
+                propertiesRes.data.data ||
+                [],
+            );
           }
         } catch (err) {
           console.error("Failed to fetch cards data:", err);
           // Fallback to cards from API details if endpoint fails
-          const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
-            id: card.id,
-            user_id: card.user_id,
-            card_customer_id: card.card_customer_id,
-            card_request_id: card.card_request_id || data.request.id,
-            card_content: card.card_content || "",
-            card_procedure: card.card_procedure || "note",
-            card_project: card.card_project ?? null,
-            card_property: card.card_property ?? null,
-            card_date: card.card_date || card.created_at || new Date().toISOString(),
-            created_at: card.created_at,
-            updated_at: card.updated_at,
-            deleted_at: card.deleted_at,
-          })) : [];
+          const cardsFromApi = Array.isArray(data.cards)
+            ? data.cards.map(
+                (card: any): CrmCard => ({
+                  id: card.id,
+                  user_id: card.user_id,
+                  card_customer_id: card.card_customer_id,
+                  card_request_id: card.card_request_id || data.request.id,
+                  card_content: card.card_content || "",
+                  card_procedure: card.card_procedure || "note",
+                  card_project: card.card_project ?? null,
+                  card_property: card.card_property ?? null,
+                  card_date:
+                    card.card_date ||
+                    card.created_at ||
+                    new Date().toISOString(),
+                  created_at: card.created_at,
+                  updated_at: card.updated_at,
+                  deleted_at: card.deleted_at,
+                }),
+              )
+            : [];
           setCards(cardsFromApi);
           setErrorCards("فشل في تحميل الأنشطة والبطاقات.");
         } finally {
@@ -243,20 +269,25 @@ export default function DealDetailsPage() {
       fetchCardsData();
     } else if (data?.cards) {
       // If no request id but cards exist in data, use them
-      const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
-        id: card.id,
-        user_id: card.user_id,
-        card_customer_id: card.card_customer_id,
-        card_request_id: card.card_request_id,
-        card_content: card.card_content || "",
-        card_procedure: card.card_procedure || "note",
-        card_project: card.card_project ?? null,
-        card_property: card.card_property ?? null,
-        card_date: card.card_date || card.created_at || new Date().toISOString(),
-        created_at: card.created_at,
-        updated_at: card.updated_at,
-        deleted_at: card.deleted_at,
-      })) : [];
+      const cardsFromApi = Array.isArray(data.cards)
+        ? data.cards.map(
+            (card: any): CrmCard => ({
+              id: card.id,
+              user_id: card.user_id,
+              card_customer_id: card.card_customer_id,
+              card_request_id: card.card_request_id,
+              card_content: card.card_content || "",
+              card_procedure: card.card_procedure || "note",
+              card_project: card.card_project ?? null,
+              card_property: card.card_property ?? null,
+              card_date:
+                card.card_date || card.created_at || new Date().toISOString(),
+              created_at: card.created_at,
+              updated_at: card.updated_at,
+              deleted_at: card.deleted_at,
+            }),
+          )
+        : [];
       setCards(cardsFromApi);
     }
   }, [data?.request?.id, data?.cards]);
@@ -369,8 +400,14 @@ export default function DealDetailsPage() {
     );
   }
 
-  const { request, customer, cards: cardsFromApi, property_specifications, property_basic, property } =
-    data as any;
+  const {
+    request,
+    customer,
+    cards: cardsFromApi,
+    property_specifications,
+    property_basic,
+    property,
+  } = data as any;
 
   // Debug: Log to check data structure
   console.log("Full Data:", data);
@@ -396,27 +433,38 @@ export default function DealDetailsPage() {
   // Extract basic info - try from property_specifications first, then property/property_basic
   const basicInfoFromSpecs = propertySpecsData?.basic_information || {};
   const basicInfoFromBasic = propertyBasicData || {};
-  
+
   // Merge both sources, giving priority to property_specifications
   const basicInfo = {
     address: basicInfoFromSpecs.address || basicInfoFromBasic.address || null,
-    building: basicInfoFromSpecs.building || basicInfoFromBasic.building || null,
-    price: basicInfoFromSpecs.price || 
-           (basicInfoFromBasic.price ? parseFloat(basicInfoFromBasic.price) : 0) || 
-           0,
-    payment_method: basicInfoFromSpecs.payment_method || basicInfoFromBasic.payment_method || null,
-    price_per_sqm: basicInfoFromSpecs.price_per_sqm || 
-                   (basicInfoFromBasic.pricePerMeter ? parseFloat(basicInfoFromBasic.pricePerMeter) : 0) || 
-                   0,
+    building:
+      basicInfoFromSpecs.building || basicInfoFromBasic.building || null,
+    price:
+      basicInfoFromSpecs.price ||
+      (basicInfoFromBasic.price ? parseFloat(basicInfoFromBasic.price) : 0) ||
+      0,
+    payment_method:
+      basicInfoFromSpecs.payment_method ||
+      basicInfoFromBasic.payment_method ||
+      null,
+    price_per_sqm:
+      basicInfoFromSpecs.price_per_sqm ||
+      (basicInfoFromBasic.pricePerMeter
+        ? parseFloat(basicInfoFromBasic.pricePerMeter)
+        : 0) ||
+      0,
     listing_type: basicInfoFromSpecs.listing_type || null,
     property_category: basicInfoFromSpecs.property_category || null,
     project: basicInfoFromSpecs.project || null,
     city: basicInfoFromSpecs.city || basicInfoFromBasic.city_id || null,
-    district: basicInfoFromSpecs.district || basicInfoFromBasic.district || null,
-    area: basicInfoFromSpecs.area || 
-          (basicInfoFromBasic.area ? parseFloat(basicInfoFromBasic.area) : null) || 
-          null,
-    property_type: basicInfoFromSpecs.property_type || basicInfoFromBasic.type || null,
+    district:
+      basicInfoFromSpecs.district || basicInfoFromBasic.district || null,
+    area:
+      basicInfoFromSpecs.area ||
+      (basicInfoFromBasic.area ? parseFloat(basicInfoFromBasic.area) : null) ||
+      null,
+    property_type:
+      basicInfoFromSpecs.property_type || basicInfoFromBasic.type || null,
     // From property/property_basic
     title: basicInfoFromBasic.title || null,
     purpose: basicInfoFromBasic.purpose || null,
@@ -429,25 +477,53 @@ export default function DealDetailsPage() {
   // Get facilities from property_specifications or from property directly
   const facilitiesFromSpecs = propertySpecsData?.facilities || {};
   const facilities = {
-    bedrooms: facilitiesFromSpecs.bedrooms || basicInfoFromBasic.beds || basicInfoFromBasic.rooms || null,
-    bathrooms: facilitiesFromSpecs.bathrooms || basicInfoFromBasic.bath || basicInfoFromBasic.bathrooms || null,
+    bedrooms:
+      facilitiesFromSpecs.bedrooms ||
+      basicInfoFromBasic.beds ||
+      basicInfoFromBasic.rooms ||
+      null,
+    bathrooms:
+      facilitiesFromSpecs.bathrooms ||
+      basicInfoFromBasic.bath ||
+      basicInfoFromBasic.bathrooms ||
+      null,
     rooms: facilitiesFromSpecs.rooms || basicInfoFromBasic.rooms || null,
     floors: facilitiesFromSpecs.floors || basicInfoFromBasic.floors || null,
-    floor_number: facilitiesFromSpecs.floor_number || basicInfoFromBasic.floor_number || null,
-    drivers_room: facilitiesFromSpecs.drivers_room || basicInfoFromBasic.driver_room || null,
-    maids_room: facilitiesFromSpecs.maids_room || basicInfoFromBasic.maid_room || null,
-    dining_room: facilitiesFromSpecs.dining_room || basicInfoFromBasic.dining_room || null,
-    living_room: facilitiesFromSpecs.living_room || basicInfoFromBasic.living_room || null,
+    floor_number:
+      facilitiesFromSpecs.floor_number ||
+      basicInfoFromBasic.floor_number ||
+      null,
+    drivers_room:
+      facilitiesFromSpecs.drivers_room ||
+      basicInfoFromBasic.driver_room ||
+      null,
+    maids_room:
+      facilitiesFromSpecs.maids_room || basicInfoFromBasic.maid_room || null,
+    dining_room:
+      facilitiesFromSpecs.dining_room || basicInfoFromBasic.dining_room || null,
+    living_room:
+      facilitiesFromSpecs.living_room || basicInfoFromBasic.living_room || null,
     majlis: facilitiesFromSpecs.majlis || basicInfoFromBasic.majlis || null,
-    storage_room: facilitiesFromSpecs.storage_room || basicInfoFromBasic.storage_room || null,
-    basement: facilitiesFromSpecs.basement || basicInfoFromBasic.basement || null,
-    swimming_pool: facilitiesFromSpecs.swimming_pool || basicInfoFromBasic.swimming_pool || null,
+    storage_room:
+      facilitiesFromSpecs.storage_room ||
+      basicInfoFromBasic.storage_room ||
+      null,
+    basement:
+      facilitiesFromSpecs.basement || basicInfoFromBasic.basement || null,
+    swimming_pool:
+      facilitiesFromSpecs.swimming_pool ||
+      basicInfoFromBasic.swimming_pool ||
+      null,
     kitchen: facilitiesFromSpecs.kitchen || basicInfoFromBasic.kitchen || null,
     balcony: facilitiesFromSpecs.balcony || basicInfoFromBasic.balcony || null,
     garden: facilitiesFromSpecs.garden || basicInfoFromBasic.garden || null,
     annex: facilitiesFromSpecs.annex || basicInfoFromBasic.annex || null,
-    elevator: facilitiesFromSpecs.elevator || basicInfoFromBasic.elevator || null,
-    parking_space: facilitiesFromSpecs.parking_space || basicInfoFromBasic.private_parking || null,
+    elevator:
+      facilitiesFromSpecs.elevator || basicInfoFromBasic.elevator || null,
+    parking_space:
+      facilitiesFromSpecs.parking_space ||
+      basicInfoFromBasic.private_parking ||
+      null,
   };
 
   return (
@@ -544,7 +620,9 @@ export default function DealDetailsPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">رقم الصفقة</p>
+                      <p className="text-sm text-muted-foreground">
+                        رقم الصفقة
+                      </p>
                       <p className="font-semibold">#{request.id}</p>
                     </div>
                     <div>
@@ -552,7 +630,9 @@ export default function DealDetailsPage() {
                       <Badge variant="secondary">#{request.stage_id}</Badge>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">تاريخ الإنشاء</p>
+                      <p className="text-sm text-muted-foreground">
+                        تاريخ الإنشاء
+                      </p>
                       <p className="font-semibold text-sm">
                         {formatDate(request.created_at)}
                       </p>
@@ -564,13 +644,12 @@ export default function DealDetailsPage() {
                       </p>
                     </div>
                   </div>
-
                 </CardContent>
               </Card>
             </div>
 
             {/* معلومات العقار - دمج property_specifications و property_basic */}
-            {(propertySpecsData || propertyBasicData) ? (
+            {propertySpecsData || propertyBasicData ? (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -587,7 +666,7 @@ export default function DealDetailsPage() {
                       </h4>
                       <div className="space-y-4">
                         {/* Title or Address */}
-                        {(basicInfo.title || basicInfo.address) ? (
+                        {basicInfo.title || basicInfo.address ? (
                           <div className="flex items-start gap-3">
                             <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
                             <div className="flex-1">
@@ -597,7 +676,9 @@ export default function DealDetailsPage() {
                               <p className="font-medium">
                                 {basicInfo.title || basicInfo.address}
                               </p>
-                              {basicInfo.title && basicInfo.address && basicInfo.title !== basicInfo.address ? (
+                              {basicInfo.title &&
+                              basicInfo.address &&
+                              basicInfo.title !== basicInfo.address ? (
                                 <p className="text-sm text-muted-foreground mt-1">
                                   {basicInfo.address}
                                 </p>
@@ -620,9 +701,9 @@ export default function DealDetailsPage() {
                           </div>
                         ) : null}
                         {/* Price */}
-                        {((basicInfo.price && basicInfo.price > 0) ||
-                          (propertyBasicData?.price &&
-                            parseFloat(String(propertyBasicData.price)) > 0)) ? (
+                        {(basicInfo.price && basicInfo.price > 0) ||
+                        (propertyBasicData?.price &&
+                          parseFloat(String(propertyBasicData.price)) > 0) ? (
                           <div className="flex items-start gap-3">
                             <DollarSign className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
                             <div className="flex-1">
@@ -633,16 +714,19 @@ export default function DealDetailsPage() {
                                 {formatCurrency(
                                   basicInfo.price ||
                                     (propertyBasicData?.price
-                                      ? typeof propertyBasicData.price === "string"
+                                      ? typeof propertyBasicData.price ===
+                                        "string"
                                         ? parseFloat(propertyBasicData.price)
                                         : propertyBasicData.price
                                       : 0),
                                 )}
                               </p>
-                              {((basicInfo.price_per_sqm &&
+                              {(basicInfo.price_per_sqm &&
                                 basicInfo.price_per_sqm > 0) ||
-                                (propertyBasicData?.pricePerMeter &&
-                                  parseFloat(String(propertyBasicData.pricePerMeter)) > 0)) ? (
+                              (propertyBasicData?.pricePerMeter &&
+                                parseFloat(
+                                  String(propertyBasicData.pricePerMeter),
+                                ) > 0) ? (
                                 <p className="text-xs text-muted-foreground mt-1">
                                   السعر للمتر:{" "}
                                   {formatCurrency(
@@ -674,7 +758,7 @@ export default function DealDetailsPage() {
                         ) : null}
                         <div className="grid grid-cols-2 gap-4 pt-2">
                           {/* Area */}
-                          {(basicInfo.area || propertyBasicData?.area) ? (
+                          {basicInfo.area || propertyBasicData?.area ? (
                             <div>
                               <p className="text-sm text-muted-foreground mb-1">
                                 المساحة
@@ -685,8 +769,9 @@ export default function DealDetailsPage() {
                             </div>
                           ) : null}
                           {/* Property Type */}
-                          {(basicInfo.property_type || 
-                            (propertyBasicData?.type && propertyBasicData.type !== "")) ? (
+                          {basicInfo.property_type ||
+                          (propertyBasicData?.type &&
+                            propertyBasicData.type !== "") ? (
                             <div>
                               <p className="text-sm text-muted-foreground mb-1">
                                 نوع العقار
@@ -718,24 +803,32 @@ export default function DealDetailsPage() {
                             </div>
                           ) : null}
                           {/* Beds */}
-                          {(basicInfo.beds || propertyBasicData?.beds || propertyBasicData?.rooms) ? (
+                          {basicInfo.beds ||
+                          propertyBasicData?.beds ||
+                          propertyBasicData?.rooms ? (
                             <div>
                               <p className="text-sm text-muted-foreground mb-1">
                                 غرف النوم
                               </p>
                               <p className="font-medium">
-                                {basicInfo.beds || propertyBasicData?.beds || propertyBasicData?.rooms}
+                                {basicInfo.beds ||
+                                  propertyBasicData?.beds ||
+                                  propertyBasicData?.rooms}
                               </p>
                             </div>
                           ) : null}
                           {/* Bath */}
-                          {(basicInfo.bath || propertyBasicData?.bath || propertyBasicData?.bathrooms) ? (
+                          {basicInfo.bath ||
+                          propertyBasicData?.bath ||
+                          propertyBasicData?.bathrooms ? (
                             <div>
                               <p className="text-sm text-muted-foreground mb-1">
                                 الحمامات
                               </p>
                               <p className="font-medium">
-                                {basicInfo.bath || propertyBasicData?.bath || propertyBasicData?.bathrooms}
+                                {basicInfo.bath ||
+                                  propertyBasicData?.bath ||
+                                  propertyBasicData?.bathrooms}
                               </p>
                             </div>
                           ) : null}
@@ -770,14 +863,21 @@ export default function DealDetailsPage() {
                     </div>
 
                     {/* المرافق */}
-                    {(Object.keys(facilities).some(key => facilities[key as keyof typeof facilities] !== null && facilities[key as keyof typeof facilities] !== 0)) ? (
+                    {Object.keys(facilities).some(
+                      (key) =>
+                        facilities[key as keyof typeof facilities] !== null &&
+                        facilities[key as keyof typeof facilities] !== 0,
+                    ) ? (
                       <div className="space-y-4">
                         <h4 className="font-semibold text-base border-b pb-2">
                           المرافق
                         </h4>
                         <div className="grid grid-cols-2 gap-4">
                           {/* Bedrooms */}
-                          {(facilities.bedrooms || basicInfo.beds || propertyBasicData?.beds || propertyBasicData?.rooms) ? (
+                          {facilities.bedrooms ||
+                          basicInfo.beds ||
+                          propertyBasicData?.beds ||
+                          propertyBasicData?.rooms ? (
                             <div className="p-3 bg-muted/50 rounded-lg">
                               <p className="text-sm text-muted-foreground mb-1">
                                 غرف النوم
@@ -791,7 +891,10 @@ export default function DealDetailsPage() {
                             </div>
                           ) : null}
                           {/* Bathrooms */}
-                          {(facilities.bathrooms || basicInfo.bath || propertyBasicData?.bath || propertyBasicData?.bathrooms) ? (
+                          {facilities.bathrooms ||
+                          basicInfo.bath ||
+                          propertyBasicData?.bath ||
+                          propertyBasicData?.bathrooms ? (
                             <div className="p-3 bg-muted/50 rounded-lg">
                               <p className="text-sm text-muted-foreground mb-1">
                                 الحمامات
@@ -972,7 +1075,11 @@ export default function DealDetailsPage() {
                       {cards.map((card) => (
                         <CrmActivityCard
                           key={card.id}
-                          card={{ ...card, card_request_id: request?.id || card.card_request_id }}
+                          card={{
+                            ...card,
+                            card_request_id:
+                              request?.id || card.card_request_id,
+                          }}
                           projects={projects}
                           properties={properties}
                           onCardUpdate={(updatedCard) => {
@@ -1001,4 +1108,3 @@ export default function DealDetailsPage() {
     </div>
   );
 }
-

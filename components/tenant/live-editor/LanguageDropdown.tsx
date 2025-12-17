@@ -111,7 +111,11 @@ export function LanguageDropdown() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="z-[9999]" style={{ zIndex: 999999 }}>
+      <DropdownMenuContent
+        align="start"
+        className="z-[9999]"
+        style={{ zIndex: 999999 }}
+      >
         {locales.map((locale) => (
           <DropdownMenuItem
             key={locale}

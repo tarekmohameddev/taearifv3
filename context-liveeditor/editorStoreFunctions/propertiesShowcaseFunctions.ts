@@ -8,7 +8,7 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
   visible: true,
   ThemeTwo: "propertiesShowcase", // Theme identifier - not used in rendering
-  
+
   // Layout configuration
   layout: {
     ThemeTwo: "layout",
@@ -26,7 +26,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
       bottom: "3rem",
     },
   },
-  
+
   // Content
   content: {
     ThemeTwo: "content",
@@ -35,13 +35,14 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
     viewAllButtonText: "عرض الكل",
     cardType: "card1", // "card1" | "card2"
   },
-  
+
   // Data Source
   dataSource: {
-    apiUrl: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+    apiUrl:
+      "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
     enabled: true,
   },
-  
+
   // Properties/Projects array - 3 Cards Mock Data
   properties: [
     {
@@ -156,7 +157,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
       url: "#",
     },
   ],
-  
+
   // Styling
   styling: {
     ThemeTwo: "styling",
@@ -170,7 +171,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
     loadMoreButtonTextColor: "#8b5f46",
     loadMoreButtonHoverTextColor: "#ffffff",
   },
-  
+
   // Typography
   typography: {
     ThemeTwo: "typography",
@@ -186,7 +187,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
       fontFamily: "Tajawal",
     },
   },
-  
+
   // Responsive behavior
   responsive: {
     ThemeTwo: "responsive",
@@ -203,7 +204,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
 export const propertiesShowcaseFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -215,46 +216,53 @@ export const propertiesShowcaseFunctions = {
       state.propertiesShowcaseStates[variantId] &&
       Object.keys(state.propertiesShowcaseStates[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data
     const defaultData = getDefaultPropertiesShowcaseData();
-    
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      propertiesShowcaseStates: { ...state.propertiesShowcaseStates, [variantId]: data }
+      propertiesShowcaseStates: {
+        ...state.propertiesShowcaseStates,
+        [variantId]: data,
+      },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.propertiesShowcaseStates[variantId] || getDefaultPropertiesShowcaseData(),
-  
+    state.propertiesShowcaseStates[variantId] ||
+    getDefaultPropertiesShowcaseData(),
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    propertiesShowcaseStates: { ...state.propertiesShowcaseStates, [variantId]: data }
+    propertiesShowcaseStates: {
+      ...state.propertiesShowcaseStates,
+      [variantId]: data,
+    },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "content.title")
@@ -262,12 +270,16 @@ export const propertiesShowcaseFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.propertiesShowcaseStates[variantId] || getDefaultPropertiesShowcaseData();
+    const source =
+      state.propertiesShowcaseStates[variantId] ||
+      getDefaultPropertiesShowcaseData();
     const newData = updateDataByPath(source, path, value);
-    
-    return {
-      propertiesShowcaseStates: { ...state.propertiesShowcaseStates, [variantId]: newData }
-    } as any;
-  }
-};
 
+    return {
+      propertiesShowcaseStates: {
+        ...state.propertiesShowcaseStates,
+        [variantId]: newData,
+      },
+    } as any;
+  },
+};

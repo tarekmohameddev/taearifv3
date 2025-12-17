@@ -58,7 +58,10 @@ export const useTokenValidation = () => {
     // التحقق من الكوكي أولاً لتجنب طلب API
     if (typeof window !== "undefined") {
       try {
-        const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
+        const {
+          getPlanCookie,
+          hasValidPlanCookie,
+        } = require("@/lib/planCookie");
         if (hasValidPlanCookie()) {
           const cachedPlan = getPlanCookie();
           if (cachedPlan) {
@@ -99,8 +102,10 @@ export const useTokenValidation = () => {
               days_remaining: newUser.membership.days_remaining,
               package_title: newUser.membership.package.title,
               package_features: newUser.membership.package.features || [],
-              project_limit_number: newUser.membership.package.project_limit_number,
-              real_estate_limit_number: newUser.membership.package.real_estate_limit_number,
+              project_limit_number:
+                newUser.membership.package.project_limit_number,
+              real_estate_limit_number:
+                newUser.membership.package.real_estate_limit_number,
               message: newUser.message,
               company_name: newUser.company_name,
               permissions: newUser.permissions || [],

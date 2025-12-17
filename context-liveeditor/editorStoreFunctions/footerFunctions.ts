@@ -142,7 +142,8 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     companyInfo: {
       enabled: true,
       name: "باهية العقارية",
-      description: "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
+      description:
+        "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
       tagline: "",
       logo: "/images/main/logo.png",
       ThemeTwo: "ThemeTwo", // ThemeTwo key added
@@ -150,7 +151,8 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     newsletter: {
       enabled: true,
       title: "اشترك في النشرة البريدية",
-      description: "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
+      description:
+        "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
       placeholder: "رقم الواتساب",
       buttonText: "اشترك الآن",
       ThemeTwo: "ThemeTwo", // ThemeTwo key added
@@ -166,18 +168,39 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     socialMedia: {
       enabled: true,
       platforms: [
-        { name: "Facebook", url: "https://www.facebook.com/share/1C974jrjRc/", ThemeTwo: "ThemeTwo" },
-        { name: "YouTube", url: "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp", ThemeTwo: "ThemeTwo" },
-        { name: "Instagram", url: "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4", ThemeTwo: "ThemeTwo" },
-        { name: "X (Twitter)", url: "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08", ThemeTwo: "ThemeTwo" },
-        { name: "Snapchat", url: "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE", ThemeTwo: "ThemeTwo" },
+        {
+          name: "Facebook",
+          url: "https://www.facebook.com/share/1C974jrjRc/",
+          ThemeTwo: "ThemeTwo",
+        },
+        {
+          name: "YouTube",
+          url: "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
+          ThemeTwo: "ThemeTwo",
+        },
+        {
+          name: "Instagram",
+          url: "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
+          ThemeTwo: "ThemeTwo",
+        },
+        {
+          name: "X (Twitter)",
+          url: "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
+          ThemeTwo: "ThemeTwo",
+        },
+        {
+          name: "Snapchat",
+          url: "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
+          ThemeTwo: "ThemeTwo",
+        },
       ],
       ThemeTwo: "ThemeTwo", // ThemeTwo key added
     },
   },
   footerBottom: {
     enabled: true,
-    copyright: "جميع الحقوق محفوظة لشركة باهية العقارية 2025© | صمم من طرف وكالة سهيل",
+    copyright:
+      "جميع الحقوق محفوظة لشركة باهية العقارية 2025© | صمم من طرف وكالة سهيل",
     companyUrl: "https://baheya.co",
     designerUrl: "http://souhailagency.com",
     legalLinks: [
@@ -233,9 +256,10 @@ export const footerFunctions = {
     }
 
     // Determine default data based on variant
-    const defaultData = variantId === "footer2"
-      ? getDefaultFooter2Data()
-      : getDefaultFooterData();
+    const defaultData =
+      variantId === "footer2"
+        ? getDefaultFooter2Data()
+        : getDefaultFooterData();
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {

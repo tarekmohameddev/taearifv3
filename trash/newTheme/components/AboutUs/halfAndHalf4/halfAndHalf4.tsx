@@ -33,9 +33,7 @@ export default function HalfAndHalf4({
               {/* Heading */}
               <div className="mb-6 md:mb-8">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 text-black leading-tight">
-                  <span className="">
-                    خدمات
-                  </span>
+                  <span className="">خدمات</span>
                   <span> موثوقة تستحق ثقتك</span>
                 </h3>
                 {/* Divider */}
@@ -67,7 +65,9 @@ export default function HalfAndHalf4({
                       الشفافية
                     </h4>
                     <p className="text-sm md:text-base text-[#8b5f46] leading-relaxed">
-                      نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.
+                      نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني
+                      الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية،
+                      دون مفاجآت أو معلومات مخفية.
                     </p>
                   </div>
                 </div>
@@ -94,7 +94,9 @@ export default function HalfAndHalf4({
                       الالتزام
                     </h4>
                     <p className="text-sm md:text-base text-[#8b5f46] leading-relaxed">
-                      نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار
+                      نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل
+                      الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك،
+                      سواء بالشراء أو الاستثمار
                     </p>
                   </div>
                 </div>
@@ -130,7 +132,9 @@ export default function HalfAndHalf4({
                       الابتكار
                     </h4>
                     <p className="text-sm md:text-base text-[#8b5f46] leading-relaxed">
-                      نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.
+                      نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات
+                      لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة،
+                      والراحة.
                     </p>
                   </div>
                 </div>
@@ -142,4 +146,3 @@ export default function HalfAndHalf4({
     </section>
   );
 }
-

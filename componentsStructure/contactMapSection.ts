@@ -370,12 +370,12 @@ export const contactMapSectionStructure: ComponentStructure = {
                   type: "color",
                   useDefaultColor: false, // Inactive color is usually custom
                 },
-                { 
-                  key: "hoverColor", 
-                  label: "Hover Star Color", 
+                {
+                  key: "hoverColor",
+                  label: "Hover Star Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "primary" // Hover star uses primary color
+                  globalColorType: "primary", // Hover star uses primary color
                 },
                 {
                   key: "showRatingText",
@@ -387,7 +387,7 @@ export const contactMapSectionStructure: ComponentStructure = {
                   label: "Rating Text Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary" // Rating text uses secondary color
+                  globalColorType: "secondary", // Rating text uses secondary color
                 },
               ],
             },
@@ -435,12 +435,12 @@ export const contactMapSectionStructure: ComponentStructure = {
                   useDefaultColor: true,
                   globalColorType: "primary", // Button hover uses primary color
                 },
-                { 
-                  key: "textColor", 
-                  label: "Text Color", 
+                {
+                  key: "textColor",
+                  label: "Text Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary" // Button text uses secondary color (usually white)
+                  globalColorType: "secondary", // Button text uses secondary color (usually white)
                 },
                 {
                   key: "fontSize",
@@ -536,12 +536,12 @@ export const contactMapSectionStructure: ComponentStructure = {
           label: "Form Labels",
           type: "object",
           fields: [
-            { 
-              key: "labelColor", 
-              label: "Label Color", 
+            {
+              key: "labelColor",
+              label: "Label Color",
               type: "color",
               useDefaultColor: true,
-              globalColorType: "secondary" // Label uses secondary color
+              globalColorType: "secondary", // Label uses secondary color
             },
             {
               key: "labelSize",

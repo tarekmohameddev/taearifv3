@@ -336,103 +336,122 @@ export function DynamicFieldsRenderer({
   // Create icon cache using useMemo for better performance
   const iconCache = useMemo(() => {
     const cache = new Map<string, React.ComponentType<any> | null>();
-    
+
     // Pre-populate cache with common icons
-    const commonLucideIcons = ['UserCircle', 'Building2', 'GraduationCap', 'TrendingUp', 'Briefcase', 'Settings', 'Home', 'MapPin', 'Phone', 'Mail'];
-    commonLucideIcons.forEach(iconName => {
+    const commonLucideIcons = [
+      "UserCircle",
+      "Building2",
+      "GraduationCap",
+      "TrendingUp",
+      "Briefcase",
+      "Settings",
+      "Home",
+      "MapPin",
+      "Phone",
+      "Mail",
+    ];
+    commonLucideIcons.forEach((iconName) => {
       const icon = (LucideIcons as any)[iconName];
       if (icon) cache.set(`lucide:${iconName}`, icon);
     });
-    
+
     return cache;
   }, []);
 
   // Helper function to get icon component dynamically with caching
-  const getIconComponent = useCallback((iconName: string, iconLibrary?: string) => {
-    if (!iconName) return null;
-    
-    const cacheKey = `${iconLibrary || "lucide"}:${iconName}`;
-    
-    // Check cache first
-    if (iconCache.has(cacheKey)) {
-      return iconCache.get(cacheKey) || null;
-    }
-    
-    try {
-      let icon: React.ComponentType<any> | null = null;
-      
-      if (iconLibrary === "lucide" || !iconLibrary) {
-        // Try lucide-react icons
-        icon = (LucideIcons as any)[iconName] || null;
-        if (icon) {
-          iconCache.set(cacheKey, icon);
-          return icon;
-        }
+  const getIconComponent = useCallback(
+    (iconName: string, iconLibrary?: string) => {
+      if (!iconName) return null;
+
+      const cacheKey = `${iconLibrary || "lucide"}:${iconName}`;
+
+      // Check cache first
+      if (iconCache.has(cacheKey)) {
+        return iconCache.get(cacheKey) || null;
       }
-      
-      if (iconLibrary === "react-icons") {
-        // Try react-icons Font Awesome first (most common)
-        if (iconName.startsWith('Fa')) {
-          icon = (ReactIconsFa as any)[iconName] || null;
+
+      try {
+        let icon: React.ComponentType<any> | null = null;
+
+        if (iconLibrary === "lucide" || !iconLibrary) {
+          // Try lucide-react icons
+          icon = (LucideIcons as any)[iconName] || null;
           if (icon) {
             iconCache.set(cacheKey, icon);
             return icon;
           }
         }
-        
-        // Try react-icons Material Design
-        if (iconName.startsWith('Md')) {
-          icon = (ReactIconsMd as any)[iconName] || null;
+
+        if (iconLibrary === "react-icons") {
+          // Try react-icons Font Awesome first (most common)
+          if (iconName.startsWith("Fa")) {
+            icon = (ReactIconsFa as any)[iconName] || null;
+            if (icon) {
+              iconCache.set(cacheKey, icon);
+              return icon;
+            }
+          }
+
+          // Try react-icons Material Design
+          if (iconName.startsWith("Md")) {
+            icon = (ReactIconsMd as any)[iconName] || null;
+            if (icon) {
+              iconCache.set(cacheKey, icon);
+              return icon;
+            }
+          }
+
+          // Try all react-icons if prefix doesn't match
+          icon =
+            (ReactIconsFa as any)[iconName] ||
+            (ReactIconsMd as any)[iconName] ||
+            null;
           if (icon) {
             iconCache.set(cacheKey, icon);
             return icon;
           }
         }
-        
-        // Try all react-icons if prefix doesn't match
-        icon = (ReactIconsFa as any)[iconName] || (ReactIconsMd as any)[iconName] || null;
-        if (icon) {
-          iconCache.set(cacheKey, icon);
-          return icon;
+
+        // Fallback: try lucide-react if no library specified
+        if (!icon) {
+          icon = (LucideIcons as any)[iconName] || null;
+          if (icon) {
+            iconCache.set(cacheKey, icon);
+            return icon;
+          }
         }
+
+        // Cache null result to avoid repeated lookups
+        iconCache.set(cacheKey, null);
+        return null;
+      } catch (error) {
+        iconCache.set(cacheKey, null);
+        return null;
       }
-      
-      // Fallback: try lucide-react if no library specified
-      if (!icon) {
-        icon = (LucideIcons as any)[iconName] || null;
-        if (icon) {
-          iconCache.set(cacheKey, icon);
-          return icon;
-        }
-      }
-      
-      // Cache null result to avoid repeated lookups
-      iconCache.set(cacheKey, null);
-      return null;
-    } catch (error) {
-      iconCache.set(cacheKey, null);
-      return null;
-    }
-  }, [iconCache]);
-  
+    },
+    [iconCache],
+  );
+
   // Memoize React Icon check function
   const isReactIcon = useCallback((iconName: string): boolean => {
-    return iconName.startsWith('Fa') || 
-           iconName.startsWith('Md') || 
-           iconName.startsWith('Io') ||
-           iconName.startsWith('Bi') ||
-           iconName.startsWith('Bs') ||
-           iconName.startsWith('Hi') ||
-           iconName.startsWith('Ai') ||
-           iconName.startsWith('Ti') ||
-           iconName.startsWith('Gi') ||
-           iconName.startsWith('Si') ||
-           iconName.startsWith('Ri') ||
-           iconName.startsWith('Tb') ||
-           iconName.startsWith('Vsc') ||
-           iconName.startsWith('Wi') ||
-           iconName.startsWith('Di') ||
-           iconName.startsWith('Im');
+    return (
+      iconName.startsWith("Fa") ||
+      iconName.startsWith("Md") ||
+      iconName.startsWith("Io") ||
+      iconName.startsWith("Bi") ||
+      iconName.startsWith("Bs") ||
+      iconName.startsWith("Hi") ||
+      iconName.startsWith("Ai") ||
+      iconName.startsWith("Ti") ||
+      iconName.startsWith("Gi") ||
+      iconName.startsWith("Si") ||
+      iconName.startsWith("Ri") ||
+      iconName.startsWith("Tb") ||
+      iconName.startsWith("Vsc") ||
+      iconName.startsWith("Wi") ||
+      iconName.startsWith("Di") ||
+      iconName.startsWith("Im")
+    );
   }, []);
 
   const renderField = (def: FieldDefinition, basePath?: string) => {
@@ -455,10 +474,14 @@ export function DynamicFieldsRenderer({
 
     const normalizedPath = normalizePath(path);
     let value = getValueByPath(normalizedPath);
-    
+
     // Ensure value is a string for color fields (not an object)
     if (def.type === "color") {
-      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
         // If value is an object, it might contain useDefaultColor and globalColorType
         // Extract the actual color string value
         value = value.value || value.color || "";
@@ -665,29 +688,41 @@ export function DynamicFieldsRenderer({
         // Only show useDefaultColor toggle if the field definition explicitly has useDefaultColor property
         // This prevents showing toggle for nested color fields that don't have useDefaultColor in their definition
         const hasUseDefaultColorInDef = def.useDefaultColor !== undefined;
-        
+
         // Get useDefaultColor and globalColorType from field definition or data
         const useDefaultColorPath = `${normalizedPath}.useDefaultColor`;
         const globalColorTypePath = `${normalizedPath}.globalColorType`;
-        
+
         // Get the current value from tempData or data, prioritizing tempData
         const currentUseDefaultColor = getValueByPath(useDefaultColorPath);
         const useDefaultColorValue = hasUseDefaultColorInDef
-          ? (currentUseDefaultColor !== undefined ? currentUseDefaultColor : (def.useDefaultColor ?? true))
+          ? currentUseDefaultColor !== undefined
+            ? currentUseDefaultColor
+            : (def.useDefaultColor ?? true)
           : false;
-        const globalColorTypeValue = getValueByPath(globalColorTypePath) ?? def.globalColorType ?? "primary";
-        
+        const globalColorTypeValue =
+          getValueByPath(globalColorTypePath) ??
+          def.globalColorType ??
+          "primary";
+
         // Get branding colors from WebsiteLayout
-        const primaryColor = tenantData?.WebsiteLayout?.branding?.colors?.primary || "#059669";
-        const secondaryColor = tenantData?.WebsiteLayout?.branding?.colors?.secondary || "#059669";
-        const accentColor = tenantData?.WebsiteLayout?.branding?.colors?.accent || "#059669";
-        
+        const primaryColor =
+          tenantData?.WebsiteLayout?.branding?.colors?.primary || "#059669";
+        const secondaryColor =
+          tenantData?.WebsiteLayout?.branding?.colors?.secondary || "#059669";
+        const accentColor =
+          tenantData?.WebsiteLayout?.branding?.colors?.accent || "#059669";
+
         const getBrandingColor = (type: "primary" | "secondary" | "accent") => {
           switch (type) {
-            case "primary": return primaryColor;
-            case "secondary": return secondaryColor;
-            case "accent": return accentColor;
-            default: return primaryColor;
+            case "primary":
+              return primaryColor;
+            case "secondary":
+              return secondaryColor;
+            case "accent":
+              return accentColor;
+            default:
+              return primaryColor;
           }
         };
 
@@ -704,19 +739,22 @@ export function DynamicFieldsRenderer({
         }
 
         return (
-          <div className="space-y-4 " >
+          <div className="space-y-4 ">
             {/* Use Default Color Toggle */}
             <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
               <div className="flex items-center justify-between mb-3">
-                
-                <label className="flex items-center space-x-3" >
+                <label className="flex items-center space-x-3">
                   <span className="text-sm font-semibold text-slate-700">
-                  {def.label} -  {t("editor_sidebar.use_default_color") || "Use Default Color"}
+                    {def.label} -{" "}
+                    {t("editor_sidebar.use_default_color") ||
+                      "Use Default Color"}
                   </span>
                 </label>
                 <button
                   type="button"
-                  onClick={() => updateValue(useDefaultColorPath, !useDefaultColorValue)}
+                  onClick={() =>
+                    updateValue(useDefaultColorPath, !useDefaultColorValue)
+                  }
                   className={`relative inline-flex h-8 w-16 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${
                     useDefaultColorValue
                       ? "bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg shadow-green-500/25"
@@ -733,8 +771,10 @@ export function DynamicFieldsRenderer({
               </div>
               <p className="text-xs text-slate-500">
                 {useDefaultColorValue
-                  ? t("editor_sidebar.using_branding_color") || "Using branding color from general settings"
-                  : t("editor_sidebar.using_custom_color") || "Using custom color"}
+                  ? t("editor_sidebar.using_branding_color") ||
+                    "Using branding color from general settings"
+                  : t("editor_sidebar.using_custom_color") ||
+                    "Using custom color"}
               </p>
             </div>
 
@@ -758,13 +798,16 @@ export function DynamicFieldsRenderer({
                     </svg>
                   </div>
                   <span className="text-sm font-semibold text-slate-700">
-                    {t("editor_sidebar.branding_color_type") || "Branding Color Type"}
+                    {t("editor_sidebar.branding_color_type") ||
+                      "Branding Color Type"}
                   </span>
                 </label>
                 <div className="relative">
                   <select
                     value={globalColorTypeValue}
-                    onChange={(e) => updateValue(globalColorTypePath, e.target.value)}
+                    onChange={(e) =>
+                      updateValue(globalColorTypePath, e.target.value)
+                    }
                     className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium appearance-none cursor-pointer pr-10 ${
                       globalColorTypeValue && globalColorTypeValue.length > 0
                         ? "border-green-300 bg-green-50"
@@ -790,7 +833,9 @@ export function DynamicFieldsRenderer({
                   {/* Color preview */}
                   <div
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                    style={{ backgroundColor: getBrandingColor(globalColorTypeValue) }}
+                    style={{
+                      backgroundColor: getBrandingColor(globalColorTypeValue),
+                    }}
                   />
                 </div>
               </div>
@@ -807,7 +852,8 @@ export function DynamicFieldsRenderer({
                   // Update both the color value and useDefaultColor in a single operation
                   updateValue(colorPath, colorValue);
                   // Explicitly set useDefaultColor to false to prevent it from reverting to true
-                  const currentUseDefaultColor = getValueByPath(useDefaultColorPath);
+                  const currentUseDefaultColor =
+                    getValueByPath(useDefaultColorPath);
                   if (currentUseDefaultColor !== false) {
                     updateValue(useDefaultColorPath, false);
                   }
@@ -839,28 +885,31 @@ export function DynamicFieldsRenderer({
       }
       case "select": {
         // Pre-compute options with icons for better performance (only when showIcons is true)
-        const optionsWithIcons = def.showIcons && def.options
-          ? (def.options || []).map((opt) => {
-              const IconComponent = opt.iconLibrary
-                ? getIconComponent(opt.value, opt.iconLibrary)
-                : null;
-              
-              const isReactIconValue = IconComponent ? isReactIcon(opt.value) : false;
-              
-              return {
-                ...opt,
-                IconComponent,
-                isReactIconValue,
-              };
-            })
-          : null;
-        
+        const optionsWithIcons =
+          def.showIcons && def.options
+            ? (def.options || []).map((opt) => {
+                const IconComponent = opt.iconLibrary
+                  ? getIconComponent(opt.value, opt.iconLibrary)
+                  : null;
+
+                const isReactIconValue = IconComponent
+                  ? isReactIcon(opt.value)
+                  : false;
+
+                return {
+                  ...opt,
+                  IconComponent,
+                  isReactIconValue,
+                };
+              })
+            : null;
+
         // Pre-compute selected option and icon
-        const selectedOption = def.options?.find(opt => opt.value === value);
+        const selectedOption = def.options?.find((opt) => opt.value === value);
         const selectedIcon = selectedOption?.iconLibrary
           ? getIconComponent(selectedOption.value, selectedOption.iconLibrary)
           : null;
-        
+
         return (
           <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
             <label className="flex items-center space-x-3 mb-3">
@@ -903,17 +952,28 @@ export function DynamicFieldsRenderer({
                     <div className="flex items-center gap-2 flex-1">
                       {selectedOption ? (
                         <>
-                          {selectedIcon && (
-                            isReactIcon(selectedOption.value) ? (
-                              React.createElement(selectedIcon, { className: "w-5 h-5", style: { fontSize: "20px", width: "20px", height: "20px", color: "currentColor" } })
-                            ) : (
-                              React.createElement(selectedIcon, { size: 20, className: "w-5 h-5", style: { color: "currentColor" } })
-                            )
-                          )}
+                          {selectedIcon &&
+                            (isReactIcon(selectedOption.value)
+                              ? React.createElement(selectedIcon, {
+                                  className: "w-5 h-5",
+                                  style: {
+                                    fontSize: "20px",
+                                    width: "20px",
+                                    height: "20px",
+                                    color: "currentColor",
+                                  },
+                                })
+                              : React.createElement(selectedIcon, {
+                                  size: 20,
+                                  className: "w-5 h-5",
+                                  style: { color: "currentColor" },
+                                }))}
                           <span>{selectedOption.label}</span>
                         </>
                       ) : (
-                        <span className="text-slate-500">{def.placeholder || t("editor_sidebar.select_option")}</span>
+                        <span className="text-slate-500">
+                          {def.placeholder || t("editor_sidebar.select_option")}
+                        </span>
                       )}
                     </div>
                     <ChevronDown className="h-4 w-4 opacity-50" />
@@ -923,7 +983,7 @@ export function DynamicFieldsRenderer({
                       const IconComponent = opt.IconComponent;
                       const isReactIconValue = opt.isReactIconValue;
                       const isSelected = opt.value === value;
-                      
+
                       return (
                         <DropdownMenuItem
                           key={opt.value}
@@ -931,15 +991,24 @@ export function DynamicFieldsRenderer({
                           className="cursor-pointer"
                         >
                           <div className="flex items-center gap-2 w-full">
-                            {IconComponent && (
-                              isReactIconValue ? (
-                                React.createElement(IconComponent, { className: "w-5 h-5", style: { fontSize: "20px", width: "20px", height: "20px" } })
-                              ) : (
-                                React.createElement(IconComponent, { size: 20, className: "w-5 h-5" })
-                              )
-                            )}
+                            {IconComponent &&
+                              (isReactIconValue
+                                ? React.createElement(IconComponent, {
+                                    className: "w-5 h-5",
+                                    style: {
+                                      fontSize: "20px",
+                                      width: "20px",
+                                      height: "20px",
+                                    },
+                                  })
+                                : React.createElement(IconComponent, {
+                                    size: 20,
+                                    className: "w-5 h-5",
+                                  }))}
                             <span className="flex-1">{opt.label}</span>
-                            {isSelected && <Check className="h-4 w-4 text-green-500" />}
+                            {isSelected && (
+                              <Check className="h-4 w-4 text-green-500" />
+                            )}
                           </div>
                         </DropdownMenuItem>
                       );
@@ -956,7 +1025,9 @@ export function DynamicFieldsRenderer({
                     }`}
                   >
                     <span className={value ? "" : "text-slate-500"}>
-                      {def.options?.find(opt => opt.value === value)?.label || def.placeholder || t("editor_sidebar.select_option")}
+                      {def.options?.find((opt) => opt.value === value)?.label ||
+                        def.placeholder ||
+                        t("editor_sidebar.select_option")}
                     </span>
                     <ChevronDown className="h-4 w-4 opacity-50" />
                   </DropdownMenuTrigger>
@@ -970,7 +1041,9 @@ export function DynamicFieldsRenderer({
                           className="cursor-pointer"
                         >
                           <span className="flex-1">{opt.label}</span>
-                          {isSelected && <Check className="h-4 w-4 text-green-500" />}
+                          {isSelected && (
+                            <Check className="h-4 w-4 text-green-500" />
+                          )}
                         </DropdownMenuItem>
                       );
                     })}

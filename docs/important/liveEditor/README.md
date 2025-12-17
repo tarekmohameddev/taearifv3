@@ -13,9 +13,11 @@ The documentation is organized into focused files for easier navigation and unde
 ### 🚀 Quick Start (Read First)
 
 #### [QUICK_START.md](./QUICK_START.md)
+
 **5-minute overview for AI** - Essential concepts and quick reference.
 
 **Contents**:
+
 - What is the Live Editor (3-sentence summary)
 - Key files you must know
 - Critical concepts (5 rules)
@@ -29,9 +31,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### [CORE_CONCEPTS.md](./CORE_CONCEPTS.md)
+
 **Essential understanding for AI** - Core concepts that must be memorized.
 
 **Contents**:
+
 - The Three IDs (id, type, componentName) - Critical!
 - Data priority system (rendering vs saving)
 - Store architecture (multi-layer)
@@ -50,11 +54,13 @@ The documentation is organized into focused files for easier navigation and unde
 ### 📚 Core System Documentation
 
 #### 1. [OVERVIEW.md](./OVERVIEW.md)
+
 **Comprehensive system introduction** - Provides high-level understanding of entire system.
 
 **Contents**:
+
 - System introduction and purpose
-- Core philosophy and design principles  
+- Core philosophy and design principles
 - High-level architecture diagrams
 - Key features overview
 - Main components summary
@@ -68,9 +74,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 2. [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)
+
 **Deep dive into state management** - How data is stored, accessed, and synchronized.
 
 **Contents**:
+
 - Store architecture (editorStore, tenantStore)
 - State types (component states, global states, temporary states)
 - Component state functions (ensure, get, set, update)
@@ -86,9 +94,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 3. [DATA_FLOW.md](./DATA_FLOW.md)
+
 **Comprehensive data flow analysis** - Traces data movement through the system.
 
 **Contents**:
+
 - Component lifecycle data flow
 - Editing session data flow
 - Save operation data flow (step-by-step)
@@ -103,9 +113,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 3.5. [DATABASE_DATA_LOADING.md](./DATABASE_DATA_LOADING.md)
+
 **Database data loading guide** - How components load saved data in Live Editor.
 
 **Contents**:
+
 - Common problem: Component shows defaults instead of database data
 - Two-step solution (loadFromDatabase + useEffect)
 - Complete implementation pattern
@@ -119,9 +131,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 4. [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md)
+
 **iframe rendering and style synchronization** - How preview works in isolated environment.
 
 **Contents**:
+
 - Why iframe is used
 - AutoFrame component implementation
 - Style synchronization (initial + ongoing)
@@ -136,9 +150,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 5. [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md)
+
 **Drag & drop mechanics** - How components are moved and positioned.
 
 **Contents**:
+
 - Drag & drop architecture
 - Core components (context, draggable, droppable)
 - Position tracking and calculation
@@ -153,9 +169,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 6. [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)
+
 **Component system design** - How components are registered, structured, and implemented.
 
 **Contents**:
+
 - Component registry system (ComponentsList)
 - Component structure definitions
 - Component functions pattern
@@ -169,9 +187,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 7. [TENANT_STORE_AND_API.md](./TENANT_STORE_AND_API.md)
+
 **API integration and data fetching** - How data is loaded from and saved to database.
 
 **Contents**:
+
 - tenantStore architecture
 - Data fetching flow
 - Data saving flow
@@ -186,9 +206,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 8. [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md)
+
 **Internationalization** - Multi-language support.
 
 **Contents**:
+
 - editorI18nStore architecture
 - Translation files (ar.json, en.json)
 - Translation functions (t, useEditorT)
@@ -201,9 +223,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 9. [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md)
+
 **Debug tools and logging** - Track operations and troubleshoot issues.
 
 **Contents**:
+
 - Debug logger architecture
 - Change tracking system
 - Debug panel (visual interface)
@@ -216,9 +240,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 10. [CONTEXT_PROVIDERS.md](./CONTEXT_PROVIDERS.md)
+
 **Context and Provider Integration** - How React Context and Zustand stores are connected.
 
 **Contents**:
+
 - Provider hierarchy (complete tree)
 - Context providers (I18n, Auth, Editor, DragDrop)
 - Zustand stores vs React Context (when to use each)
@@ -235,9 +261,11 @@ The documentation is organized into focused files for easier navigation and unde
 ### 🎨 EditorSidebar Subsystem
 
 #### 11. [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)
+
 **EditorSidebar introduction** - The editing interface.
 
 **Contents**:
+
 - EditorSidebar architecture
 - Main components breakdown
 - Views and modes (main, add-section, edit-component)
@@ -249,9 +277,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 12. [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md)
+
 **Field rendering system** - How different field types are displayed and edited.
 
 **Contents**:
+
 - Field type system
 - Simple field renderers (color, image, boolean, number)
 - Complex field renderers (array, object)
@@ -265,9 +295,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 13. [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md)
+
 **EditorSidebar data flow** - How data moves through the sidebar.
 
 **Contents**:
+
 - Opening sidebar flow (step-by-step)
 - Real-time editing flow
 - Saving changes flow (complete process)
@@ -282,9 +314,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 14. [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md)
+
 **EditorSidebar components** - Detailed component references.
 
 **Contents**:
+
 - Component hierarchy
 - AdvancedSimpleSwitcher (structure loading, mode switching)
 - DynamicFieldsRenderer (form generation)
@@ -300,9 +334,11 @@ The documentation is organized into focused files for easier navigation and unde
 ### 🛠️ Practical Guides
 
 #### 15. [COMMON_PATTERNS.md](./COMMON_PATTERNS.md)
+
 **Code patterns and best practices** - Proven patterns for common scenarios.
 
 **Contents**:
+
 - Component patterns (with store, multi-variant, conditional)
 - State management patterns (initialize, get, update)
 - Update patterns (path-based, batch, conditional, deferred)
@@ -316,9 +352,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 16. [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md)
+
 **Real-world examples** - Complete implementations you can follow.
 
 **Contents**:
+
 - Complete component implementation (Gallery component)
 - Adding new component type (step-by-step)
 - Implementing custom field renderer (ColorGradientRenderer)
@@ -331,9 +369,11 @@ The documentation is organized into focused files for easier navigation and unde
 ---
 
 #### 17. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+
 **Problem-solving guide** - Common issues and solutions.
 
 **Contents**:
+
 - Common issues (changes not saving, component not rendering, sidebar not opening)
 - Data issues (data lost, duplicate IDs, wrong data source)
 - Rendering issues (styles missing, component not re-rendering)
@@ -351,9 +391,11 @@ The documentation is organized into focused files for easier navigation and unde
 ### 📖 Reference Documentation
 
 #### 18. [API_REFERENCE.md](./API_REFERENCE.md)
+
 **Complete function reference** - All APIs documented.
 
 **Contents**:
+
 - editorStore API (all functions and properties)
 - tenantStore API (fetch, save, state)
 - Component functions API (ensure, get, set, update)
@@ -438,12 +480,14 @@ The documentation is organized into focused files for easier navigation and unde
 ### For New AI/Developer
 
 **Level 0: Quick Start (15 minutes)**
+
 1. Read [QUICK_START.md](./QUICK_START.md) - 5-minute overview
 2. Read [CORE_CONCEPTS.md](./CORE_CONCEPTS.md) - Essential concepts
 3. Memorize the 8 essential rules from CORE_CONCEPTS
 4. Review quick reference cards
 
 **Level 1: Conceptual Understanding (1-2 hours)**
+
 1. Read [OVERVIEW.md](./OVERVIEW.md) completely
 2. Understand high-level architecture
 3. Learn key terminology (component instance, variant, tempData, etc.)
@@ -451,6 +495,7 @@ The documentation is organized into focused files for easier navigation and unde
 5. Understand file organization
 
 **Level 2: State Management (2-3 hours)**
+
 1. Read [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)
 2. Understand store structure and layers
 3. Learn component state functions pattern
@@ -459,6 +504,7 @@ The documentation is organized into focused files for easier navigation and unde
 6. Learn store synchronization rules
 
 **Level 3: Data Flow (2-3 hours)**
+
 1. Read [DATA_FLOW.md](./DATA_FLOW.md)
 2. Trace complete edit cycle step-by-step
 3. Understand save operation in detail
@@ -467,6 +513,7 @@ The documentation is organized into focused files for easier navigation and unde
 6. Understand database integration flows
 
 **Level 4: Core Subsystems (3-4 hours)**
+
 1. Read [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md) - Preview rendering
 2. Read [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md) - Component positioning
 3. Read [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md) - Component system
@@ -474,29 +521,34 @@ The documentation is organized into focused files for easier navigation and unde
 5. Read [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md) - Translations
 
 **Level 5: EditorSidebar (2-3 hours)**
+
 1. Read [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)
 2. Read [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md)
 3. Read [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md)
 4. Read [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md)
 
 **Level 6: Practical Skills (2-3 hours)**
+
 1. Read [COMMON_PATTERNS.md](./COMMON_PATTERNS.md)
 2. Read [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md)
 3. Try implementing example from PRACTICAL_EXAMPLES
 4. Review patterns for your use case
 
 **Level 7: Tools and Debugging (1-2 hours)**
+
 1. Read [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md)
 2. Read [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 3. Learn to use debug panel
 4. Practice debugging scenarios
 
 **Level 8: Reference (Ongoing)**
+
 1. Bookmark [API_REFERENCE.md](./API_REFERENCE.md)
 2. Use as quick reference for functions
 3. Refer when implementing new features
 
 **Level 9: Mastery**
+
 - Can add new component types independently
 - Can debug complex data flow issues
 - Can optimize performance
@@ -510,6 +562,7 @@ The documentation is organized into focused files for easier navigation and unde
 ### Task: Add New Component Type
 
 **Files to Modify**:
+
 1. `componentsStructure/{type}.ts` - Create structure
 2. `editorStoreFunctions/{type}Functions.ts` - Create functions
 3. `ComponentsList.tsx` - Register component
@@ -524,6 +577,7 @@ The documentation is organized into focused files for easier navigation and unde
 ### Task: Debug Save Issues
 
 **Steps**:
+
 1. Check if tempData has changes: `console.log(editorStore.tempData)`
 2. Check merge process: `console.log({ existing, store, temp, merged })`
 3. Check store updated: `console.log(editorStore.heroStates[id])`
@@ -537,6 +591,7 @@ The documentation is organized into focused files for easier navigation and unde
 ### Task: Debug Rendering Issues
 
 **Steps**:
+
 1. Check component data: `console.log(getComponentData(type, id))`
 2. Check merge in component: `console.log(mergedData)`
 3. Check iframe loaded: `console.log(iframeReady, stylesLoaded)`
@@ -550,6 +605,7 @@ The documentation is organized into focused files for easier navigation and unde
 ### Task: Debug Drag & Drop
 
 **Steps**:
+
 1. Check position calculation: Review console logs
 2. Check validation: `console.log(validateComponentPositions(components))`
 3. Check store sync: Verify setTimeout updates executed
@@ -571,6 +627,7 @@ The documentation is organized into focused files for easier navigation and unde
 ### Data Priority
 
 **When rendering**:
+
 ```
 currentStoreData (heroStates[id])
   ↓
@@ -584,6 +641,7 @@ defaultData (fallback)
 ```
 
 **When saving**:
+
 ```
 tempData (latest edits)
   ↓
@@ -595,6 +653,7 @@ existingData (original data)
 ### Store Synchronization
 
 **Every update must update**:
+
 1. Component type state (e.g., heroStates[id])
 2. pageComponentsByPage[page][index].data
 3. Local state via onComponentUpdate callback (optional but recommended)
@@ -602,6 +661,7 @@ existingData (original data)
 ### Global Components
 
 **Special handling required**:
+
 - IDs: `"global-header"` or `"global-footer"`
 - Storage: globalComponentsData, NOT pageComponentsByPage
 - Updates: updateGlobalComponentByPath, NOT updateComponentByPath
@@ -670,6 +730,7 @@ useEffect(() => {
 ### Problem: Changes not saving
 
 **Possible Causes**:
+
 1. tempData not initialized
 2. Shallow merge instead of deep merge
 3. Store not updated
@@ -682,6 +743,7 @@ useEffect(() => {
 ### Problem: Component not rendering
 
 **Possible Causes**:
+
 1. Component not in ComponentsList
 2. Structure not loaded
 3. componentName doesn't match variant ID
@@ -694,6 +756,7 @@ useEffect(() => {
 ### Problem: Styles not applying in iframe
 
 **Possible Causes**:
+
 1. Styles not copied to iframe
 2. CSS variables not synchronized
 3. External stylesheets not loaded
@@ -706,6 +769,7 @@ useEffect(() => {
 ### Problem: Drag & drop not working
 
 **Possible Causes**:
+
 1. iframe document not accessible
 2. Position calculation wrong
 3. Elements missing data-component-id
@@ -719,63 +783,67 @@ useEffect(() => {
 
 ### Core Files
 
-| File | Purpose | Documentation |
-|------|---------|---------------|
-| `LiveEditor.tsx` | Main orchestrator | [OVERVIEW.md](./OVERVIEW.md) |
-| `LiveEditorUI.tsx` | UI rendering | [OVERVIEW.md](./OVERVIEW.md), [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md) |
-| `LiveEditorHooks.tsx` | State management | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md) |
-| `LiveEditorEffects.tsx` | Side effects | [DATA_FLOW.md](./DATA_FLOW.md) |
-| `LiveEditorHandlers.tsx` | Event handlers | [DATA_FLOW.md](./DATA_FLOW.md) |
-| `editorStore.ts` | Main store | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md) |
-| `ComponentsList.tsx` | Component registry | [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md) |
+| File                     | Purpose            | Documentation                                                        |
+| ------------------------ | ------------------ | -------------------------------------------------------------------- |
+| `LiveEditor.tsx`         | Main orchestrator  | [OVERVIEW.md](./OVERVIEW.md)                                         |
+| `LiveEditorUI.tsx`       | UI rendering       | [OVERVIEW.md](./OVERVIEW.md), [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md) |
+| `LiveEditorHooks.tsx`    | State management   | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)                         |
+| `LiveEditorEffects.tsx`  | Side effects       | [DATA_FLOW.md](./DATA_FLOW.md)                                       |
+| `LiveEditorHandlers.tsx` | Event handlers     | [DATA_FLOW.md](./DATA_FLOW.md)                                       |
+| `editorStore.ts`         | Main store         | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)                         |
+| `ComponentsList.tsx`     | Component registry | [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)             |
 
 ### EditorSidebar Files
 
-| File | Purpose | Documentation |
-|------|---------|---------------|
-| `EditorSidebar/index.tsx` | Sidebar container | [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md) |
-| `AdvancedSimpleSwitcher.tsx` | Mode switching | [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md) |
-| `DynamicFieldsRenderer.tsx` | Form generation | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
-| `ArrayFieldRenderer.tsx` | Array editing | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
-| `ObjectFieldRenderer.tsx` | Object editing | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
+| File                         | Purpose           | Documentation                                                          |
+| ---------------------------- | ----------------- | ---------------------------------------------------------------------- |
+| `EditorSidebar/index.tsx`    | Sidebar container | [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)               |
+| `AdvancedSimpleSwitcher.tsx` | Mode switching    | [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md)           |
+| `DynamicFieldsRenderer.tsx`  | Form generation   | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
+| `ArrayFieldRenderer.tsx`     | Array editing     | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
+| `ObjectFieldRenderer.tsx`    | Object editing    | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) |
 
 ---
 
 ## Important Rules Summary
 
 ### Rule 1: Always Use component.id
+
 ```typescript
 // ✅ CORRECT
-getComponentData("hero", component.id)
+getComponentData("hero", component.id);
 
 // ❌ WRONG
-getComponentData("hero", component.componentName)
+getComponentData("hero", component.componentName);
 ```
 
 ### Rule 2: Deep Merge When Saving
+
 ```typescript
 // ✅ CORRECT
-const merged = deepMerge(deepMerge(a, b), c)
+const merged = deepMerge(deepMerge(a, b), c);
 
 // ❌ WRONG
-const merged = { ...a, ...b, ...c }
+const merged = { ...a, ...b, ...c };
 ```
 
 ### Rule 3: Update All Stores
+
 ```typescript
 // ✅ CORRECT
 return {
   heroStates: { ...state.heroStates, [id]: data },
-  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated }
-}
+  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated },
+};
 
 // ❌ WRONG - Only updates one store
 return {
-  heroStates: { ...state.heroStates, [id]: data }
-}
+  heroStates: { ...state.heroStates, [id]: data },
+};
 ```
 
 ### Rule 4: Check for Global Components
+
 ```typescript
 // ✅ CORRECT
 if (component.id === "global-header") {
@@ -789,6 +857,7 @@ updateComponentByPath(type, id, path, value);
 ```
 
 ### Rule 5: Use setTimeout for Store Updates from Handlers
+
 ```typescript
 // ✅ CORRECT
 setTimeout(() => {
@@ -941,6 +1010,7 @@ docs/important/liveEditor/
 ### ✨ Key Features
 
 **For AI**:
+
 - Written specifically for AI comprehension
 - Explicit step numbering with visual separators
 - Clear data flow diagrams (ASCII art)
@@ -952,6 +1022,7 @@ docs/important/liveEditor/
 - Command patterns and snippets
 
 **For Humans**:
+
 - Comprehensive reference documentation
 - System architecture explanations
 - Implementation patterns and examples
@@ -989,7 +1060,7 @@ This documentation covers:
 ✅ **Common issues** (troubleshooting for major problems)  
 ✅ **Best practices** (patterns, performance, error handling)  
 ✅ **Complete examples** (practical implementations)  
-✅ **Full API reference** (all functions documented)  
+✅ **Full API reference** (all functions documented)
 
 ---
 
@@ -1004,4 +1075,3 @@ This documentation covers:
 **Quality**: ⭐⭐⭐⭐⭐ AI-optimized for maximum comprehension
 
 **Coverage**: 100% of Live Editor system including all subsystems, providers, and integrations
-

@@ -166,29 +166,44 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
   // Parse price - handle both string and number formats
   const priceValue = property.price || property.priceRange || "0";
   const priceNum = parsePrice(priceValue);
-  
+
   // Parse area - handle both string and number formats
   const areaValue = property.area || property.size || "0";
   const areaNum = parseArea(areaValue);
-  
+
   // Parse bedrooms/rooms
   const bedrooms = property.bedrooms || property.rooms || 0;
   const bathrooms = property.bathrooms || 0;
-  
+
   // Parse location
-  const city = property.city || property.location?.city || property.address?.city || "غير محدد";
-  const district = property.district || property.location?.district || property.address?.district || property.location?.address || "غير محدد";
-  
+  const city =
+    property.city ||
+    property.location?.city ||
+    property.address?.city ||
+    "غير محدد";
+  const district =
+    property.district ||
+    property.location?.district ||
+    property.address?.district ||
+    property.location?.address ||
+    "غير محدد";
+
   // Parse status
-  const status = property.status || property.transactionType === "rent" ? "للإيجار" : property.transactionType === "sale" ? "للبيع" : "غير محدد";
-  
+  const status =
+    property.status || property.transactionType === "rent"
+      ? "للإيجار"
+      : property.transactionType === "sale"
+        ? "للبيع"
+        : "غير محدد";
+
   // Parse floors - try to extract from property data
   const floorsMin = property.floors?.min || property.minFloors || 1;
-  const floorsMax = property.floors?.max || property.maxFloors || property.floors || 1;
-  
+  const floorsMax =
+    property.floors?.max || property.maxFloors || property.floors || 1;
+
   // Parse units - for properties, usually 1, but can be extracted from data
   const units = property.units || 1;
-  
+
   return {
     ThemeTwo: "property",
     id: property.id || property.slug || String(Date.now()),
@@ -233,29 +248,43 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
   // Parse price - projects usually have minPrice and maxPrice
   const minPrice = parsePrice(project.minPrice);
   const maxPrice = parsePrice(project.maxPrice);
-  
+
   // Parse area - projects might have area range
   const minArea = parseArea(project.minArea) || 150;
   const maxArea = parseArea(project.maxArea) || 300;
-  
+
   // Parse rooms - projects might have room range
   const minRooms = project.minRooms || project.minBedrooms || 3;
   const maxRooms = project.maxRooms || project.maxBedrooms || 5;
-  
+
   // Parse floors
   const floorsMin = project.minFloors || project.floors?.min || 3;
-  const floorsMax = project.maxFloors || project.floors?.max || project.floors || 5;
-  
+  const floorsMax =
+    project.maxFloors || project.floors?.max || project.floors || 5;
+
   // Parse units
   const units = project.units || 50;
-  
+
   // Parse location
-  const city = project.city || project.location?.city || project.address?.city || "غير محدد";
-  const district = project.district || project.location?.district || project.address?.district || project.location?.address || project.address || "غير محدد";
-  
+  const city =
+    project.city ||
+    project.location?.city ||
+    project.address?.city ||
+    "غير محدد";
+  const district =
+    project.district ||
+    project.location?.district ||
+    project.address?.district ||
+    project.location?.address ||
+    project.address ||
+    "غير محدد";
+
   // Parse status
-  const status = project.completeStatus === "1" || project.status === "completed" ? "مكتمل" : "قيد الإنشاء";
-  
+  const status =
+    project.completeStatus === "1" || project.status === "completed"
+      ? "مكتمل"
+      : "قيد الإنشاء";
+
   return {
     ThemeTwo: "property",
     id: project.id || project.slug || String(Date.now()),
@@ -407,14 +436,18 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Title and Status */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h4 className="text-xl font-bold text-black mb-2">{property.title}</h4>
+            <h4 className="text-xl font-bold text-black mb-2">
+              {property.title}
+            </h4>
             <div className="flex items-center gap-2 text-sm text-black">
               <span>في {property.city}</span>
               <span>-</span>
               <span>{property.district}</span>
             </div>
           </div>
-          <div className="text-green-600 font-semibold text-lg">{property.status}</div>
+          <div className="text-green-600 font-semibold text-lg">
+            {property.status}
+          </div>
         </div>
 
         {/* Divider */}
@@ -427,7 +460,8 @@ function ProjectCard({ property }: { property: Property }) {
             <div className="flex items-center justify-center gap-1 mb-1">
               <AreaIcon />
               <span className="text-[#896042] text-sm font-medium">
-                {formatNumber(property.area.min)} - {formatNumber(property.area.max)} م²
+                {formatNumber(property.area.min)} -{" "}
+                {formatNumber(property.area.max)} م²
               </span>
             </div>
             <span className="text-xs text-gray-600">المساحة</span>
@@ -470,7 +504,8 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Price Section */}
         <div className="bg-[#896042] rounded-lg px-4 py-3 text-center">
           <div className="text-white text-base font-medium">
-            {formatNumber(property.price.min)} - {formatNumber(property.price.max)} ريال سعودي
+            {formatNumber(property.price.min)} -{" "}
+            {formatNumber(property.price.max)} ريال سعودي
           </div>
         </div>
       </div>
@@ -501,13 +536,17 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-  const getComponentData = useEditorStore(s => s.getComponentData);
-  const propertiesShowcaseStates = useEditorStore(s => s.propertiesShowcaseStates);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const propertiesShowcaseStates = useEditorStore(
+    (s) => s.propertiesShowcaseStates,
+  );
 
-  const tenantData = useTenantStore(s => s.tenantData);
-  const fetchTenantData = useTenantStore(s => s.fetchTenantData);
-  const tenantId = useTenantStore(s => s.tenantId);
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   // Tenant ID hook for API calls
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
@@ -622,22 +661,28 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "propertiesShowcase" && component.componentName === variantId) {
+        if (
+          component.type === "propertiesShowcase" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -651,7 +696,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -660,17 +705,18 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   useEffect(() => {
     if (props.useStore) {
       // ✅ Use database data if available
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultPropertiesShowcaseData(),
-            ...tenantComponentData,  // Database data takes priority
-            ...props
-          }
-        : {
-            ...getDefaultPropertiesShowcaseData(),
-            ...props
-          };
-      
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPropertiesShowcaseData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultPropertiesShowcaseData(),
+              ...props,
+            };
+
       // Initialize in store
       ensureComponentVariant("propertiesShowcase", uniqueId, initialData);
     }
@@ -686,11 +732,11 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultPropertiesShowcaseData(),    // 1. Defaults (lowest priority)
-    ...storeData,                             // 2. Store state
-    ...currentStoreData,                      // 3. Current store data
-    ...tenantComponentData,                   // 4. Tenant component data
-    ...props                                  // 5. Props (highest priority)
+    ...getDefaultPropertiesShowcaseData(), // 1. Defaults (lowest priority)
+    ...storeData, // 2. Store state
+    ...currentStoreData, // 3. Current store data
+    ...tenantComponentData, // 4. Tenant component data
+    ...props, // 5. Props (highest priority)
   };
 
   // ─────────────────────────────────────────────────────────
@@ -721,9 +767,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // 6. DETERMINE WHICH DATA TO USE (API vs Static)
   // ─────────────────────────────────────────────────────────
   const useApiData = mergedData.dataSource?.enabled !== false;
-  const properties = useApiData
-    ? apiProperties
-    : mergedData.properties || [];
+  const properties = useApiData ? apiProperties : mergedData.properties || [];
 
   // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
@@ -735,13 +779,13 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // ─────────────────────────────────────────────────────────
   // 8. RENDER
   // ─────────────────────────────────────────────────────────
-  
+
   const formatNumber = (num: number) => {
     return num.toLocaleString("ar-SA");
   };
 
   return (
-    <section 
+    <section
       className="py-12 px-4"
       style={{
         backgroundColor: mergedData.styling?.backgroundColor || "#efe5dc",
@@ -749,42 +793,47 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
         paddingBottom: mergedData.layout?.padding?.bottom || "3rem",
       }}
     >
-      <div 
+      <div
         className="container mx-auto"
         style={{ maxWidth: mergedData.layout?.maxWidth || "7xl" }}
       >
         {/* View All Button and Heading */}
         <div className="flex items-center justify-between mb-8">
           <div className="text-right">
-            <h3 
+            <h3
               className={cn(
                 "font-bold mb-3",
                 `text-${mergedData.typography?.title?.fontSize?.mobile || "xl"} md:text-${mergedData.typography?.title?.fontSize?.tablet || "2xl"} lg:text-${mergedData.typography?.title?.fontSize?.desktop || "3xl"}`,
               )}
               style={{
                 color: mergedData.styling?.titleColor || "#1f2937",
-                fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
+                fontFamily:
+                  mergedData.typography?.title?.fontFamily || "Tajawal",
                 fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               }}
             >
               {mergedData.content?.title || "المشاريع والعقارات"}
             </h3>
             {/* Divider */}
-            <div 
+            <div
               className="w-24 h-[2px] mb-4 ml-auto"
-              style={{ backgroundColor: mergedData.styling?.dividerColor || "#8b5f46" }}
+              style={{
+                backgroundColor: mergedData.styling?.dividerColor || "#8b5f46",
+              }}
             ></div>
           </div>
-          <button 
+          <button
             className="flex items-center gap-2 font-medium transition-colors duration-300 text-md md:text-xl"
-            style={{ 
-              color: mergedData.styling?.viewAllButtonColor || "#8b5f46"
+            style={{
+              color: mergedData.styling?.viewAllButtonColor || "#8b5f46",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = mergedData.styling?.viewAllButtonHoverColor || "#6b4630";
+              e.currentTarget.style.color =
+                mergedData.styling?.viewAllButtonHoverColor || "#6b4630";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = mergedData.styling?.viewAllButtonColor || "#8b5f46";
+              e.currentTarget.style.color =
+                mergedData.styling?.viewAllButtonColor || "#8b5f46";
             }}
           >
             <span>{mergedData.content?.viewAllButtonText || "عرض الكل"}</span>
@@ -804,20 +853,23 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             </svg>
           </button>
         </div>
-        
+
         {/* Properties Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div 
+              <div
                 className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-                style={{ borderBottomColor: mergedData.styling?.loadMoreButtonColor || "#8b5f46" }}
+                style={{
+                  borderBottomColor:
+                    mergedData.styling?.loadMoreButtonColor || "#8b5f46",
+                }}
               ></div>
               <p className="text-gray-600">جاري تحميل العقارات...</p>
             </div>
           </div>
         ) : properties.length > 0 ? (
-          <div 
+          <div
             className="grid gap-6"
             style={{
               gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
@@ -850,15 +902,17 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
                 لا توجد عقارات متاحة حالياً
               </p>
               <p className="text-gray-500 text-sm mt-2">
-                {useApiData ? "يرجى المحاولة مرة أخرى لاحقاً" : "أضف عقارات من لوحة التحكم"}
+                {useApiData
+                  ? "يرجى المحاولة مرة أخرى لاحقاً"
+                  : "أضف عقارات من لوحة التحكم"}
               </p>
             </div>
           </div>
         )}
-        
+
         {/* Load More Button */}
         <div className="flex justify-center mt-12">
-          <button 
+          <button
             className="px-5 py-3 border-2 font-medium rounded-2xl transition-all duration-300 hover:scale-110"
             style={{
               borderColor: mergedData.styling?.loadMoreButtonColor || "#8b5f46",
@@ -866,12 +920,15 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
               color: mergedData.styling?.loadMoreButtonTextColor || "#8b5f46",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = mergedData.styling?.loadMoreButtonHoverColor || "#8b5f46";
-              e.currentTarget.style.color = mergedData.styling?.loadMoreButtonHoverTextColor || "#ffffff";
+              e.currentTarget.style.backgroundColor =
+                mergedData.styling?.loadMoreButtonHoverColor || "#8b5f46";
+              e.currentTarget.style.color =
+                mergedData.styling?.loadMoreButtonHoverTextColor || "#ffffff";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = mergedData.styling?.loadMoreButtonTextColor || "#8b5f46";
+              e.currentTarget.style.color =
+                mergedData.styling?.loadMoreButtonTextColor || "#8b5f46";
             }}
           >
             {mergedData.content?.loadMoreButtonText || "تحميل المزيد"}
@@ -881,4 +938,3 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
     </section>
   );
 }
-

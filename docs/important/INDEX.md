@@ -11,18 +11,22 @@ This is the **master index** for all system documentation. Use this to quickly f
 ## 🎯 START HERE
 
 ### **New to the Project?**
+
 1. Read: `liveEditor/README.md` - System overview
 2. Read: `liveEditor/QUICK_START.md` - Get started quickly
 3. Study: `components/README.md` - Component system
 4. Review: `.cursorrules` - Project conventions
 
 ### **Working on Components?**
+
 → Jump to [Components Documentation](#-components-documentation)
 
 ### **Working on Live Editor?**
+
 → Jump to [Live Editor Documentation](#-live-editor-documentation)
 
 ### **Working on Dashboard?**
+
 → Jump to [Dashboard Documentation](#-dashboard-documentation)
 
 ---
@@ -46,15 +50,16 @@ docs/important/
 
 **Location:** `docs/important/components/`
 
-| File | Purpose | Use When |
-|------|---------|----------|
-| `README.md` | Complete overview & decision tree | Choosing which doc to read |
-| `ADD_NEW_COMPONENT.md` | Full guide (2003 lines) | Creating new component manually |
-| `ADD_NEW_COMPONENT_PROMPT.md` | AI prompts & templates | Creating component with AI |
-| `FIX_COMPONENT_PROMPT.md` | Diagnostic & repair system | Fixing broken component |
-| `FIX_COMPONENT_QUICK_START.md` | Quick repair reference | Fast fixes for common issues |
+| File                           | Purpose                           | Use When                        |
+| ------------------------------ | --------------------------------- | ------------------------------- |
+| `README.md`                    | Complete overview & decision tree | Choosing which doc to read      |
+| `ADD_NEW_COMPONENT.md`         | Full guide (2003 lines)           | Creating new component manually |
+| `ADD_NEW_COMPONENT_PROMPT.md`  | AI prompts & templates            | Creating component with AI      |
+| `FIX_COMPONENT_PROMPT.md`      | Diagnostic & repair system        | Fixing broken component         |
+| `FIX_COMPONENT_QUICK_START.md` | Quick repair reference            | Fast fixes for common issues    |
 
 **Key Topics:**
+
 - 9-step component creation process
 - 7-step React component pattern
 - 4 required functions (ensureVariant, getData, setData, updateByPath)
@@ -64,6 +69,7 @@ docs/important/
 - Common patterns and pitfalls
 
 **Quick Commands:**
+
 ```bash
 # Create component
 @docs/important/components/ADD_NEW_COMPONENT_PROMPT.md
@@ -83,54 +89,54 @@ docs/important/
 
 ### **Core Documentation**
 
-| File | Lines | Purpose | Priority |
-|------|-------|---------|----------|
-| `README.md` | - | Start here | 🔴 HIGH |
-| `OVERVIEW.md` | - | System overview | 🔴 HIGH |
-| `QUICK_START.md` | - | Quick start guide | 🔴 HIGH |
-| `COMPONENT_ARCHITECTURE.md` | 1551 | Component system deep dive | 🔴 HIGH |
-| `STATE_MANAGEMENT.md` | 1347 | Zustand state management | 🔴 HIGH |
-| `DATA_FLOW.md` | - | Data flow patterns | 🔴 HIGH |
-| `CORE_CONCEPTS.md` | - | Core concepts explained | 🟡 MEDIUM |
-| `COMMON_PATTERNS.md` | - | Common patterns | 🟡 MEDIUM |
-| `PRACTICAL_EXAMPLES.md` | - | Real-world examples | 🟡 MEDIUM |
-| `TROUBLESHOOTING.md` | - | Problem solving | 🟢 LOW |
+| File                        | Lines | Purpose                    | Priority  |
+| --------------------------- | ----- | -------------------------- | --------- |
+| `README.md`                 | -     | Start here                 | 🔴 HIGH   |
+| `OVERVIEW.md`               | -     | System overview            | 🔴 HIGH   |
+| `QUICK_START.md`            | -     | Quick start guide          | 🔴 HIGH   |
+| `COMPONENT_ARCHITECTURE.md` | 1551  | Component system deep dive | 🔴 HIGH   |
+| `STATE_MANAGEMENT.md`       | 1347  | Zustand state management   | 🔴 HIGH   |
+| `DATA_FLOW.md`              | -     | Data flow patterns         | 🔴 HIGH   |
+| `CORE_CONCEPTS.md`          | -     | Core concepts explained    | 🟡 MEDIUM |
+| `COMMON_PATTERNS.md`        | -     | Common patterns            | 🟡 MEDIUM |
+| `PRACTICAL_EXAMPLES.md`     | -     | Real-world examples        | 🟡 MEDIUM |
+| `TROUBLESHOOTING.md`        | -     | Problem solving            | 🟢 LOW    |
 
 ### **Advanced Topics**
 
-| File | Purpose |
-|------|---------|
-| `API_REFERENCE.md` | API documentation |
-| `CONTEXT_PROVIDERS.md` | Context providers |
-| `DEBUG_AND_LOGGING.md` | Debugging system |
-| `DRAG_DROP_SYSTEM.md` | Drag & drop mechanics |
-| `I18N_TRANSLATION_SYSTEM.md` | Translation system |
-| `IFRAME_SYSTEM.md` | IFrame integration |
-| `TENANT_STORE_AND_API.md` | Tenant data management |
+| File                         | Purpose                |
+| ---------------------------- | ---------------------- |
+| `API_REFERENCE.md`           | API documentation      |
+| `CONTEXT_PROVIDERS.md`       | Context providers      |
+| `DEBUG_AND_LOGGING.md`       | Debugging system       |
+| `DRAG_DROP_SYSTEM.md`        | Drag & drop mechanics  |
+| `I18N_TRANSLATION_SYSTEM.md` | Translation system     |
+| `IFRAME_SYSTEM.md`           | IFrame integration     |
+| `TENANT_STORE_AND_API.md`    | Tenant data management |
 
 ### **Context System**
 
 **Location:** `docs/important/liveEditor/context/`
 
-| File | Purpose | Priority |
-|------|---------|----------|
-| `README.md` | Context overview | 🔴 HIGH |
-| `COMPONENT_INTEGRATION.md` | Component integration guide | 🔴 HIGH |
-| `EDITOR_STORE_FUNCTIONS.md` | Store functions reference | 🔴 HIGH |
-| `STORES_OVERVIEW.md` | All stores explained | 🟡 MEDIUM |
-| `SUMMARY.md` | Quick summary | 🟢 LOW |
-| `INDEX.md` | Context index | 🟢 LOW |
+| File                        | Purpose                     | Priority  |
+| --------------------------- | --------------------------- | --------- |
+| `README.md`                 | Context overview            | 🔴 HIGH   |
+| `COMPONENT_INTEGRATION.md`  | Component integration guide | 🔴 HIGH   |
+| `EDITOR_STORE_FUNCTIONS.md` | Store functions reference   | 🔴 HIGH   |
+| `STORES_OVERVIEW.md`        | All stores explained        | 🟡 MEDIUM |
+| `SUMMARY.md`                | Quick summary               | 🟢 LOW    |
+| `INDEX.md`                  | Context index               | 🟢 LOW    |
 
 ### **EditorSidebar System**
 
 **Location:** `docs/important/liveEditor/editorSidebar/`
 
-| File | Purpose | Priority |
-|------|---------|----------|
-| `README.md` | EditorSidebar overview | 🔴 HIGH |
-| `OVERVIEW.md` | System overview | 🔴 HIGH |
-| `COMPONENTS.md` | Components breakdown | 🟡 MEDIUM |
-| `DATA_FLOW.md` | Data flow in sidebar | 🟡 MEDIUM |
+| File                 | Purpose                | Priority  |
+| -------------------- | ---------------------- | --------- |
+| `README.md`          | EditorSidebar overview | 🔴 HIGH   |
+| `OVERVIEW.md`        | System overview        | 🔴 HIGH   |
+| `COMPONENTS.md`      | Components breakdown   | 🟡 MEDIUM |
+| `DATA_FLOW.md`       | Data flow in sidebar   | 🟡 MEDIUM |
 | `FIELD_RENDERERS.md` | Field rendering system | 🟡 MEDIUM |
 
 ---
@@ -139,15 +145,15 @@ docs/important/
 
 **Location:** `docs/important/dashboard/`
 
-| File | Purpose | Priority |
-|------|---------|----------|
-| `README.md` | Dashboard overview | 🔴 HIGH |
-| `CORE_INFRASTRUCTURE.md` | Core infrastructure | 🔴 HIGH |
-| `AUTHENTICATION.md` | Auth system | 🟡 MEDIUM |
-| `DATA_FLOWS.md` | Data flows | 🟡 MEDIUM |
-| `MODULES.md` | Module breakdown | 🟡 MEDIUM |
-| `DEBUGGING.md` | Debugging guide | 🟢 LOW |
-| `RELATED_SYSTEMS.md` | Related systems | 🟢 LOW |
+| File                     | Purpose             | Priority  |
+| ------------------------ | ------------------- | --------- |
+| `README.md`              | Dashboard overview  | 🔴 HIGH   |
+| `CORE_INFRASTRUCTURE.md` | Core infrastructure | 🔴 HIGH   |
+| `AUTHENTICATION.md`      | Auth system         | 🟡 MEDIUM |
+| `DATA_FLOWS.md`          | Data flows          | 🟡 MEDIUM |
+| `MODULES.md`             | Module breakdown    | 🟡 MEDIUM |
+| `DEBUGGING.md`           | Debugging guide     | 🟢 LOW    |
+| `RELATED_SYSTEMS.md`     | Related systems     | 🟢 LOW    |
 
 ---
 
@@ -155,12 +161,13 @@ docs/important/
 
 **Location:** `docs/important/GA4/`
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `README.md` | 207 | GA4 overview |
-| `ARCHITECTURE.md` | 996 | GA4 architecture |
+| File              | Lines | Purpose          |
+| ----------------- | ----- | ---------------- |
+| `README.md`       | 207   | GA4 overview     |
+| `ARCHITECTURE.md` | 996   | GA4 architecture |
 
 **Key Topics:**
+
 - GA4 integration
 - Event tracking
 - Custom events
@@ -174,41 +181,41 @@ docs/important/
 
 ### **Project Setup & Maintenance**
 
-| File | Purpose |
-|------|---------|
-| `INDEX.md` | This file - Master documentation index |
-| `MAINTENANCE_GUIDE.md` | How to keep docs updated |
-| `HOW_TO_USE_CURSORRULES.md` | Guide to using .cursorrules |
-| `.cursorrules` (root) | Cursor AI instruction file |
+| File                        | Purpose                                |
+| --------------------------- | -------------------------------------- |
+| `INDEX.md`                  | This file - Master documentation index |
+| `MAINTENANCE_GUIDE.md`      | How to keep docs updated               |
+| `HOW_TO_USE_CURSORRULES.md` | Guide to using .cursorrules            |
+| `.cursorrules` (root)       | Cursor AI instruction file             |
 
 ### **Loading & Caching**
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `COMPONENT_LOADING_SYSTEM.md` | 1042 | How components load |
-| `componentsCachingSystem.md` | - | Caching strategy |
-| `ifDataDoesntExistPutTheDefaultDataOnTheEditorSidebar.md` | - | Default data handling |
+| File                                                      | Lines | Purpose               |
+| --------------------------------------------------------- | ----- | --------------------- |
+| `COMPONENT_LOADING_SYSTEM.md`                             | 1042  | How components load   |
+| `componentsCachingSystem.md`                              | -     | Caching strategy      |
+| `ifDataDoesntExistPutTheDefaultDataOnTheEditorSidebar.md` | -     | Default data handling |
 
 ### **Authentication & Security**
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `AUTHENTICATION_SYSTEMS.md` | - | Auth systems overview |
-| `RECAPTCHA_SYSTEM.md` | 1802 | reCAPTCHA integration |
+| File                        | Lines | Purpose               |
+| --------------------------- | ----- | --------------------- |
+| `AUTHENTICATION_SYSTEMS.md` | -     | Auth systems overview |
+| `RECAPTCHA_SYSTEM.md`       | 1802  | reCAPTCHA integration |
 
 ### **Routing & Localization**
 
-| File | Purpose |
-|------|---------|
-| `LOCALE_ROUTING_SYSTEM.md` | Routing & locales |
-| `MIDDLEWARE_TENANT_DETECTION.md` | Tenant detection |
-| `URL_QUERY_PARAMETERS.md` | URL params for property listings |
+| File                             | Purpose                          |
+| -------------------------------- | -------------------------------- |
+| `LOCALE_ROUTING_SYSTEM.md`       | Routing & locales                |
+| `MIDDLEWARE_TENANT_DETECTION.md` | Tenant detection                 |
+| `URL_QUERY_PARAMETERS.md`        | URL params for property listings |
 
 ### **Other Systems**
 
-| File | Purpose |
-|------|---------|
-| `metaDataIntegration.md` | SEO metadata system |
+| File                                | Purpose                |
+| ----------------------------------- | ---------------------- |
+| `metaDataIntegration.md`            | SEO metadata system    |
 | `editorSidebarTranslationSystem.md` | Translation in sidebar |
 
 ---
@@ -216,38 +223,46 @@ docs/important/
 ## 🔍 SEARCH BY TOPIC
 
 ### **State Management**
+
 - `liveEditor/STATE_MANAGEMENT.md` - Complete guide
 - `liveEditor/context/STORES_OVERVIEW.md` - Store overview
 - `liveEditor/context/EDITOR_STORE_FUNCTIONS.md` - Functions reference
 
 ### **Component Creation**
+
 - `components/ADD_NEW_COMPONENT.md` - Manual creation
 - `components/ADD_NEW_COMPONENT_PROMPT.md` - AI creation
 - `liveEditor/COMPONENT_ARCHITECTURE.md` - Architecture
 
 ### **Component Repair**
+
 - `components/FIX_COMPONENT_PROMPT.md` - Full diagnostic
 - `components/FIX_COMPONENT_QUICK_START.md` - Quick fixes
 
 ### **Data Flow**
+
 - `liveEditor/DATA_FLOW.md` - Data flow patterns
 - `liveEditor/editorSidebar/DATA_FLOW.md` - Sidebar data flow
 - `dashboard/DATA_FLOWS.md` - Dashboard data flows
 
 ### **Integration**
+
 - `liveEditor/context/COMPONENT_INTEGRATION.md` - Component integration
 - `liveEditor/CONTEXT_PROVIDERS.md` - Context providers
 
 ### **Debugging**
+
 - `liveEditor/DEBUG_AND_LOGGING.md` - Debug system
 - `liveEditor/TROUBLESHOOTING.md` - Troubleshooting
 - `dashboard/DEBUGGING.md` - Dashboard debugging
 
 ### **Authentication**
+
 - `AUTHENTICATION_SYSTEMS.md` - Auth overview
 - `dashboard/AUTHENTICATION.md` - Dashboard auth
 
 ### **Translations & Routing**
+
 - `liveEditor/I18N_TRANSLATION_SYSTEM.md` - i18n system
 - `editorSidebarTranslationSystem.md` - Sidebar translations
 - `LOCALE_ROUTING_SYSTEM.md` - Locale routing
@@ -258,6 +273,7 @@ docs/important/
 ## 🎯 DOCUMENTATION BY TASK
 
 ### **Task: Create New Component**
+
 ```
 READ:
 1. components/README.md (Overview)
@@ -273,6 +289,7 @@ REFERENCE:
 ```
 
 ### **Task: Fix Broken Component**
+
 ```
 READ:
 1. components/FIX_COMPONENT_QUICK_START.md (Quick ref)
@@ -284,6 +301,7 @@ REFERENCE:
 ```
 
 ### **Task: Modify editorStore**
+
 ```
 READ:
 1. liveEditor/STATE_MANAGEMENT.md (State patterns)
@@ -295,6 +313,7 @@ REFERENCE:
 ```
 
 ### **Task: Add EditorSidebar Field**
+
 ```
 READ:
 1. liveEditor/editorSidebar/README.md
@@ -306,6 +325,7 @@ REFERENCE:
 ```
 
 ### **Task: Add Analytics Event**
+
 ```
 READ:
 1. GA4/README.md
@@ -316,6 +336,7 @@ REFERENCE:
 ```
 
 ### **Task: Modify Authentication**
+
 ```
 READ:
 1. AUTHENTICATION_SYSTEMS.md
@@ -326,6 +347,7 @@ REFERENCE:
 ```
 
 ### **Task: Add Tenant Feature**
+
 ```
 READ:
 1. liveEditor/TENANT_STORE_AND_API.md
@@ -336,6 +358,7 @@ REFERENCE:
 ```
 
 ### **Task: Implement URL-based Filtering**
+
 ```
 READ:
 1. URL_QUERY_PARAMETERS.md (Complete guide)
@@ -370,6 +393,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ## 🔄 MAINTENANCE
 
 ### **Keep Docs Updated:**
+
 - When architecture changes → Update architecture docs
 - When patterns change → Update pattern docs
 - When adding features → Update relevant docs
@@ -382,6 +406,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ## 🎓 LEARNING PATH
 
 ### **Day 1: Basics**
+
 ```
 1. liveEditor/README.md
 2. liveEditor/OVERVIEW.md
@@ -390,6 +415,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ```
 
 ### **Day 2: Components**
+
 ```
 1. components/ADD_NEW_COMPONENT.md (Overview)
 2. liveEditor/COMPONENT_ARCHITECTURE.md
@@ -398,6 +424,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ```
 
 ### **Day 3: State**
+
 ```
 1. liveEditor/STATE_MANAGEMENT.md
 2. liveEditor/context/STORES_OVERVIEW.md
@@ -406,6 +433,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ```
 
 ### **Day 4: Integration**
+
 ```
 1. liveEditor/context/COMPONENT_INTEGRATION.md
 2. liveEditor/DATA_FLOW.md
@@ -413,6 +441,7 @@ Recent Additions: URL Query Parameters System (Oct 2025)
 ```
 
 ### **Day 5+: Advanced**
+
 ```
 1. liveEditor/COMMON_PATTERNS.md
 2. liveEditor/PRACTICAL_EXAMPLES.md
@@ -442,6 +471,7 @@ grep -r "component" docs/important/liveEditor/
 ## 📞 GETTING HELP
 
 ### **Can't Find What You Need?**
+
 1. Use search functionality above
 2. Check related topics section
 3. Look at task-based docs
@@ -449,6 +479,7 @@ grep -r "component" docs/important/liveEditor/
 5. Check .cursorrules
 
 ### **Doc Needs Update?**
+
 1. Note what's wrong/missing
 2. Check MAINTENANCE_GUIDE.md
 3. Update accordingly
@@ -460,6 +491,7 @@ grep -r "component" docs/important/liveEditor/
 ## 🔗 EXTERNAL RESOURCES
 
 ### **Technologies Used:**
+
 - Next.js: https://nextjs.org/docs
 - React: https://react.dev/
 - TypeScript: https://www.typescriptlang.org/docs/
@@ -467,6 +499,7 @@ grep -r "component" docs/important/liveEditor/
 - Tailwind CSS: https://tailwindcss.com/docs
 
 ### **Related Patterns:**
+
 - Component-based architecture
 - State management patterns
 - React hooks patterns
@@ -477,6 +510,7 @@ grep -r "component" docs/important/liveEditor/
 ## 📋 DOCUMENTATION CHECKLIST
 
 **Good Documentation Has:**
+
 - [ ] Clear purpose statement
 - [ ] Table of contents (if >300 lines)
 - [ ] Code examples
@@ -487,6 +521,7 @@ grep -r "component" docs/important/liveEditor/
 - [ ] Consistent formatting
 
 **Check Before Publishing:**
+
 - [ ] Examples work
 - [ ] Links are valid
 - [ ] Formatting correct
@@ -499,21 +534,25 @@ grep -r "component" docs/important/liveEditor/
 ## 🎯 PRIORITY READING
 
 ### **🔴 Must Read (Everyone):**
+
 1. `.cursorrules`
 2. `liveEditor/README.md`
 3. `components/README.md`
 
 ### **🔴 Must Read (Component Work):**
+
 1. `components/ADD_NEW_COMPONENT.md`
 2. `liveEditor/COMPONENT_ARCHITECTURE.md`
 3. `liveEditor/STATE_MANAGEMENT.md`
 
 ### **🟡 Should Read (Regular Development):**
+
 1. `liveEditor/COMMON_PATTERNS.md`
 2. `liveEditor/DATA_FLOW.md`
 3. `liveEditor/TROUBLESHOOTING.md`
 
 ### **🟢 Reference As Needed:**
+
 - All other docs based on specific task
 
 ---
@@ -541,4 +580,3 @@ grep -r "component" docs/important/liveEditor/
 **END OF INDEX**
 
 Use Ctrl+F / Cmd+F to search within this document.
-

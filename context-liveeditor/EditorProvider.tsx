@@ -70,7 +70,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             },
             content: {
               title: "اكتشف عقارك المثالي في أفضل المواقع",
-              description: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+              description:
+                "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
               alignment: "center",
               maxWidth: "5xl",
               font: {
@@ -150,7 +151,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             content: {
               eyebrow: "شريك موثوق",
               title: "نحن شريكك الموثوق في عالم العقارات",
-              description: "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
+              description:
+                "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
               button: {
                 text: "تعرف علينا",
                 enabled: true,
@@ -271,7 +273,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             },
             content: {
               title: "رسالتنا",
-              description: "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+              description:
+                "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
               imagePosition: "left",
               eyebrow: "",
             },
@@ -312,7 +315,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             },
             content: {
               title: "رؤيتنا",
-              description: "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+              description:
+                "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
               imagePosition: "left",
               eyebrow: "",
             },
@@ -511,7 +515,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             },
             header: {
               title: "لماذا تختارنا؟",
-              description: "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
+              description:
+                "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
               marginBottom: "mb-10",
               textAlign: "text-right",
               paddingX: "px-5",
@@ -605,7 +610,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           data: {
             visible: true,
             title: "آراء عملائنا",
-            description: "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
+            description:
+              "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
             background: {
               color: "#ffffff",
               image: "",
@@ -647,7 +653,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             testimonials: [
               {
                 id: "1",
-                quote: "خدمة ممتازة وسريعة، ساعدوني في العثور على العقار المثالي في وقت قياسي.",
+                quote:
+                  "خدمة ممتازة وسريعة، ساعدوني في العثور على العقار المثالي في وقت قياسي.",
                 name: "أحمد محمد",
                 location: "الرياض",
                 rating: 5,
@@ -657,7 +664,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
               },
               {
                 id: "2",
-                quote: "فريق محترف ومتفهم لاحتياجات العملاء، أنصح بالتعامل معهم.",
+                quote:
+                  "فريق محترف ومتفهم لاحتياجات العملاء، أنصح بالتعامل معهم.",
                 name: "فاطمة علي",
                 location: "جدة",
                 rating: 5,
@@ -667,7 +675,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
               },
               {
                 id: "3",
-                quote: "تجربة رائعة من البداية للنهاية، شكراً لكم على الخدمة المتميزة.",
+                quote:
+                  "تجربة رائعة من البداية للنهاية، شكراً لكم على الخدمة المتميزة.",
                 name: "محمد السعد",
                 location: "الدمام",
                 rating: 5,
@@ -716,7 +725,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             },
             content: {
               title: "اكتشف عقارك المثالي في أفضل المواقع",
-              description: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+              description:
+                "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
               alignment: "center",
               maxWidth: "5xl",
               font: {
@@ -1091,7 +1101,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
               streetViewControl: true,
               rotateControl: true,
               fullscreenControl: true,
-              embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d118991.6033066348!2d43.91428236250001!3d26.331491700000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e97523f269a8385%3A0xc66519139265f49e!2sAl%20Qassim%20Province%2C%20Saudi%20Arabia!5e0!3m2!1sen!2sus!4v1709605799797!5m2!1sen!2sus",
+              embedUrl:
+                "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d118991.6033066348!2d43.91428236250001!3d26.331491700000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e97523f269a8385%3A0xc66519139265f49e!2sAl%20Qassim%20Province%2C%20Saudi%20Arabia!5e0!3m2!1sen!2sus!4v1709605799797!5m2!1sen!2sus",
             },
             markers: {
               enabled: true,
@@ -1135,7 +1146,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             content: {
               enabled: true,
               title: "تواصل معنا",
-              description: "نحن متواجدون في قلب المدينة، يمكن الوصول إلينا بسهولة عبر وسائل النقل العام مع توفر مواقف سيارات واسعة.",
+              description:
+                "نحن متواجدون في قلب المدينة، يمكن الوصول إلينا بسهولة عبر وسائل النقل العام مع توفر مواقف سيارات واسعة.",
               position: "top-left",
               style: {
                 backgroundColor: "#ffffff",
@@ -1291,8 +1303,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       // Ask user if they want to save static pages
       const shouldSaveStaticPages = window.confirm(
         "هل تريد حفظ صفحات about-us و contact-us الثابتة؟\n\n" +
-        "نعم: سيتم حفظ الصفحات الثابتة\n" +
-        "لا: سيتم الحفظ بدون الصفحات الثابتة"
+          "نعم: سيتم حفظ الصفحات الثابتة\n" +
+          "لا: سيتم الحفظ بدون الصفحات الثابتة",
       );
 
       if (shouldSaveStaticPages) {
@@ -1303,9 +1315,13 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           "contact-us": staticContactUsData,
         };
 
-        console.log("[DEV MODE] Using static data for about-us and contact-us pages");
+        console.log(
+          "[DEV MODE] Using static data for about-us and contact-us pages",
+        );
       } else {
-        console.log("[DEV MODE] Skipping static data for about-us and contact-us pages");
+        console.log(
+          "[DEV MODE] Skipping static data for about-us and contact-us pages",
+        );
       }
     }
 

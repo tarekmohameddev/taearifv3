@@ -70,7 +70,7 @@ export const PropertyRequestsTable = ({
   const openWhatsApp = (raw: string) => {
     const phone = raw.replace(/\D/g, ""); // remove non-digits
     let full = "";
-  
+
     // Saudi numbers
     if (phone.startsWith("05")) full = "966" + phone.slice(1);
     else if (phone.startsWith("5")) full = "966" + phone;
@@ -78,10 +78,10 @@ export const PropertyRequestsTable = ({
     else if (phone.startsWith("1")) full = "20" + phone;
     // fallback: assume KSA
     else full = "966" + phone;
-  
+
     window.open(`https://wa.me/${full}`, "_blank");
   };
-  
+
   return (
     <div className="space-y-4">
       {/* Bulk Actions */}
@@ -350,10 +350,12 @@ export const PropertyRequestsTable = ({
                           )}
 
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => openWhatsApp(propertyRequest.phone)}>
-  <MessageSquare className="ml-2 h-4 w-4" />
-  إرسال واتساب
-</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => openWhatsApp(propertyRequest.phone)}
+                          >
+                            <MessageSquare className="ml-2 h-4 w-4" />
+                            إرسال واتساب
+                          </DropdownMenuItem>
 
                           <DropdownMenuItem>
                             <Phone className="ml-2 h-4 w-4" />

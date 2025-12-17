@@ -1,6 +1,7 @@
 # i18n and Translation System
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [editorI18nStore](#editori18nstore)
 3. [Translation Files](#translation-files)
@@ -14,6 +15,7 @@
 ## Overview
 
 The Live Editor includes a comprehensive **internationalization (i18n)** system supporting:
+
 - **Multiple languages**: Arabic (ar) and English (en)
 - **Editor UI translations**: All interface text translatable
 - **Component translations**: Component names and descriptions
@@ -25,17 +27,17 @@ The Live Editor includes a comprehensive **internationalization (i18n)** system 
 
 ```typescript
 export const locales = ["ar", "en"] as const;
-export type Locale = typeof locales[number];
+export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "ar";
 
 export const localeNames = {
   ar: "العربية",
-  en: "English"
+  en: "English",
 };
 
 export const localeFlags = {
   ar: "🇸🇦",
-  en: "🇬🇧"
+  en: "🇬🇧",
 };
 ```
 
@@ -51,11 +53,11 @@ export const localeFlags = {
 
 ```typescript
 interface EditorI18nState {
-  locale: Locale;                    // Current locale ("ar" or "en")
-  translations: TranslationsObject;  // All translations
-  setLocale: (locale: Locale) => void;  // Change language
-  t: (key: string, params?) => string;  // Translate key
-  getCurrentTranslations: () => Translations;  // Get current locale translations
+  locale: Locale; // Current locale ("ar" or "en")
+  translations: TranslationsObject; // All translations
+  setLocale: (locale: Locale) => void; // Change language
+  t: (key: string, params?) => string; // Translate key
+  getCurrentTranslations: () => Translations; // Get current locale translations
 }
 ```
 
@@ -65,12 +67,12 @@ interface EditorI18nState {
 export const useEditorI18nStore = create<EditorI18nState>()(
   persist(
     (set, get) => ({
-      locale: defaultLocale,  // "ar"
+      locale: defaultLocale, // "ar"
       translations: {
         ar: arTranslations,
-        en: enTranslations
+        en: enTranslations,
       },
-      
+
       // ═══════════════════════════════════════════════════════════
       // SET LOCALE
       // ═══════════════════════════════════════════════════════════
@@ -79,69 +81,69 @@ export const useEditorI18nStore = create<EditorI18nState>()(
           console.warn("Invalid locale:", locale);
           return;
         }
-        
+
         set({ locale });
-        
+
         // Optionally trigger re-render of components
         // (Most components use t() hook which auto-updates)
       },
-      
+
       // ═══════════════════════════════════════════════════════════
       // TRANSLATION FUNCTION
       // ═══════════════════════════════════════════════════════════
       t: (key, params?) => {
         const { locale, translations } = get();
         const currentTranslations = translations[locale];
-        
+
         // Navigate nested object using dot notation
         const keys = key.split(".");
         let value = currentTranslations;
-        
+
         for (const k of keys) {
           if (value && typeof value === "object" && k in value) {
             value = value[k];
           } else {
             // Fallback to default locale
             value = translations[defaultLocale];
-            
+
             for (const fallbackKey of keys) {
               if (value && typeof value === "object" && fallbackKey in value) {
                 value = value[fallbackKey];
               } else {
-                return key;  // Return key if not found
+                return key; // Return key if not found
               }
             }
             break;
           }
         }
-        
+
         if (typeof value !== "string") {
-          return key;  // Return key if final value not string
+          return key; // Return key if final value not string
         }
-        
+
         // Replace parameters
         if (params) {
           return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
             return params[paramKey]?.toString() || match;
           });
         }
-        
+
         return value;
       },
-      
+
       // ═══════════════════════════════════════════════════════════
       // GET CURRENT TRANSLATIONS
       // ═══════════════════════════════════════════════════════════
       getCurrentTranslations: () => {
         const { locale, translations } = get();
         return translations[locale];
-      }
+      },
     }),
     {
-      name: "editor-i18n-storage",  // LocalStorage key
-      partialize: (state) => ({ locale: state.locale })  // Only persist locale
-    }
-  )
+      name: "editor-i18n-storage", // LocalStorage key
+      partialize: (state) => ({ locale: state.locale }), // Only persist locale
+    },
+  ),
 );
 ```
 
@@ -154,6 +156,7 @@ export const useEditorI18nStore = create<EditorI18nState>()(
 **Persisted**: Only `locale` property
 
 **Why Persist?**
+
 - Remember user's language preference
 - Restore on page reload
 - Consistent experience across sessions
@@ -181,13 +184,13 @@ lib/i18n/locales/
     "cancel": "إلغاء",
     "add_section": "إضافة قسم",
     "edit_component": "تعديل المكون",
-    
+
     "responsive": {
       "mobile": "موبايل",
       "tablet": "تابلت",
       "desktop": "سطح المكتب"
     },
-    
+
     "dialogs": {
       "unsaved_changes": {
         "title": "تغييرات غير محفوظة",
@@ -197,7 +200,7 @@ lib/i18n/locales/
       }
     }
   },
-  
+
   "components": {
     "hero": {
       "display_name": "بانر رئيسي",
@@ -213,14 +216,14 @@ lib/i18n/locales/
     }
     // ... more components
   },
-  
+
   "sections": {
     "homepage": {
       "display_name": "الصفحة الرئيسية",
       "description": "مكونات الصفحة الرئيسية للموقع"
     }
   },
-  
+
   "fields": {
     "visible": "مرئي",
     "title": "العنوان",
@@ -244,14 +247,14 @@ lib/i18n/locales/
     "cancel": "Cancel",
     "add_section": "Add Section",
     "edit_component": "Edit Component",
-    
+
     "responsive": {
       "mobile": "Mobile",
       "tablet": "Tablet",
       "desktop": "Desktop"
     }
   },
-  
+
   "components": {
     "hero": {
       "display_name": "Hero",
@@ -274,12 +277,13 @@ lib/i18n/locales/
 **Purpose**: Get translation function
 
 **Usage**:
+
 ```typescript
 import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 function MyComponent() {
   const t = useEditorT();
-  
+
   return (
     <div>
       <h1>{t("live_editor.title")}</h1>
@@ -290,6 +294,7 @@ function MyComponent() {
 ```
 
 **Translation Lookup**:
+
 ```
 Key: "live_editor.title"
   ↓
@@ -320,6 +325,7 @@ const message = t("messages.component_added", {
 ```
 
 **Parameter Replacement**:
+
 ```typescript
 value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
   return params[paramKey]?.toString() || match;
@@ -335,7 +341,7 @@ value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
 t: (key, params?) => {
   const { locale, translations } = get();
   let value = translations[locale];
-  
+
   // Try current locale first
   for (const k of keys) {
     if (value && k in value) {
@@ -343,23 +349,24 @@ t: (key, params?) => {
     } else {
       // Fallback to default locale (Arabic)
       value = translations[defaultLocale];
-      
+
       for (const fallbackKey of keys) {
         if (value && fallbackKey in value) {
           value = value[fallbackKey];
         } else {
-          return key;  // Return key itself if not found
+          return key; // Return key itself if not found
         }
       }
       break;
     }
   }
-  
+
   return value;
-}
+};
 ```
 
 **Fallback Order**:
+
 ```
 1. Try current locale (e.g., "en")
 2. If not found, try default locale ("ar")
@@ -377,34 +384,34 @@ t: (key, params?) => {
 
 // Function to get translated components
 export const getComponents = (
-  t: (key: string) => string
+  t: (key: string) => string,
 ): Record<string, ComponentType> => ({
   hero: {
     id: "hero",
     name: "hero",
-    displayName: t("components.hero.display_name"),  // Translated!
-    description: t("components.hero.description"),   // Translated!
+    displayName: t("components.hero.display_name"), // Translated!
+    description: t("components.hero.description"), // Translated!
     category: "banner",
     section: "homepage",
     subPath: "hero",
     icon: "🌟",
-    ...heroStructure
+    ...heroStructure,
   },
-  
+
   header: {
     id: "header",
     name: "header",
     displayName: t("components.header.display_name"),
     description: t("components.header.description"),
     // ...
-  }
+  },
   // ... more components
 });
 
 // Helper to get translated component by ID
 export const getComponentByIdTranslated = (
   id: string,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): ComponentType | undefined => {
   const components = getComponents(t);
   return components[id];
@@ -417,10 +424,10 @@ export const getComponentByIdTranslated = (
 // In ComponentsSidebar
 function ComponentsSidebar() {
   const t = useEditorT();
-  
+
   // Get translated components
   const components = getAllComponentsTranslated(t);
-  
+
   return (
     <div>
       {components.map(component => (
@@ -441,64 +448,72 @@ function ComponentsSidebar() {
 
 export const translateComponentStructure = (
   structure: ComponentStructure,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): ComponentStructure => {
   return {
     ...structure,
-    variants: structure.variants.map(variant => ({
+    variants: structure.variants.map((variant) => ({
       ...variant,
-      name: t(`components.${structure.componentType}.variants.${variant.id}.name`) || variant.name,
-      description: t(`components.${structure.componentType}.variants.${variant.id}.description`) || variant.description,
-      
-      fields: variant.fields.map(field => translateField(field, structure.componentType, t)),
-      simpleFields: variant.simpleFields?.map(field => translateField(field, structure.componentType, t))
-    }))
+      name:
+        t(
+          `components.${structure.componentType}.variants.${variant.id}.name`,
+        ) || variant.name,
+      description:
+        t(
+          `components.${structure.componentType}.variants.${variant.id}.description`,
+        ) || variant.description,
+
+      fields: variant.fields.map((field) =>
+        translateField(field, structure.componentType, t),
+      ),
+      simpleFields: variant.simpleFields?.map((field) =>
+        translateField(field, structure.componentType, t),
+      ),
+    })),
   };
 };
 
 const translateField = (
   field: FieldDefinition,
   componentType: string,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): FieldDefinition => {
   const translationKey = `components.${componentType}.fields.${field.key}`;
-  
+
   const translated = {
     ...field,
     label: t(`${translationKey}.label`) || field.label,
     placeholder: t(`${translationKey}.placeholder`) || field.placeholder,
-    description: t(`${translationKey}.description`) || field.description
+    description: t(`${translationKey}.description`) || field.description,
   };
-  
+
   // Translate nested fields for object/array types
   if (field.type === "object" && field.fields) {
-    translated.fields = field.fields.map(f => 
-      translateField(f, componentType, t)
+    translated.fields = field.fields.map((f) =>
+      translateField(f, componentType, t),
     );
   }
-  
+
   if (field.type === "array" && field.of) {
-    translated.of = field.of.map(f => 
-      translateField(f, componentType, t)
-    );
+    translated.of = field.of.map((f) => translateField(f, componentType, t));
   }
-  
+
   return translated;
 };
 ```
 
 **Usage in AdvancedSimpleSwitcher**:
+
 ```typescript
 const loadStructure = async (componentType) => {
-  const structureModule = await import(`@/componentsStructure/${componentType}`);
-  const loadedStructure = structureModule[`${componentType}Structure`];
-  
-  // Translate structure
-  const translatedStructure = translateComponentStructure(
-    loadedStructure,
-    t
+  const structureModule = await import(
+    `@/componentsStructure/${componentType}`
   );
-  
+  const loadedStructure = structureModule[`${componentType}Structure`];
+
+  // Translate structure
+  const translatedStructure = translateComponentStructure(loadedStructure, t);
+
   setStructure(translatedStructure);
 };
 ```
@@ -515,12 +530,12 @@ const loadStructure = async (componentType) => {
 export function LanguageSwitcher() {
   const { locale, setLocale } = useEditorLocale();
   const t = useEditorT();
-  
+
   const languages = [
     { code: "ar", name: "العربية", flag: "🇸🇦" },
     { code: "en", name: "English", flag: "🇬🇧" }
   ];
-  
+
   return (
     <Select value={locale} onValueChange={setLocale}>
       <SelectTrigger>
@@ -528,7 +543,7 @@ export function LanguageSwitcher() {
           {localeFlags[locale]} {localeNames[locale]}
         </SelectValue>
       </SelectTrigger>
-      
+
       <SelectContent>
         {languages.map(lang => (
           <SelectItem key={lang.code} value={lang.code}>
@@ -603,14 +618,14 @@ export function TranslationFields({
   locales = ["ar", "en"]
 }) {
   const [activeLocale, setActiveLocale] = useState("ar");
-  
+
   const handleValueChange = (locale, newValue) => {
     onChange({
       ...value,
       [locale]: newValue
     });
   };
-  
+
   return (
     <Card className="translation-field">
       <CardHeader>
@@ -621,7 +636,7 @@ export function TranslationFields({
           Edit content in different languages
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <Tabs value={activeLocale} onValueChange={setActiveLocale}>
           {/* Language tabs */}
@@ -633,7 +648,7 @@ export function TranslationFields({
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           {/* Language content */}
           {locales.map(locale => (
             <TabsContent key={locale} value={locale}>
@@ -641,7 +656,7 @@ export function TranslationFields({
                 <Label htmlFor={`${fieldKey}-${locale}`}>
                   {localeNames[locale]} {label}
                 </Label>
-                
+
                 {type === "textarea" ? (
                   <Textarea
                     id={`${fieldKey}-${locale}`}
@@ -660,7 +675,7 @@ export function TranslationFields({
                     dir={locale === "ar" ? "rtl" : "ltr"}
                   />
                 )}
-                
+
                 {/* Character count */}
                 <div className="text-xs text-gray-500">
                   {(value?.[locale] || "").length} characters
@@ -720,6 +735,7 @@ export function TranslationFields({
 ```
 
 **Rendering**:
+
 ```typescript
 // In component
 const { locale } = useEditorLocale();
@@ -728,7 +744,7 @@ return (
   <section>
     <h1>{data.title?.[locale] || data.title}</h1>
     <p>{data.description?.[locale] || data.description}</p>
-    
+
     {data.buttons?.map(btn => (
       <a href={btn.url}>
         {btn.text?.[locale] || btn.text}
@@ -751,11 +767,11 @@ Examples:
   live_editor.title                          # Editor title
   live_editor.buttons.save                   # Save button
   live_editor.dialogs.unsaved_changes.title  # Dialog title
-  
+
   components.hero.display_name               # Component name
   components.hero.description                # Component description
   components.hero.fields.title.label         # Field label
-  
+
   sections.homepage.display_name             # Section name
 ```
 
@@ -782,9 +798,10 @@ Examples:
 ```
 
 **Access**:
+
 ```typescript
-t("live_editor.sidebar.main.title")      // "Settings"
-t("live_editor.sidebar.edit.save")       // "Save Changes"
+t("live_editor.sidebar.main.title"); // "Settings"
+t("live_editor.sidebar.edit.save"); // "Save Changes"
 ```
 
 ---
@@ -809,14 +826,11 @@ return (
 
 ```typescript
 const formatDate = (date, locale) => {
-  return new Intl.DateTimeFormat(
-    locale === "ar" ? "ar-SA" : "en-US",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    }
-  ).format(date);
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
 };
 
 // Usage
@@ -829,9 +843,9 @@ formatDate(new Date(), locale);
 
 ```typescript
 const formatNumber = (number, locale) => {
-  return new Intl.NumberFormat(
-    locale === "ar" ? "ar-SA" : "en-US"
-  ).format(number);
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format(
+    number,
+  );
 };
 
 // Usage
@@ -858,7 +872,7 @@ formatNumber(123456, locale);
 
 ```typescript
 // ✅ GOOD
-displayName: t("components.hero.display_name") || "Hero"
+displayName: t("components.hero.display_name") || "Hero";
 ```
 
 ### Practice 3: Group Related Translations
@@ -884,12 +898,12 @@ displayName: t("components.hero.display_name") || "Hero"
 
 ```typescript
 // ❌ BAD
-t("btn1")
-t("text_123")
+t("btn1");
+t("text_123");
 
 // ✅ GOOD
-t("live_editor.buttons.save")
-t("components.hero.fields.title.label")
+t("live_editor.buttons.save");
+t("components.hero.fields.title.label");
 ```
 
 ---
@@ -956,7 +970,7 @@ import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 function DuplicateButton() {
   const t = useEditorT();
-  
+
   return (
     <button onClick={handleDuplicate}>
       {t("live_editor.buttons.duplicate")}
@@ -975,17 +989,20 @@ RESULT: Feature supports both languages ✓
 ### When Adding i18n Support
 
 1. **Always use t() for user-facing text**:
+
    ```typescript
    // Not just for labels and buttons
    // Also for: errors, placeholders, descriptions, tooltips
    ```
 
 2. **Provide both ar and en translations**:
+
    ```typescript
    // Never add to just one language file
    ```
 
 3. **Use consistent key structure**:
+
    ```typescript
    // Follow existing patterns
    {category}.{subcategory}.{item}
@@ -993,7 +1010,7 @@ RESULT: Feature supports both languages ✓
 
 4. **Handle missing translations gracefully**:
    ```typescript
-   t("some.key") || "Fallback text"
+   t("some.key") || "Fallback text";
    ```
 
 ### When Translating Components
@@ -1006,6 +1023,7 @@ RESULT: Feature supports both languages ✓
 ### Common Patterns
 
 **Pattern 1**: Component with translation
+
 ```typescript
 const t = useEditorT();
 const component = getComponentByIdTranslated("hero", t);
@@ -1014,6 +1032,7 @@ const component = getComponentByIdTranslated("hero", t);
 ```
 
 **Pattern 2**: Multi-language content
+
 ```typescript
 const { locale } = useEditorLocale();
 
@@ -1021,8 +1040,9 @@ const { locale } = useEditorLocale();
 ```
 
 **Pattern 3**: Parameterized translation
+
 ```typescript
-t("messages.items_count", { count: items.length })
+t("messages.items_count", { count: items.length });
 // Arabic: "عدد العناصر: {{count}}"
 // Result: "عدد العناصر: 5"
 ```
@@ -1041,6 +1061,7 @@ The i18n system provides:
 6. **Fallback mechanism**: Missing translations fall back gracefully
 
 **Key Components**:
+
 - editorI18nStore: State management for locale
 - Translation files: ar.json, en.json
 - useEditorT hook: Translation function
@@ -1048,14 +1069,15 @@ The i18n system provides:
 - TranslationFields: Multi-language content editing
 
 **Integration**:
+
 - Used throughout Live Editor
 - ComponentsList has translated versions
 - Structure fields can be translated
 - All UI text should use t() function
 
 Understanding i18n is important for:
+
 - Adding new features with proper translations
 - Supporting additional languages
 - Debugging translation issues
 - Maintaining consistency across locales
-

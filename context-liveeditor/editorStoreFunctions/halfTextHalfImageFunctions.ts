@@ -345,7 +345,8 @@ export const getDefaultHalfTextHalfImage6Data = (): ComponentData => ({
     ThemeTwo: "ThemeTwo",
     title: "خبراء في خدمتك – نرافقك نحو استثمار آمن",
     titleUnderlined: "خبراء في",
-    paragraph: "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم.",
+    paragraph:
+      "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم.",
   },
   image: {
     ThemeTwo: "ThemeTwo",
@@ -484,21 +485,24 @@ export const getDefaultHalfTextHalfImage7Data = (): ComponentData => ({
         ThemeTwo: "ThemeTwo",
         id: "1",
         title: "الشفافية",
-        description: "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
+        description:
+          "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
         icon: "transparency",
       },
       {
         ThemeTwo: "ThemeTwo",
         id: "2",
         title: "الالتزام",
-        description: "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
+        description:
+          "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
         icon: "commitment",
       },
       {
         ThemeTwo: "ThemeTwo",
         id: "3",
         title: "الابتكار",
-        description: "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
+        description:
+          "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
         icon: "innovation",
       },
     ],
@@ -541,9 +545,12 @@ export const halfTextHalfImageFunctions = {
     // ⭐ STEP 1: Find componentName (Theme) from pageComponentsByPage
     // Search in all pages for this component
     let currentTheme: string | null = null;
-    for (const [pageSlug, pageComponents] of Object.entries(state.pageComponentsByPage || {})) {
+    for (const [pageSlug, pageComponents] of Object.entries(
+      state.pageComponentsByPage || {},
+    )) {
       const found = (pageComponents as any[]).find(
-        (comp: any) => comp.type === "halfTextHalfImage" && comp.id === variantId
+        (comp: any) =>
+          comp.type === "halfTextHalfImage" && comp.id === variantId,
       );
       if (found && found.componentName) {
         currentTheme = found.componentName;
@@ -600,7 +607,7 @@ export const halfTextHalfImageFunctions = {
       const defaultHasParagraphs = !!defaultData.content?.paragraphs;
 
       // If Theme structure doesn't match, Theme has changed - reset to default
-      const themeChanged = 
+      const themeChanged =
         existingHasThemeTwo !== defaultHasThemeTwo ||
         existingHasStats !== defaultHasStats ||
         existingHasFeatures !== defaultHasFeatures ||
@@ -611,7 +618,8 @@ export const halfTextHalfImageFunctions = {
           oldData: existingData,
           newDefaultData: defaultData,
           currentTheme,
-          reason: "Theme changed, completely removing old data and using only default data for new Theme",
+          reason:
+            "Theme changed, completely removing old data and using only default data for new Theme",
         });
 
         // ⭐ IMPORTANT: Use ONLY defaultData when Theme changes - ignore initial and tempData

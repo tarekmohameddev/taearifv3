@@ -2,12 +2,15 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 // تحميل GoogleReCaptchaProvider بشكل ديناميكي
 const GoogleReCaptchaProvider = dynamic(
-  () => import('react-google-recaptcha-v3').then(mod => mod.GoogleReCaptchaProvider),
-  { ssr: false }
+  () =>
+    import("react-google-recaptcha-v3").then(
+      (mod) => mod.GoogleReCaptchaProvider,
+    ),
+  { ssr: false },
 );
 
 // Wrapper محلي للتأكد من تحميل ReCAPTCHA
@@ -50,8 +53,8 @@ function LocalReCaptchaWrapper({ children }: { children: ReactNode }) {
       }}
       container={{
         parameters: {
-          badge: 'bottomright',
-          theme: 'light',
+          badge: "bottomright",
+          theme: "light",
         },
       }}
     >
@@ -73,4 +76,3 @@ export function LoginPageWithReCaptcha({ children }: { children: ReactNode }) {
 
   return <LocalReCaptchaWrapper>{children}</LocalReCaptchaWrapper>;
 }
-

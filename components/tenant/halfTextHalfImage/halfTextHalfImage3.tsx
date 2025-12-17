@@ -243,9 +243,11 @@ export default function VisionSection(props: VisionSectionProps = {}) {
   // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage3Data from halfTextHalfImageFunctions.ts
   // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
   // So we only use getDefaultHalfTextHalfImage3Data() as fallback if no store data exists
-  const defaultData = (variantId === "halfTextHalfImage3" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
-    ? getDefaultHalfTextHalfImage3Data() 
-    : {};
+  const defaultData =
+    variantId === "halfTextHalfImage3" &&
+    (!currentStoreData || Object.keys(currentStoreData).length === 0)
+      ? getDefaultHalfTextHalfImage3Data()
+      : {};
 
   // Check if currentStoreData contains old halfTextHalfImage1 data
   const hasOldData =
@@ -329,18 +331,18 @@ export default function VisionSection(props: VisionSectionProps = {}) {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -349,104 +351,143 @@ export default function VisionSection(props: VisionSectionProps = {}) {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "typography.title.color")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = styling;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = styling;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
       if (fieldPath.includes("title") && fieldPath.includes("color")) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      } else if (
+        fieldPath.includes("textColor") ||
+        fieldPath.includes("Text")
+      ) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor") || fieldPath.includes("backgroundColor")) {
+      } else if (
+        fieldPath.includes("Button") ||
+        fieldPath.includes("button") ||
+        fieldPath.includes("hoverBgColor") ||
+        fieldPath.includes("backgroundColor")
+      ) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+      } else if (
+        fieldPath.includes("color") &&
+        !fieldPath.includes("imageBackground")
+      ) {
         defaultGlobalColorType = "secondary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("title") && fieldPath.includes("color")) {
       defaultGlobalColorType = "primary";
     } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
-    } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+    } else if (
+      fieldPath.includes("color") &&
+      !fieldPath.includes("imageBackground")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Get title color - use primary color as default if available, otherwise use custom color or CSS class
-  const hasPrimaryColor = tenantData?.WebsiteLayout?.branding?.colors?.primary && 
-                         tenantData.WebsiteLayout.branding.colors.primary.trim() !== "";
-  const titleColor = content.font?.title?.color || 
-                    getColor("typography.title.color", brandingColors.primary) ||
-                    (hasPrimaryColor ? brandingColors.primary : undefined);
+  const hasPrimaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== "";
+  const titleColor =
+    content.font?.title?.color ||
+    getColor("typography.title.color", brandingColors.primary) ||
+    (hasPrimaryColor ? brandingColors.primary : undefined);
 
   if (!visible) return null;
 
@@ -461,7 +502,10 @@ export default function VisionSection(props: VisionSectionProps = {}) {
           minHeight: layout.minHeight || undefined,
         }}
       >
-        <div className="md:flex-[.6] xl:flex-[.72] flex flex-col justify-center order-2 md:order-1" dir="rtl">
+        <div
+          className="md:flex-[.6] xl:flex-[.72] flex flex-col justify-center order-2 md:order-1"
+          dir="rtl"
+        >
           {content.eyebrow && (
             <p
               className={`mb-2 ${content.font?.eyebrow?.size || "text-xs md:text-base xl:text-lg"} ${content.font?.eyebrow?.weight || "font-normal"} ${content.font?.eyebrow?.color || "text-muted-foreground"} ${content.font?.eyebrow?.lineHeight || "leading-[22.5px]"}`}

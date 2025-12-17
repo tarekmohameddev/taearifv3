@@ -313,9 +313,11 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage2Data from halfTextHalfImageFunctions.ts
   // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
   // So we only use getDefaultHalfTextHalfImage2Data() as fallback if no store data exists
-  const defaultData = (variantId === "halfTextHalfImage2" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
-    ? getDefaultHalfTextHalfImage2Data() 
-    : {};
+  const defaultData =
+    variantId === "halfTextHalfImage2" &&
+    (!currentStoreData || Object.keys(currentStoreData).length === 0)
+      ? getDefaultHalfTextHalfImage2Data()
+      : {};
 
   // Merge data with priority: currentStoreData > tenantComponentData > props > default
   const mergedData = {
@@ -334,18 +336,18 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -354,93 +356,127 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "imageBackground.color")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = styling;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = styling;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
       // Image background should use primary color
-      if (fieldPath.includes("imageBackground") || fieldPath.includes("background")) {
+      if (
+        fieldPath.includes("imageBackground") ||
+        fieldPath.includes("background")
+      ) {
         defaultGlobalColorType = "primary";
       } else if (fieldPath.includes("eyebrow")) {
         defaultGlobalColorType = "primary";
       } else if (fieldPath.includes("stats") || fieldPath.includes("value")) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      } else if (
+        fieldPath.includes("textColor") ||
+        fieldPath.includes("Text")
+      ) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground") && !fieldPath.includes("background")) {
+      } else if (
+        fieldPath.includes("color") &&
+        !fieldPath.includes("imageBackground") &&
+        !fieldPath.includes("background")
+      ) {
         // For other color fields (not imageBackground), default to secondary
         defaultGlobalColorType = "secondary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     // Image background should use primary color
-    if (fieldPath.includes("imageBackground") || fieldPath.includes("background")) {
+    if (
+      fieldPath.includes("imageBackground") ||
+      fieldPath.includes("background")
+    ) {
       defaultGlobalColorType = "primary";
     } else if (fieldPath.includes("eyebrow")) {
       defaultGlobalColorType = "primary";
@@ -448,31 +484,55 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
       defaultGlobalColorType = "primary";
     } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
-    } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground") && !fieldPath.includes("background")) {
+    } else if (
+      fieldPath.includes("color") &&
+      !fieldPath.includes("imageBackground") &&
+      !fieldPath.includes("background")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Get colors for styling
-  const imageBackgroundColor = getColor("imageBackground.color", brandingColors.primary);
-  const eyebrowColor = getColor("typography.eyebrow.color", brandingColors.primary);
-  const statsValueColor = getColor("typography.stats.valueColor", brandingColors.primary);
+  const imageBackgroundColor = getColor(
+    "imageBackground.color",
+    brandingColors.primary,
+  );
+  const eyebrowColor = getColor(
+    "typography.eyebrow.color",
+    brandingColors.primary,
+  );
+  const statsValueColor = getColor(
+    "typography.stats.valueColor",
+    brandingColors.primary,
+  );
 
   // Generate dynamic styles
   const sectionStyles = {
@@ -532,8 +592,7 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
           {mergedData.content?.eyebrow && (
             <p
               className={cn(
-                mergedData.typography?.eyebrow?.className ||
-                  "section-title",
+                mergedData.typography?.eyebrow?.className || "section-title",
                 mergedData.typography?.eyebrow?.marginBottom || "mb-3",
               )}
               style={{ color: eyebrowColor }}
@@ -584,8 +643,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                     <li>
                       <div
                         className={
-                          mergedData.typography?.stats?.valueClassName?.replace(/text-emerald-\d+|text-green-\d+/g, '').trim() ||
-                          "text-2xl"
+                          mergedData.typography?.stats?.valueClassName
+                            ?.replace(/text-emerald-\d+|text-green-\d+/g, "")
+                            .trim() || "text-2xl"
                         }
                         style={{ color: statsValueColor }}
                       >
@@ -607,8 +667,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                     <li>
                       <div
                         className={
-                          mergedData.typography?.stats?.valueClassName?.replace(/text-emerald-\d+|text-green-\d+/g, '').trim() ||
-                          "text-2xl"
+                          mergedData.typography?.stats?.valueClassName
+                            ?.replace(/text-emerald-\d+|text-green-\d+/g, "")
+                            .trim() || "text-2xl"
                         }
                         style={{ color: statsValueColor }}
                       >
@@ -630,8 +691,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                     <li>
                       <div
                         className={
-                          mergedData.typography?.stats?.valueClassName?.replace(/text-emerald-\d+|text-green-\d+/g, '').trim() ||
-                          "text-2xl"
+                          mergedData.typography?.stats?.valueClassName
+                            ?.replace(/text-emerald-\d+|text-green-\d+/g, "")
+                            .trim() || "text-2xl"
                         }
                         style={{ color: statsValueColor }}
                       >
@@ -653,8 +715,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                     <li>
                       <div
                         className={
-                          mergedData.typography?.stats?.valueClassName?.replace(/text-emerald-\d+|text-green-\d+/g, '').trim() ||
-                          "text-2xl"
+                          mergedData.typography?.stats?.valueClassName
+                            ?.replace(/text-emerald-\d+|text-green-\d+/g, "")
+                            .trim() || "text-2xl"
                         }
                         style={{ color: statsValueColor }}
                       >
@@ -692,8 +755,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                     <li key={index}>
                       <div
                         className={
-                          mergedData.typography?.stats?.valueClassName?.replace(/text-emerald-\d+|text-green-\d+/g, '').trim() ||
-                          "text-2xl"
+                          mergedData.typography?.stats?.valueClassName
+                            ?.replace(/text-emerald-\d+|text-green-\d+/g, "")
+                            .trim() || "text-2xl"
                         }
                         style={{ color: statsValueColor }}
                       >
@@ -731,9 +795,11 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
               className={cn(
                 "relative flex-1",
                 mergedData.image?.background?.positioning?.pr || "pr-[15px]",
-                mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
+                mergedData.image?.background?.positioning?.xlPr ||
+                  "xl:pr-[21px]",
                 mergedData.image?.background?.positioning?.pb || "pb-[15px]",
-                mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
+                mergedData.image?.background?.positioning?.xlPb ||
+                  "xl:pb-[21px]",
                 mergedData.image?.background?.enabled &&
                   (mergedData.image?.background?.className ||
                     "bg-emerald-600 rounded-[10px]"),

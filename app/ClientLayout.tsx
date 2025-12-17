@@ -174,7 +174,7 @@ export default function ClientLayout({
         // استخدام البيانات من AuthContext بدلاً من جلبها مباشرة
         const currentUserData = useAuthStore.getState().userData;
         const completed = currentUserData?.onboarding_completed;
-        
+
         // إذا كانت البيانات موجودة في AuthContext، استخدمها
         if (completed !== undefined && completed !== null) {
           setOnboardingCompleted(completed);
@@ -197,7 +197,10 @@ export default function ClientLayout({
         // التحقق من الكوكي أولاً
         if (typeof window !== "undefined") {
           try {
-            const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
+            const {
+              getPlanCookie,
+              hasValidPlanCookie,
+            } = require("@/lib/planCookie");
             if (hasValidPlanCookie()) {
               const cachedPlan = getPlanCookie();
               if (cachedPlan && cachedPlan.onboarding_completed !== undefined) {
@@ -217,7 +220,7 @@ export default function ClientLayout({
             console.error("Error reading plan cookie:", error);
           }
         }
-        
+
         // فقط إذا لم تكن البيانات موجودة في أي مكان، جلبها من API مرة واحدة فقط
         isFetchingOnboardingRef.current = true;
         hasCheckedOnboardingRef.current = true;
@@ -283,10 +286,16 @@ export default function ClientLayout({
     if (!isMounted || IsLoading) return;
 
     const pathWithoutLocale = removeLocaleFromPath(pathname || "");
-    
-    if (pathWithoutLocale === "/live-editor" || pathWithoutLocale.startsWith("/live-editor/")) {
+
+    if (
+      pathWithoutLocale === "/live-editor" ||
+      pathWithoutLocale.startsWith("/live-editor/")
+    ) {
       // منع إعادة الجلب إذا كان هناك طلب قيد التنفيذ أو تم الجلب من قبل
-      if (isFetchingLiveEditorDataRef.current || hasFetchedLiveEditorDataRef.current) {
+      if (
+        isFetchingLiveEditorDataRef.current ||
+        hasFetchedLiveEditorDataRef.current
+      ) {
         return;
       }
 

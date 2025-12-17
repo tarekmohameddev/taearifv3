@@ -12,7 +12,7 @@ export default function ClientsSection() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const element = document.getElementById("clients");
@@ -28,7 +28,10 @@ export default function ClientsSection() {
   }, []);
 
   return (
-    <section id="clients" className="py-20 bg-[#d7f7ec] relative overflow-hidden">
+    <section
+      id="clients"
+      className="py-20 bg-[#d7f7ec] relative overflow-hidden"
+    >
       {/* Background decorative elements */}
       <img
         src="/bghero.webp"

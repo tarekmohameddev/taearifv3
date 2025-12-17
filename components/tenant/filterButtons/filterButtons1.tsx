@@ -17,7 +17,7 @@ interface FilterButtonsProps {
   content?: any;
 }
 
-export default function FilterButtons({ 
+export default function FilterButtons({
   className,
   useStore = false,
   id,
@@ -52,30 +52,29 @@ export default function FilterButtons({
   const storeData = useStore
     ? getComponentData("filterButtons", uniqueId) || {}
     : {};
-  const currentStoreData = useStore
-    ? filterButtonsStates[uniqueId] || {}
-    : {};
+  const currentStoreData = useStore ? filterButtonsStates[uniqueId] || {} : {};
 
   // Merge content prop with store data (store data takes priority)
-  const mergedContent = useStore && storeData && Object.keys(storeData).length > 0
-    ? { ...content, ...storeData }
-    : content;
+  const mergedContent =
+    useStore && storeData && Object.keys(storeData).length > 0
+      ? { ...content, ...storeData }
+      : content;
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -84,130 +83,166 @@ export default function FilterButtons({
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedContent (which includes store data)
     const styling = mergedContent?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "inspectionButton.bgColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = styling;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = styling;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
       if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor")) {
+      } else if (
+        fieldPath.includes("Button") ||
+        fieldPath.includes("button") ||
+        fieldPath.includes("hoverBgColor")
+      ) {
         defaultGlobalColorType = "primary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to create lighter color (for hover backgrounds)
   const getLighterColor = (hex: string, opacity: number = 0.1): string => {
-    if (!hex || !hex.startsWith('#')) return `${primaryColor}1A`; // 10% opacity default
+    if (!hex || !hex.startsWith("#")) return `${primaryColor}1A`; // 10% opacity default
     // Return hex color with opacity using rgba
-    const cleanHex = hex.replace('#', '');
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return `${primaryColor}1A`;
-    
+
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   // Helper function to get contrast text color (black or white) based on background color
   // Uses WCAG luminance formula to determine if background is light or dark
   const getContrastTextColor = (backgroundColor: string): string => {
-    if (!backgroundColor || !backgroundColor.startsWith('#')) return "#ffffff";
-    const cleanHex = backgroundColor.replace('#', '');
+    if (!backgroundColor || !backgroundColor.startsWith("#")) return "#ffffff";
+    const cleanHex = backgroundColor.replace("#", "");
     if (cleanHex.length !== 6) return "#ffffff";
-    
+
     // Parse RGB values
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     // Calculate relative luminance using WCAG formula
     // https://www.w3.org/WAI/GL/wiki/Relative_luminance
     const getLuminance = (value: number): number => {
@@ -216,30 +251,56 @@ export default function FilterButtons({
         ? normalized / 12.92
         : Math.pow((normalized + 0.055) / 1.055, 2.4);
     };
-    
-    const luminance = 0.2126 * getLuminance(r) + 0.7152 * getLuminance(g) + 0.0722 * getLuminance(b);
-    
+
+    const luminance =
+      0.2126 * getLuminance(r) +
+      0.7152 * getLuminance(g) +
+      0.0722 * getLuminance(b);
+
     // If luminance is less than 0.5, use white text, otherwise use black text
     return luminance < 0.5 ? "#ffffff" : "#000000";
   };
 
   // Get colors for inspection button
-  const inspectionButtonBgColor = getColor("inspectionButton.bgColor", "#059669");
+  const inspectionButtonBgColor = getColor(
+    "inspectionButton.bgColor",
+    "#059669",
+  );
   // Always calculate text color from background color (black or white) - ignore custom text color
-  const inspectionButtonTextColor = getContrastTextColor(inspectionButtonBgColor);
-  const inspectionButtonHoverBgColor = getColor("inspectionButton.hoverBgColor", getDarkerColor(inspectionButtonBgColor, 20));
+  const inspectionButtonTextColor = getContrastTextColor(
+    inspectionButtonBgColor,
+  );
+  const inspectionButtonHoverBgColor = getColor(
+    "inspectionButton.hoverBgColor",
+    getDarkerColor(inspectionButtonBgColor, 20),
+  );
   // Always calculate hover text color from hover background color
-  const inspectionButtonHoverTextColor = getContrastTextColor(inspectionButtonHoverBgColor);
-  
+  const inspectionButtonHoverTextColor = getContrastTextColor(
+    inspectionButtonHoverBgColor,
+  );
+
   // Get colors for filter buttons
-  const filterButtonsActiveBgColor = getColor("filterButtons.activeBgColor", "#059669");
+  const filterButtonsActiveBgColor = getColor(
+    "filterButtons.activeBgColor",
+    "#059669",
+  );
   // Always calculate text color from background color (black or white) - ignore custom text color
-  const filterButtonsActiveTextColor = getContrastTextColor(filterButtonsActiveBgColor);
-  const filterButtonsInactiveTextColor = getColor("filterButtons.inactiveTextColor", "#059669");
-  const filterButtonsHoverBgColor = getColor("filterButtons.hoverBgColor", getLighterColor(filterButtonsActiveBgColor, 0.1));
+  const filterButtonsActiveTextColor = getContrastTextColor(
+    filterButtonsActiveBgColor,
+  );
+  const filterButtonsInactiveTextColor = getColor(
+    "filterButtons.inactiveTextColor",
+    "#059669",
+  );
+  const filterButtonsHoverBgColor = getColor(
+    "filterButtons.hoverBgColor",
+    getLighterColor(filterButtonsActiveBgColor, 0.1),
+  );
   // Always calculate hover text color from hover background color
-  const filterButtonsHoverTextColor = getContrastTextColor(filterButtonsHoverBgColor);
-  
+  const filterButtonsHoverTextColor = getContrastTextColor(
+    filterButtonsHoverBgColor,
+  );
+
   // Use the colors for primaryColor and variants
   const primaryColor = inspectionButtonBgColor;
   const primaryColorHover = inspectionButtonHoverBgColor;
@@ -308,17 +369,23 @@ export default function FilterButtons({
             }
             onMouseEnter={(e) => {
               if (activeFilter !== button.key) {
-                e.currentTarget.style.backgroundColor = filterButtonsHoverBgColor;
+                e.currentTarget.style.backgroundColor =
+                  filterButtonsHoverBgColor;
                 e.currentTarget.style.color = filterButtonsHoverTextColor;
               } else {
-                const hoverBgColor = getDarkerColor(filterButtonsActiveBgColor, 20);
+                const hoverBgColor = getDarkerColor(
+                  filterButtonsActiveBgColor,
+                  20,
+                );
                 e.currentTarget.style.backgroundColor = hoverBgColor;
-                e.currentTarget.style.color = getContrastTextColor(hoverBgColor);
+                e.currentTarget.style.color =
+                  getContrastTextColor(hoverBgColor);
               }
             }}
             onMouseLeave={(e) => {
               if (activeFilter === button.key) {
-                e.currentTarget.style.backgroundColor = filterButtonsActiveBgColor;
+                e.currentTarget.style.backgroundColor =
+                  filterButtonsActiveBgColor;
                 e.currentTarget.style.color = filterButtonsActiveTextColor;
               } else {
                 e.currentTarget.style.backgroundColor = "white";

@@ -15,20 +15,25 @@ interface GA4ProviderProps {
   children: React.ReactNode;
 }
 
-export default function GA4Provider({ tenantId, domainType, children }: GA4ProviderProps) {
+export default function GA4Provider({
+  tenantId,
+  domainType,
+  children,
+}: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // الحصول على username من tenantStore (للـ custom domains)
   const tenantData = useTenantStore((s) => s.tenantData);
 
   // Initialize GA4 only once
   useEffect(() => {
-    const currentDomain = typeof window !== 'undefined' ? window.location.hostname : '';
+    const currentDomain =
+      typeof window !== "undefined" ? window.location.hostname : "";
     const shouldTrack = shouldTrackDomain(currentDomain);
 
     if (!shouldTrack) {
-      console.log('Skipping GA4 tracking for domain:', currentDomain);
+      console.log("Skipping GA4 tracking for domain:", currentDomain);
       return;
     }
 
@@ -40,26 +45,31 @@ export default function GA4Provider({ tenantId, domainType, children }: GA4Provi
 
   // Track page views with tenant_id
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const currentDomain = window.location.hostname;
     const domainTenantId = getTenantIdFromDomain(currentDomain);
-    
+
     // Use tenantId if it's a valid string, otherwise use domainTenantId
     // This prevents empty strings from being used
-    let finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
+    let finalTenantId =
+      tenantId && tenantId.trim() !== "" ? tenantId : domainTenantId;
 
     // ✅ للـ custom domains: استخدم username من API بدلاً من domain
-    if (domainType === 'custom' && tenantData?.username) {
+    if (domainType === "custom" && tenantData?.username) {
       finalTenantId = tenantData.username;
-      console.log('🌐 GA4: Using username from API for custom domain:', finalTenantId);
+      console.log(
+        "🌐 GA4: Using username from API for custom domain:",
+        finalTenantId,
+      );
     }
 
     // Only track if we have a valid tenant ID (not empty, not null, not 'www')
-    const isValidTenantId = finalTenantId && 
-                           finalTenantId.trim() !== '' && 
-                           finalTenantId !== 'www' &&
-                           finalTenantId !== '(not set)';
+    const isValidTenantId =
+      finalTenantId &&
+      finalTenantId.trim() !== "" &&
+      finalTenantId !== "www" &&
+      finalTenantId !== "(not set)";
 
     if (isValidTenantId && pathname && isInitialized) {
       // Set tenant context
@@ -70,7 +80,7 @@ export default function GA4Provider({ tenantId, domainType, children }: GA4Provi
         trackPageView(finalTenantId, pathname);
       }, 500);
     } else {
-      console.warn('⚠️ Missing required data for tracking:', {
+      console.warn("⚠️ Missing required data for tracking:", {
         finalTenantId,
         pathname,
         isInitialized,
@@ -96,16 +106,16 @@ const shouldTrackDomain = (domain: string): boolean => {
 
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
-    console.log('Skipping tracking for main domain:', domain);
+    console.log("Skipping tracking for main domain:", domain);
     return false;
   }
 
   // Track tenant subdomains in production (e.g., lira.taearif.com)
   // But NOT www.taearif.com
   if (domain.endsWith(`.${productionDomain}`)) {
-    const subdomain = domain.replace(`.${productionDomain}`, '');
-    if (subdomain === 'www') {
-      console.log('Skipping tracking for www subdomain');
+    const subdomain = domain.replace(`.${productionDomain}`, "");
+    if (subdomain === "www") {
+      console.log("Skipping tracking for www subdomain");
       return false;
     }
     return true;
@@ -121,9 +131,12 @@ const shouldTrackDomain = (domain: string): boolean => {
 
   // ✅ Track custom domains (any domain that's not the base domain)
   // Custom domains like: liraksa.com, mybusiness.net, etc.
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(domain);
+  const isCustomDomain =
+    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+      domain,
+    );
   if (isCustomDomain) {
-    console.log('Tracking custom domain:', domain);
+    console.log("Tracking custom domain:", domain);
     return true;
   }
 
@@ -143,14 +156,14 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   // For production: lira.taearif.com -> lira
   if (domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, "");
-    
+
     // Exclude 'www' and empty subdomains - not valid tenants
-    if (!subdomain || subdomain.trim() === '' || subdomain === 'www') {
-      console.warn('Skipping invalid subdomain (not a tenant):', subdomain);
+    if (!subdomain || subdomain.trim() === "" || subdomain === "www") {
+      console.warn("Skipping invalid subdomain (not a tenant):", subdomain);
       return null;
     }
-    
-    console.log('Extracted tenant from production domain:', subdomain);
+
+    console.log("Extracted tenant from production domain:", subdomain);
     return subdomain;
   }
 
@@ -159,19 +172,18 @@ const getTenantIdFromDomain = (domain: string): string | null => {
     const parts = domain.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const subdomain = parts[0];
-      
+
       // Exclude 'www' and empty subdomains in development too
-      if (!subdomain || subdomain.trim() === '' || subdomain === 'www') {
-        console.warn('Skipping invalid subdomain (not a tenant):', subdomain);
+      if (!subdomain || subdomain.trim() === "" || subdomain === "www") {
+        console.warn("Skipping invalid subdomain (not a tenant):", subdomain);
         return null;
       }
-      
-      console.log('Extracted tenant from dev domain:', subdomain);
+
+      console.log("Extracted tenant from dev domain:", subdomain);
       return subdomain;
     }
   }
 
-  console.warn('Could not extract tenant from domain:', domain);
+  console.warn("Could not extract tenant from domain:", domain);
   return null;
 };
-

@@ -11,15 +11,17 @@ import * as ReactIconsMd from "react-icons/md";
 import type { IconType } from "react-icons";
 
 // Function to get icon component based on type or name
-const getWhyChooseUsIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+const getWhyChooseUsIcon = (
+  typeOrName: string,
+): LucideIcon | IconType | React.ComponentType<any> => {
   // Legacy icon mapping for backward compatibility
   const legacyIconMap: Record<string, LucideIcon> = {
-    icon1: LucideIcons.UserCircle,      // خدمة شخصية
-    icon2: LucideIcons.Building2,       // مجموعة واسعة من العقارات
-    icon3: LucideIcons.GraduationCap,   // إرشادات الخبراء
-    icon4: LucideIcons.TrendingUp,      // تحليل السوق
-    icon5: LucideIcons.Briefcase,      // الاستشارات الاستثمارية
-    icon6: LucideIcons.Settings,       // إدارة الممتلكات
+    icon1: LucideIcons.UserCircle, // خدمة شخصية
+    icon2: LucideIcons.Building2, // مجموعة واسعة من العقارات
+    icon3: LucideIcons.GraduationCap, // إرشادات الخبراء
+    icon4: LucideIcons.TrendingUp, // تحليل السوق
+    icon5: LucideIcons.Briefcase, // الاستشارات الاستثمارية
+    icon6: LucideIcons.Settings, // إدارة الممتلكات
   };
 
   // Check legacy icons first
@@ -494,18 +496,18 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -514,23 +516,34 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData (check styling.icon.color, styling.colors, and colors)
     const styling = mergedData?.styling || {};
-    
+
     // Special handling for icon.color path
     if (fieldPath === "icon.color") {
       // Check styling.icon.color first (from EditorSidebar)
       const stylingIconColor = styling?.icon?.color;
       if (stylingIconColor !== undefined && stylingIconColor !== null) {
         // If it's a string with #, return it
-        if (typeof stylingIconColor === 'string' && stylingIconColor.startsWith('#')) {
+        if (
+          typeof stylingIconColor === "string" &&
+          stylingIconColor.startsWith("#")
+        ) {
           return stylingIconColor;
         }
         // If it's an object, check for value and useDefaultColor
-        if (typeof stylingIconColor === 'object' && !Array.isArray(stylingIconColor)) {
-          if (stylingIconColor.useDefaultColor === false && stylingIconColor.value && typeof stylingIconColor.value === 'string' && stylingIconColor.value.startsWith('#')) {
+        if (
+          typeof stylingIconColor === "object" &&
+          !Array.isArray(stylingIconColor)
+        ) {
+          if (
+            stylingIconColor.useDefaultColor === false &&
+            stylingIconColor.value &&
+            typeof stylingIconColor.value === "string" &&
+            stylingIconColor.value.startsWith("#")
+          ) {
             return stylingIconColor.value;
           }
           if (stylingIconColor.useDefaultColor !== false) {
@@ -540,106 +553,146 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         }
       }
       // Fallback to iconColor from colors
-      const colorsIconColor = mergedData?.colors?.iconColor || mergedData?.styling?.colors?.iconColor;
-      if (colorsIconColor && typeof colorsIconColor === 'string' && colorsIconColor.startsWith('#')) {
+      const colorsIconColor =
+        mergedData?.colors?.iconColor || mergedData?.styling?.colors?.iconColor;
+      if (
+        colorsIconColor &&
+        typeof colorsIconColor === "string" &&
+        colorsIconColor.startsWith("#")
+      ) {
         return colorsIconColor;
       }
       // Final fallback to primary branding color
       return brandingColors.primary;
     }
-    
+
     // For other paths, use existing logic
     const colors = styling?.colors || mergedData?.colors || {};
-    
+
     // Navigate to the field using the path (e.g., "titleColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = colors;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = colors;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = colors;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
-      if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+      if (
+        fieldPath.includes("titleColor") ||
+        fieldPath.includes("descriptionColor") ||
+        fieldPath.includes("textColor")
+      ) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("iconColor") || fieldPath.includes("ringColor") || fieldPath.includes("primary")) {
+      } else if (
+        fieldPath.includes("iconColor") ||
+        fieldPath.includes("ringColor") ||
+        fieldPath.includes("primary")
+      ) {
         defaultGlobalColorType = "primary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
-    if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+    if (
+      fieldPath.includes("titleColor") ||
+      fieldPath.includes("descriptionColor") ||
+      fieldPath.includes("textColor")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Helper function to create lighter color for ring/border (10% opacity of primary)
   const getLighterColor = (hex: string, opacity: number = 0.1): string => {
-    if (!hex || !hex.startsWith('#')) return "rgba(5, 150, 105, 0.1)";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "rgba(5, 150, 105, 0.1)";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "rgba(5, 150, 105, 0.1)";
-    
+
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
@@ -741,19 +794,24 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   const titleColor = brandingColors.primary;
   const descriptionColor = "#6b7280"; // Always gray-500 (#6b7280)
   const iconColor = getColor("icon.color", brandingColors.primary);
-  const ringColor = getColor("ringColor", getLighterColor(brandingColors.primary, 0.1));
-  
+  const ringColor = getColor(
+    "ringColor",
+    getLighterColor(brandingColors.primary, 0.1),
+  );
+
   // Get header title color - use primary color as default if available, otherwise use section-title CSS class
   // Check if primary color exists in branding (not just default fallback)
-  const hasPrimaryColor = tenantData?.WebsiteLayout?.branding?.colors?.primary && 
-                         tenantData.WebsiteLayout.branding.colors.primary.trim() !== "";
-  
+  const hasPrimaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== "";
+
   // Priority: custom color > primary branding color > undefined (use CSS class)
-  const headerTitleColor = mergedData?.styling?.header?.title?.color || 
-                          mergedData?.header?.title?.color ||
-                          mergedData?.styling?.textColor ||
-                          mergedData?.colors?.textColor ||
-                          (hasPrimaryColor ? brandingColors.primary : undefined);
+  const headerTitleColor =
+    mergedData?.styling?.header?.title?.color ||
+    mergedData?.header?.title?.color ||
+    mergedData?.styling?.textColor ||
+    mergedData?.colors?.textColor ||
+    (hasPrimaryColor ? brandingColors.primary : undefined);
 
   return (
     <section
@@ -791,7 +849,8 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
           </h2>
           <p
             className={
-              mergedData.header?.typography?.description?.className !== undefined &&
+              mergedData.header?.typography?.description?.className !==
+                undefined &&
               mergedData.header?.typography?.description?.className !== ""
                 ? mergedData.header.typography.description.className
                 : "section-subtitle-xl"
@@ -827,11 +886,14 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                 mergedData.features?.card?.className ||
                 "rounded-2xl border bg-white p-6 shadow-sm ring-1"
               }
-              style={{
-                backgroundColor: mergedData.colors?.cardBackground || "#ffffff",
-                borderColor: "#e5e7eb", // Always gray (gray-200)
-                "--tw-ring-color": ringColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  backgroundColor:
+                    mergedData.colors?.cardBackground || "#ffffff",
+                  borderColor: "#e5e7eb", // Always gray (gray-200)
+                  "--tw-ring-color": ringColor,
+                } as React.CSSProperties
+              }
             >
               <div
                 className={
@@ -844,36 +906,42 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
               >
                 {(() => {
                   // Priority: name > type > default
-                  const iconNameOrType = f.icon?.name || f.icon?.type || "icon1";
+                  const iconNameOrType =
+                    f.icon?.name || f.icon?.type || "icon1";
                   const IconComponent = getWhyChooseUsIcon(iconNameOrType);
-                  
+
                   // Get icon size
-                  const iconSize = typeof f.icon?.size === "number" 
-                    ? f.icon.size 
-                    : parseInt(f.icon?.size || "80");
-                  
+                  const iconSize =
+                    typeof f.icon?.size === "number"
+                      ? f.icon.size
+                      : parseInt(f.icon?.size || "80");
+
                   // Get icon className
-                  const iconClassName = f.icon?.className || mergedData.features?.icon?.image?.className || "";
-                  
+                  const iconClassName =
+                    f.icon?.className ||
+                    mergedData.features?.icon?.image?.className ||
+                    "";
+
                   // Check if it's a React Icon (from react-icons) by checking the icon name pattern
                   // React Icons typically start with Fa, Md, Io, etc.
-                  const isReactIcon = iconNameOrType.startsWith('Fa') || 
-                                     iconNameOrType.startsWith('Md') || 
-                                     iconNameOrType.startsWith('Io') ||
-                                     iconNameOrType.startsWith('Bi') ||
-                                     iconNameOrType.startsWith('Bs') ||
-                                     iconNameOrType.startsWith('Hi') ||
-                                     iconNameOrType.startsWith('Ai') ||
-                                     iconNameOrType.startsWith('Ti') ||
-                                     iconNameOrType.startsWith('Gi') ||
-                                     iconNameOrType.startsWith('Si') ||
-                                     iconNameOrType.startsWith('Ri') ||
-                                     iconNameOrType.startsWith('Tb') ||
-                                     iconNameOrType.startsWith('Vsc') ||
-                                     iconNameOrType.startsWith('Wi') ||
-                                     iconNameOrType.startsWith('Di') ||
-                                     iconNameOrType.startsWith('Im');
-                  
+                  const isReactIcon =
+                    iconNameOrType.startsWith("Fa") ||
+                    iconNameOrType.startsWith("Md") ||
+                    iconNameOrType.startsWith("Io") ||
+                    iconNameOrType.startsWith("Bi") ||
+                    iconNameOrType.startsWith("Bs") ||
+                    iconNameOrType.startsWith("Hi") ||
+                    iconNameOrType.startsWith("Ai") ||
+                    iconNameOrType.startsWith("Ti") ||
+                    iconNameOrType.startsWith("Gi") ||
+                    iconNameOrType.startsWith("Si") ||
+                    iconNameOrType.startsWith("Ri") ||
+                    iconNameOrType.startsWith("Tb") ||
+                    iconNameOrType.startsWith("Vsc") ||
+                    iconNameOrType.startsWith("Wi") ||
+                    iconNameOrType.startsWith("Di") ||
+                    iconNameOrType.startsWith("Im");
+
                   // For React Icons, use style with fontSize
                   if (isReactIcon) {
                     return (
@@ -888,7 +956,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                       />
                     );
                   }
-                  
+
                   // For Lucide icons, use size prop
                   return (
                     <IconComponent

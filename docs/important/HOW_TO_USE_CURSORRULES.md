@@ -3,6 +3,7 @@
 ## 🎯 What is .cursorrules?
 
 `.cursorrules` is a special file that **trains Cursor AI** to understand your project deeply. It tells Cursor:
+
 - What documentation to reference
 - What patterns to follow
 - What rules to enforce
@@ -13,10 +14,12 @@
 ## ✅ What We've Set Up For You
 
 ### **1. `.cursorrules` File**
+
 **Location:** Project root  
 **Purpose:** Main AI instruction file
 
 Contains:
+
 - ✅ All 56+ documentation files indexed
 - ✅ Priority system (Tier 1/2/3)
 - ✅ Critical rules that must never be broken
@@ -28,9 +31,11 @@ Contains:
 ---
 
 ### **2. `docs/important/INDEX.md`**
+
 **Purpose:** Complete documentation map
 
 Contains:
+
 - ✅ All 56+ files listed and categorized
 - ✅ Search by topic
 - ✅ Search by task
@@ -40,9 +45,11 @@ Contains:
 ---
 
 ### **3. `docs/important/MAINTENANCE_GUIDE.md`**
+
 **Purpose:** How to keep docs updated
 
 Contains:
+
 - ✅ When to update documentation
 - ✅ Update workflow
 - ✅ Templates for common updates
@@ -54,6 +61,7 @@ Contains:
 ## 🚀 How Cursor Will Use This
 
 ### **Before Any Change:**
+
 ```
 Cursor AI will:
 1. ✅ Read relevant documentation from .cursorrules
@@ -63,6 +71,7 @@ Cursor AI will:
 ```
 
 ### **During Changes:**
+
 ```
 Cursor AI will:
 1. ✅ Follow the 7-step component pattern
@@ -72,6 +81,7 @@ Cursor AI will:
 ```
 
 ### **After Changes:**
+
 ```
 Cursor AI will:
 1. ✅ Verify all integration points
@@ -126,6 +136,7 @@ Cursor: [References documentation] → Clear explanation with code examples
 ## 🎯 What Changed For You
 
 ### **Before .cursorrules:**
+
 ```
 You: "Create pricing component"
 Cursor: "How should I structure it?"
@@ -135,6 +146,7 @@ You: [Fixes mistakes]
 ```
 
 ### **After .cursorrules:**
+
 ```
 You: "Create pricing component"
 Cursor: [Automatically knows pattern from .cursorrules]
@@ -150,6 +162,7 @@ You: ✅ Done!
 Cursor now **automatically knows** about:
 
 ### **Component Work:**
+
 - How to create components (9 steps)
 - How to fix components (7 diagnostic layers)
 - 7-step React pattern
@@ -157,12 +170,14 @@ Cursor now **automatically knows** about:
 - Integration points
 
 ### **State Management:**
+
 - Zustand patterns
 - Store structure
 - Data flow
 - Update patterns
 
 ### **Architecture:**
+
 - Component architecture
 - File organization
 - Naming conventions
@@ -183,7 +198,7 @@ Cursor now **automatically knows** about:
    "I've changed [X]. These docs may need updating:
    - docs/important/[Y].md
    - docs/important/[Z].md
-   
+
    Should I update them?"
    ↓
 4. You say "yes"
@@ -241,7 +256,7 @@ Cursor automatically:
 ✅ Updates default data in testimonialsFunctions.ts
 ✅ Adds field to testimonials.ts structure
 ✅ Uses field in testimonials1.tsx with mergedData
-✅ Prompts: "Should I update ADD_NEW_COMPONENT.md 
+✅ Prompts: "Should I update ADD_NEW_COMPONENT.md
             to show this field type as an example?"
 ```
 
@@ -250,6 +265,7 @@ Cursor automatically:
 ## 🚨 Critical Rules Cursor Will Enforce
 
 ### **Component Rules:**
+
 ```
 ✅ Always follow 7-step pattern
 ✅ Always use 4 required functions
@@ -260,6 +276,7 @@ Cursor automatically:
 ```
 
 ### **State Rules:**
+
 ```
 ✅ Always update both componentStates AND pageComponentsByPage
 ✅ Always use Zustand correctly
@@ -268,6 +285,7 @@ Cursor automatically:
 ```
 
 ### **Integration Rules:**
+
 ```
 ✅ Always update all 7 integration files
 ✅ Always export in index files
@@ -280,6 +298,7 @@ Cursor automatically:
 ## 📊 What's Indexed in .cursorrules
 
 ### **56+ Documentation Files:**
+
 ```
 ✅ All component documentation (5 files)
 ✅ All Live Editor docs (25+ files)
@@ -290,6 +309,7 @@ Cursor automatically:
 ```
 
 ### **Organized by Priority:**
+
 ```
 🔴 Tier 1: Must read for component work
 🟡 Tier 2: Reference for specific features
@@ -301,12 +321,14 @@ Cursor automatically:
 ## 🎯 Practical Usage Tips
 
 ### **Tip 1: Trust the System**
+
 ```
 Old way: "Let me check the docs first..."
 New way: Just ask Cursor - it knows!
 ```
 
 ### **Tip 2: Be Specific When Needed**
+
 ```
 Generic: "Fix this component"
 Better: "Fix this component not updating"
@@ -314,12 +336,14 @@ Cursor: [Knows to check updateByPath + store subscriptions]
 ```
 
 ### **Tip 3: Ask for Explanations**
+
 ```
 You: "Why are we doing it this way?"
 Cursor: [Explains with references to docs]
 ```
 
 ### **Tip 4: Let Cursor Verify**
+
 ```
 After changes:
 You: "Verify this component is correct"
@@ -331,24 +355,28 @@ Cursor: [Runs through checklist] → Reports any issues
 ## 🔍 How to Verify It's Working
 
 ### **Test 1: Ask About Pattern**
+
 ```
 You: "What's the 7-step component pattern?"
 Expected: Cursor lists all 7 steps correctly
 ```
 
 ### **Test 2: Create Component**
+
 ```
 You: "Create a simple banner component"
 Expected: Cursor follows all 9 steps automatically
 ```
 
 ### **Test 3: Ask About Architecture**
+
 ```
 You: "Where should I put component functions?"
 Expected: Cursor says "context-liveeditor/editorStoreFunctions/"
 ```
 
 ### **Test 4: Ask About Rules**
+
 ```
 You: "Can I use props directly in render?"
 Expected: Cursor says "No, always use mergedData"
@@ -362,7 +390,7 @@ Expected: Cursor says "No, always use mergedData"
 # Create component
 "Create [name] component"
 
-# Fix component  
+# Fix component
 "Fix [name] component"
 
 # Explain pattern
@@ -383,6 +411,7 @@ Expected: Cursor says "No, always use mergedData"
 ## 🎓 Learning More
 
 ### **To Understand .cursorrules:**
+
 ```
 Read: .cursorrules file itself
 Read: docs/important/INDEX.md
@@ -390,6 +419,7 @@ Read: docs/important/MAINTENANCE_GUIDE.md
 ```
 
 ### **To Understand System:**
+
 ```
 Read: docs/important/liveEditor/README.md
 Read: docs/important/components/README.md
@@ -401,6 +431,7 @@ Read: .cursorrules (Rules section)
 ## 🔄 Keeping It Updated
 
 ### **The system updates itself:**
+
 ```
 1. You make code changes
 2. Cursor detects affected docs
@@ -411,6 +442,7 @@ Read: .cursorrules (Rules section)
 ```
 
 ### **Manual updates (if needed):**
+
 ```
 See: docs/important/MAINTENANCE_GUIDE.md
 ```
@@ -420,6 +452,7 @@ See: docs/important/MAINTENANCE_GUIDE.md
 ## 🎯 Benefits You Get
 
 ### **For You:**
+
 ```
 ✅ Faster development
 ✅ Fewer mistakes
@@ -430,6 +463,7 @@ See: docs/important/MAINTENANCE_GUIDE.md
 ```
 
 ### **For Team:**
+
 ```
 ✅ Same patterns everywhere
 ✅ Easy onboarding
@@ -439,6 +473,7 @@ See: docs/important/MAINTENANCE_GUIDE.md
 ```
 
 ### **For Project:**
+
 ```
 ✅ Scalable architecture
 ✅ Consistent quality
@@ -452,24 +487,28 @@ See: docs/important/MAINTENANCE_GUIDE.md
 ## 🚀 Next Steps
 
 ### **1. Try It Out:**
+
 ```
 Ask Cursor: "Create a simple testimonials variant"
 Watch: Cursor follows all patterns automatically
 ```
 
 ### **2. Explore Documentation:**
+
 ```
 Open: docs/important/INDEX.md
 Browse: All available documentation
 ```
 
 ### **3. Learn Patterns:**
+
 ```
 Ask Cursor: "Explain the component system"
 Read: Cursor's explanation with references
 ```
 
 ### **4. Start Building:**
+
 ```
 You're ready! Cursor knows everything.
 Just ask naturally and it will follow all rules.
@@ -480,6 +519,7 @@ Just ask naturally and it will follow all rules.
 ## 🎉 You're All Set!
 
 **Cursor AI now has:**
+
 - ✅ Complete project knowledge
 - ✅ All patterns and conventions
 - ✅ All documentation indexed
@@ -487,6 +527,7 @@ Just ask naturally and it will follow all rules.
 - ✅ Auto-update capability
 
 **You can now:**
+
 - 💬 Ask naturally
 - 🚀 Build faster
 - ✅ Get consistent results
@@ -513,4 +554,3 @@ Cursor now knows everything! 🎯
 
 **Last Updated:** 2025-10-26  
 **System Version:** 2.2
-

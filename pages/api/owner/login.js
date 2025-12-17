@@ -9,14 +9,19 @@ export default async function handler(req, res) {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     // Call external API
-    const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
-      email,
-      password,
-    });
+    const response = await axios.post(
+      "https://api.taearif.com/api/v1/owner-rental/login",
+      {
+        email,
+        password,
+      },
+    );
 
     const { success, data } = response.data;
 
@@ -32,15 +37,15 @@ export default async function handler(req, res) {
 
       res.setHeader(
         "Set-Cookie",
-        `owner_token=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}, ownerRentalToken=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}`
+        `owner_token=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}, ownerRentalToken=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}`,
       );
 
       return res.status(200).json({
         success: true,
         user: {
           email: user.email,
-          first_name: user.name ? user.name.split(' ')[0] : null,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : null,
+          first_name: user.name ? user.name.split(" ")[0] : null,
+          last_name: user.name ? user.name.split(" ").slice(1).join(" ") : null,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -52,7 +57,7 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error("❌ Error in owner login:", error);
-    
+
     let errorMessage = "فشل تسجيل الدخول";
     let statusCode = 500;
 
@@ -67,9 +72,9 @@ export default async function handler(req, res) {
       statusCode = 404;
     }
 
-    return res.status(statusCode).json({ 
+    return res.status(statusCode).json({
       success: false,
-      message: errorMessage 
+      message: errorMessage,
     });
   }
 }

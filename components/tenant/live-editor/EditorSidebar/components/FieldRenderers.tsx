@@ -12,20 +12,25 @@ export const ColorFieldRenderer: React.FC<{
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
   const t = useEditorT();
-  
+
   // Ensure value is a string (handle cases where it might be an object)
-  const stringValue = typeof value === "string" ? value : (typeof value === "object" && value !== null ? (value.value || value.color || "") : String(value || ""));
+  const stringValue =
+    typeof value === "string"
+      ? value
+      : typeof value === "object" && value !== null
+        ? value.value || value.color || ""
+        : String(value || "");
   const hasHex = typeof stringValue === "string" && stringValue.startsWith("#");
   const colorValue = hasHex ? stringValue : "#000000";
-  
+
   // Local state to track the current color value for immediate UI updates
   const [localValue, setLocalValue] = useState(stringValue);
-  
+
   // Update local value when prop value changes
   React.useEffect(() => {
     setLocalValue(stringValue);
   }, [stringValue]);
-  
+
   // Handle color updates
   const handleColorChange = (newValue: string) => {
     setLocalValue(newValue);
@@ -42,7 +47,12 @@ export const ColorFieldRenderer: React.FC<{
         <div className="relative w-16 h-16">
           <div
             className="absolute inset-0 rounded-full border-4 border-slate-200 shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-110"
-            style={{ backgroundColor: (localValue && localValue.startsWith("#")) ? localValue : "transparent" }}
+            style={{
+              backgroundColor:
+                localValue && localValue.startsWith("#")
+                  ? localValue
+                  : "transparent",
+            }}
             title={t("editor_sidebar.pick_color")}
           >
             {!(localValue && localValue.startsWith("#")) && (
@@ -54,7 +64,9 @@ export const ColorFieldRenderer: React.FC<{
           <input
             aria-label={`Color picker for ${label}`}
             type="color"
-            value={localValue && localValue.startsWith("#") ? localValue : "#000000"}
+            value={
+              localValue && localValue.startsWith("#") ? localValue : "#000000"
+            }
             onChange={(e) => handleColorChange(e.target.value)}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             style={{ WebkitAppearance: "none", appearance: "none" as any }}
@@ -75,7 +87,8 @@ export const ColorFieldRenderer: React.FC<{
           type="button"
           onClick={() => handleColorChange("transparent")}
           className={`px-4 py-2 text-xs font-semibold rounded-lg border-2 transition-all duration-200 ${
-            localValue === "transparent" || !(localValue && localValue.startsWith("#"))
+            localValue === "transparent" ||
+            !(localValue && localValue.startsWith("#"))
               ? "bg-slate-100 border-slate-400 text-slate-700 shadow-inner"
               : "bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 shadow-sm"
           }`}

@@ -5,6 +5,7 @@
 ### What is the Live Editor?
 
 A real-time website builder that lets users:
+
 - Drag & drop components to build pages
 - Edit components visually in sidebar
 - Preview changes in isolated iframe
@@ -36,10 +37,10 @@ EditorSidebar/index.tsx     → Editing interface
 
 ```typescript
 const newComponent = {
-  id: uuidv4(),              // ← Generate UUID
-  type: "hero",              // ← Component type
-  componentName: "hero1",    // ← Variant
-  data: createDefaultData("hero", "hero1")
+  id: uuidv4(), // ← Generate UUID
+  type: "hero", // ← Component type
+  componentName: "hero1", // ← Variant
+  data: createDefaultData("hero", "hero1"),
 };
 
 setPageComponents([...current, newComponent]);
@@ -58,13 +59,10 @@ setSelectedComponentId(component.id);
 setSidebarView("edit-component");
 
 // 2. User edits
-updateByPath("content.title", "New Title");  // Updates tempData
+updateByPath("content.title", "New Title"); // Updates tempData
 
 // 3. Save
-const merged = deepMerge(
-  deepMerge(existingData, storeData),
-  tempData
-);
+const merged = deepMerge(deepMerge(existingData, storeData), tempData);
 
 store.setComponentData(type, id, merged);
 store.forceUpdatePageComponents(page, updated);
@@ -76,7 +74,7 @@ store.forceUpdatePageComponents(page, updated);
 const payload = {
   tenantId,
   pages: store.pageComponentsByPage,
-  globalComponentsData: store.globalComponentsData
+  globalComponentsData: store.globalComponentsData,
 };
 
 await axios.post("/v1/tenant-website/save-pages", payload);
@@ -90,40 +88,40 @@ await axios.post("/v1/tenant-website/save-pages", payload);
 
 ```typescript
 // WRONG
-getComponentData("hero", "hero1")
+getComponentData("hero", "hero1");
 
 // CORRECT
-getComponentData("hero", component.id)  // UUID!
+getComponentData("hero", component.id); // UUID!
 ```
 
 ### ❌ Mistake 2: Shallow Merge
 
 ```typescript
 // WRONG
-const merged = { ...a, ...b, ...c }
+const merged = { ...a, ...b, ...c };
 
 // CORRECT
-const merged = deepMerge(deepMerge(a, b), c)
+const merged = deepMerge(deepMerge(a, b), c);
 ```
 
 ### ❌ Mistake 3: Updating Only One Store
 
 ```typescript
 // WRONG
-return { heroStates: { ...state.heroStates, [id]: data } }
+return { heroStates: { ...state.heroStates, [id]: data } };
 
 // CORRECT
 return {
   heroStates: { ...state.heroStates, [id]: data },
-  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated }
-}
+  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated },
+};
 ```
 
 ### ❌ Mistake 4: Not Checking Global Components
 
 ```typescript
 // WRONG
-updateComponentByPath(type, id, path, value)  // Fails for globals!
+updateComponentByPath(type, id, path, value); // Fails for globals!
 
 // CORRECT
 if (id === "global-header" || id === "global-footer") {
@@ -146,22 +144,17 @@ const data = useEditorStore.getState().getComponentData(type, id);
 ### Update Component Field
 
 ```typescript
-useEditorStore.getState().updateComponentByPath(
-  type,
-  id,
-  "content.title",
-  "New Title"
-);
+useEditorStore
+  .getState()
+  .updateComponentByPath(type, id, "content.title", "New Title");
 ```
 
 ### Update Global Component
 
 ```typescript
-useEditorStore.getState().updateGlobalComponentByPath(
-  "header",
-  "menu[0].text",
-  "Home"
-);
+useEditorStore
+  .getState()
+  .updateGlobalComponentByPath("header", "menu[0].text", "Home");
 ```
 
 ### Add to Page
@@ -182,15 +175,19 @@ store.forceUpdatePageComponents(page, updatedComponents);
 ## When Things Go Wrong
 
 ### Changes Not Saving?
+
 → Check: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) → "Changes Not Saving"
 
 ### Component Not Rendering?
+
 → Check: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) → "Component Not Rendering"
 
 ### Drag & Drop Issues?
+
 → Check: [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md) → "Position Calculation"
 
 ### Global Component Issues?
+
 → Check: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) → "Global Component Issues"
 
 ---
@@ -198,25 +195,30 @@ store.forceUpdatePageComponents(page, updatedComponents);
 ## Documentation Map
 
 ### Start Here
+
 - [OVERVIEW.md](./OVERVIEW.md) - High-level understanding
 - [CORE_CONCEPTS.md](./CORE_CONCEPTS.md) - Essential concepts
 
 ### Deep Dives
+
 - [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md) - Store architecture
 - [DATA_FLOW.md](./DATA_FLOW.md) - Data movement
 - [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md) - Component system
 
 ### Subsystems
+
 - [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md) - Preview rendering
 - [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md) - Drag & drop
 - [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md) - Translations
 
 ### EditorSidebar
+
 - [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md) - Sidebar overview
 - [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) - Field types
 - [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md) - Sidebar data flow
 
 ### Reference
+
 - [API_REFERENCE.md](./API_REFERENCE.md) - All functions
 - [COMMON_PATTERNS.md](./COMMON_PATTERNS.md) - Code patterns
 - [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md) - Real examples
@@ -244,8 +246,8 @@ store.forceUpdatePageComponents(page, updatedComponents);
 3. All updates must synchronize multiple stores (componentStates + pageComponentsByPage), use deep merge, and check for global components
 
 **Remember**:
+
 - component.id = PRIMARY KEY
 - Deep merge = DATA SAFETY
 - All stores = CONSISTENCY
 - Global check = CORRECTNESS
-

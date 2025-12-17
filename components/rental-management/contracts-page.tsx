@@ -52,8 +52,8 @@ export function ContractsPage() {
                   إدارة جميع عقود الإيجار والمستأجرين في النظام
                 </p>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.push("/dashboard/rental-management")}
                 className="flex items-center gap-2"
               >

@@ -9,7 +9,8 @@ import ImageText from "@/components/homepage/imageText/imageText";
 // Projects data
 const projectsData = [
   {
-    image: "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     title: "تاون هاوس المحمدية",
     city: "مدينة الرياض",
     district: "حي المحمدية",
@@ -35,7 +36,8 @@ const projectsData = [
     url: "/properties/townhouse-al-mohammadiyah",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     title: "شقق فاخرة في النرجس",
     city: "مدينة الرياض",
     district: "حي النرجس",
@@ -61,7 +63,8 @@ const projectsData = [
     url: "/properties/luxury-apartments-al-narjis",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     title: "فلل راقية في الياسمين",
     city: "مدينة الرياض",
     district: "حي الياسمين",
@@ -91,7 +94,8 @@ const projectsData = [
 // Off-plan sale projects data (البيع على الخارطة)
 const offPlanProjectsData = [
   {
-    image: "https://baheya.co/wp-content/uploads/2025/09/9ddc69660c32566b22cb77d214f1a0ff.jpg",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/09/9ddc69660c32566b22cb77d214f1a0ff.jpg",
     title: "أراضي شمس الرياض",
     city: "مدينة الرياض",
     district: "حي شمس الرياض",
@@ -117,7 +121,8 @@ const offPlanProjectsData = [
     url: "/off-plan-sale/aradi-shams-al-riyadh",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/08/Screenshot-2025-08-14-085718.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/08/Screenshot-2025-08-14-085718.png",
     title: "NEPTUNE INTERIORS",
     city: "مدينة الرياض",
     district: "حي سدرة",
@@ -143,7 +148,8 @@ const offPlanProjectsData = [
     url: "/off-plan-sale/neptune-interiors",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/08/Screenshot-2025-08-14-022222.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/08/Screenshot-2025-08-14-022222.png",
     title: "Trump Tower",
     city: "مدينة جدة",
     district: "حي الزهراء",
@@ -173,7 +179,8 @@ const offPlanProjectsData = [
 // Featured individuals data (الأفراد المميزة)
 const featuredIndividualsData = [
   {
-    image: "https://baheya.co/wp-content/uploads/2025/08/PHOTO-2025-08-14-00-28-05.jpg",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/08/PHOTO-2025-08-14-00-28-05.jpg",
     title: "بنتهاوس",
     city: "مدينة الرياض",
     district: "حي النرجس",
@@ -203,7 +210,8 @@ const featuredIndividualsData = [
     url: "/individuals/penthouse",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/08/PHOTO-2025-08-14-00-13-43-3.jpg",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/08/PHOTO-2025-08-14-00-13-43-3.jpg",
     title: "تاون هاوس",
     city: "مدينة الرياض",
     district: "حي النرجس",
@@ -233,7 +241,8 @@ const featuredIndividualsData = [
     url: "/individuals/townhouse",
   },
   {
-    image: "https://baheya.co/wp-content/uploads/2025/07/PHOTO-2025-08-13-22-14-01.jpg",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/07/PHOTO-2025-08-13-22-14-01.jpg",
     title: "فيلا 01",
     city: "مدينة الرياض",
     district: "حي النرجس",

@@ -762,7 +762,9 @@ export default function PropertyForm({ mode }) {
       }
       // التحقق من حجم الصورة فوراً عند اختيارها
       if (file.size >= 10 * 1024 * 1024) {
-        toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
+        toast.error(
+          "حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت",
+        );
         e.target.value = ""; // Reset input
         return;
       }
@@ -788,7 +790,9 @@ export default function PropertyForm({ mode }) {
       }
       // التحقق من حجم الصورة فوراً عند اختيارها
       if (file.size >= 10 * 1024 * 1024) {
-        toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
+        toast.error(
+          "حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت",
+        );
         e.target.value = ""; // Reset input
         return;
       }
@@ -811,7 +815,9 @@ export default function PropertyForm({ mode }) {
       const maxVideoSizeInBytes = 50 * 1024 * 1024; // 50 MB in bytes
 
       if (file.size >= maxVideoSizeInBytes) {
-        toast.error("حجم الفيديو كبير جداً. الحد الأقصى المسموح به هو 50 ميجابايت");
+        toast.error(
+          "حجم الفيديو كبير جداً. الحد الأقصى المسموح به هو 50 ميجابايت",
+        );
         e.target.value = ""; // Reset input
         return;
       }
@@ -849,12 +855,14 @@ export default function PropertyForm({ mode }) {
           return false;
         }
         if (file.size >= 10 * 1024 * 1024) {
-          toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
+          toast.error(
+            "حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت",
+          );
           return false;
         }
         return true;
       });
-      
+
       // إعادة تعيين input إذا تم رفض أي صورة
       if (validFiles.length !== files.length) {
         e.target.value = ""; // Reset input
@@ -988,7 +996,10 @@ export default function PropertyForm({ mode }) {
           );
           thumbnailPath =
             mode === "add"
-              ? uploadedFile.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, "")
+              ? uploadedFile.path.replace(
+                  process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
+                  "",
+                )
               : uploadedFile.url;
         }
 
@@ -1000,7 +1011,10 @@ export default function PropertyForm({ mode }) {
           galleryPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, ""),
+                  f.path.replace(
+                    process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
+                    "",
+                  ),
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -1013,7 +1027,10 @@ export default function PropertyForm({ mode }) {
           floorPlansPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, ""),
+                  f.path.replace(
+                    process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
+                    "",
+                  ),
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -1258,7 +1275,9 @@ export default function PropertyForm({ mode }) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">اسم العقار <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="title">
+                      اسم العقار <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="title"
                       name="title"
@@ -1273,7 +1292,9 @@ export default function PropertyForm({ mode }) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">وصف العقار <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="description">
+                      وصف العقار <span className="text-red-500">*</span>
+                    </Label>
                     <Textarea
                       id="description"
                       name="description"
@@ -1291,7 +1312,9 @@ export default function PropertyForm({ mode }) {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="address">العنوان <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="address">
+                        العنوان <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         id="address"
                         name="address"
@@ -1409,7 +1432,9 @@ export default function PropertyForm({ mode }) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="purpose">نوع القائمة <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="purpose">
+                        نوع القائمة <span className="text-red-500">*</span>
+                      </Label>
                       <Select
                         name="purpose"
                         value={formData.purpose}
@@ -1440,7 +1465,9 @@ export default function PropertyForm({ mode }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="category">فئة العقار <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="category">
+                        فئة العقار <span className="text-red-500">*</span>
+                      </Label>
                       <Select
                         name="category"
                         value={formData.category}
@@ -2248,11 +2275,14 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className={errors.thumbnail ? "border-red-500 border-2" : ""}>
+              <Card
+                className={errors.thumbnail ? "border-red-500 border-2" : ""}
+              >
                 <CardHeader>
                   <CardTitle>صورة العقار الرئيسية</CardTitle>
                   <CardDescription>
-                    قم بتحميل صورة رئيسية تمثل العقار <span className="text-red-500">*</span>
+                    قم بتحميل صورة رئيسية تمثل العقار{" "}
+                    <span className="text-red-500">*</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

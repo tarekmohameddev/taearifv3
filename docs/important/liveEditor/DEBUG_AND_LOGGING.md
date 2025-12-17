@@ -1,6 +1,7 @@
 # Debug and Logging System
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Debug Logger](#debug-logger)
 3. [Change Tracking](#change-tracking)
@@ -13,6 +14,7 @@
 ## Overview
 
 The Live Editor includes a comprehensive **debug and logging system** for tracking operations, changes, and troubleshooting issues. The system provides:
+
 - **Centralized logging**: All operations logged to single system
 - **Change tracking**: Before/after comparison for data changes
 - **Debug panel**: Visual interface for viewing logs
@@ -29,11 +31,11 @@ The Live Editor includes a comprehensive **debug and logging system** for tracki
 
 ```typescript
 class DebugLogger {
-  private logs: DebugLog[] = [];           // All operations
-  private changeLogs: ChangeLog[] = [];    // Data changes
-  private previousStates: Map<string, any> = new Map();  // State tracking
-  private isEnabled: boolean;              // Only in development
-  private maxLogs: number = 1000;          // Prevent memory issues
+  private logs: DebugLog[] = []; // All operations
+  private changeLogs: ChangeLog[] = []; // Data changes
+  private previousStates: Map<string, any> = new Map(); // State tracking
+  private isEnabled: boolean; // Only in development
+  private maxLogs: number = 1000; // Prevent memory issues
 }
 ```
 
@@ -43,13 +45,13 @@ class DebugLogger {
 
 ```typescript
 interface DebugLog {
-  timestamp: string;        // ISO timestamp
-  source: string;           // "COMPONENT_ADD", "EDITOR_STORE", etc.
-  action: string;           // "ADD_COMPONENT", "UPDATE_DATA", etc.
-  data: any;                // Operation data
-  componentId?: string;     // Component UUID
-  componentName?: string;   // Component variant
-  componentType?: string;   // Component type
+  timestamp: string; // ISO timestamp
+  source: string; // "COMPONENT_ADD", "EDITOR_STORE", etc.
+  action: string; // "ADD_COMPONENT", "UPDATE_DATA", etc.
+  data: any; // Operation data
+  componentId?: string; // Component UUID
+  componentName?: string; // Component variant
+  componentType?: string; // Component type
 }
 ```
 
@@ -61,8 +63,8 @@ interface ChangeLog {
   componentId: string;
   componentName: string;
   componentType: string;
-  before: any;              // State before change
-  after: any;               // State after change
+  before: any; // State before change
+  after: any; // State after change
   changeType: "GLOBAL_HEADER" | "GLOBAL_FOOTER" | "COMPONENT_UPDATE";
 }
 ```
@@ -87,6 +89,7 @@ debugLogger.log(
 ```
 
 **Example**:
+
 ```typescript
 debugLogger.log(
   "SIDEBAR",
@@ -95,12 +98,13 @@ debugLogger.log(
   {
     componentId: "uuid-123",
     componentName: "hero1",
-    componentType: "hero"
-  }
+    componentType: "hero",
+  },
 );
 ```
 
 **Log Format**:
+
 ```
 [2025-10-26 14:30:15.234] [SIDEBAR] [OPEN] [ID:uuid-123] [NAME:hero1] [TYPE:hero]
 {
@@ -125,6 +129,7 @@ debugLogger.logChange(
 ```
 
 **Example**:
+
 ```typescript
 // In EditorSidebar handleSave
 logChange(
@@ -132,11 +137,12 @@ logChange(
   selectedComponent.componentName,
   selectedComponent.type,
   mergedData,
-  "COMPONENT_UPDATE"
+  "COMPONENT_UPDATE",
 );
 ```
 
 **Change Log Format**:
+
 ```
 [2025-10-26 14:30:20.456] [ID:uuid-123] [NAME:hero1] [TYPE:hero] [CHANGE:COMPONENT_UPDATE]
 
@@ -162,72 +168,46 @@ AFTER:
 
 ```typescript
 // Log component addition
-debugLogger.logComponentAdd(
-  componentId,
-  componentName,
-  componentType,
-  data
-);
+debugLogger.logComponentAdd(componentId, componentName, componentType, data);
 
 // Log component change (theme switch, etc.)
-debugLogger.logComponentChange(
-  componentId,
-  oldTheme,
-  newTheme,
-  data
-);
+debugLogger.logComponentChange(componentId, oldTheme, newTheme, data);
 
 // Log component render
-debugLogger.logComponentRender(
-  componentId,
-  componentName,
-  componentType,
-  data
-);
+debugLogger.logComponentRender(componentId, componentName, componentType, data);
 ```
 
 #### Store Logging
 
 ```typescript
 // Log editorStore operations
-debugLogger.logEditorStore(
-  "UPDATE_BY_PATH",
-  componentId,
-  componentName,
-  { path, value }
-);
+debugLogger.logEditorStore("UPDATE_BY_PATH", componentId, componentName, {
+  path,
+  value,
+});
 
 // Log tenantStore operations
-debugLogger.logTenantStore(
-  "FETCH_DATA",
-  tenantId,
-  tenantName,
-  { success: true }
-);
+debugLogger.logTenantStore("FETCH_DATA", tenantId, tenantName, {
+  success: true,
+});
 ```
 
 #### Sidebar Logging
 
 ```typescript
 // Log sidebar operations
-debugLogger.logSidebar(
-  "SAVE_CHANGES",
-  componentId,
-  componentName,
-  { mergedData }
-);
+debugLogger.logSidebar("SAVE_CHANGES", componentId, componentName, {
+  mergedData,
+});
 ```
 
 #### User Action Logging
 
 ```typescript
 // Log user interactions
-debugLogger.logUserAction(
-  "CLICK_EDIT",
-  componentId,
-  componentName,
-  { timestamp: Date.now() }
-);
+debugLogger.logUserAction("CLICK_EDIT", componentId, componentName, {
+  timestamp: Date.now(),
+});
 ```
 
 ### Log Management
@@ -328,16 +308,16 @@ const changes = getChangeLogsAsString();
 
 Output:
   === CHANGES DETECTED ===
-  
+
   [2025-10-26 14:30:20.456] [ID:uuid-123] [NAME:hero1] [TYPE:hero] [CHANGE:COMPONENT_UPDATE]
-  
+
   BEFORE:
   {
     "content": {
       "title": "Old Title"
     }
   }
-  
+
   AFTER:
   {
     "content": {
@@ -358,6 +338,7 @@ RESULT: All changes tracked ✓
 3. **COMPONENT_UPDATE**: Changes to regular components
 
 **Usage**:
+
 ```typescript
 // In EditorSidebar handleSave
 if (selectedComponent.id === "global-header") {
@@ -366,7 +347,7 @@ if (selectedComponent.id === "global-header") {
     "header1",
     "header",
     latestTempData,
-    "GLOBAL_HEADER"
+    "GLOBAL_HEADER",
   );
 } else if (selectedComponent.id === "global-footer") {
   logChange(
@@ -374,7 +355,7 @@ if (selectedComponent.id === "global-header") {
     "footer1",
     "footer",
     latestTempData,
-    "GLOBAL_FOOTER"
+    "GLOBAL_FOOTER",
   );
 } else {
   logChange(
@@ -382,7 +363,7 @@ if (selectedComponent.id === "global-header") {
     selectedComponent.componentName,
     selectedComponent.type,
     mergedData,
-    "COMPONENT_UPDATE"
+    "COMPONENT_UPDATE",
   );
 }
 ```
@@ -408,7 +389,7 @@ export function DebugControls({
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [logs, setLogs] = useState<DebugLog[]>([]);
   const [changeLogs, setChangeLogs] = useState<ChangeLog[]>([]);
-  
+
   // Refresh logs periodically
   useEffect(() => {
     if (showDebugPanel) {
@@ -416,11 +397,11 @@ export function DebugControls({
         setLogs(getDebugLogs());
         setChangeLogs(getAllChangeLogs());
       }, 1000);
-      
+
       return () => clearInterval(interval);
     }
   }, [showDebugPanel]);
-  
+
   return (
     <div className="debug-controls">
       {/* Toggle button */}
@@ -430,7 +411,7 @@ export function DebugControls({
       >
         🐛 Debug {showDebugPanel ? "▼" : "▶"}
       </button>
-      
+
       {/* Debug panel */}
       {showDebugPanel && (
         <div className="debug-panel">
@@ -443,7 +424,7 @@ export function DebugControls({
               <TabsTrigger value="logs">Logs</TabsTrigger>
               <TabsTrigger value="actions">Actions</TabsTrigger>
             </TabsList>
-            
+
             {/* Validation tab */}
             <TabsContent value="validation">
               <div className="validation-status">
@@ -451,14 +432,14 @@ export function DebugControls({
                 <div className={positionValidation.isValid ? "valid" : "invalid"}>
                   {positionValidation.isValid ? "✅ Valid" : "❌ Invalid"}
                 </div>
-                
+
                 {!positionValidation.isValid && (
                   <div className="issues">
                     <h5>Issues:</h5>
                     {positionValidation.issues.map((issue, i) => (
                       <div key={i} className="error">{issue}</div>
                     ))}
-                    
+
                     <h5>Suggestions:</h5>
                     {positionValidation.suggestions.map((suggestion, i) => (
                       <div key={i} className="suggestion">💡 {suggestion}</div>
@@ -467,12 +448,12 @@ export function DebugControls({
                 )}
               </div>
             </TabsContent>
-            
+
             {/* Components tab */}
             <TabsContent value="components">
               <div className="components-list">
                 <h4>Current Components ({pageComponents.length})</h4>
-                
+
                 {pageComponents.map((comp, index) => (
                   <div
                     key={comp.id}
@@ -482,7 +463,7 @@ export function DebugControls({
                       <span className="index">{index}</span>
                       <span className="name">{comp.componentName || comp.name}</span>
                     </div>
-                    
+
                     <div className="component-details">
                       <div>ID: {comp.id.slice(0, 8)}...</div>
                       <div>Type: {comp.type}</div>
@@ -493,7 +474,7 @@ export function DebugControls({
                 ))}
               </div>
             </TabsContent>
-            
+
             {/* Changes tab */}
             <TabsContent value="changes">
               <div className="changes-list">
@@ -503,29 +484,29 @@ export function DebugControls({
                     Clear
                   </button>
                 </div>
-                
+
                 {changeLogs.map((log, i) => (
                   <div key={i} className="change-log">
                     <div className="change-header">
                       <span>{log.timestamp}</span>
                       <span className="badge">{log.changeType}</span>
                     </div>
-                    
+
                     <div className="change-details">
                       <div>Component: {log.componentName}</div>
                       <div>Type: {log.componentType}</div>
                       <div>ID: {log.componentId.slice(0, 8)}...</div>
                     </div>
-                    
+
                     <details>
                       <summary>View Changes</summary>
-                      
+
                       <div className="diff">
                         <div className="before">
                           <h5>Before:</h5>
                           <pre>{JSON.stringify(log.before, null, 2)}</pre>
                         </div>
-                        
+
                         <div className="after">
                           <h5>After:</h5>
                           <pre>{JSON.stringify(log.after, null, 2)}</pre>
@@ -536,7 +517,7 @@ export function DebugControls({
                 ))}
               </div>
             </TabsContent>
-            
+
             {/* Logs tab */}
             <TabsContent value="logs">
               <div className="logs-list">
@@ -549,7 +530,7 @@ export function DebugControls({
                     Download
                   </button>
                 </div>
-                
+
                 {logs.slice(-50).reverse().map((log, i) => (
                   <div key={i} className="log-entry">
                     <div className="log-header">
@@ -557,13 +538,13 @@ export function DebugControls({
                       <span className="source">{log.source}</span>
                       <span className="action">{log.action}</span>
                     </div>
-                    
+
                     {log.componentId && (
                       <div className="component-info">
                         {log.componentName} ({log.componentType})
                       </div>
                     )}
-                    
+
                     <details>
                       <summary>View Data</summary>
                       <pre>{JSON.stringify(log.data, null, 2)}</pre>
@@ -572,26 +553,26 @@ export function DebugControls({
                 ))}
               </div>
             </TabsContent>
-            
+
             {/* Actions tab */}
             <TabsContent value="actions">
               <div className="actions-panel">
                 <h4>Debug Actions</h4>
-                
+
                 <div className="action-group">
                   <h5>Positions</h5>
                   <button onClick={onResetPositions}>
                     Reset All Positions
                   </button>
                   <button onClick={() => {
-                    console.log("Current positions:", 
+                    console.log("Current positions:",
                       pageComponents.map(c => ({ id: c.id, pos: c.position }))
                     );
                   }}>
                     Log Positions to Console
                   </button>
                 </div>
-                
+
                 <div className="action-group">
                   <h5>Logs</h5>
                   <button onClick={() => clearDebugLog()}>
@@ -604,7 +585,7 @@ export function DebugControls({
                     Download Logs
                   </button>
                 </div>
-                
+
                 <div className="action-group">
                   <h5>Store State</h5>
                   <button onClick={() => {
@@ -661,7 +642,7 @@ console.log("🔧 [Data] Merge:", {
   existing: existingData,
   store: storeData,
   temp: tempData,
-  merged: mergedData
+  merged: mergedData,
 });
 
 // Data update
@@ -720,13 +701,15 @@ console.log("💾 [User] Save:", { componentId, changes });
 
 ```typescript
 // 1. Check if store data updated
-console.log("Store data:", 
-  useEditorStore.getState().getComponentData(type, id)
+console.log(
+  "Store data:",
+  useEditorStore.getState().getComponentData(type, id),
 );
 
 // 2. Check if pageComponentsByPage updated
-console.log("Page components:", 
-  useEditorStore.getState().pageComponentsByPage[currentPage]
+console.log(
+  "Page components:",
+  useEditorStore.getState().pageComponentsByPage[currentPage],
 );
 
 // 3. Check if local state updated
@@ -754,7 +737,7 @@ console.log("🚀 handleSave called");
 console.log("Data sources:", {
   existingData: existingComponent?.data,
   storeData: store.getComponentData(type, id),
-  tempData: store.tempData
+  tempData: store.tempData,
 });
 
 // 3. Check merge result
@@ -762,16 +745,12 @@ console.log("Merged data:", mergedData);
 
 // 4. Check store update
 setTimeout(() => {
-  console.log("After setComponentData:", 
-    store.getComponentData(type, id)
-  );
+  console.log("After setComponentData:", store.getComponentData(type, id));
 }, 100);
 
 // 5. Check pageComponentsByPage
 setTimeout(() => {
-  console.log("After forceUpdate:", 
-    store.pageComponentsByPage[currentPage]
-  );
+  console.log("After forceUpdate:", store.pageComponentsByPage[currentPage]);
 }, 100);
 
 // 6. Check parent notified
@@ -786,7 +765,7 @@ console.log("onComponentUpdate called:", id, mergedData);
 // 1. Check source and target
 console.log("Drag & Drop:", {
   source: { id: source.id, type: source.type },
-  target: { id: target.id, type: target.type }
+  target: { id: target.id, type: target.type },
 });
 
 // 2. Check position calculation
@@ -794,19 +773,20 @@ console.log("Position calc:", {
   dragY,
   sortedElements,
   calculatedIndex,
-  adjustedIndex
+  adjustedIndex,
 });
 
 // 3. Check move execution
 console.log("Move:", {
   from: sourceIndex,
   to: targetIndex,
-  adjustedTo: adjustedFinalIndex
+  adjustedTo: adjustedFinalIndex,
 });
 
 // 4. Check updated components
-console.log("Updated components:", 
-  updatedComponents.map(c => ({ id: c.id, pos: c.position }))
+console.log(
+  "Updated components:",
+  updatedComponents.map((c) => ({ id: c.id, pos: c.position })),
 );
 
 // 5. Check validation
@@ -820,9 +800,10 @@ console.log("Validation:", validateComponentPositions(updatedComponents));
 ```typescript
 // 1. Check component ID
 console.log("Component ID:", selectedComponent.id);
-console.log("Is global:", 
+console.log(
+  "Is global:",
   selectedComponent.id === "global-header" ||
-  selectedComponent.id === "global-footer"
+    selectedComponent.id === "global-footer",
 );
 
 // 2. Check global data
@@ -835,7 +816,10 @@ console.log("Temp data:", useEditorStore.getState().tempData);
 
 // 4. Check save flow
 console.log("Saving global header:", latestTempData);
-console.log("After save:", useEditorStore.getState().globalComponentsData.header);
+console.log(
+  "After save:",
+  useEditorStore.getState().globalComponentsData.header,
+);
 ```
 
 ---
@@ -849,36 +833,36 @@ console.log("After save:", useEditorStore.getState().globalComponentsData.header
 const takeSnapshot = () => {
   const editorState = useEditorStore.getState();
   const tenantState = useTenantStore.getState();
-  
+
   const snapshot = {
     timestamp: new Date().toISOString(),
-    
+
     editor: {
       currentPage: editorState.currentPage,
       hasChanges: editorState.hasChangesMade,
       tempData: editorState.tempData,
-      
+
       globalComponents: {
         header: editorState.globalHeaderData,
-        footer: editorState.globalFooterData
+        footer: editorState.globalFooterData,
       },
-      
+
       componentStates: {
         heroStates: editorState.heroStates,
         headerStates: editorState.headerStates,
         // ... all component states
       },
-      
-      pages: editorState.pageComponentsByPage
+
+      pages: editorState.pageComponentsByPage,
     },
-    
+
     tenant: {
       tenantId: tenantState.tenantId,
       loading: tenantState.loadingTenantData,
-      hasData: !!tenantState.tenantData
-    }
+      hasData: !!tenantState.tenantData,
+    },
   };
-  
+
   console.log("📸 Snapshot:", snapshot);
   return snapshot;
 };
@@ -889,12 +873,12 @@ const takeSnapshot = () => {
 ```typescript
 const compareSnapshots = (snapshot1, snapshot2) => {
   const differences = [];
-  
+
   // Compare component states
   for (const type in snapshot1.editor.componentStates) {
     const state1 = snapshot1.editor.componentStates[type];
     const state2 = snapshot2.editor.componentStates[type];
-    
+
     for (const id in state1) {
       if (JSON.stringify(state1[id]) !== JSON.stringify(state2[id])) {
         differences.push({
@@ -902,12 +886,12 @@ const compareSnapshots = (snapshot1, snapshot2) => {
           componentType: type,
           componentId: id,
           before: state1[id],
-          after: state2[id]
+          after: state2[id],
         });
       }
     }
   }
-  
+
   // Compare pages
   for (const page in snapshot1.editor.pages) {
     if (
@@ -918,11 +902,11 @@ const compareSnapshots = (snapshot1, snapshot2) => {
         type: "page",
         page,
         before: snapshot1.editor.pages[page],
-        after: snapshot2.editor.pages[page]
+        after: snapshot2.editor.pages[page],
       });
     }
   }
-  
+
   console.log("🔍 Differences:", differences);
   return differences;
 };
@@ -934,18 +918,18 @@ const compareSnapshots = (snapshot1, snapshot2) => {
 // Measure operation time
 const measureOperation = async (name, operation) => {
   const start = performance.now();
-  
+
   const result = await operation();
-  
+
   const end = performance.now();
   const duration = end - start;
-  
+
   console.log(`⏱️ [Performance] ${name}: ${duration.toFixed(2)}ms`);
-  
+
   if (duration > 100) {
     console.warn(`⚠️ Slow operation: ${name} took ${duration}ms`);
   }
-  
+
   return result;
 };
 
@@ -1023,6 +1007,7 @@ The debug and logging system provides:
 5. **Development-only**: No performance impact in production
 
 **Key Features**:
+
 - Automatic state tracking
 - Change detection
 - Formatted log output
@@ -1030,15 +1015,16 @@ The debug and logging system provides:
 - Easy integration with codebase
 
 **Usage**:
+
 - Import debugLogger or helper functions
 - Call appropriate log method
 - View in debug panel or console
 - Download for detailed analysis
 
 Understanding the debug system enables:
+
 - Faster debugging
 - Better error tracking
 - Performance monitoring
 - Change auditing
 - Issue reproduction
-

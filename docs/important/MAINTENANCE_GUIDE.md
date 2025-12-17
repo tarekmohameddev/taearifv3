@@ -164,6 +164,7 @@ These changes DON'T require doc updates:
 
 ```markdown
 ## AFFECTED DOCS:
+
 - components/ADD_NEW_COMPONENT.md
 - .cursorrules
 - INDEX.md
@@ -171,20 +172,24 @@ These changes DON'T require doc updates:
 ## UPDATES NEEDED:
 
 ### In ADD_NEW_COMPONENT.md:
+
 - [ ] Add pattern to "Common Patterns" section
 - [ ] Add example
 - [ ] Update relevant steps if needed
 - [ ] Add to troubleshooting if applicable
 
 ### In .cursorrules:
+
 - [ ] Add to component rules if critical
 - [ ] Add to checklist if required step
 
 ### In INDEX.md:
+
 - [ ] Update if new file created
 - [ ] Add to search by topic if significant
 
 ## AFTER UPDATE:
+
 - [ ] Test example code
 - [ ] Verify formatting
 - [ ] Update "Last Updated"
@@ -196,6 +201,7 @@ These changes DON'T require doc updates:
 
 ```markdown
 ## AFFECTED DOCS:
+
 - liveEditor/STATE_MANAGEMENT.md
 - liveEditor/context/EDITOR_STORE_FUNCTIONS.md
 - liveEditor/context/STORES_OVERVIEW.md
@@ -204,24 +210,29 @@ These changes DON'T require doc updates:
 ## UPDATES NEEDED:
 
 ### In STATE_MANAGEMENT.md:
+
 - [ ] Update interface definition
 - [ ] Update state structure diagram
 - [ ] Update code examples
 - [ ] Update explanations
 
 ### In EDITOR_STORE_FUNCTIONS.md:
+
 - [ ] Update function signatures
 - [ ] Update examples
 - [ ] Add new functions if any
 
 ### In STORES_OVERVIEW.md:
+
 - [ ] Update overview diagram
 - [ ] Update state properties list
 
 ### In .cursorrules:
+
 - [ ] Update state management rules if needed
 
 ## AFTER UPDATE:
+
 - [ ] Verify all examples correct
 - [ ] Check no broken references
 - [ ] Update dates
@@ -233,6 +244,7 @@ These changes DON'T require doc updates:
 
 ```markdown
 ## AFFECTED DOCS:
+
 - Feature-specific doc (or create new)
 - INDEX.md
 - README.md (if major)
@@ -241,6 +253,7 @@ These changes DON'T require doc updates:
 ## UPDATES NEEDED:
 
 ### Create/Update Feature Doc:
+
 - [ ] Purpose/overview
 - [ ] How to use
 - [ ] API reference
@@ -248,19 +261,23 @@ These changes DON'T require doc updates:
 - [ ] Common issues
 
 ### In INDEX.md:
+
 - [ ] Add to appropriate section
 - [ ] Add to search by topic
 - [ ] Update documentation metrics
 
 ### In README.md:
+
 - [ ] Add to features list (if major)
 - [ ] Update quick start (if affects it)
 
 ### In .cursorrules:
+
 - [ ] Add rules if critical
 - [ ] Add to checklists if required
 
 ## AFTER UPDATE:
+
 - [ ] Examples work
 - [ ] Links valid
 - [ ] Formatting consistent
@@ -272,7 +289,7 @@ These changes DON'T require doc updates:
 
 ### **Quick Search Commands:**
 
-```bash
+````bash
 # Find all mentions of a component
 grep -r "componentName" docs/important/
 
@@ -287,7 +304,7 @@ grep -r "STEP [0-9]" docs/important/
 
 # Find all checklists
 grep -r "- \[ \]" docs/important/
-```
+````
 
 ---
 
@@ -335,6 +352,7 @@ System-wide change             → Multiple docs + .cursorrules
 ## ✅ DOCUMENTATION QUALITY CHECKLIST
 
 ### **Before Updating:**
+
 ```
 □ Understand what changed completely
 □ Identify all affected documentation
@@ -343,6 +361,7 @@ System-wide change             → Multiple docs + .cursorrules
 ```
 
 ### **During Update:**
+
 ```
 □ Update descriptions accurately
 □ Update ALL code examples
@@ -355,6 +374,7 @@ System-wide change             → Multiple docs + .cursorrules
 ```
 
 ### **After Update:**
+
 ```
 □ Test all code examples work
 □ Verify all links are valid
@@ -413,7 +433,7 @@ hero1.tsx
 
 ### **Step-by-Step Guides:**
 
-```markdown
+````markdown
 ✅ GOOD - Clear numbered steps
 STEP 1: Create functions file
 STEP 2: Create structure file
@@ -421,16 +441,20 @@ STEP 3: Update editorStore
 
 ✅ GOOD - With code examples
 STEP 1: Create functions file
+
 ```typescript
 export const myFunctions = {
   // implementation
 };
 ```
+````
 
 ❌ BAD - Vague
+
 1. Create file
 2. Update store
-```
+
+````
 
 ---
 
@@ -455,7 +479,7 @@ components/
 
 ❌ BAD - Too complex or unclear
 [Complex diagram that's hard to maintain]
-```
+````
 
 ---
 
@@ -518,11 +542,13 @@ components/
 
 ```markdown
 WRONG:
+
 - Update function signature in one place ✓
 - Leave old signature in examples ✗
 - Update some docs but not others ✗
 
 CORRECT:
+
 - Find ALL mentions (use grep) ✓
 - Update consistently everywhere ✓
 - Verify no old signatures remain ✓
@@ -612,9 +638,10 @@ Add component somehow...
 
 ### **2. Show, Don't Just Tell**
 
-```markdown
+````markdown
 ✅ GOOD - With example
 Use mergedData instead of props:
+
 ```typescript
 // ✓ Correct
 <h1>{mergedData.content?.title}</h1>
@@ -622,10 +649,12 @@ Use mergedData instead of props:
 // ✗ Wrong
 <h1>{props.content?.title}</h1>
 ```
+````
 
 ❌ BAD - Just telling
 Use mergedData instead of props
-```
+
+````
 
 ---
 
@@ -637,7 +666,7 @@ We use mergedData because it merges defaults, store, and props in correct priori
 
 ❌ BAD - No explanation
 Use mergedData.
-```
+````
 
 ---
 
@@ -814,26 +843,31 @@ LOW IMPACT, LOW URGENCY (Backlog):
 **Change Type:** UI Modification (Temporary)
 
 **Files Modified:**
+
 - `components/settings-page.tsx`:
   - Line 117: Changed default billing period from "monthly" to "yearly"
   - Line 844: Added `hidden` class to monthly billing button
   - Added comments: "TEMPORARY HIDDEN: Monthly billing button"
 
 **Documentation Updated:**
+
 - `docs/important/dashboard/MODULES.md` - Added warning about temporary change
 
 **Reason:**
+
 - Temporarily hide monthly subscription option
 - Show only yearly plans to users
 - Code preserved for easy re-enabling in the future
 
 **Impact:**
+
 - ✅ Users will only see yearly subscription plans
 - ✅ Default billing period is now yearly
 - ✅ Monthly billing code preserved (not deleted)
 - ✅ Easy to revert by removing `hidden` class and changing default back to "monthly"
 
 **To Re-enable Monthly Billing:**
+
 1. Change line 117: `"yearly"` → `"monthly"`
 2. Remove `hidden` class from line 844
 3. Remove temporary comments
@@ -846,6 +880,7 @@ LOW IMPACT, LOW URGENCY (Backlog):
 **Feature Added:** URL-based filtering for property listing pages
 
 **Files Modified:**
+
 - `middleware.ts` (Line 329-331) - **CRITICAL:** Preserve query params during locale redirect
 - `store/propertiesStore.ts` (Line 250-255) - Add `search` and `type_id` to API requests
 - `components/tenant/hero/hero1.tsx` - URL params integration, removed keywords field
@@ -853,22 +888,26 @@ LOW IMPACT, LOW URGENCY (Backlog):
 - `components/property-filter.tsx` - Store integration
 
 **Files Created:**
+
 - `hooks-liveeditor/use-url-filters.ts` - Custom hook for URL parameter management
 - `docs/important/URL_QUERY_PARAMETERS.md` - Complete documentation
 - `docs/important/URL_PARAMETERS_TEST_CHECKLIST.md` - Testing guide
 - `docs/important/URL_PARAMETERS_IMPLEMENTATION_SUMMARY.md` - Quick reference
 
 **Documentation Updated:**
+
 - `docs/important/LOCALE_ROUTING_SYSTEM.md` - Added query params preservation notes
 - `docs/important/INDEX.md` - Added new documentation references
 
 **Impact:**
+
 - ✅ Users can now share filtered property searches via URL
 - ✅ Search forms auto-fill from URL parameters
 - ✅ Bookmarkable search results
 - ✅ Deep linking with filters supported
 
 **Testing Required:**
+
 - See `URL_PARAMETERS_TEST_CHECKLIST.md` for 20 test cases
 
 ---
@@ -879,4 +918,3 @@ LOW IMPACT, LOW URGENCY (Backlog):
 ---
 
 **END OF MAINTENANCE GUIDE**
-

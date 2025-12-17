@@ -1,6 +1,7 @@
 # EditorSidebar - Comprehensive Overview
 
 ## Table of Contents
+
 1. [Introduction](#introduction)
 2. [Architecture](#architecture)
 3. [Main Components](#main-components)
@@ -13,6 +14,7 @@
 ## Introduction
 
 The **EditorSidebar** is a dynamic, right-side panel that provides the interface for editing component properties. It features:
+
 - **Multiple views**: Main settings, Add section, Edit component
 - **Simple/Advanced modes**: Progressive disclosure of complexity
 - **Dynamic field rendering**: Auto-generated forms based on component structure
@@ -22,6 +24,7 @@ The **EditorSidebar** is a dynamic, right-side panel that provides the interface
 ### Purpose
 
 The EditorSidebar serves as the primary interface for:
+
 - Editing component content (text, images, colors)
 - Modifying component layout and styling
 - Managing nested data structures (arrays, objects)
@@ -98,6 +101,7 @@ EditorSidebar (index.tsx)
 **Role**: Main container and controller
 
 **Props**:
+
 ```typescript
 interface EditorSidebarProps {
   isOpen: boolean;
@@ -116,23 +120,25 @@ interface EditorSidebarProps {
 ```
 
 **State Management**:
+
 ```typescript
 const {
-  tempData,              // Draft changes
-  setTempData,           // Initialize draft
-  updateByPath,          // Update field in draft
-  globalHeaderData,      // Global header data
-  globalFooterData,      // Global footer data
-  updateGlobalHeaderByPath,  // Update global header
-  updateGlobalFooterByPath,  // Update global footer
-  globalComponentsData,  // Unified global data
-  setGlobalComponentsData,   // Set unified global data
-  setCurrentPage,        // Track which page/component editing
-  setHasChangesMade      // Mark changes made
+  tempData, // Draft changes
+  setTempData, // Initialize draft
+  updateByPath, // Update field in draft
+  globalHeaderData, // Global header data
+  globalFooterData, // Global footer data
+  updateGlobalHeaderByPath, // Update global header
+  updateGlobalFooterByPath, // Update global footer
+  globalComponentsData, // Unified global data
+  setGlobalComponentsData, // Set unified global data
+  setCurrentPage, // Track which page/component editing
+  setHasChangesMade, // Mark changes made
 } = useEditorStore();
 ```
 
 **Key Responsibilities**:
+
 1. **View Management**: Switch between main, add-section, edit-component
 2. **Data Initialization**: Load component data into tempData when editing starts
 3. **Resize Handling**: Allow user to drag sidebar edge to resize
@@ -157,7 +163,7 @@ export function AdvancedSimpleSwitcher({
 }) {
   const [mode, setMode] = useState<"simple" | "advanced">("simple");
   const [structure, setStructure] = useState(null);
-  
+
   // Load component structure
   useEffect(() => {
     const loadStructure = async () => {
@@ -167,18 +173,18 @@ export function AdvancedSimpleSwitcher({
       const loadedStructure = structureModule[`${type}Structure`];
       setStructure(translateComponentStructure(loadedStructure, t));
     };
-    
+
     loadStructure();
   }, [type]);
-  
+
   // Find matching variant
   const variant = structure.variants.find(v => v.id === componentName);
-  
+
   // Select fields based on mode
   const fields = mode === "simple" && variant.simpleFields
     ? variant.simpleFields
     : variant.fields;
-  
+
   return (
     <div>
       {/* Simple/Advanced toggle */}
@@ -186,7 +192,7 @@ export function AdvancedSimpleSwitcher({
         <button onClick={() => setMode("simple")}>Simple</button>
         <button onClick={() => setMode("advanced")}>Advanced</button>
       </div>
-      
+
       {/* Render fields */}
       <DynamicFieldsRenderer
         fields={fields}
@@ -201,10 +207,12 @@ export function AdvancedSimpleSwitcher({
 ```
 
 **Simple vs Advanced**:
+
 - **Simple Mode**: Shows subset of most common fields (defined in `simpleFields`)
 - **Advanced Mode**: Shows ALL fields (defined in `fields`)
 
 **Structure Loading**:
+
 1. Dynamic import: `import(`@/componentsStructure/${type}`)`
 2. Extract structure: `structureModule[${type}Structure]`
 3. Translate labels: `translateComponentStructure(loaded, t)`
@@ -217,13 +225,14 @@ export function AdvancedSimpleSwitcher({
 **Location**: `components/DynamicFieldsRenderer.tsx`
 
 **Props**:
+
 ```typescript
 interface DynamicFieldsRendererProps {
-  fields: FieldDefinition[];          // Fields to render
-  componentType?: string;             // Component type
-  variantId?: string;                 // Component ID
-  onUpdateByPath?: (path, value) => void;  // Update callback
-  currentData?: any;                  // Current values
+  fields: FieldDefinition[]; // Fields to render
+  componentType?: string; // Component type
+  variantId?: string; // Component ID
+  onUpdateByPath?: (path, value) => void; // Update callback
+  currentData?: any; // Current values
 }
 ```
 
@@ -238,11 +247,11 @@ export function DynamicFieldsRenderer({
   currentData
 }) {
   const { tempData, updateByPath, getComponentData } = useEditorStore();
-  
+
   // Get value from path
   const getValueByPath = useCallback((path) => {
     const segments = path.split(".").filter(Boolean);
-    
+
     // Determine data source
     let cursor;
     if (currentData && Object.keys(currentData).length > 0) {
@@ -257,16 +266,16 @@ export function DynamicFieldsRenderer({
     } else {
       cursor = tempData || {};
     }
-    
+
     // Navigate path
     for (const seg of segments) {
       if (cursor == null) return undefined;
       cursor = cursor[seg];
     }
-    
+
     return cursor;
   }, [currentData, tempData, componentType, variantId]);
-  
+
   // Update value at path
   const updateValue = useCallback((path, value) => {
     if (onUpdateByPath) {
@@ -285,12 +294,12 @@ export function DynamicFieldsRenderer({
       updateByPath(path, value);
     }
   }, [onUpdateByPath, updateByPath, componentType, variantId]);
-  
+
   // Render each field based on type
   const renderField = (def: FieldDefinition, basePath?: string) => {
     const path = basePath ? `${basePath}.${def.key}` : def.key;
     const value = getValueByPath(path);
-    
+
     switch (def.type) {
       case "text":
         return <TextInput value={value} onChange={...} />;
@@ -310,7 +319,7 @@ export function DynamicFieldsRenderer({
         return <ObjectFieldRenderer ... />;
     }
   };
-  
+
   return (
     <div className="space-y-4">
       {fields.map((field, i) => (
@@ -322,6 +331,7 @@ export function DynamicFieldsRenderer({
 ```
 
 **Key Responsibilities**:
+
 - **Value Retrieval**: Get current value from appropriate data source
 - **Value Updates**: Route updates to correct store function
 - **Field Rendering**: Delegate to specialized renderers based on type
@@ -336,6 +346,7 @@ export function DynamicFieldsRenderer({
 **Purpose**: Global settings and quick actions
 
 **Content**:
+
 ```
 ┌─────────────────────────────────┐
 │  🎨 Theme Settings              │
@@ -360,6 +371,7 @@ export function DynamicFieldsRenderer({
 ```
 
 **User Actions**:
+
 - Change page theme → Applies to all components on page
 - Adjust global colors/fonts (future feature)
 - Click "Add New Section" → Switch to "add-section" view
@@ -369,6 +381,7 @@ export function DynamicFieldsRenderer({
 **Purpose**: Add new components to page
 
 **Content**:
+
 ```
 ┌─────────────────────────────────┐
 │  🏗️ Add Section                 │
@@ -391,11 +404,13 @@ export function DynamicFieldsRenderer({
 ```
 
 **User Actions**:
+
 - Click section → onSectionAdd(type) → Component added to page
 - Click "Back to Settings" → Return to "main" view
 
 **Component List**:
 Loaded from `AVAILABLE_SECTIONS` in constants.ts:
+
 ```typescript
 export const AVAILABLE_SECTIONS = [
   {
@@ -403,7 +418,7 @@ export const AVAILABLE_SECTIONS = [
     name: "Hero",
     section: "homepage",
     component: "hero",
-    description: "Main banner section"
+    description: "Main banner section",
   },
   // ... more sections
 ];
@@ -414,6 +429,7 @@ export const AVAILABLE_SECTIONS = [
 **Purpose**: Edit selected component's properties
 
 **Content**:
+
 ```
 ┌─────────────────────────────────┐
 │  🎨 Component Theme (commented) │
@@ -441,6 +457,7 @@ export const AVAILABLE_SECTIONS = [
 ```
 
 **User Actions**:
+
 - Toggle Simple/Advanced mode
 - Edit fields (triggers updateByPath)
 - Click "Save Changes" → Merge and persist data
@@ -460,65 +477,61 @@ useEffect(() => {
     // Handle global components
     if (selectedComponent.id === "global-header") {
       const defaultData = getDefaultHeaderData();
-      const dataToUse = 
-        globalComponentsData?.header || 
-        globalHeaderData || 
-        defaultData;
-      
+      const dataToUse =
+        globalComponentsData?.header || globalHeaderData || defaultData;
+
       setCurrentPage("global-header");
       setTempData(dataToUse);
       return;
     }
-    
+
     if (selectedComponent.id === "global-footer") {
       const defaultData = getDefaultFooterData();
-      const dataToUse = 
-        globalComponentsData?.footer || 
-        globalFooterData || 
-        defaultData;
-      
+      const dataToUse =
+        globalComponentsData?.footer || globalFooterData || defaultData;
+
       setCurrentPage("global-footer");
       setTempData(dataToUse);
       return;
     }
-    
+
     // Handle regular components
     const store = useEditorStore.getState();
     const defaultData = createDefaultData(
       selectedComponent.type,
-      selectedComponent.componentName
+      selectedComponent.componentName,
     );
-    
-    const uniqueVariantId = selectedComponent.id;  // UUID
-    
+
+    const uniqueVariantId = selectedComponent.id; // UUID
+
     // Determine data to use
     let dataToUse;
     if (selectedComponent.type === "contactCards") {
       // Special handling for contactCards - check if cards array exists
-      const hasCards = 
+      const hasCards =
         selectedComponent.data?.cards &&
         Array.isArray(selectedComponent.data.cards) &&
         selectedComponent.data.cards.length > 0;
-      
+
       dataToUse = hasCards ? selectedComponent.data : defaultData;
     } else {
-      dataToUse = 
+      dataToUse =
         selectedComponent.data && Object.keys(selectedComponent.data).length > 0
           ? selectedComponent.data
           : defaultData;
     }
-    
+
     // Initialize in store
     store.ensureComponentVariant(
       selectedComponent.type,
       uniqueVariantId,
-      dataToUse
+      dataToUse,
     );
-    
+
     // Load into tempData
     const currentComponentData = store.getComponentData(
       selectedComponent.type,
-      uniqueVariantId
+      uniqueVariantId,
     );
     setTempData(currentComponentData || {});
   }
@@ -526,6 +539,7 @@ useEffect(() => {
 ```
 
 **Logic Breakdown**:
+
 1. **Check if editing**: `view === "edit-component"`
 2. **Global component check**: Special IDs `"global-header"` or `"global-footer"`
 3. **Data priority**: globalComponentsData > globalHeaderData > defaultData
@@ -540,75 +554,67 @@ useEffect(() => {
 ```typescript
 const handleSave = () => {
   if (!selectedComponent) return;
-  
+
   // Mark changes made
   setHasChangesMade(true);
-  
+
   const store = useEditorStore.getState();
   const currentPage = store.currentPage || "homepage";
-  
+
   // Get latest tempData
-  const latestTempData = 
+  const latestTempData =
     selectedComponent.id === "global-header" ||
     selectedComponent.id === "global-footer"
       ? store.tempData || tempData
       : tempData;
-  
+
   // GLOBAL HEADER
   if (selectedComponent.id === "global-header") {
     setGlobalHeaderData(latestTempData);
     setGlobalComponentsData({
       ...globalComponentsData,
-      header: latestTempData
+      header: latestTempData,
     });
     onComponentUpdate(selectedComponent.id, latestTempData);
     onClose();
     return;
   }
-  
+
   // GLOBAL FOOTER
   if (selectedComponent.id === "global-footer") {
     setGlobalFooterData(latestTempData);
     setGlobalComponentsData({
       ...globalComponentsData,
-      footer: latestTempData
+      footer: latestTempData,
     });
     onComponentUpdate(selectedComponent.id, latestTempData);
     onClose();
     return;
   }
-  
+
   // REGULAR COMPONENTS
   const uniqueVariantId = selectedComponent.id;
-  
+
   // Get store data
   const storeData = store.getComponentData(
     selectedComponent.type,
-    uniqueVariantId
+    uniqueVariantId,
   );
-  
+
   // Get existing component from page
-  const currentPageComponents = 
-    store.pageComponentsByPage[currentPage] || [];
+  const currentPageComponents = store.pageComponentsByPage[currentPage] || [];
   const existingComponent = currentPageComponents.find(
-    (comp) => comp.id === selectedComponent.id
+    (comp) => comp.id === selectedComponent.id,
   );
-  
+
   // CRITICAL: Deep merge all data sources
   const mergedData = existingComponent?.data
-    ? deepMerge(
-        deepMerge(existingComponent.data, storeData),
-        latestTempData
-      )
+    ? deepMerge(deepMerge(existingComponent.data, storeData), latestTempData)
     : deepMerge(storeData, latestTempData);
-  
+
   // Update store
-  store.setComponentData(
-    selectedComponent.type,
-    uniqueVariantId,
-    mergedData
-  );
-  
+  store.setComponentData(selectedComponent.type, uniqueVariantId, mergedData);
+
   // Update pageComponentsByPage
   const updatedPageComponents = currentPageComponents.map((comp) => {
     if (comp.id === selectedComponent.id) {
@@ -616,15 +622,15 @@ const handleSave = () => {
     }
     return comp;
   });
-  
+
   store.forceUpdatePageComponents(currentPage, updatedPageComponents);
-  
+
   // Notify parent
   onComponentUpdate(selectedComponent.id, mergedData);
-  
+
   // Update tempData to stay in sync
   setTempData(mergedData);
-  
+
   onClose();
 };
 ```
@@ -635,7 +641,7 @@ const handleSave = () => {
 2. **Get latest data**: Use store.tempData for global components
 3. **Branch by type**: Global components vs regular components
 4. **Global components**: Update both individual and unified global data
-5. **Regular components**: 
+5. **Regular components**:
    - Get existing data from page
    - Get store data from component state
    - **Deep merge** all three sources: existing → store → tempData
@@ -648,8 +654,8 @@ const handleSave = () => {
 ```typescript
 // Shallow merge (WRONG)
 const merged = {
-  ...existingData,    // { content: { title: "Old", subtitle: "Old Sub" } }
-  ...tempData         // { content: { title: "New" } }
+  ...existingData, // { content: { title: "Old", subtitle: "Old Sub" } }
+  ...tempData, // { content: { title: "New" } }
 };
 // Result: { content: { title: "New" } }  ← subtitle LOST!
 
@@ -668,14 +674,17 @@ const handleMouseDown = (e) => {
   document.addEventListener("mouseup", handleMouseUp);
 };
 
-const handleMouseMove = useCallback((e) => {
-  if (isResizing.current && sidebarRef.current) {
-    const newWidth = window.innerWidth - e.clientX;
-    if (newWidth > 400 && newWidth < 1000) {
-      setWidth(newWidth);
+const handleMouseMove = useCallback(
+  (e) => {
+    if (isResizing.current && sidebarRef.current) {
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth > 400 && newWidth < 1000) {
+        setWidth(newWidth);
+      }
     }
-  }
-}, [setWidth]);
+  },
+  [setWidth],
+);
 
 const handleMouseUp = useCallback(() => {
   isResizing.current = false;
@@ -685,6 +694,7 @@ const handleMouseUp = useCallback(() => {
 ```
 
 **Implementation**:
+
 - Resize handle on left edge of sidebar
 - Minimum width: 400px
 - Maximum width: 1000px
@@ -777,6 +787,7 @@ Fields can have conditions:
 ```
 
 **Implementation**:
+
 ```typescript
 renderField(def, basePath?) {
   // Check condition
@@ -786,7 +797,7 @@ renderField(def, basePath?) {
       return null;  // Don't render
     }
   }
-  
+
   // Render field...
 }
 ```
@@ -902,27 +913,29 @@ renderField(def, basePath?) {
 Defines which component types can be added:
 
 ```typescript
-export const AVAILABLE_SECTIONS: AvailableSection[] = 
-  getComponentsBySection("homepage").map((component) => ({
-    type: component.id,           // "hero"
-    name: component.displayName,  // "Hero"
-    section: component.section,   // "homepage"
-    component: component.name,    // "hero"
-    description: component.description
-  }));
+export const AVAILABLE_SECTIONS: AvailableSection[] = getComponentsBySection(
+  "homepage",
+).map((component) => ({
+  type: component.id, // "hero"
+  name: component.displayName, // "Hero"
+  section: component.section, // "homepage"
+  component: component.name, // "hero"
+  description: component.description,
+}));
 ```
 
 **Loaded from**: `ComponentsList.tsx` via `getComponentsBySection()`
 
 **Translated Version**:
+
 ```typescript
 export const getAvailableSectionsTranslated = (t) => {
   return getComponentsBySectionTranslated("homepage", t).map((component) => ({
     type: component.id,
-    name: component.displayName,  // Now translated
+    name: component.displayName, // Now translated
     section: component.section,
     component: component.name,
-    description: component.description  // Now translated
+    description: component.description, // Now translated
   }));
 };
 ```
@@ -956,18 +969,18 @@ export const getSectionIcon = (type: string): string => {
 ```typescript
 export const createDefaultData = (
   type: string,
-  componentName?: string
+  componentName?: string,
 ): ComponentData => {
   const component = getComponentById(type);
-  
+
   if (!component) {
     // Fallback for unknown components
     return {
       texts: { title: `${type} Title` },
-      colors: { background: "#FFFFFF" }
+      colors: { background: "#FFFFFF" },
     };
   }
-  
+
   // Component-specific defaults
   switch (type) {
     case "hero":
@@ -976,25 +989,23 @@ export const createDefaultData = (
         height: { desktop: "90vh", tablet: "90vh", mobile: "90vh" },
         background: {
           image: "https://example.com/hero.jpg",
-          overlay: { enabled: true, opacity: "0.45" }
+          overlay: { enabled: true, opacity: "0.45" },
         },
         content: {
           title: "Discover Your Perfect Property",
-          subtitle: "We offer the best real estate options"
+          subtitle: "We offer the best real estate options",
         },
         // ... extensive default configuration
       };
-    
+
     case "header":
       return {
         visible: true,
         logo: { type: "image+text", text: "Company" },
-        menu: [
-          { id: "home", type: "link", text: "Home", url: "/" }
-        ],
+        menu: [{ id: "home", type: "link", text: "Home", url: "/" }],
         // ... header defaults
       };
-    
+
     case "halfTextHalfImage":
       // Check componentName to select appropriate defaults
       if (componentName === "halfTextHalfImage2") {
@@ -1004,7 +1015,7 @@ export const createDefaultData = (
       } else {
         return getDefaultHalfTextHalfImageData();
       }
-    
+
     case "contactCards":
       return {
         visible: true,
@@ -1012,30 +1023,31 @@ export const createDefaultData = (
           {
             icon: { src: "/address.svg", alt: "Address" },
             title: { text: "Address" },
-            content: { type: "text", text: "Saudi Arabia" }
+            content: { type: "text", text: "Saudi Arabia" },
           },
           {
             icon: { src: "/email.svg", alt: "Email" },
             title: { text: "Email" },
             content: {
               type: "links",
-              links: [{ text: "info@example.com", href: "mailto:..." }]
-            }
-          }
-        ]
+              links: [{ text: "info@example.com", href: "mailto:..." }],
+            },
+          },
+        ],
       };
-    
+
     default:
       return {
         visible: true,
         texts: { title: `${type} Title` },
-        colors: { background: "#FFFFFF" }
+        colors: { background: "#FFFFFF" },
       };
   }
 };
 ```
 
 **Key Points**:
+
 - Imports default data functions from `editorStoreFunctions/`
 - Handles component variants (hero1, hero2, etc.)
 - Returns complete, valid component data
@@ -1062,7 +1074,7 @@ normalizePath("slides.[2].title")  → "slides.2.title"
 ```typescript
 export const getValueByPath = (obj: any, path: string): any => {
   const segments = normalizePath(path).split(".").filter(Boolean);
-  
+
   let cursor = obj;
   for (const seg of segments) {
     if (cursor == null) return undefined;
@@ -1090,15 +1102,11 @@ getValueByPath(data, "content.stats.stat1.value") → "100+"
 **Purpose**: Set value in nested object via path
 
 ```typescript
-export const updateValueByPath = (
-  obj: any,
-  path: string,
-  value: any
-): any => {
+export const updateValueByPath = (obj: any, path: string, value: any): any => {
   const segments = normalizePath(path).split(".").filter(Boolean);
   const result = { ...obj };
   let cursor = result;
-  
+
   for (let i = 0; i < segments.length - 1; i++) {
     const seg = segments[i];
     if (!(seg in cursor)) {
@@ -1106,7 +1114,7 @@ export const updateValueByPath = (
     }
     cursor = cursor[seg];
   }
-  
+
   cursor[segments[segments.length - 1]] = value;
   return result;
 };
@@ -1130,6 +1138,7 @@ The sidebar can be resized by dragging the left edge:
 ```
 
 **Constraints**:
+
 - Min width: 400px
 - Max width: 1000px
 - Smooth dragging experience
@@ -1143,6 +1152,7 @@ Three types of theme selectors:
 3. **CardThemeSelector**: Specialized themes for card components
 
 **Example**:
+
 ```typescript
 <PageThemeSelector
   onThemeChange={(themeId, components) => {
@@ -1171,6 +1181,7 @@ Before resetting component, show confirmation dialog:
 ```
 
 **Warning Shown**:
+
 - All customizations will be lost
 - Colors, text, layout settings reset
 - Cannot be undone
@@ -1224,7 +1235,7 @@ For Regular Components:
 ## Next Steps
 
 For detailed information on specific subsystems:
+
 - **Field Renderers**: See `FIELD_RENDERERS.md`
 - **Data Flow**: See `DATA_FLOW.md`
 - **Components**: See `COMPONENTS.md`
-

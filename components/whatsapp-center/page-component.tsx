@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Phone,
   MessageCircle,
@@ -11,13 +11,19 @@ import {
   AlertCircle,
   ExternalLink,
   RefreshCw,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import {
   Dialog,
   DialogContent,
@@ -25,127 +31,132 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { WhatsappIcon } from "@/components/icons"
-import axiosInstance from "@/lib/axiosInstance"
-import useAuthStore from "@/context/AuthContext"
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { WhatsappIcon } from "@/components/icons";
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 interface WhatsAppNumber {
-  id: number
-  phoneNumber: string
-  name: string | null
-  status: string
-  request_status: string
-  linkingMethod: string
-  apiMethod: string
-  requestId: string
-  created_at: string
-  updated_at: string
+  id: number;
+  phoneNumber: string;
+  name: string | null;
+  status: string;
+  request_status: string;
+  linkingMethod: string;
+  apiMethod: string;
+  requestId: string;
+  created_at: string;
+  updated_at: string;
   employee?: {
-    id: number
-    name: string
-    email: string
-  }
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 interface WhatsAppResponse {
-  success: boolean
+  success: boolean;
   data: {
-    status: string
-    numbers: WhatsAppNumber[]
-    total: number
-    active_count: number
-    pending_count: number
-  }
-  message: string
+    status: string;
+    numbers: WhatsAppNumber[];
+    total: number;
+    active_count: number;
+    pending_count: number;
+  };
+  message: string;
 }
 
 interface RedirectResponse {
-  success: boolean
-  redirect_url: string
-  mode: string
-  config_id: string
+  success: boolean;
+  redirect_url: string;
+  mode: string;
+  config_id: string;
 }
 
 export function WhatsAppCenterPage() {
-  const [connectedNumbers, setConnectedNumbers] = useState<WhatsAppNumber[]>([])
-  const [totalMessages, setTotalMessages] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [numberToDelete, setNumberToDelete] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const { userData } = useAuthStore()
+  const [connectedNumbers, setConnectedNumbers] = useState<WhatsAppNumber[]>(
+    [],
+  );
+  const [totalMessages, setTotalMessages] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [numberToDelete, setNumberToDelete] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { userData } = useAuthStore();
   // Fetch WhatsApp data on component mount
   useEffect(() => {
     const fetchWhatsAppData = async () => {
       try {
-        setIsLoading(true)
-        setError(null)
-        const response = await axiosInstance.get("/whatsapp" , {
+        setIsLoading(true);
+        setError(null);
+        const response = await axiosInstance.get("/whatsapp", {
           headers: {
-            "Authorization": `Bearer ${userData?.token}`
-          }
-        })
-        
+            Authorization: `Bearer ${userData?.token}`,
+          },
+        });
+
         if (response.data.success && response.data.data) {
-          setConnectedNumbers(response.data.data.numbers || [])
-          setTotalMessages(response.data.data.total || 0)
+          setConnectedNumbers(response.data.data.numbers || []);
+          setTotalMessages(response.data.data.total || 0);
         } else {
-          setError("فشل في تحميل البيانات")
+          setError("فشل في تحميل البيانات");
         }
       } catch (err: any) {
-        console.error("Error fetching WhatsApp data:", err)
-        setError(
-          err.response?.data?.message || "حدث خطأ أثناء تحميل البيانات"
-        )
+        console.error("Error fetching WhatsApp data:", err);
+        setError(err.response?.data?.message || "حدث خطأ أثناء تحميل البيانات");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchWhatsAppData()
-  }, [])
+    fetchWhatsAppData();
+  }, []);
 
   const handleFacebookLogin = async () => {
     try {
-      setIsConnecting(true)
-      setError(null)
-      
+      setIsConnecting(true);
+      setError(null);
+
       const response = await axiosInstance.get("/whatsapp/meta/redirect", {
         params: {
-          mode: "existing"
-        }
-      })
-      
+          mode: "existing",
+        },
+      });
+
       if (response.data.success && response.data.redirect_url) {
         // Open redirect URL in new tab
-        window.open(response.data.redirect_url, "_blank")
+        window.open(response.data.redirect_url, "_blank");
       } else {
-        setError("فشل في الحصول على رابط التوجيه")
+        setError("فشل في الحصول على رابط التوجيه");
       }
     } catch (err: any) {
-      console.error("Error getting redirect URL:", err)
-      setError(
-        err.response?.data?.message || "حدث خطأ أثناء محاولة الربط"
-      )
+      console.error("Error getting redirect URL:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء محاولة الربط");
     } finally {
-      setIsConnecting(false)
+      setIsConnecting(false);
     }
-  }
+  };
 
   const handleDeleteNumber = (id: number) => {
-    setConnectedNumbers((prev) => prev.filter((num) => num.id !== id))
-    setDeleteDialogOpen(false)
-    setNumberToDelete(null)
-  }
+    setConnectedNumbers((prev) => prev.filter((num) => num.id !== id));
+    setDeleteDialogOpen(false);
+    setNumberToDelete(null);
+  };
 
   const confirmDelete = (id: number) => {
-    setNumberToDelete(String(id))
-    setDeleteDialogOpen(true)
-  }
+    setNumberToDelete(String(id));
+    setDeleteDialogOpen(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -156,9 +167,12 @@ export function WhatsAppCenterPage() {
           <div className="space-y-6">
             {/* Page Header */}
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">مركز الواتساب</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                مركز الواتساب
+              </h1>
               <p className="text-muted-foreground">
-                قم بربط أرقام الواتساب الخاصة بك عبر فيسبوك بيزنس لإدارة الرسائل والتواصل مع العملاء
+                قم بربط أرقام الواتساب الخاصة بك عبر فيسبوك بيزنس لإدارة الرسائل
+                والتواصل مع العملاء
               </p>
             </div>
 
@@ -166,9 +180,12 @@ export function WhatsAppCenterPage() {
             {showSuccessAlert && (
               <Alert className="border-green-200 bg-green-50">
                 <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertTitle className="text-green-800">تم الربط بنجاح!</AlertTitle>
+                <AlertTitle className="text-green-800">
+                  تم الربط بنجاح!
+                </AlertTitle>
                 <AlertDescription className="text-green-700">
-                  تم ربط رقم الواتساب الجديد بحسابك بنجاح. يمكنك الآن استخدامه للتواصل مع العملاء.
+                  تم ربط رقم الواتساب الجديد بحسابك بنجاح. يمكنك الآن استخدامه
+                  للتواصل مع العملاء.
                 </AlertDescription>
               </Alert>
             )}
@@ -186,19 +203,25 @@ export function WhatsAppCenterPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">الأرقام المتصلة</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    الأرقام المتصلة
+                  </CardTitle>
                   <Phone className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {isLoading ? "..." : connectedNumbers.length}
                   </div>
-                  <p className="text-xs text-muted-foreground">أرقام واتساب نشطة</p>
+                  <p className="text-xs text-muted-foreground">
+                    أرقام واتساب نشطة
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">الرسائل المرسلة</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    الرسائل المرسلة
+                  </CardTitle>
                   <MessageCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -210,15 +233,23 @@ export function WhatsAppCenterPage() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">حالة الاتصال</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    حالة الاتصال
+                  </CardTitle>
                   <CheckCircle className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {isLoading ? "..." : connectedNumbers.length > 0 ? "متصل" : "غير متصل"}
+                    {isLoading
+                      ? "..."
+                      : connectedNumbers.length > 0
+                        ? "متصل"
+                        : "غير متصل"}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {connectedNumbers.length > 0 ? "جميع الأرقام تعمل بشكل طبيعي" : "لا توجد أرقام متصلة"}
+                    {connectedNumbers.length > 0
+                      ? "جميع الأرقام تعمل بشكل طبيعي"
+                      : "لا توجد أرقام متصلة"}
                   </p>
                 </CardContent>
               </Card>
@@ -232,7 +263,8 @@ export function WhatsAppCenterPage() {
                   إضافة رقم واتساب جديد
                 </CardTitle>
                 <CardDescription>
-                  اربط رقم واتساب بيزنس جديد عبر حساب فيسبوك الخاص بك لبدء التواصل مع العملاء
+                  اربط رقم واتساب بيزنس جديد عبر حساب فيسبوك الخاص بك لبدء
+                  التواصل مع العملاء
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -241,7 +273,9 @@ export function WhatsAppCenterPage() {
                   <AlertTitle>متطلبات الربط</AlertTitle>
                   <AlertDescription>
                     <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                      <li>يجب ان يكون واتساب تطبيق اعمال حصرياً, وليس واتساب عادي</li>
+                      <li>
+                        يجب ان يكون واتساب تطبيق اعمال حصرياً, وليس واتساب عادي
+                      </li>
                       <li>حساب فيسبوك بيزنس مُفعّل</li>
                       <li>رقم هاتف غير مرتبط بحساب واتساب آخر</li>
                       <li>إمكانية استقبال رمز التحقق عبر SMS</li>
@@ -262,7 +296,13 @@ export function WhatsAppCenterPage() {
                     </>
                   ) : (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="white"
+                      >
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                       </svg>
                       تسجيل الدخول عبر فيسبوك
@@ -271,7 +311,8 @@ export function WhatsAppCenterPage() {
                 </Button>
 
                 <p className="text-xs text-muted-foreground">
-                  بالنقر على الزر، ستتم إعادة توجيهك إلى فيسبوك لتسجيل الدخول وربط حساب واتساب بيزنس الخاص بك.
+                  بالنقر على الزر، ستتم إعادة توجيهك إلى فيسبوك لتسجيل الدخول
+                  وربط حساب واتساب بيزنس الخاص بك.
                 </p>
               </CardContent>
             </Card>
@@ -283,7 +324,9 @@ export function WhatsAppCenterPage() {
                   <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
                   الأرقام المتصلة
                 </CardTitle>
-                <CardDescription>جميع أرقام الواتساب المرتبطة بحسابك</CardDescription>
+                <CardDescription>
+                  جميع أرقام الواتساب المرتبطة بحسابك
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -302,12 +345,18 @@ export function WhatsAppCenterPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-right">رقم الهاتف</TableHead>
-                        <TableHead className="text-right">الاسم المعروض</TableHead>
+                        <TableHead className="text-right">
+                          الاسم المعروض
+                        </TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
                         <TableHead className="text-right">حالة الطلب</TableHead>
-                        <TableHead className="text-right">تاريخ الربط</TableHead>
+                        <TableHead className="text-right">
+                          تاريخ الربط
+                        </TableHead>
                         <TableHead className="text-right">آخر تحديث</TableHead>
-                        <TableHead className="text-right">الموظف المسؤول</TableHead>
+                        <TableHead className="text-right">
+                          الموظف المسؤول
+                        </TableHead>
                         <TableHead className="text-right">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -320,36 +369,62 @@ export function WhatsAppCenterPage() {
                           <TableCell>{number.name || "-"}</TableCell>
                           <TableCell>
                             <Badge
-                              variant={number.status === "active" ? "default" : "secondary"}
+                              variant={
+                                number.status === "active"
+                                  ? "default"
+                                  : "secondary"
+                              }
                               className={
-                                number.status === "active" ? "bg-green-100 text-green-800 hover:bg-green-100" : ""
+                                number.status === "active"
+                                  ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                  : ""
                               }
                             >
-                              {number.status === "active" ? "نشط" : number.status === "inactive" ? "غير نشط" : number.status}
+                              {number.status === "active"
+                                ? "نشط"
+                                : number.status === "inactive"
+                                  ? "غير نشط"
+                                  : number.status}
                             </Badge>
                           </TableCell>
                           <TableCell>
                             <Badge
-                              variant={number.request_status === "active" ? "default" : number.request_status === "pending" ? "secondary" : "outline"}
-                              className={
-                                number.request_status === "active" 
-                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-100" 
+                              variant={
+                                number.request_status === "active"
+                                  ? "default"
                                   : number.request_status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                  : ""
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                              className={
+                                number.request_status === "active"
+                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                  : number.request_status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                    : ""
                               }
                             >
-                              {number.request_status === "active" ? "نشط" : number.request_status === "pending" ? "قيد الانتظار" : number.request_status}
+                              {number.request_status === "active"
+                                ? "نشط"
+                                : number.request_status === "pending"
+                                  ? "قيد الانتظار"
+                                  : number.request_status}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {new Date(number.created_at).toLocaleDateString("ar-US")}
+                            {new Date(number.created_at).toLocaleDateString(
+                              "ar-US",
+                            )}
                           </TableCell>
                           <TableCell>
-                            {new Date(number.updated_at).toLocaleDateString("ar-US")}
+                            {new Date(number.updated_at).toLocaleDateString(
+                              "ar-US",
+                            )}
                           </TableCell>
                           <TableCell>
-                            {number.employee ? `${number.employee.name} (${number.employee.email})` : "-"}
+                            {number.employee
+                              ? `${number.employee.name} (${number.employee.email})`
+                              : "-"}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -413,19 +488,28 @@ export function WhatsAppCenterPage() {
           <DialogHeader>
             <DialogTitle>تأكيد الحذف</DialogTitle>
             <DialogDescription>
-              هل أنت متأكد من أنك تريد فصل هذا الرقم؟ لن تتمكن من استقبال أو إرسال الرسائل عبره بعد الآن.
+              هل أنت متأكد من أنك تريد فصل هذا الرقم؟ لن تتمكن من استقبال أو
+              إرسال الرسائل عبره بعد الآن.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
               إلغاء
             </Button>
-            <Button variant="destructive" onClick={() => numberToDelete && handleDeleteNumber(Number(numberToDelete))}>
+            <Button
+              variant="destructive"
+              onClick={() =>
+                numberToDelete && handleDeleteNumber(Number(numberToDelete))
+              }
+            >
               نعم، فصل الرقم
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

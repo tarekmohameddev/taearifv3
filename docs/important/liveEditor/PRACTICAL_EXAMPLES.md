@@ -1,6 +1,7 @@
 # Practical Examples - Real-World Scenarios
 
 ## Table of Contents
+
 1. [Complete Component Implementation](#complete-component-implementation)
 2. [Adding New Component Type](#adding-new-component-type)
 3. [Implementing Custom Field Renderer](#implementing-custom-field-renderer)
@@ -23,20 +24,20 @@ import { ComponentStructure } from "./types";
 
 export const galleryStructure: ComponentStructure = {
   componentType: "gallery",
-  
+
   variants: [
     {
       id: "gallery1",
       name: "Grid Gallery",
       description: "Image gallery in grid layout",
       componentPath: "components/tenant/gallery/gallery1.tsx",
-      
+
       fields: [
         {
           key: "visible",
           label: "Visible",
           type: "boolean",
-          defaultValue: true
+          defaultValue: true,
         },
         {
           key: "header",
@@ -49,16 +50,16 @@ export const galleryStructure: ComponentStructure = {
               type: "text",
               placeholder: "Our Gallery",
               min: 3,
-              max: 100
+              max: 100,
             },
             {
               key: "subtitle",
               label: "Gallery Subtitle",
               type: "textarea",
               placeholder: "Explore our collection...",
-              max: 200
-            }
-          ]
+              max: 200,
+            },
+          ],
         },
         {
           key: "images",
@@ -72,27 +73,27 @@ export const galleryStructure: ComponentStructure = {
             {
               key: "url",
               label: "Image URL",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Image description"
+              placeholder: "Image description",
             },
             {
               key: "caption",
               label: "Caption",
               type: "text",
-              placeholder: "Optional caption"
+              placeholder: "Optional caption",
             },
             {
               key: "featured",
               label: "Featured",
               type: "boolean",
-              defaultValue: false
-            }
-          ]
+              defaultValue: false,
+            },
+          ],
         },
         {
           key: "layout",
@@ -110,7 +111,7 @@ export const galleryStructure: ComponentStructure = {
                   type: "number",
                   min: 1,
                   max: 6,
-                  defaultValue: 4
+                  defaultValue: 4,
                 },
                 {
                   key: "tablet",
@@ -118,7 +119,7 @@ export const galleryStructure: ComponentStructure = {
                   type: "number",
                   min: 1,
                   max: 4,
-                  defaultValue: 3
+                  defaultValue: 3,
                 },
                 {
                   key: "mobile",
@@ -126,9 +127,9 @@ export const galleryStructure: ComponentStructure = {
                   type: "number",
                   min: 1,
                   max: 2,
-                  defaultValue: 2
-                }
-              ]
+                  defaultValue: 2,
+                },
+              ],
             },
             {
               key: "gap",
@@ -137,9 +138,9 @@ export const galleryStructure: ComponentStructure = {
               options: [
                 { label: "Small", value: "4" },
                 { label: "Medium", value: "8" },
-                { label: "Large", value: "12" }
+                { label: "Large", value: "12" },
               ],
-              defaultValue: "8"
+              defaultValue: "8",
             },
             {
               key: "aspectRatio",
@@ -148,11 +149,11 @@ export const galleryStructure: ComponentStructure = {
               options: [
                 { label: "Square (1:1)", value: "1:1" },
                 { label: "Landscape (16:9)", value: "16:9" },
-                { label: "Portrait (3:4)", value: "3:4" }
+                { label: "Portrait (3:4)", value: "3:4" },
               ],
-              defaultValue: "1:1"
-            }
-          ]
+              defaultValue: "1:1",
+            },
+          ],
         },
         {
           key: "lightbox",
@@ -163,7 +164,7 @@ export const galleryStructure: ComponentStructure = {
               key: "enabled",
               label: "Enable Lightbox",
               type: "boolean",
-              defaultValue: true
+              defaultValue: true,
             },
             {
               key: "showCaptions",
@@ -172,10 +173,10 @@ export const galleryStructure: ComponentStructure = {
               defaultValue: true,
               condition: {
                 field: "lightbox.enabled",
-                value: true
-              }
-            }
-          ]
+                value: true,
+              },
+            },
+          ],
         },
         {
           key: "colors",
@@ -186,34 +187,34 @@ export const galleryStructure: ComponentStructure = {
               key: "background",
               label: "Background Color",
               type: "color",
-              defaultValue: "#F3F4F6"
+              defaultValue: "#F3F4F6",
             },
             {
               key: "text",
               label: "Text Color",
               type: "color",
-              defaultValue: "#1F2937"
+              defaultValue: "#1F2937",
             },
             {
               key: "border",
               label: "Border Color",
               type: "color",
-              defaultValue: "#E5E7EB"
-            }
-          ]
-        }
+              defaultValue: "#E5E7EB",
+            },
+          ],
+        },
       ],
-      
+
       simpleFields: [
         {
           key: "visible",
           label: "Visible",
-          type: "boolean"
+          type: "boolean",
         },
         {
           key: "header.title",
           label: "Title",
-          type: "text"
+          type: "text",
         },
         {
           key: "images",
@@ -221,17 +222,17 @@ export const galleryStructure: ComponentStructure = {
           type: "array",
           of: [
             { key: "url", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" }
-          ]
+            { key: "alt", label: "Alt Text", type: "text" },
+          ],
         },
         {
           key: "layout.columns.desktop",
           label: "Columns",
-          type: "number"
-        }
-      ]
-    }
-  ]
+          type: "number",
+        },
+      ],
+    },
+  ],
 };
 ```
 
@@ -247,46 +248,46 @@ export const getDefaultGalleryData = (): ComponentData => ({
   visible: true,
   header: {
     title: "Our Gallery",
-    subtitle: "Explore our collection of beautiful properties"
+    subtitle: "Explore our collection of beautiful properties",
   },
   images: [
     {
       url: "https://example.com/gallery/image1.jpg",
       alt: "Modern apartment",
       caption: "Luxury apartment in downtown",
-      featured: true
+      featured: true,
     },
     {
       url: "https://example.com/gallery/image2.jpg",
       alt: "Villa exterior",
       caption: "Spacious villa with garden",
-      featured: false
+      featured: false,
     },
     {
       url: "https://example.com/gallery/image3.jpg",
       alt: "Office space",
       caption: "Modern office in business district",
-      featured: false
-    }
+      featured: false,
+    },
   ],
   layout: {
     columns: {
       desktop: 4,
       tablet: 3,
-      mobile: 2
+      mobile: 2,
     },
     gap: "8",
-    aspectRatio: "1:1"
+    aspectRatio: "1:1",
   },
   lightbox: {
     enabled: true,
-    showCaptions: true
+    showCaptions: true,
   },
   colors: {
     background: "#F3F4F6",
     text: "#1F2937",
-    border: "#E5E7EB"
-  }
+    border: "#E5E7EB",
+  },
 });
 
 export const galleryFunctions = {
@@ -297,72 +298,70 @@ export const galleryFunctions = {
     ) {
       return {};
     }
-    
+
     const defaultData = getDefaultGalleryData();
     const data = initial || state.tempData || defaultData;
-    
+
     return {
       galleryStates: {
         ...state.galleryStates,
-        [variantId]: data
-      }
+        [variantId]: data,
+      },
     };
   },
-  
+
   getData: (state: any, variantId: string) => {
     return state.galleryStates[variantId] || {};
   },
-  
+
   setData: (state: any, variantId: string, data: ComponentData) => {
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
-      state.pageComponentsByPage[currentPage] || [];
-    
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "gallery" && comp.id === variantId) {
         return { ...comp, data };
       }
       return comp;
     });
-    
+
     return {
       galleryStates: {
         ...state.galleryStates,
-        [variantId]: data
+        [variantId]: data,
       },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents
-      }
+        [currentPage]: updatedComponents,
+      },
     };
   },
-  
+
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.galleryStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     const currentPage = state.currentPage;
-    const updatedPageComponents = 
-      state.pageComponentsByPage[currentPage] || [];
-    
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "gallery" && comp.id === variantId) {
         return { ...comp, data: newData };
       }
       return comp;
     });
-    
+
     return {
       galleryStates: {
         ...state.galleryStates,
-        [variantId]: newData
+        [variantId]: newData,
       },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents
-      }
+        [currentPage]: updatedComponents,
+      },
     };
-  }
+  },
 };
 ```
 
@@ -378,7 +377,7 @@ import { galleryStructure } from "@/componentsStructure/gallery";
 // Add to interface
 interface EditorStore {
   // ... existing properties
-  
+
   // Gallery states
   galleryStates: Record<string, ComponentData>;
   ensureGalleryVariant: (variantId: string, initial?: ComponentData) => void;
@@ -390,53 +389,53 @@ interface EditorStore {
 // Add to create function
 export const useEditorStore = create<EditorStore>((set, get) => ({
   // ... existing state
-  
+
   galleryStates: {},
-  
+
   // Update switches
   ensureComponentVariant: (type, id, initial) =>
     set((state) => {
       switch (type) {
         // ... existing cases
-        
+
         case "gallery":
           return galleryFunctions.ensureVariant(state, id, initial);
-        
+
         default:
-          // Fallback...
+        // Fallback...
       }
     }),
-  
+
   getComponentData: (type, id) => {
     const state = get();
-    
+
     switch (type) {
       // ... existing cases
-      
+
       case "gallery":
         return galleryFunctions.getData(state, id);
-      
+
       default:
-        // Fallback...
+      // Fallback...
     }
   },
-  
+
   // Similar for setComponentData and updateComponentByPath
-  
+
   // Specific functions
   ensureGalleryVariant: (id, initial) =>
-    set(state => galleryFunctions.ensureVariant(state, id, initial)),
-  
+    set((state) => galleryFunctions.ensureVariant(state, id, initial)),
+
   getGalleryData: (id) => {
     const state = get();
     return galleryFunctions.getData(state, id);
   },
-  
+
   setGalleryData: (id, data) =>
-    set(state => galleryFunctions.setData(state, id, data)),
-  
+    set((state) => galleryFunctions.setData(state, id, data)),
+
   updateGalleryByPath: (id, path, value) =>
-    set(state => galleryFunctions.updateByPath(state, id, path, value))
+    set((state) => galleryFunctions.updateByPath(state, id, path, value)),
 }));
 ```
 
@@ -449,7 +448,7 @@ import { galleryStructure } from "@/componentsStructure/gallery";
 
 export const COMPONENTS: Record<string, ComponentType> = {
   // ... existing components
-  
+
   gallery: {
     id: "gallery",
     name: "gallery",
@@ -459,14 +458,14 @@ export const COMPONENTS: Record<string, ComponentType> = {
     section: "homepage",
     subPath: "gallery",
     icon: "🖼️",
-    ...galleryStructure
-  }
+    ...galleryStructure,
+  },
 };
 
 // Translated version
 export const getComponents = (t: (key: string) => string) => ({
   // ... existing components
-  
+
   gallery: {
     id: "gallery",
     name: "gallery",
@@ -476,8 +475,8 @@ export const getComponents = (t: (key: string) => string) => ({
     section: "homepage",
     subPath: "gallery",
     icon: "🖼️",
-    ...galleryStructure
-  }
+    ...galleryStructure,
+  },
 });
 ```
 
@@ -506,19 +505,19 @@ export default function Gallery1(props: GalleryProps = {}) {
   // ═══════════════════════════════════════════════════════════
   const variantId = props.variant || "gallery1";
   const uniqueId = props.id || variantId;
-  
+
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 2. STORE CONNECTION
   // ═══════════════════════════════════════════════════════════
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const galleryStates = useEditorStore(s => s.galleryStates);
-  
+
   const tenantData = useTenantStore(s => s.tenantData);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 3. INITIALIZATION
   // ═══════════════════════════════════════════════════════════
@@ -528,17 +527,17 @@ export default function Gallery1(props: GalleryProps = {}) {
         ...getDefaultGalleryData(),
         ...props
       };
-      
+
       ensureComponentVariant("gallery", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore]);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 4. DATA MERGING
   // ═══════════════════════════════════════════════════════════
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) return {};
-    
+
     for (const [page, components] of Object.entries(tenantData.componentSettings)) {
       if (typeof components === "object") {
         for (const [id, comp] of Object.entries(components as any)) {
@@ -548,10 +547,10 @@ export default function Gallery1(props: GalleryProps = {}) {
         }
       }
     }
-    
+
     return {};
   };
-  
+
   const defaultData = getDefaultGalleryData();
   const tenantComponentData = getTenantComponentData();
   const storeData = props.useStore
@@ -560,14 +559,14 @@ export default function Gallery1(props: GalleryProps = {}) {
   const currentStoreData = props.useStore
     ? galleryStates[uniqueId] || {}
     : {};
-  
+
   const mergedData = {
     ...defaultData,
     ...props,
     ...tenantComponentData,
     ...storeData,
     ...currentStoreData,
-    
+
     // Deep merge nested objects
     header: {
       ...defaultData.header,
@@ -576,14 +575,14 @@ export default function Gallery1(props: GalleryProps = {}) {
       ...(storeData.header || {}),
       ...(currentStoreData.header || {})
     },
-    
+
     layout: {
       ...defaultData.layout,
       ...(props.layout || {}),
       ...(tenantComponentData.layout || {}),
       ...(storeData.layout || {}),
       ...(currentStoreData.layout || {}),
-      
+
       columns: {
         ...defaultData.layout?.columns,
         ...(props.layout?.columns || {}),
@@ -592,7 +591,7 @@ export default function Gallery1(props: GalleryProps = {}) {
         ...(currentStoreData.layout?.columns || {})
       }
     },
-    
+
     colors: {
       ...defaultData.colors,
       ...(props.colors || {}),
@@ -600,7 +599,7 @@ export default function Gallery1(props: GalleryProps = {}) {
       ...(storeData.colors || {}),
       ...(currentStoreData.colors || {})
     },
-    
+
     lightbox: {
       ...defaultData.lightbox,
       ...(props.lightbox || {}),
@@ -609,7 +608,7 @@ export default function Gallery1(props: GalleryProps = {}) {
       ...(currentStoreData.lightbox || {})
     }
   };
-  
+
   // ═══════════════════════════════════════════════════════════
   // 5. EVENT HANDLERS
   // ═══════════════════════════════════════════════════════════
@@ -619,30 +618,30 @@ export default function Gallery1(props: GalleryProps = {}) {
       setLightboxOpen(true);
     }
   };
-  
+
   const closeLightbox = () => {
     setLightboxOpen(false);
   };
-  
+
   const nextImage = () => {
     const images = mergedData.images || [];
     setSelectedImage((selectedImage + 1) % images.length);
   };
-  
+
   const prevImage = () => {
     const images = mergedData.images || [];
     setSelectedImage((selectedImage - 1 + images.length) % images.length);
   };
-  
+
   // ═══════════════════════════════════════════════════════════
   // 6. RENDER
   // ═══════════════════════════════════════════════════════════
   if (!mergedData.visible) return null;
-  
+
   const images = Array.isArray(mergedData.images) ? mergedData.images : [];
   const columns = mergedData.layout?.columns || { desktop: 4, tablet: 3, mobile: 2 };
   const gap = mergedData.layout?.gap || "8";
-  
+
   return (
     <section
       className="gallery-section py-16"
@@ -660,7 +659,7 @@ export default function Gallery1(props: GalleryProps = {}) {
             >
               {mergedData.header.title}
             </h2>
-            
+
             {mergedData.header.subtitle && (
               <p
                 className="text-xl"
@@ -671,7 +670,7 @@ export default function Gallery1(props: GalleryProps = {}) {
             )}
           </div>
         )}
-        
+
         {/* Gallery Grid */}
         <div
           className={`grid gap-${gap}`}
@@ -696,13 +695,13 @@ export default function Gallery1(props: GalleryProps = {}) {
                   fill
                   className="object-cover transition-transform hover:scale-110"
                 />
-                
+
                 {image.caption && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
                     <p className="text-white text-sm">{image.caption}</p>
                   </div>
                 )}
-                
+
                 {image.featured && (
                   <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs">
                     Featured
@@ -712,7 +711,7 @@ export default function Gallery1(props: GalleryProps = {}) {
             </div>
           ))}
         </div>
-        
+
         {/* Lightbox */}
         {lightboxOpen && mergedData.lightbox?.enabled && (
           <div
@@ -725,7 +724,7 @@ export default function Gallery1(props: GalleryProps = {}) {
             >
               ×
             </button>
-            
+
             <button
               className="absolute left-4 text-white text-3xl"
               onClick={(e) => {
@@ -735,7 +734,7 @@ export default function Gallery1(props: GalleryProps = {}) {
             >
               ‹
             </button>
-            
+
             <div className="max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
               <Image
                 src={images[selectedImage]?.url || ""}
@@ -744,14 +743,14 @@ export default function Gallery1(props: GalleryProps = {}) {
                 height={800}
                 className="object-contain"
               />
-              
+
               {mergedData.lightbox.showCaptions && images[selectedImage]?.caption && (
                 <p className="text-white text-center mt-4">
                   {images[selectedImage].caption}
                 </p>
               )}
             </div>
-            
+
             <button
               className="absolute right-4 text-white text-3xl"
               onClick={(e) => {
@@ -779,12 +778,12 @@ import { getDefaultGalleryData } from "@/context-liveeditor/editorStoreFunctions
 export const createDefaultData = (type: string, componentName?: string) => {
   switch (type) {
     // ... existing cases
-    
+
     case "gallery":
       return getDefaultGalleryData();
-    
+
     default:
-      // Fallback...
+    // Fallback...
   }
 };
 ```
@@ -797,32 +796,34 @@ export const createDefaultData = (type: string, componentName?: string) => {
 loadFromDatabase: (tenantData) =>
   set((state) => {
     const newState = { ...state };
-    
+
     // ... existing loading logic
-    
+
     // Load component data
-    Object.entries(tenantData.componentSettings).forEach(([page, pageSettings]) => {
-      if (pageSettings) {
-        Object.entries(pageSettings).forEach(([id, comp]) => {
-          if (comp.data && comp.componentName) {
-            switch (comp.type) {
-              // ... existing cases
-              
-              case "gallery":
-                newState.galleryStates = galleryFunctions.setData(
-                  newState,
-                  comp.id,
-                  comp.data
-                ).galleryStates;
-                break;
+    Object.entries(tenantData.componentSettings).forEach(
+      ([page, pageSettings]) => {
+        if (pageSettings) {
+          Object.entries(pageSettings).forEach(([id, comp]) => {
+            if (comp.data && comp.componentName) {
+              switch (comp.type) {
+                // ... existing cases
+
+                case "gallery":
+                  newState.galleryStates = galleryFunctions.setData(
+                    newState,
+                    comp.id,
+                    comp.data,
+                  ).galleryStates;
+                  break;
+              }
             }
-          }
-        });
-      }
-    });
-    
+          });
+        }
+      },
+    );
+
     return newState;
-  })
+  });
 ```
 
 #### Step 8: Test
@@ -887,50 +888,50 @@ export function ColorGradientRenderer({
     { color: "#3B82F6", position: 0 },
     { color: "#8B5CF6", position: 100 }
   ];
-  
+
   const addStop = () => {
     const newStop = {
       color: "#000000",
       position: 50
     };
-    
+
     updateValue(`${path}.stops`, [...stops, newStop]);
   };
-  
+
   const removeStop = (index: number) => {
     if (stops.length <= 2) {
       alert("Gradient must have at least 2 color stops");
       return;
     }
-    
+
     const newStops = stops.filter((_, i) => i !== index);
     updateValue(`${path}.stops`, newStops);
   };
-  
+
   const updateStop = (index: number, field: string, value: any) => {
     const newStops = stops.map((stop, i) =>
       i === index ? { ...stop, [field]: value } : stop
     );
-    
+
     updateValue(`${path}.stops`, newStops);
   };
-  
+
   // Generate CSS gradient preview
   const gradientCSS = `linear-gradient(
     ${value?.angle || 90}deg,
     ${stops.map(s => `${s.color} ${s.position}%`).join(", ")}
   )`;
-  
+
   return (
     <div className="gradient-renderer">
       <label className="block mb-2 font-medium">{label}</label>
-      
+
       {/* Gradient Preview */}
       <div
         className="w-full h-24 rounded-lg mb-4"
         style={{ background: gradientCSS }}
       />
-      
+
       {/* Gradient Type */}
       <div className="mb-4">
         <label className="text-sm">Type</label>
@@ -943,7 +944,7 @@ export function ColorGradientRenderer({
           <option value="radial">Radial</option>
         </select>
       </div>
-      
+
       {/* Angle (for linear) */}
       {value?.type === "linear" && (
         <div className="mb-4">
@@ -958,7 +959,7 @@ export function ColorGradientRenderer({
           />
         </div>
       )}
-      
+
       {/* Color Stops */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
@@ -967,7 +968,7 @@ export function ColorGradientRenderer({
             + Add Stop
           </Button>
         </div>
-        
+
         {stops.map((stop, index) => (
           <div key={index} className="flex items-center gap-2 mb-2">
             {/* Color picker */}
@@ -979,7 +980,7 @@ export function ColorGradientRenderer({
                 updateValue={(_, v) => updateStop(index, "color", v)}
               />
             </div>
-            
+
             {/* Position slider */}
             <div className="w-24">
               <input
@@ -992,7 +993,7 @@ export function ColorGradientRenderer({
               />
               <div className="text-xs text-center">{stop.position}%</div>
             </div>
-            
+
             {/* Remove button */}
             <Button
               size="sm"
@@ -1005,7 +1006,7 @@ export function ColorGradientRenderer({
           </div>
         ))}
       </div>
-      
+
       {/* CSS Output (for reference) */}
       <details className="mt-4">
         <summary className="text-sm cursor-pointer">CSS Output</summary>
@@ -1028,7 +1029,7 @@ import { ColorGradientRenderer } from "./FieldRenderers/ColorGradientRenderer";
 // In renderField switch statement
 switch (def.type) {
   // ... existing cases
-  
+
   case "gradient":  // New type!
     return (
       <ColorGradientRenderer
@@ -1038,7 +1039,7 @@ switch (def.type) {
         updateValue={updateValue}
       />
     );
-  
+
   // ... other cases
 }
 ```
@@ -1073,7 +1074,7 @@ switch (def.type) {
 export function GuidedSetup({ onComplete }) {
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState({});
-  
+
   const steps = [
     {
       title: "Basic Info",
@@ -1092,7 +1093,7 @@ export function GuidedSetup({ onComplete }) {
       fields: ["colors.background", "colors.text"]
     }
   ];
-  
+
   const handleNext = () => {
     if (step < steps.length) {
       setStep(step + 1);
@@ -1100,20 +1101,20 @@ export function GuidedSetup({ onComplete }) {
       onComplete(config);
     }
   };
-  
+
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
     }
   };
-  
+
   return (
     <div className="guided-setup">
       {/* Progress indicator */}
       <div className="progress">
         Step {step} of {steps.length}: {steps[step - 1].title}
       </div>
-      
+
       {/* Current step fields */}
       <DynamicFieldsRenderer
         fields={getFieldsForStep(steps[step - 1].fields)}
@@ -1122,7 +1123,7 @@ export function GuidedSetup({ onComplete }) {
         }}
         currentData={config}
       />
-      
+
       {/* Navigation */}
       <div className="flex justify-between mt-4">
         <Button onClick={handleBack} disabled={step === 1}>
@@ -1146,29 +1147,29 @@ export function GuidedSetup({ onComplete }) {
 ```typescript
 const handleSaveWithValidation = () => {
   if (!selectedComponent) return;
-  
+
   // ═══════════════════════════════════════════════════════════
   // 1. VALIDATE DATA
   // ═══════════════════════════════════════════════════════════
   const validation = validateComponentData(tempData, selectedComponent.type);
-  
+
   if (!validation.isValid) {
     console.error("Validation failed:", validation.errors);
-    
+
     // Show errors to user
     toast.error(`Validation failed: ${validation.errors[0]}`);
-    
+
     // Highlight invalid fields
     setInvalidFields(validation.invalidFields);
-    
-    return;  // Don't save
+
+    return; // Don't save
   }
-  
+
   // ═══════════════════════════════════════════════════════════
   // 2. TRANSFORM DATA (if needed)
   // ═══════════════════════════════════════════════════════════
   const transformedData = transformDataForSave(tempData);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 3. SAVE WITH CONFIRMATION
   // ═══════════════════════════════════════════════════════════
@@ -1179,21 +1180,21 @@ const handleSaveWithValidation = () => {
       // Merge data
       const merged = deepMerge(
         deepMerge(existingData, storeData),
-        transformedData
+        transformedData,
       );
-      
+
       // Save
       store.setComponentData(type, id, merged);
       store.forceUpdatePageComponents(page, updatedComponents);
-      
+
       // Log change
       logChange(id, componentName, type, merged, "COMPONENT_UPDATE");
-      
+
       // Notify user
       toast.success("Changes saved successfully!");
-      
+
       onClose();
-    }
+    },
   });
 };
 
@@ -1201,7 +1202,7 @@ const handleSaveWithValidation = () => {
 const validateComponentData = (data, type) => {
   const errors = [];
   const invalidFields = [];
-  
+
   // Type-specific validation
   switch (type) {
     case "hero":
@@ -1209,19 +1210,19 @@ const validateComponentData = (data, type) => {
         errors.push("Title is required");
         invalidFields.push("content.title");
       }
-      
+
       if (data.height?.desktop && !isValidCSSValue(data.height.desktop)) {
         errors.push("Invalid height value");
         invalidFields.push("height.desktop");
       }
       break;
-    
+
     case "gallery":
       if (!data.images || data.images.length === 0) {
         errors.push("At least one image is required");
         invalidFields.push("images");
       }
-      
+
       data.images?.forEach((img, i) => {
         if (!img.url) {
           errors.push(`Image ${i + 1} missing URL`);
@@ -1230,11 +1231,11 @@ const validateComponentData = (data, type) => {
       });
       break;
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
-    invalidFields
+    invalidFields,
   };
 };
 
@@ -1245,11 +1246,11 @@ const transformDataForSave = (data) => {
     if (value === "") return undefined;
     return value;
   });
-  
+
   // Add metadata
   cleaned._lastModified = Date.now();
   cleaned._modifiedBy = currentUser.id;
-  
+
   return cleaned;
 };
 ```
@@ -1382,6 +1383,7 @@ These practical examples demonstrate:
 5. **Complex data structures**: Nested arrays, conditional fields
 
 **Key Takeaways**:
+
 - Follow established patterns
 - Implement all required parts (structure, functions, store, component)
 - Test thoroughly at each step
@@ -1390,9 +1392,9 @@ These practical examples demonstrate:
 - Log important operations
 
 **For AI**:
+
 - Use as templates for new implementations
 - Adapt patterns to specific needs
 - Follow same structure and naming
 - Include all necessary integrations
 - Test edge cases
-

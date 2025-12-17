@@ -42,12 +42,8 @@ import { PropertyCounter } from "@/components/property/propertyCOMP/property-cou
 export default function NewDealForm() {
   const router = useRouter();
   const { userData } = useAuthStore();
-  const {
-    pipelineStages,
-    newDealData,
-    clearNewDealData,
-  } = useCrmStore();
-  
+  const { pipelineStages, newDealData, clearNewDealData } = useCrmStore();
+
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("crm");
 
@@ -112,7 +108,6 @@ export default function NewDealForm() {
     const storeData = newDealData;
     console.log("storeData", storeData);
     if (storeData) {
-        
       setFormData((prev) => ({
         ...prev,
         customer_name: storeData.customer_name || "",
@@ -135,7 +130,11 @@ export default function NewDealForm() {
       try {
         const categoriesRes = await axiosInstance.get("/properties/categories");
         if (categoriesRes.data?.data) {
-          setCategories(Array.isArray(categoriesRes.data.data) ? categoriesRes.data.data : []);
+          setCategories(
+            Array.isArray(categoriesRes.data.data)
+              ? categoriesRes.data.data
+              : [],
+          );
         }
       } catch (categoriesErr) {
         console.error("Error fetching categories:", categoriesErr);
@@ -146,7 +145,11 @@ export default function NewDealForm() {
       try {
         const projectsRes = await axiosInstance.get("/user/projects");
         if (projectsRes.data?.data?.user_projects) {
-          setProjects(Array.isArray(projectsRes.data.data.user_projects) ? projectsRes.data.data.user_projects : []);
+          setProjects(
+            Array.isArray(projectsRes.data.data.user_projects)
+              ? projectsRes.data.data.user_projects
+              : [],
+          );
         }
       } catch (projectsErr) {
         console.error("Error fetching projects:", projectsErr);
@@ -156,8 +159,15 @@ export default function NewDealForm() {
       // Fetch buildings
       try {
         const buildingsRes = await axiosInstance.get("/buildings");
-        if (buildingsRes.data?.status === "success" && buildingsRes.data.data?.buildings) {
-          setBuildings(Array.isArray(buildingsRes.data.data.buildings) ? buildingsRes.data.data.buildings : []);
+        if (
+          buildingsRes.data?.status === "success" &&
+          buildingsRes.data.data?.buildings
+        ) {
+          setBuildings(
+            Array.isArray(buildingsRes.data.data.buildings)
+              ? buildingsRes.data.data.buildings
+              : [],
+          );
         }
       } catch (buildingsErr) {
         console.error("Error fetching buildings:", buildingsErr);
@@ -253,7 +263,9 @@ export default function NewDealForm() {
         },
         attributes: {
           area_sqft: parseFloat(formData.area_sqft) || null,
-          year_built: formData.year_built ? parseInt(formData.year_built) : null,
+          year_built: formData.year_built
+            ? parseInt(formData.year_built)
+            : null,
         },
         facilities: {
           bedrooms: formData.bedrooms ?? null,
@@ -324,14 +336,11 @@ export default function NewDealForm() {
       }
     } catch (err: any) {
       console.error("Error creating deal:", err);
-      toast.error(
-        err.response?.data?.message || "حدث خطأ أثناء إنشاء الصفقة",
-      );
+      toast.error(err.response?.data?.message || "حدث خطأ أثناء إنشاء الصفقة");
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -397,7 +406,9 @@ export default function NewDealForm() {
                         onChange={handleInputChange}
                         placeholder="+966500000000"
                         required
-                        className={errors.customer_phone ? "border-red-500" : ""}
+                        className={
+                          errors.customer_phone ? "border-red-500" : ""
+                        }
                       />
                       {errors.customer_phone && (
                         <p className="text-sm text-red-500">
@@ -429,7 +440,9 @@ export default function NewDealForm() {
                         </SelectContent>
                       </Select>
                       {errors.stage_id && (
-                        <p className="text-sm text-red-500">{errors.stage_id}</p>
+                        <p className="text-sm text-red-500">
+                          {errors.stage_id}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -477,7 +490,10 @@ export default function NewDealForm() {
                         type="number"
                         value={formData.price_per_sqm}
                         onChange={(e) =>
-                          handleStringNumberChange("price_per_sqm", e.target.value)
+                          handleStringNumberChange(
+                            "price_per_sqm",
+                            e.target.value,
+                          )
                         }
                         placeholder="0"
                       />
@@ -646,9 +662,12 @@ export default function NewDealForm() {
                         selectedDistrictId={formData.district}
                         onDistrictSelect={(districtId) => {
                           // Convert to number if possible, otherwise keep as is
-                          const districtValue = typeof districtId === 'string' 
-                            ? (isNaN(Number(districtId)) ? districtId : Number(districtId))
-                            : districtId;
+                          const districtValue =
+                            typeof districtId === "string"
+                              ? isNaN(Number(districtId))
+                                ? districtId
+                                : Number(districtId)
+                              : districtId;
                           setFormData((prev) => ({
                             ...prev,
                             district: districtValue,
@@ -829,4 +848,3 @@ export default function NewDealForm() {
     </div>
   );
 }
-

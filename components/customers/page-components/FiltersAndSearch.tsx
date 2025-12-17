@@ -298,7 +298,7 @@ export const FiltersAndSearch = ({
           onChange={(e) => handleSearchChange(e.target.value)}
         />
       </div>
-      
+
       {/* Filter Buttons */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Type Filter */}

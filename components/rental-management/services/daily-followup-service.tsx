@@ -125,7 +125,7 @@ export function DailyFollowupService() {
   const router = useRouter();
   const { userData } = useAuthStore();
   const isInitialMount = useRef(true);
-  
+
   const {
     paymentData,
     buildings,
@@ -158,7 +158,7 @@ export function DailyFollowupService() {
     nextPage,
     prevPage,
     validateCurrentPage,
-    resetFilters
+    resetFilters,
   } = useDailyFollowupStore();
 
   // جلب البيانات
@@ -212,11 +212,9 @@ export function DailyFollowupService() {
           <span className="text-sm text-gray-700">
             صفحة {currentPage} من {totalPages}
           </span>
-          <span className="text-sm text-gray-500">
-            ({totalRecords} سجل)
-          </span>
+          <span className="text-sm text-gray-500">({totalRecords} سجل)</span>
         </div>
-        
+
         <div className="flex items-center gap-1">
           {/* Previous Button */}
           <Button
@@ -280,8 +278,12 @@ export function DailyFollowupService() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">متابعة المستحقات المالية</h2>
-          <p className="text-gray-600 mt-1">متابعة المستحقات والمدفوعات المتأخرة</p>
+          <h2 className="text-2xl font-bold text-gray-900">
+            متابعة المستحقات المالية
+          </h2>
+          <p className="text-gray-600 mt-1">
+            متابعة المستحقات والمدفوعات المتأخرة
+          </p>
         </div>
       </div>
 
@@ -306,7 +308,7 @@ export function DailyFollowupService() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         fetchPaymentData();
                       }
                     }}
@@ -365,7 +367,10 @@ export function DailyFollowupService() {
               )}
               <div className="space-y-2">
                 <Label htmlFor="building">العمارة</Label>
-                <Select value={buildingFilter} onValueChange={setBuildingFilter}>
+                <Select
+                  value={buildingFilter}
+                  onValueChange={setBuildingFilter}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر العمارة" />
                   </SelectTrigger>
@@ -380,7 +385,7 @@ export function DailyFollowupService() {
                 </Select>
               </div>
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-end gap-3 pt-2 border-t">
               <Button
@@ -456,7 +461,9 @@ export function DailyFollowupService() {
                   <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex items-center justify-center">
                       <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                      <span className="mr-2 text-gray-500">جاري التحميل...</span>
+                      <span className="mr-2 text-gray-500">
+                        جاري التحميل...
+                      </span>
                     </div>
                   </td>
                 </tr>
@@ -476,11 +483,17 @@ export function DailyFollowupService() {
                 </tr>
               ) : (
                 filteredData.map((item, index) => (
-                  <tr key={`${item.rental_id}-${item.installment_info?.installment_id || index}`} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={`${item.rental_id}-${item.installment_info?.installment_id || index}`}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3 space-x-reverse">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src="" alt={item.tenant_name || "غير محدد"} />
+                          <AvatarImage
+                            src=""
+                            alt={item.tenant_name || "غير محدد"}
+                          />
                           <AvatarFallback>
                             {(item.tenant_name || "غير محدد").charAt(0)}
                           </AvatarFallback>
@@ -536,10 +549,14 @@ export function DailyFollowupService() {
                       <div className="text-sm">
                         {(item.arrears?.total_unpaid_amount || 0) > 0 ? (
                           <span className="text-red-600 font-medium">
-                            {formatCurrency(item.arrears?.total_unpaid_amount || 0)}
+                            {formatCurrency(
+                              item.arrears?.total_unpaid_amount || 0,
+                            )}
                           </span>
                         ) : (
-                          <span className="text-green-600">لا توجد متأخرات</span>
+                          <span className="text-green-600">
+                            لا توجد متأخرات
+                          </span>
                         )}
                       </div>
                     </td>

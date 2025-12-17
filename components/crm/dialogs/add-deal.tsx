@@ -35,11 +35,8 @@ interface AddDealDialogProps {
 export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
   const router = useRouter();
   const { userData } = useAuthStore();
-  const {
-    showAddDealDialog,
-    setShowAddDealDialog,
-    pipelineStages,
-  } = useCrmStore();
+  const { showAddDealDialog, setShowAddDealDialog, pipelineStages } =
+    useCrmStore();
 
   const [formData, setFormData] = useState({
     customer_name: "",
@@ -49,9 +46,9 @@ export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<string>("");
-  const [selectedOption, setSelectedOption] = useState<"existing" | "new" | null>(
-    null,
-  );
+  const [selectedOption, setSelectedOption] = useState<
+    "existing" | "new" | null
+  >(null);
   const [isLoadingProperties, setIsLoadingProperties] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +134,7 @@ export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
 
       // Close dialog
       handleClose();
-      
+
       // Small delay to ensure store is updated before navigation
       setTimeout(() => {
         router.push("/dashboard/crm/new-deal");
@@ -271,9 +268,7 @@ export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
 
           {/* Stage Dropdown */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              المرحلة
-            </label>
+            <label className="text-sm font-medium text-gray-700">المرحلة</label>
             <Select
               value={formData.stage_id}
               onValueChange={(value) => handleInputChange("stage_id", value)}
@@ -453,4 +448,3 @@ export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
     </div>
   );
 }
-

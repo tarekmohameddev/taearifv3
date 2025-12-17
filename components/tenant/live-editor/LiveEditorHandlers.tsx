@@ -175,65 +175,65 @@ export function useLiveEditorHandlers(state: any) {
     // Handle global-header specially
     if (id === "global-header") {
       const store = useEditorStore.getState();
-      
+
       // Get default data for the new theme
       const newDefaultData = createDefaultData("header", newTheme);
-      
+
       // ⭐ Add variant to newDefaultData to ensure it's included
       const newDefaultDataWithVariant = {
         ...newDefaultData,
         variant: newTheme,
       };
-      
+
       // IMPORTANT: Update variant FIRST, then data
       // This ensures the variant is saved before any other operations
       store.setGlobalHeaderVariant(newTheme);
-      
+
       // Update data with variant included
       store.setGlobalHeaderData(newDefaultDataWithVariant);
-      
+
       // Update globalComponentsData with BOTH variant and data
       store.setGlobalComponentsData({
         ...store.globalComponentsData,
         header: newDefaultDataWithVariant,
         globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
       } as any);
-      
+
       // Mark as changed
       store.setHasChangesMade(true);
-      
+
       return; // Don't proceed with regular component update
     }
 
     // Handle global-footer specially
     if (id === "global-footer") {
       const store = useEditorStore.getState();
-      
+
       // Get default data for the new theme
       const newDefaultData = createDefaultData("footer", newTheme);
-      
+
       // ⭐ Add variant to newDefaultData to ensure it's included
       const newDefaultDataWithVariant = {
         ...newDefaultData,
         variant: newTheme,
       };
-      
+
       // IMPORTANT: Update variant FIRST, then data
       store.setGlobalFooterVariant(newTheme);
-      
+
       // Update data with variant included
       store.setGlobalFooterData(newDefaultDataWithVariant);
-      
+
       // Update globalComponentsData with BOTH variant and data
       store.setGlobalComponentsData({
         ...store.globalComponentsData,
         footer: newDefaultDataWithVariant,
         globalFooterVariant: newTheme,
       } as any);
-      
+
       // Mark as changed
       store.setHasChangesMade(true);
-      
+
       return; // Don't proceed with regular component update
     }
 

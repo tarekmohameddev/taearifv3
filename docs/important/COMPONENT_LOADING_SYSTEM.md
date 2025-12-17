@@ -3,6 +3,7 @@
 ## Overview
 
 The application uses a **dynamic component loading system** that:
+
 - Loads React components on-demand using `lazy()` imports
 - Supports multiple component variants (e.g., `hero1`, `hero2`, `hero3`)
 - Manages component data, positions, and configurations
@@ -16,6 +17,7 @@ The application uses a **dynamic component loading system** that:
 ### Component Structure
 
 Each component has:
+
 1. **Base Name**: Component type (e.g., `hero`, `header`, `footer`)
 2. **Variant Number**: Visual variation (e.g., `1`, `2`, `3`)
 3. **Full Component Name**: Base + Number (e.g., `hero1`, `header2`)
@@ -68,13 +70,16 @@ export const COMPONENTS: Record<string, ComponentType> = {
     category: "navigation",
     section: "homepage",
     subPath: "header",
-    variants: [/* ... */],
+    variants: [
+      /* ... */
+    ],
   },
   // ... more components
 };
 ```
 
 **Component Properties:**
+
 - `id`: Unique identifier
 - `name`: Component name (same as id)
 - `displayName`: Human-readable name
@@ -97,9 +102,18 @@ export const SECTIONS: Record<string, SectionType> = {
     description: "مكونات الصفحة الرئيسية للموقع",
     icon: "🏠",
     components: [
-      "header", "hero", "halfTextHalfImage", "propertySlider",
-      "ctaValuation", "stepsSection", "whyChooseUs", "testimonials",
-      "contactMapSection", "footer", "grid", "filterButtons",
+      "header",
+      "hero",
+      "halfTextHalfImage",
+      "propertySlider",
+      "ctaValuation",
+      "stepsSection",
+      "whyChooseUs",
+      "testimonials",
+      "contactMapSection",
+      "footer",
+      "grid",
+      "filterButtons",
       // ... more components
     ],
   },
@@ -144,10 +158,10 @@ const loadComponent = (section: string, componentName: string) => {
 
   // Get component sub-path from registry
   const subPath = getComponentSubPath(baseName);
-  
+
   if (!subPath) {
     console.error("Invalid component type:", baseName);
-    
+
     // Fallback to hero directory
     const fallbackPath = "hero";
     const fallbackFullPath = `${fallbackPath}/${componentName}`;
@@ -215,15 +229,14 @@ const fullPath = `${subPath}/${componentName}`;
 #### Step 4: Lazy Load Component
 
 ```typescript
-const Component = lazy(() => 
-  import(`@/components/tenant/${fullPath}`)
-);
+const Component = lazy(() => import(`@/components/tenant/${fullPath}`));
 
 // Resolves to:
 // import("@/components/tenant/hero/hero2")
 ```
 
 **File Structure:**
+
 ```
 components/tenant/
   ├── hero/
@@ -245,6 +258,7 @@ components/tenant/
 ### Tenant Component Settings
 
 **Stored in Backend:**
+
 ```json
 {
   "componentSettings": {
@@ -296,7 +310,10 @@ const componentsList = useMemo(() => {
     const components = Object.entries(pageSettings)
       .map(([id, component]: [string, any]) => {
         // Validate componentName
-        if (!component.componentName || typeof component.componentName !== "string") {
+        if (
+          !component.componentName ||
+          typeof component.componentName !== "string"
+        ) {
           // Fallback to default
           const fallbackName = `${component.type || "hero"}1`;
           return {
@@ -325,6 +342,7 @@ const componentsList = useMemo(() => {
 ```
 
 **Output:**
+
 ```javascript
 [
   {
@@ -371,13 +389,13 @@ export default function HomePageWrapper({ tenantId }) {
     <div>
       {/* Global Header */}
       <StaticHeader1 />
-      
+
       {/* Page Content */}
       <main>
         {filteredComponentsList.map((comp: any) => {
           // Load component dynamically
           const Cmp = loadComponent("homepage", comp.componentName);
-          
+
           if (!Cmp) {
             return <Fragment key={comp.id} />;
           }
@@ -392,7 +410,7 @@ export default function HomePageWrapper({ tenantId }) {
           );
         })}
       </main>
-      
+
       {/* Global Footer */}
       <StaticFooter1 />
     </div>
@@ -403,7 +421,7 @@ export default function HomePageWrapper({ tenantId }) {
 ### Props Passed to Component
 
 ```typescript
-<Cmp 
+<Cmp
   {...(comp.data as any)}  // Spread all component data
   useStore                 // Flag to use Zustand store
   variant={comp.id}        // Unique variant ID
@@ -411,6 +429,7 @@ export default function HomePageWrapper({ tenantId }) {
 ```
 
 **Example for hero1:**
+
 ```typescript
 <Hero1
   title="عنوان البطل"
@@ -439,6 +458,7 @@ const Hero1 = lazy(() => import("@/components/tenant/hero/hero1"));
 ```
 
 **Benefits:**
+
 1. **Code Splitting**: Each component in separate bundle
 2. **Lazy Loading**: Component loaded only when needed
 3. **Better Performance**: Smaller initial bundle size
@@ -503,10 +523,10 @@ export function HeroSkeleton1() {
       <div className="container mx-auto h-full flex flex-col justify-center items-center">
         {/* Title skeleton */}
         <div className="h-12 bg-gray-300 rounded w-3/4 mb-4"></div>
-        
+
         {/* Subtitle skeleton */}
         <div className="h-6 bg-gray-300 rounded w-1/2 mb-8"></div>
-        
+
         {/* Button skeleton */}
         <div className="h-12 bg-gray-300 rounded w-40"></div>
       </div>
@@ -546,7 +566,7 @@ if (shouldShowLoading || !componentsList) {
 ```typescript
 const loadComponent = (section: string, componentName: string) => {
   // ... validation ...
-  
+
   const fullPath = `${subPath}/${componentName}`;
 
   return lazy(() =>
@@ -595,11 +615,11 @@ if (!subPath) {
 ```typescript
 {filteredComponentsList.map((comp: any) => {
   const Cmp = loadComponent("homepage", comp.componentName);
-  
+
   if (!Cmp) {
     return <Fragment key={comp.id} />; // Render nothing
   }
-  
+
   return <Cmp key={comp.id} {...comp.data} />;
 })}
 ```
@@ -627,7 +647,7 @@ if (!subPath) {
 **File: `lib-liveeditor/defaultComponents.js`**
 
 ```javascript
-import defaultData from '../lib/defaultData.json';
+import defaultData from "../lib/defaultData.json";
 
 export const PAGE_DEFINITIONS = defaultData.componentSettings;
 ```
@@ -733,7 +753,7 @@ export function getCenterWrapperStyles(componentName: string): object {
 ```typescript
 {filteredComponentsList.map((comp: any) => {
   const Cmp = loadComponent("homepage", comp.componentName);
-  
+
   const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
   const centerWrapperStyles = getCenterWrapperStyles(comp.componentName);
 
@@ -773,12 +793,12 @@ return (
   <div>
     {/* Global Header - always shown */}
     <StaticHeader1 />
-    
+
     {/* Page components */}
     <main>
       {componentsList.map(/* ... */)}
     </main>
-    
+
     {/* Global Footer - always shown */}
     <StaticFooter1 />
   </div>
@@ -797,6 +817,7 @@ const filteredComponentsList = componentsList.filter((comp: any) => {
 ```
 
 **Why?**
+
 - Header and footer are global (same across all pages)
 - Loaded from `globalComponentsData` instead of `componentSettings`
 - Always rendered at fixed positions
@@ -894,8 +915,8 @@ export const getComponentSubPath = (baseName: string): string | undefined => {
 };
 
 // Example:
-getComponentSubPath("hero") // → "hero"
-getComponentSubPath("halfTextHalfImage") // → "halfTextHalfImage"
+getComponentSubPath("hero"); // → "hero"
+getComponentSubPath("halfTextHalfImage"); // → "halfTextHalfImage"
 ```
 
 ### getSectionPath()
@@ -907,8 +928,8 @@ export const getSectionPath = (section: string): string => {
 };
 
 // Example:
-getSectionPath("homepage") // → "homepage"
-getSectionPath("for-rent") // → "for-rent"
+getSectionPath("homepage"); // → "homepage"
+getSectionPath("for-rent"); // → "for-rent"
 ```
 
 ### getComponentById()
@@ -919,7 +940,7 @@ export const getComponentById = (id: string): ComponentType | undefined => {
 };
 
 // Example:
-getComponentById("hero") // → { id: "hero", name: "hero", ... }
+getComponentById("hero"); // → { id: "hero", name: "hero", ... }
 ```
 
 ---
@@ -929,6 +950,7 @@ getComponentById("hero") // → { id: "hero", name: "hero", ... }
 ### 1. Code Splitting
 
 Each component is in its own bundle:
+
 ```
 hero1.tsx → hero1.bundle.js (loaded only when needed)
 hero2.tsx → hero2.bundle.js
@@ -1038,4 +1060,3 @@ Render component
 6. **Use Fragment for null cases** to avoid empty DOM nodes
 
 This system enables a flexible, performant, and maintainable component architecture that scales with the application's needs.
-

@@ -339,7 +339,7 @@ export default function StaticFooter({
 
   // منطق مبسط: عرض skeleton loading فقط عند الضرورة القصوى
   const shouldShowSkeleton = loadingTenantData || !mergedData;
-  
+
   if (shouldShowSkeleton) {
     return <StaticFooterSkeleton />;
   }
@@ -495,12 +495,15 @@ export default function StaticFooter({
                   fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                 }}
               >
-              عنا
+                عنا
               </h4>
               <p
                 className={`text-${mergedData.styling.typography.bodySize} font-${mergedData.styling.typography.bodyWeight} leading-7 text-white/90`}
               >
-                {mergedData.content.companyInfo.description?.replace('دليل الجواء العقاري يقدم', 'نقدم')}
+                {mergedData.content.companyInfo.description?.replace(
+                  "دليل الجواء العقاري يقدم",
+                  "نقدم",
+                )}
               </p>
             </div>
           )}
@@ -552,7 +555,10 @@ export default function StaticFooter({
                   <span
                     className={`text-${mergedData.styling.typography.bodySize} text-white/90`}
                   >
-                    {mergedData.content.contactInfo.address?.replace('المملكة العربية السعودية - القصيم', 'المملكة العربية السعودية')}
+                    {mergedData.content.contactInfo.address?.replace(
+                      "المملكة العربية السعودية - القصيم",
+                      "المملكة العربية السعودية",
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

@@ -5,7 +5,11 @@ import PropertyPageWrapper from "./PropertyPageWrapper";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
@@ -96,8 +100,17 @@ export default async function PropertyPage({
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
-  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const domainType = headersList.get("x-domain-type") as
+    | "subdomain"
+    | "custom"
+    | null;
   const { id } = await params;
 
-  return <PropertyPageWrapper tenantId={tenantId} domainType={domainType} propertySlug={id} />;
+  return (
+    <PropertyPageWrapper
+      tenantId={tenantId}
+      domainType={domainType}
+      propertySlug={id}
+    />
+  );
 }

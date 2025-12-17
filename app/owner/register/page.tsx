@@ -5,7 +5,13 @@ import useOwnerAuthStore from "@/context/OwnerAuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 
@@ -20,8 +26,9 @@ export default function OwnerRegister() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  
-  const { register, ownerIsLogged, errorRegister, initializeFromStorage } = useOwnerAuthStore();
+
+  const { register, ownerIsLogged, errorRegister, initializeFromStorage } =
+    useOwnerAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -33,16 +40,20 @@ export default function OwnerRegister() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Validate password confirmation
     if (name === "confirmPassword" || name === "password") {
       if (name === "confirmPassword" && value !== formData.password) {
         setPasswordError("كلمة المرور غير متطابقة");
-      } else if (name === "password" && formData.confirmPassword && value !== formData.confirmPassword) {
+      } else if (
+        name === "password" &&
+        formData.confirmPassword &&
+        value !== formData.confirmPassword
+      ) {
         setPasswordError("كلمة المرور غير متطابقة");
       } else {
         setPasswordError("");
@@ -52,7 +63,7 @@ export default function OwnerRegister() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (passwordError) {
       return;
     }
@@ -65,9 +76,9 @@ export default function OwnerRegister() {
         formData.password,
         formData.firstName,
         formData.lastName,
-        formData.phone
+        formData.phone,
       );
-      
+
       if (result.success) {
         router.push("/owner/dashboard");
       }
@@ -83,7 +94,9 @@ export default function OwnerRegister() {
       <div className="max-w-md w-full space-y-8">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">تسجيل مالك جديد</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              تسجيل مالك جديد
+            </CardTitle>
             <CardDescription>
               أنشئ حساب جديد للوصول إلى لوحة تحكم المالك
             </CardDescription>
@@ -191,8 +204,8 @@ export default function OwnerRegister() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 لديك حساب بالفعل؟{" "}
-                <Link 
-                  href="/owner/login" 
+                <Link
+                  href="/owner/login"
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   تسجيل الدخول

@@ -71,7 +71,7 @@ export const TrustedBrandsScroller = ({
   speed = 40,
   pauseOnHover = true,
   opacity = 0.6,
-  hoverOpacity = 1.0
+  hoverOpacity = 1.0,
 }: TrustedBrandsScrollerProps) => {
   // Fallback to default logos if none provided
   const defaultLogos = [
@@ -85,10 +85,13 @@ export const TrustedBrandsScroller = ({
     "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-02-cAk2qbxpAg3S93YrcscxN1R4O1GW2f.svg",
     "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-01-gX8JYjjL15YsCE3Nr26CRLHwOpvEmJ.svg",
   ];
-  
-  const logosToUse: Logo[] = logos.length > 0 
-    ? logos.map(logo => typeof logo === 'string' ? { src: logo, alt: 'Client Logo' } : logo)
-    : defaultLogos.map(src => ({ src, alt: 'Client Logo' }));
+
+  const logosToUse: Logo[] =
+    logos.length > 0
+      ? logos.map((logo) =>
+          typeof logo === "string" ? { src: logo, alt: "Client Logo" } : logo,
+        )
+      : defaultLogos.map((src) => ({ src, alt: "Client Logo" }));
 
   // Calculate number of repetitions based on logo count
   const repetitionCount = getRepetitionCount(logosToUse.length);
@@ -111,7 +114,7 @@ export const TrustedBrandsScroller = ({
         }
 
         .group:hover .animate-marquee {
-          animation-play-state: ${pauseOnHover ? 'paused' : 'running'};
+          animation-play-state: ${pauseOnHover ? "paused" : "running"};
         }
       `}</style>
 
@@ -131,7 +134,7 @@ export const TrustedBrandsScroller = ({
                 hoverOpacity={hoverOpacity}
                 repetitionIndex={repIndex}
               />
-            ))
+            )),
           )}
         </div>
       </div>
@@ -144,7 +147,7 @@ export const TrustedBrandsScrollerReverse = ({
   speed = 40,
   pauseOnHover = true,
   opacity = 0.6,
-  hoverOpacity = 1.0
+  hoverOpacity = 1.0,
 }: TrustedBrandsScrollerProps) => {
   // Fallback to default logos if none provided
   const defaultLogos = [
@@ -158,10 +161,13 @@ export const TrustedBrandsScrollerReverse = ({
     "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-02-cAk2qbxpAg3S93YrcscxN1R4O1GW2f.svg",
     "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-01-gX8JYjjL15YsCE3Nr26CRLHwOpvEmJ.svg",
   ];
-  
-  const logosToUse: Logo[] = logos.length > 0 
-    ? logos.map(logo => typeof logo === 'string' ? { src: logo, alt: 'Client Logo' } : logo)
-    : defaultLogos.map(src => ({ src, alt: 'Client Logo' }));
+
+  const logosToUse: Logo[] =
+    logos.length > 0
+      ? logos.map((logo) =>
+          typeof logo === "string" ? { src: logo, alt: "Client Logo" } : logo,
+        )
+      : defaultLogos.map((src) => ({ src, alt: "Client Logo" }));
 
   // Calculate number of repetitions based on logo count
   const repetitionCount = getRepetitionCount(logosToUse.length);
@@ -184,7 +190,7 @@ export const TrustedBrandsScrollerReverse = ({
         }
 
         .group:hover .animate-marquee-reverse {
-          animation-play-state: ${pauseOnHover ? 'paused' : 'running'};
+          animation-play-state: ${pauseOnHover ? "paused" : "running"};
         }
       `}</style>
 
@@ -204,7 +210,7 @@ export const TrustedBrandsScrollerReverse = ({
                 hoverOpacity={hoverOpacity}
                 repetitionIndex={repIndex}
               />
-            ))
+            )),
           )}
         </div>
       </div>

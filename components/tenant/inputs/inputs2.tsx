@@ -131,14 +131,14 @@ interface InputsProps {
 
 // Helper function to get shadow color from primary color
 const getShadowColor = (hex: string): string => {
-  if (!hex || !hex.startsWith('#')) return "rgba(5, 150, 105, 0.1)"; // emerald-600 fallback
-  const cleanHex = hex.replace('#', '');
+  if (!hex || !hex.startsWith("#")) return "rgba(5, 150, 105, 0.1)"; // emerald-600 fallback
+  const cleanHex = hex.replace("#", "");
   if (cleanHex.length !== 6) return "rgba(5, 150, 105, 0.1)";
-  
+
   const r = parseInt(cleanHex.substr(0, 2), 16);
   const g = parseInt(cleanHex.substr(2, 2), 16);
   const b = parseInt(cleanHex.substr(4, 2), 16);
-  
+
   return `rgba(${r}, ${g}, ${b}, 0.1)`;
 };
 
@@ -171,8 +171,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default (fallback)
@@ -180,28 +180,37 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to create lighter color (for hover backgrounds)
   const getLighterColor = (hex: string, opacity: number = 0.1): string => {
-    if (!hex || !hex.startsWith('#')) return `${primaryColor}1A`; // 10% opacity default
+    if (!hex || !hex.startsWith("#")) return `${primaryColor}1A`; // 10% opacity default
     // Return hex color with opacity using rgba
-    const cleanHex = hex.replace('#', '');
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return `${primaryColor}1A`;
-    
+
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
@@ -947,8 +956,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
         // Create the JSON data in the exact format you specified
         const jsonFormData = mapFormDataToJsonFormat(formData);
 
-
-
         // Send data to API endpoint
         if (apiEndpoint && apiEndpoint.trim() !== "") {
           try {
@@ -1280,9 +1287,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
-              style={{
-                '--focus-ring-color': primaryColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--focus-ring-color": primaryColor,
+                } as React.CSSProperties
+              }
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                 focus:outline-none focus:ring-2 focus:border-transparent
@@ -1298,8 +1307,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.boxShadow = "";
               }}
               rows={4}
             />
@@ -1308,9 +1317,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               <select
                 value={formData[field.id] || ""}
                 onChange={(e) => handleInputChange(field.id, e.target.value)}
-                style={{
-                  '--focus-ring-color': primaryColor,
-                } as React.CSSProperties}
+                style={
+                  {
+                    "--focus-ring-color": primaryColor,
+                  } as React.CSSProperties
+                }
                 className={`
       w-full px-4 py-3 pr-12 border rounded-xl transition-all duration-300
       appearance-none
@@ -1327,8 +1338,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                   e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '';
-                  e.currentTarget.style.boxShadow = '';
+                  e.currentTarget.style.borderColor = "";
+                  e.currentTarget.style.boxShadow = "";
                 }}
               >
                 <option value="">اختر {field.label}</option>
@@ -1372,9 +1383,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
-              style={{
-                '--focus-ring-color': primaryColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--focus-ring-color": primaryColor,
+                } as React.CSSProperties
+              }
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                 focus:outline-none focus:ring-2 focus:border-transparent
@@ -1390,8 +1403,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.boxShadow = "";
               }}
             />
           ) : fieldType === "number" ? (
@@ -1400,9 +1413,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
-              style={{
-                '--focus-ring-color': primaryColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--focus-ring-color": primaryColor,
+                } as React.CSSProperties
+              }
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                 focus:outline-none focus:ring-2 focus:border-transparent
@@ -1418,8 +1433,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.boxShadow = "";
               }}
             />
           ) : fieldType === "date" ? (
@@ -1428,9 +1443,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
-              style={{
-                '--focus-ring-color': primaryColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--focus-ring-color": primaryColor,
+                } as React.CSSProperties
+              }
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                 focus:outline-none focus:ring-2 focus:border-transparent
@@ -1446,8 +1463,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.boxShadow = "";
               }}
             />
           ) : fieldType === "currency" ? (
@@ -1458,9 +1475,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 value={formData[field.id] || ""}
                 onChange={(e) => handleInputChange(field.id, e.target.value)}
                 placeholder={field.placeholder || `أدخل ${field.label}`}
-                style={{
-                  '--focus-ring-color': primaryColor,
-                } as React.CSSProperties}
+                style={
+                  {
+                    "--focus-ring-color": primaryColor,
+                  } as React.CSSProperties
+                }
                 className={`
                   w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                   focus:outline-none focus:ring-2 focus:border-transparent
@@ -1476,8 +1495,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                   e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '';
-                  e.currentTarget.style.boxShadow = '';
+                  e.currentTarget.style.borderColor = "";
+                  e.currentTarget.style.boxShadow = "";
                 }}
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -1507,13 +1526,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     onMouseEnter={(e) => {
                       if (formData[field.id] !== option.value) {
                         e.currentTarget.style.borderColor = primaryColor;
-                        e.currentTarget.style.backgroundColor = primaryColorLight;
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorLight;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (formData[field.id] !== option.value) {
-                        e.currentTarget.style.borderColor = '';
-                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = "";
+                        e.currentTarget.style.backgroundColor = "white";
                       }
                     }}
                     onClick={() => handleInputChange(field.id, option.value)}
@@ -1543,9 +1563,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
-              style={{
-                '--focus-ring-color': primaryColor,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--focus-ring-color": primaryColor,
+                } as React.CSSProperties
+              }
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
                 focus:outline-none focus:ring-2 focus:border-transparent
@@ -1561,8 +1583,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = '';
+                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.boxShadow = "";
               }}
             />
           )}
@@ -1803,7 +1825,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       <section className="w-full bg-background py-8">
         <div className="mx-auto max-w-[1600px] px-4">
           <div className="text-center py-12">
-            <div 
+            <div
               className="inline-block animate-spin rounded-full h-8 w-8 border-b-2"
               style={{ borderBottomColor: primaryColor }}
             ></div>

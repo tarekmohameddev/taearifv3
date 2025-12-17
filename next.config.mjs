@@ -19,7 +19,7 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // تحسينات للأداء 
+  // تحسينات للأداء
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
@@ -36,10 +36,10 @@ const nextConfig = {
     config.watchOptions = {
       ...config.watchOptions,
       ignored: [
-        ...(Array.isArray(config.watchOptions?.ignored) 
-          ? config.watchOptions.ignored 
-          : config.watchOptions?.ignored 
-            ? [config.watchOptions.ignored] 
+        ...(Array.isArray(config.watchOptions?.ignored)
+          ? config.watchOptions.ignored
+          : config.watchOptions?.ignored
+            ? [config.watchOptions.ignored]
             : []),
         "**/trash/**",
         "**/docs/**",

@@ -1435,7 +1435,11 @@
     {
       "scenario": "Financial Reporting",
       "description": "Generate financial reports and collection analysis",
-      "data_sources": ["monthly_collections", "yearly_overview", "late_payments"]
+      "data_sources": [
+        "monthly_collections",
+        "yearly_overview",
+        "late_payments"
+      ]
     },
     {
       "scenario": "Tenant Management",
@@ -1455,7 +1459,11 @@
     {
       "scenario": "Payment Collection",
       "description": "Track and manage payment collections",
-      "data_sources": ["payments_due_current_month_details", "payments_due_next_month_details", "overdue_payments_details"]
+      "data_sources": [
+        "payments_due_current_month_details",
+        "payments_due_next_month_details",
+        "overdue_payments_details"
+      ]
     }
   ],
   "notes": {

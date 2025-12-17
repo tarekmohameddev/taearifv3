@@ -90,7 +90,7 @@ interface PaymentData {
 export function ContractsService() {
   const router = useRouter();
   const { userData } = useAuthStore();
-  
+
   const {
     contractsData,
     buildings,
@@ -124,9 +124,8 @@ export function ContractsService() {
     goToPage,
     nextPage,
     prevPage,
-    validateCurrentPage
+    validateCurrentPage,
   } = useContractsStore();
-
 
   // جلب البيانات
   const fetchPaymentData = async () => {
@@ -149,11 +148,18 @@ export function ContractsService() {
     if (userData?.token) {
       fetchPaymentData();
     }
-  }, [searchTerm, contractStatusFilter, paymentStatusFilter, rentalMethodFilter, buildingFilter, dateFilter, currentPage]);
+  }, [
+    searchTerm,
+    contractStatusFilter,
+    paymentStatusFilter,
+    rentalMethodFilter,
+    buildingFilter,
+    dateFilter,
+    currentPage,
+  ]);
 
   // فلترة البيانات
   const filteredData = getFilteredData();
-
 
   // Pagination Component
   const PaginationComponent = () => {
@@ -177,11 +183,9 @@ export function ContractsService() {
           <span className="text-sm text-gray-700">
             صفحة {currentPage} من {totalPages}
           </span>
-          <span className="text-sm text-gray-500">
-            ({totalRecords} سجل)
-          </span>
+          <span className="text-sm text-gray-500">({totalRecords} سجل)</span>
         </div>
-        
+
         <div className="flex items-center gap-1">
           {/* Previous Button */}
           <Button
@@ -248,7 +252,9 @@ export function ContractsService() {
           <CardTitle className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">قائمة العقود</h2>
-              <p className="text-gray-600 mt-1">جميع عقود الإيجار والمستأجرين</p>
+              <p className="text-gray-600 mt-1">
+                جميع عقود الإيجار والمستأجرين
+              </p>
             </div>
           </CardTitle>
         </CardHeader>
@@ -270,7 +276,10 @@ export function ContractsService() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="contract-status">حالة العقد</Label>
-              <Select value={contractStatusFilter} onValueChange={setContractStatusFilter}>
+              <Select
+                value={contractStatusFilter}
+                onValueChange={setContractStatusFilter}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر حالة العقد" />
                 </SelectTrigger>
@@ -284,7 +293,10 @@ export function ContractsService() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="payment-status">حالة الدفع</Label>
-              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+              <Select
+                value={paymentStatusFilter}
+                onValueChange={setPaymentStatusFilter}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر حالة الدفع" />
                 </SelectTrigger>
@@ -299,7 +311,10 @@ export function ContractsService() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="rental-method">طريقة الإيجار</Label>
-              <Select value={rentalMethodFilter} onValueChange={setRentalMethodFilter}>
+              <Select
+                value={rentalMethodFilter}
+                onValueChange={setRentalMethodFilter}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر طريقة الإيجار" />
                 </SelectTrigger>
@@ -320,11 +335,11 @@ export function ContractsService() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">جميع المباني</SelectItem>
-                         {buildings.map((building: any) => (
-                           <SelectItem key={building.id} value={building.id}>
-                             {building.name}
-                           </SelectItem>
-                         ))}
+                  {buildings.map((building: any) => (
+                    <SelectItem key={building.id} value={building.id}>
+                      {building.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -385,7 +400,9 @@ export function ContractsService() {
                       <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex items-center justify-center">
                           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                          <span className="mr-2 text-gray-500">جاري التحميل...</span>
+                          <span className="mr-2 text-gray-500">
+                            جاري التحميل...
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -405,23 +422,37 @@ export function ContractsService() {
                     </tr>
                   ) : (
                     filteredData.map((item: any, index: number) => (
-                      <tr key={`${item.contract_id}-${index}`} className="hover:bg-gray-50 transition-colors">
+                      <tr
+                        key={`${item.contract_id}-${index}`}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
                         {/* المستأجر */}
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-3 space-x-reverse">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src="" alt={item.tenant_information?.tenant_name || "غير محدد"} />
+                              <AvatarImage
+                                src=""
+                                alt={
+                                  item.tenant_information?.tenant_name ||
+                                  "غير محدد"
+                                }
+                              />
                               <AvatarFallback>
-                                {(item.tenant_information?.tenant_name || "غير محدد").charAt(0)}
+                                {(
+                                  item.tenant_information?.tenant_name ||
+                                  "غير محدد"
+                                ).charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <div className="font-medium text-gray-900">
-                                {item.tenant_information?.tenant_name || "غير محدد"}
+                                {item.tenant_information?.tenant_name ||
+                                  "غير محدد"}
                               </div>
                               <div className="text-sm text-gray-500 flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
-                                {item.tenant_information?.tenant_phone || "غير محدد"}
+                                {item.tenant_information?.tenant_phone ||
+                                  "غير محدد"}
                               </div>
                             </div>
                           </div>
@@ -434,7 +465,8 @@ export function ContractsService() {
                             </div>
                             <div className="text-sm text-gray-500 flex items-center gap-1">
                               <Building2 className="h-3 w-3" />
-                              {item.unit_information?.unit_address || "غير محدد"}
+                              {item.unit_information?.unit_address ||
+                                "غير محدد"}
                             </div>
                           </div>
                         </td>
@@ -461,11 +493,15 @@ export function ContractsService() {
                         {/* طريقة الإيجار */}
                         <td className="px-6 py-4">
                           <div className="text-sm text-gray-900">
-                            {item.rental_method === "Monthly" ? "شهري" :
-                             item.rental_method === "Quarterly" ? "ربعي" :
-                             item.rental_method === "Semi-Annual" ? "نصف سنوي" :
-                             item.rental_method === "Annual" ? "سنوي" :
-                             item.rental_method || "غير محدد"}
+                            {item.rental_method === "Monthly"
+                              ? "شهري"
+                              : item.rental_method === "Quarterly"
+                                ? "ربعي"
+                                : item.rental_method === "Semi-Annual"
+                                  ? "نصف سنوي"
+                                  : item.rental_method === "Annual"
+                                    ? "سنوي"
+                                    : item.rental_method || "غير محدد"}
                           </div>
                         </td>
                         {/* تاريخ البدء */}
@@ -474,24 +510,34 @@ export function ContractsService() {
                             {formatDate(item.lease_term?.start_date || "")}
                           </div>
                           <div className="text-xs text-gray-500">
-                            انتهاء: {formatDate(item.lease_term?.end_date || "")}
+                            انتهاء:{" "}
+                            {formatDate(item.lease_term?.end_date || "")}
                           </div>
                         </td>
                         {/* حالة العقد */}
                         <td className="px-6 py-4">
-                          <Badge className={getContractStatusColor(item.contract_status)}>
+                          <Badge
+                            className={getContractStatusColor(
+                              item.contract_status,
+                            )}
+                          >
                             {getContractStatusText(item.contract_status)}
                           </Badge>
                         </td>
                         {/* حالة الدفع */}
                         <td className="px-6 py-4">
-                          <Badge className={getPaymentStatusColor(item.payment_status)}>
+                          <Badge
+                            className={getPaymentStatusColor(
+                              item.payment_status,
+                            )}
+                          >
                             {getPaymentStatusText(item.payment_status)}
                           </Badge>
                           {item.payment_details?.message && (
                             <div className="text-xs text-gray-500 mt-1">
-                              {item.payment_details.message === "Payment not due yet" 
-                                ? "غير مستحق الآن" 
+                              {item.payment_details.message ===
+                              "Payment not due yet"
+                                ? "غير مستحق الآن"
                                 : item.payment_details.message}
                             </div>
                           )}

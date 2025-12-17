@@ -7,11 +7,13 @@
 هذا دليل شامل لحل مشكلة Google OAuth التي تظهر عند محاولة فتح callback URL مباشرة.
 
 ### 🚨 الخطأ:
+
 ```
 Error: This action with HTTP GET is not supported by NextAuth.js
 ```
 
 ### 🎯 الحل:
+
 تصحيح الإعدادات واستخدام NextAuth.js بالطريقة الصحيحة.
 
 ---
@@ -21,18 +23,21 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 تم إنشاء **4 ملفات توثيقية شاملة** لمساعدتك:
 
 ### 1️⃣ **[START_HERE_AR.md](./START_HERE_AR.md)** ⭐ ابدأ هنا
+
 - نقطة البداية
 - توجيهات سريعة
 - اختر المسار المناسب لك
 - **الوقت:** 2 دقيقة
 
 ### 2️⃣ **[VISUAL_COMPARISON.md](./VISUAL_COMPARISON.md)** 👀 مقارنة مرئية
+
 - الصحيح vs الخاطئ
 - مخططات توضيحية
 - أمثلة مرئية
 - **الوقت:** 5 دقائق
 
 ### 3️⃣ **[DEEP_ANALYSIS_GOOGLE_OAUTH.md](./DEEP_ANALYSIS_GOOGLE_OAUTH.md)** 🔬 تحليل عميق
+
 - تحليل جذري للمشكلة
 - السبب الحقيقي
 - الحل الشامل خطوة بخطوة
@@ -40,6 +45,7 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 - **الوقت:** 15 دقيقة
 
 ### 4️⃣ **[FINAL_SOLUTION.md](./FINAL_SOLUTION.md)** ✅ الحل النهائي
+
 - 3 خطوات فقط
 - مباشر وواضح
 - جاهز للتطبيق
@@ -50,6 +56,7 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 ## ⚡ الحل السريع (TL;DR)
 
 ### المشكلة:
+
 ```
 ❌ /api/auth/google/callback    (خاطئ)
 ✅ /api/auth/callback/google    (صحيح)
@@ -58,6 +65,7 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 ### الحل:
 
 1. **أضف في Vercel:**
+
    ```env
    NEXTAUTH_URL=https://www.taearif.com
    GOOGLE_CLIENT_ID=your_client_id
@@ -65,6 +73,7 @@ Error: This action with HTTP GET is not supported by NextAuth.js
    ```
 
 2. **صحح في Google Console:**
+
    ```
    Redirect URI: https://www.taearif.com/api/auth/callback/google
    ```
@@ -82,12 +91,14 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 ### المشاكل الثلاثة:
 
 #### 1. **الـ URL خاطئ**
+
 ```
 أنت تفتح:      /api/auth/google/callback    ❌
 NextAuth يتوقع: /api/auth/callback/google    ✅
 ```
 
 #### 2. **متغيرات البيئة خاطئة**
+
 ```env
 الحالي:  NEXTAUTH_URL=http://taearif.com     ❌
 الصحيح:  NEXTAUTH_URL=https://www.taearif.com ✅
@@ -100,6 +111,7 @@ NextAuth يتوقع: /api/auth/callback/google    ✅
 ```
 
 #### 3. **الكود يستخدم نظام قديم**
+
 ```typescript
 القديم:  fetchGoogleAuthUrl() → Backend API  ❌
 الجديد:  signIn("google") → NextAuth.js      ✅
@@ -149,11 +161,13 @@ git push origin main
 ## 📖 كيف تستخدم هذا الدليل
 
 ### إذا كنت مستعجل:
+
 1. اقرأ: **[FINAL_SOLUTION.md](./FINAL_SOLUTION.md)** (5 دقائق)
 2. نفّذ: الخطوات الثلاثة
 3. اختبر
 
 ### إذا تريد فهم المشكلة:
+
 1. ابدأ: **[START_HERE_AR.md](./START_HERE_AR.md)** (2 دقيقة)
 2. اقرأ: **[VISUAL_COMPARISON.md](./VISUAL_COMPARISON.md)** (5 دقائق)
 3. افهم: **[DEEP_ANALYSIS_GOOGLE_OAUTH.md](./DEEP_ANALYSIS_GOOGLE_OAUTH.md)** (15 دقيقة)
@@ -173,12 +187,12 @@ git push origin main
 
 ## 🐛 استكشاف الأخطاء الشائعة
 
-| الخطأ | السبب | الحل |
-|------|-------|------|
-| "This action with HTTP GET is not supported" | URL خاطئ أو محاولة فتحه مباشرة | استخدم `signIn("google")` |
-| "redirect_uri_mismatch" | NEXTAUTH_URL لا يطابق Google Console | صحح NEXTAUTH_URL |
-| "Invalid client" | GOOGLE_CLIENT_ID/SECRET خاطئ | راجع القيم من Google Console |
-| "Access blocked" | لم يتم إعداد OAuth consent screen | أكمل إعداد OAuth consent screen |
+| الخطأ                                        | السبب                                | الحل                            |
+| -------------------------------------------- | ------------------------------------ | ------------------------------- |
+| "This action with HTTP GET is not supported" | URL خاطئ أو محاولة فتحه مباشرة       | استخدم `signIn("google")`       |
+| "redirect_uri_mismatch"                      | NEXTAUTH_URL لا يطابق Google Console | صحح NEXTAUTH_URL                |
+| "Invalid client"                             | GOOGLE_CLIENT_ID/SECRET خاطئ         | راجع القيم من Google Console    |
+| "Access blocked"                             | لم يتم إعداد OAuth consent screen    | أكمل إعداد OAuth consent screen |
 
 للتفاصيل: **[DEEP_ANALYSIS_GOOGLE_OAUTH.md](./DEEP_ANALYSIS_GOOGLE_OAUTH.md)**
 
@@ -198,14 +212,14 @@ git push origin main
 
 ## ⏱️ الوقت المطلوب
 
-| النشاط | الوقت |
-|--------|-------|
-| القراءة (جميع الملفات) | 20-30 دقيقة |
-| الحصول على Google Credentials | 10-15 دقيقة |
-| التطبيق في Vercel | 2-3 دقيقة |
-| إعادة النشر | 2-3 دقيقة |
-| الاختبار | 2 دقيقة |
-| **المجموع** | **35-50 دقيقة** |
+| النشاط                        | الوقت           |
+| ----------------------------- | --------------- |
+| القراءة (جميع الملفات)        | 20-30 دقيقة     |
+| الحصول على Google Credentials | 10-15 دقيقة     |
+| التطبيق في Vercel             | 2-3 دقيقة       |
+| إعادة النشر                   | 2-3 دقيقة       |
+| الاختبار                      | 2 دقيقة         |
+| **المجموع**                   | **35-50 دقيقة** |
 
 ---
 
@@ -214,18 +228,21 @@ git push origin main
 ### ⚠️ تذكر دائماً:
 
 1. **الترتيب مهم:**
+
    ```
    ✅ /api/auth/callback/google    (callback قبل google)
    ❌ /api/auth/google/callback    (google قبل callback)
    ```
 
 2. **https و www مهمة:**
+
    ```env
    ✅ NEXTAUTH_URL=https://www.taearif.com
    ❌ NEXTAUTH_URL=http://taearif.com
    ```
 
 3. **التطابق التام ضروري:**
+
    ```
    NEXTAUTH_URL + /api/auth/callback/google
    = Google Console Redirect URI
@@ -303,4 +320,3 @@ git push origin main
 </div>
 
 **Happy Coding! 💻**
-

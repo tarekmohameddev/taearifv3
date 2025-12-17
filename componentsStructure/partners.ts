@@ -10,12 +10,12 @@ export const partnersStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -28,7 +28,7 @@ export const partnersStructure: ComponentStructure = {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "1600px"
+              placeholder: "1600px",
             },
             {
               key: "padding",
@@ -39,19 +39,19 @@ export const partnersStructure: ComponentStructure = {
                   key: "top",
                   label: "Top Padding",
                   type: "text",
-                  placeholder: "5rem"
+                  placeholder: "5rem",
                 },
                 {
                   key: "bottom",
                   label: "Bottom Padding",
                   type: "text",
-                  placeholder: "5rem"
-                }
-              ]
-            }
-          ]
+                  placeholder: "5rem",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CONTENT
         // ═══════════════════════════════════════════════════════════
@@ -64,11 +64,11 @@ export const partnersStructure: ComponentStructure = {
               key: "title",
               label: "Section Title",
               type: "text",
-              placeholder: "موثوق من خبراء العقار. في جميع أنحاء المملكة."
-            }
-          ]
+              placeholder: "موثوق من خبراء العقار. في جميع أنحاء المملكة.",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // PARTNERS ARRAY - Dynamic Images
         // ═══════════════════════════════════════════════════════════
@@ -82,17 +82,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "src",
               label: "Partner Logo",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Partner Logo"
-            }
-          ]
+              placeholder: "Partner Logo",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // GRID CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -110,31 +110,31 @@ export const partnersStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile Columns",
                   type: "number",
-                  placeholder: "2"
+                  placeholder: "2",
                 },
                 {
                   key: "tablet",
                   label: "Tablet Columns",
                   type: "number",
-                  placeholder: "3"
+                  placeholder: "3",
                 },
                 {
                   key: "desktop",
                   label: "Desktop Columns",
                   type: "number",
-                  placeholder: "6"
-                }
-              ]
+                  placeholder: "6",
+                },
+              ],
             },
             {
               key: "gap",
               label: "Gap Between Cards",
               type: "text",
-              placeholder: "2rem"
-            }
-          ]
+              placeholder: "2rem",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -147,7 +147,7 @@ export const partnersStructure: ComponentStructure = {
               key: "backgroundColor",
               label: "Background Color",
               type: "color",
-              defaultValue: "transparent"
+              defaultValue: "transparent",
             },
             {
               key: "titleColor",
@@ -159,33 +159,33 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "descriptionColor",
               label: "Description Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardBackgroundColor",
               label: "Card Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardHoverBackgroundColor",
               label: "Card Hover Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "logoOpacity",
               label: "Logo Opacity",
               type: "number",
-              placeholder: "0.7"
+              placeholder: "0.7",
             },
             {
               key: "logoHoverOpacity",
               label: "Logo Hover Opacity",
               type: "number",
-              placeholder: "1.0"
-            }
-          ]
+              placeholder: "1.0",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // TYPOGRAPHY
         // ═══════════════════════════════════════════════════════════
@@ -208,41 +208,41 @@ export const partnersStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "2xl"
+                      placeholder: "2xl",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "4xl"
+                      placeholder: "4xl",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "6xl"
-                    }
-                  ]
+                      placeholder: "6xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold"
+                  placeholder: "bold",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
+                  placeholder: "Tajawal",
                 },
                 {
                   key: "lineHeight",
                   label: "Line Height",
                   type: "text",
-                  placeholder: "tight"
-                }
-              ]
+                  placeholder: "tight",
+                },
+              ],
             },
             {
               key: "description",
@@ -258,45 +258,45 @@ export const partnersStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "base"
+                      placeholder: "base",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "lg"
+                      placeholder: "lg",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "xl"
-                    }
-                  ]
+                      placeholder: "xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal"
+                  placeholder: "normal",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
+                  placeholder: "Tajawal",
                 },
                 {
                   key: "lineHeight",
                   label: "Line Height",
                   type: "text",
-                  placeholder: "relaxed"
-                }
-              ]
-            }
-          ]
+                  placeholder: "relaxed",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // ANIMATION SETTINGS
         // ═══════════════════════════════════════════════════════════
@@ -308,30 +308,30 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "enabled",
               label: "Enable Animation",
-              type: "boolean"
+              type: "boolean",
             },
             {
               key: "type",
               label: "Animation Type",
               type: "text",
-              placeholder: "fade-up"
+              placeholder: "fade-up",
             },
             {
               key: "duration",
               label: "Duration (ms)",
               type: "number",
-              placeholder: "1000"
+              placeholder: "1000",
             },
             {
               key: "threshold",
               label: "Intersection Threshold",
               type: "number",
-              placeholder: "0.1"
-            }
-          ]
-        }
+              placeholder: "0.1",
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
@@ -348,17 +348,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "src",
               label: "Partner Logo",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Partner Logo"
-            }
-          ]
-        }
-      ]
+              placeholder: "Partner Logo",
+            },
+          ],
+        },
+      ],
     },
     {
       id: "partners2",
@@ -367,12 +367,12 @@ export const partnersStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -385,7 +385,7 @@ export const partnersStructure: ComponentStructure = {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "1600px"
+              placeholder: "1600px",
             },
             {
               key: "padding",
@@ -396,43 +396,43 @@ export const partnersStructure: ComponentStructure = {
                   key: "top",
                   label: "Top Padding",
                   type: "text",
-                  placeholder: "5rem"
+                  placeholder: "5rem",
                 },
                 {
                   key: "bottom",
                   label: "Bottom Padding",
                   type: "text",
-                  placeholder: "5rem"
-                }
-              ]
+                  placeholder: "5rem",
+                },
+              ],
             },
             {
               key: "columns",
               label: "Grid Columns",
               type: "number",
-              placeholder: "4"
+              placeholder: "4",
             },
             {
               key: "rows",
               label: "Grid Rows",
               type: "number",
-              placeholder: "4"
+              placeholder: "4",
             },
             {
               key: "gap",
               label: "Gap",
               type: "text",
-              placeholder: "2"
+              placeholder: "2",
             },
             {
               key: "cardsPerSlide",
               label: "Cards Per Slide",
               type: "number",
-              placeholder: "16"
-            }
-          ]
+              placeholder: "16",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CONTENT
         // ═══════════════════════════════════════════════════════════
@@ -445,23 +445,23 @@ export const partnersStructure: ComponentStructure = {
               key: "title",
               label: "Section Title",
               type: "text",
-              placeholder: "عملاءنا"
+              placeholder: "عملاءنا",
             },
             {
               key: "subtitle",
               label: "Subtitle",
               type: "text",
-              placeholder: "تنال خدماتنا ثقة الـمؤسسات..."
+              placeholder: "تنال خدماتنا ثقة الـمؤسسات...",
             },
             {
               key: "badge",
               label: "Badge Text",
               type: "text",
-              placeholder: "— عملاءنا —"
-            }
-          ]
+              placeholder: "— عملاءنا —",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // PARTNERS ARRAY - Dynamic Images
         // ═══════════════════════════════════════════════════════════
@@ -475,17 +475,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "src",
               label: "Partner Logo",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Partner Logo"
-            }
-          ]
+              placeholder: "Partner Logo",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // SETTINGS
         // ═══════════════════════════════════════════════════════════
@@ -497,27 +497,27 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "autoplay",
               label: "Autoplay",
-              type: "boolean"
+              type: "boolean",
             },
             {
               key: "intervalMs",
               label: "Interval (ms)",
               type: "number",
-              placeholder: "5000"
+              placeholder: "5000",
             },
             {
               key: "showBadge",
               label: "Show Badge",
-              type: "boolean"
+              type: "boolean",
             },
             {
               key: "animation",
               label: "Enable Animation",
-              type: "boolean"
-            }
-          ]
+              type: "boolean",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -530,38 +530,38 @@ export const partnersStructure: ComponentStructure = {
               key: "backgroundColor",
               label: "Background Color",
               type: "color",
-              defaultValue: "transparent"
+              defaultValue: "transparent",
             },
             {
               key: "titleColor",
               label: "Title Color",
               type: "color",
               useDefaultColor: true,
-              globalColorType: "primary"
+              globalColorType: "primary",
             },
             {
               key: "subtitleColor",
               label: "Subtitle Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "badgeColor",
               label: "Badge Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "paginationActive",
               label: "Pagination Active Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "paginationInactive",
               label: "Pagination Inactive Color",
-              type: "color"
-            }
-          ]
+              type: "color",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // TYPOGRAPHY
         // ═══════════════════════════════════════════════════════════
@@ -584,41 +584,41 @@ export const partnersStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "2xl"
+                      placeholder: "2xl",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "3xl"
+                      placeholder: "3xl",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "3xl"
-                    }
-                  ]
+                      placeholder: "3xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold"
+                  placeholder: "bold",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
+                  placeholder: "Tajawal",
                 },
                 {
                   key: "lineHeight",
                   label: "Line Height",
                   type: "text",
-                  placeholder: "tight"
-                }
-              ]
+                  placeholder: "tight",
+                },
+              ],
             },
             {
               key: "subtitle",
@@ -634,46 +634,46 @@ export const partnersStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "base"
+                      placeholder: "base",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "lg"
+                      placeholder: "lg",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "lg"
-                    }
-                  ]
+                      placeholder: "lg",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal"
+                  placeholder: "normal",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
+                  placeholder: "Tajawal",
                 },
                 {
                   key: "lineHeight",
                   label: "Line Height",
                   type: "text",
-                  placeholder: "relaxed"
-                }
-              ]
-            }
-          ]
-        }
+                  placeholder: "relaxed",
+                },
+              ],
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
@@ -692,18 +692,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "src",
               label: "Partner Logo",
-              type: "image"
+              type: "image",
             },
             {
               key: "alt",
               label: "Alt Text",
               type: "text",
-              placeholder: "Partner Logo"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+              placeholder: "Partner Logo",
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
-

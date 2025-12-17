@@ -1,5 +1,5 @@
-import { AIMatchingPage } from "@/components/matching/ai-matching-page"
+import { AIMatchingPage } from "@/components/matching/ai-matching-page";
 
 export default function MatchingPage() {
-  return <AIMatchingPage />
+  return <AIMatchingPage />;
 }

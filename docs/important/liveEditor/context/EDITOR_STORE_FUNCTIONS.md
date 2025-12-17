@@ -11,10 +11,12 @@ This document explains ALL component function files in `context-liveeditor/edito
 ## Table of Contents
 
 ### Foundation
+
 1. [types.ts](#typests) - Shared utilities
 2. [index.ts](#indexts) - Export aggregator
 
 ### Component Functions (Alphabetical)
+
 3. [applicationFormFunctions](#applicationformfunctions)
 4. [contactCardsFunctions](#contactcardsfunctions)
 5. [contactFormSectionFunctions](#contactformsectionfunctions)
@@ -54,10 +56,12 @@ export type ComponentState = Record<string, ComponentData>;
 ```
 
 **Meaning**:
+
 - Key = variantId (UUID of component instance)
 - Value = ComponentData (component's data object)
 
 **Example**:
+
 ```typescript
 heroStates: {
   "abc-123-def": { visible: true, content: {...} },
@@ -109,6 +113,7 @@ export const createDefaultData = (type: string): ComponentData => {
 **Used When**: Component-specific defaults not available
 
 **Example**:
+
 ```typescript
 createDefaultData("newComponent")
 // Returns:
@@ -139,6 +144,7 @@ export const updateDataByPath = (
 **The Most IMPORTANT utility function**
 
 **Features**:
+
 1. Cleans duplicate path segments
 2. Creates missing nested objects/arrays
 3. Deep clones (no mutation)
@@ -149,9 +155,9 @@ export const updateDataByPath = (
 ```typescript
 // STEP 1: Parse path
 const segments = path
-  .replace(/\[(\d+)\]/g, ".$1")  // array[0] → array.0
+  .replace(/\[(\d+)\]/g, ".$1") // array[0] → array.0
   .split(".")
-  .filter(Boolean);              // Remove empty strings
+  .filter(Boolean); // Remove empty strings
 
 // STEP 2: Clean duplicates
 // "spacing.padding.padding.top.top" → "spacing.padding.top"
@@ -170,19 +176,19 @@ let cursor = newData;
 for (let i = 0; i < cleanedSegments.length - 1; i++) {
   const key = cleanedSegments[i];
   const nextIsIndex = !Number.isNaN(Number(cleanedSegments[i + 1]));
-  
+
   // Create if missing
   if (cursor[key] == null) {
     cursor[key] = nextIsIndex ? [] : {};
   }
-  
+
   // Fix type mismatch
   if (nextIsIndex && !Array.isArray(cursor[key])) {
     cursor[key] = [];
   } else if (!nextIsIndex && Array.isArray(cursor[key])) {
     cursor[key] = {};
   }
-  
+
   cursor = cursor[key];
 }
 
@@ -198,8 +204,8 @@ return newData;
 ```typescript
 const data = {
   content: {
-    title: "Old Title"
-  }
+    title: "Old Title",
+  },
 };
 
 // Update simple path
@@ -254,7 +260,7 @@ export * from "./propertyFilterFunctions";
 import {
   heroFunctions,
   headerFunctions,
-  updateDataByPath
+  updateDataByPath,
 } from "@/context-liveeditor/editorStoreFunctions";
 ```
 
@@ -289,26 +295,26 @@ export const {type}Functions = {
   ensureVariant: (state, variantId, initial?) => {
     // Initialize if not exists
     if (state.{type}States[variantId]) return {};
-    
+
     const defaultData = getDefault{Type}Data();
     const data = initial || state.tempData || defaultData;
-    
+
     return {
       {type}States: { ...state.{type}States, [variantId]: data }
     };
   },
-  
-  getData: (state, variantId) => 
+
+  getData: (state, variantId) =>
     state.{type}States[variantId] || getDefault{Type}Data(),
-  
+
   setData: (state, variantId, data) => ({
     {type}States: { ...state.{type}States, [variantId]: data }
   }),
-  
+
   updateByPath: (state, variantId, path, value) => {
     const source = state.{type}States[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       {type}States: { ...state.{type}States, [variantId]: newData }
     };
@@ -331,7 +337,7 @@ export const {type}Functions = {
 ```typescript
 export const getDefaultHeroData = (): ComponentData => ({
   visible: true,
-  
+
   // Height configuration
   height: {
     desktop: "90vh",
@@ -343,7 +349,7 @@ export const getDefaultHeroData = (): ComponentData => ({
     tablet: "520px",
     mobile: "520px"
   },
-  
+
   // Background
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
@@ -354,7 +360,7 @@ export const getDefaultHeroData = (): ComponentData => ({
       color: "#000000"
     }
   },
-  
+
   // Content
   content: {
     title: "اكتشف عقارك المثالي في أفضل المواقع",
@@ -378,7 +384,7 @@ export const getDefaultHeroData = (): ComponentData => ({
     maxWidth: "5xl",
     paddingTop: "200px"
   },
-  
+
   // Search form configuration
   searchForm: {
     enabled: true,
@@ -432,7 +438,7 @@ export const getDefaultHeroData = (): ComponentData => ({
       mobile: "stacked"
     }
   },
-  
+
   // Animations
   animations: {
     title: {
@@ -466,28 +472,28 @@ export const getDefaultHero2Data = (): ComponentData => ({
   description: "شريكك الموثوق في تحقيق أفضل الفرص العقارية",
   imageSrc: "https://dalel-lovat.vercel.app/images/hero.webp",
   imageAlt: "Background",
-  
+
   height: {
     desktop: "229px",
     tablet: "229px",
-    mobile: "229px"
+    mobile: "229px",
   },
   minHeight: {
     desktop: "229px",
     tablet: "229px",
-    mobile: "229px"
+    mobile: "229px",
   },
-  
+
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     alt: "Background",
     overlay: {
       enabled: true,
       opacity: "0.6",
-      color: "#000000"
-    }
+      color: "#000000",
+    },
   },
-  
+
   content: {
     title: "من نحن",
     description: "شريكك الموثوق في تحقيق أفضل الفرص العقارية",
@@ -499,31 +505,31 @@ export const getDefaultHero2Data = (): ComponentData => ({
         size: { desktop: "36px", tablet: "36px", mobile: "36px" },
         weight: "bold",
         color: "#ffffff",
-        lineHeight: "1.25"
+        lineHeight: "1.25",
       },
       description: {
         family: "Tajawal",
         size: { desktop: "15px", tablet: "15px", mobile: "15px" },
         weight: "normal",
-        color: "#ffffff"
-      }
-    }
+        color: "#ffffff",
+      },
+    },
   },
-  
+
   animations: {
     title: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 200
+      delay: 200,
     },
     description: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 400
-    }
-  }
+      delay: 400,
+    },
+  },
 });
 ```
 
@@ -537,23 +543,23 @@ ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     state.heroStates[variantId] &&
     Object.keys(state.heroStates[variantId]).length > 0
   ) {
-    return {} as any;  // Already exists
+    return {} as any; // Already exists
   }
-  
+
   // Determine default data based on variant
-  const defaultData = variantId === "hero2" 
-    ? getDefaultHero2Data() 
-    : getDefaultHeroData();
-    
+  const defaultData =
+    variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
+
   const data: ComponentData = initial || state.tempData || defaultData;
-  
+
   return {
-    heroStates: { ...state.heroStates, [variantId]: data }
+    heroStates: { ...state.heroStates, [variantId]: data },
   } as any;
-}
+};
 ```
 
 **Key Logic**:
+
 - Checks if variant already exists
 - Selects appropriate default based on `variantId`
 - Uses `initial` if provided, else `tempData`, else default
@@ -572,29 +578,29 @@ ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
 ```typescript
 export const getDefaultHeaderData = (): ComponentData => ({
   visible: true,
-  
+
   position: {
     type: "sticky",
     top: 0,
-    zIndex: 50
+    zIndex: 50,
   },
-  
+
   height: {
-    desktop: 96,  // h-24 = 96px
+    desktop: 96, // h-24 = 96px
     tablet: 80,
-    mobile: 64
+    mobile: 64,
   },
-  
+
   background: {
     type: "solid",
     opacity: "0.8",
     blur: true,
     colors: {
       from: "#ffffff",
-      to: "#ffffff"
-    }
+      to: "#ffffff",
+    },
   },
-  
+
   colors: {
     text: "#1f2937",
     link: "#6b7280",
@@ -603,9 +609,9 @@ export const getDefaultHeaderData = (): ComponentData => ({
     icon: "#374151",
     iconHover: "#1f2937",
     border: "#e5e7eb",
-    accent: "#059669"
+    accent: "#059669",
   },
-  
+
   logo: {
     type: "image+text",
     image: "https://dalel-lovat.vercel.app/images/logo.svg",
@@ -613,88 +619,88 @@ export const getDefaultHeaderData = (): ComponentData => ({
     font: {
       family: "Tajawal",
       size: 24,
-      weight: "600"
+      weight: "600",
     },
     url: "/",
-    clickAction: "navigate"
+    clickAction: "navigate",
   },
-  
+
   menu: [
     {
       id: "home",
       type: "link",
       text: "الرئيسية",
-      url: "/"
+      url: "/",
     },
     {
       id: "for-rent",
       type: "link",
       text: "للإيجار",
-      url: "/for-rent"
+      url: "/for-rent",
     },
     {
       id: "for-sale",
       type: "link",
       text: "للبيع",
-      url: "/for-sale"
+      url: "/for-sale",
     },
     {
       id: "about",
       type: "link",
       text: "من نحن",
-      url: "/about-us"
+      url: "/about-us",
     },
     {
       id: "contact",
       type: "link",
       text: "تواصل معنا",
-      url: "/contact-us"
-    }
+      url: "/contact-us",
+    },
   ],
-  
+
   actions: {
     search: {
       enabled: false,
-      placeholder: "بحث..."
+      placeholder: "بحث...",
     },
     user: {
       showProfile: false,
       showCart: false,
       showWishlist: false,
-      showNotifications: false
+      showNotifications: false,
     },
     mobile: {
       showLogo: true,
       showLanguageToggle: false,
-      showSearch: false
-    }
+      showSearch: false,
+    },
   },
-  
+
   responsive: {
     breakpoints: {
       mobile: 768,
       tablet: 1024,
-      desktop: 1280
+      desktop: 1280,
     },
     mobileMenu: {
       side: "right",
       width: 320,
-      overlay: true
-    }
+      overlay: true,
+    },
   },
-  
+
   animations: {
     menuItems: {
       enabled: true,
       duration: 200,
-      delay: 50
+      delay: 50,
     },
     mobileMenu: {
       enabled: true,
       duration: 300,
-      easing: "ease-in-out"
-    }
-  }
+      easing: "ease-in-out",
+    },
+  },
 });
 ```
 
@@ -711,7 +717,7 @@ export const getDefaultHeaderData = (): ComponentData => ({
 ```typescript
 export const getDefaultFooterData = (): ComponentData => ({
   visible: true,
-  
+
   background: {
     type: "image",
     image: "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
@@ -722,30 +728,30 @@ export const getDefaultFooterData = (): ComponentData => ({
       direction: "to-r",
       startColor: "#1f2937",
       endColor: "#374151",
-      middleColor: "#4b5563"
+      middleColor: "#4b5563",
     },
     overlay: {
       enabled: true,
       opacity: "0.7",
       color: "#000000",
-      blendMode: "multiply"
-    }
+      blendMode: "multiply",
+    },
   },
-  
+
   layout: {
     columns: "3",
     spacing: "8",
     padding: "16",
-    maxWidth: "7xl"
+    maxWidth: "7xl",
   },
-  
+
   content: {
     companyInfo: {
       enabled: true,
       name: "الشركة العقارية",
       description: "نقدم لك أفضل الحلول العقارية...",
       tagline: "للخدمات العقارية",
-      logo: ""
+      logo: "",
     },
     quickLinks: {
       enabled: true,
@@ -755,8 +761,8 @@ export const getDefaultFooterData = (): ComponentData => ({
         { text: "البيع", url: "/for-sale" },
         { text: "الإيجار", url: "/for-rent" },
         { text: "من نحن", url: "/about-us" },
-        { text: "تواصل معنا", url: "/contact-us" }
-      ]
+        { text: "تواصل معنا", url: "/contact-us" },
+      ],
     },
     contactInfo: {
       enabled: true,
@@ -764,7 +770,7 @@ export const getDefaultFooterData = (): ComponentData => ({
       address: "المملكة العربية السعودية",
       phone1: "0000",
       phone2: "0000",
-      email: "info@example.com"
+      email: "info@example.com",
     },
     socialMedia: {
       enabled: true,
@@ -774,45 +780,45 @@ export const getDefaultFooterData = (): ComponentData => ({
         { name: "لينكد إن", icon: "Linkedin", url: "#", color: "#0077B5" },
         { name: "إنستغرام", icon: "Instagram", url: "#", color: "#E4405F" },
         { name: "تويتر", icon: "Twitter", url: "#", color: "#1DA1F2" },
-        { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" }
-      ]
-    }
+        { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" },
+      ],
+    },
   },
-  
+
   footerBottom: {
     enabled: true,
     copyright: "© 2024 الشركة العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
     legalLinks: [
       { text: "سياسة الخصوصية", url: "/privacy" },
-      { text: "الشروط والأحكام", url: "/terms" }
-    ]
+      { text: "الشروط والأحكام", url: "/terms" },
+    ],
   },
-  
+
   styling: {
     colors: {
       textPrimary: "#ffffff",
       textSecondary: "#ffffff",
       textMuted: "rgba(255, 255, 255, 0.7)",
       accent: "#10b981",
-      border: "rgba(255, 255, 255, 0.2)"
+      border: "rgba(255, 255, 255, 0.2)",
     },
     typography: {
       titleSize: "xl",
       titleWeight: "bold",
       bodySize: "sm",
-      bodyWeight: "normal"
+      bodyWeight: "normal",
     },
     spacing: {
       sectionPadding: "16",
       columnGap: "8",
-      itemGap: "3"
+      itemGap: "3",
     },
     effects: {
       hoverTransition: "0.3s",
       shadow: "none",
-      borderRadius: "none"
-    }
-  }
+      borderRadius: "none",
+    },
+  },
 });
 ```
 
@@ -831,30 +837,30 @@ export const getDefaultFooterData = (): ComponentData => ({
 ```typescript
 export const getDefaultHalfTextHalfImageData = (): ComponentData => ({
   visible: true,
-  
+
   layout: {
     direction: "rtl",
     textWidth: 52.8,
     imageWidth: 47.2,
     gap: "16",
-    minHeight: "369px"
+    minHeight: "369px",
   },
-  
+
   spacing: {
     padding: {
       top: 12,
       bottom: 6,
       left: 4,
-      right: 4
+      right: 4,
     },
     margin: {
       top: 0,
       bottom: 0,
       left: 0,
-      right: 0
-    }
+      right: 0,
+    },
   },
-  
+
   content: {
     eyebrow: "شريك موثوق",
     title: "نحن شريكك الموثوق في عالم العقارات",
@@ -870,86 +876,86 @@ export const getDefaultHalfTextHalfImageData = (): ComponentData => ({
         hoverTextColor: "#ffffff",
         width: "119px",
         height: "46px",
-        borderRadius: "10px"
-      }
-    }
+        borderRadius: "10px",
+      },
+    },
   },
-  
+
   typography: {
     eyebrow: {
       size: "text-xs md:text-base xl:text-lg",
       weight: "font-normal",
       color: "text-muted-foreground",
-      lineHeight: "leading-[22.5px]"
+      lineHeight: "leading-[22.5px]",
     },
     title: {
       size: "section-title-large",
       weight: "font-normal",
       color: "text-foreground",
-      lineHeight: "lg:leading-[64px]"
+      lineHeight: "lg:leading-[64px]",
     },
     description: {
       size: "text-sm md:text-sm xl:text-xl",
       weight: "font-normal",
       color: "text-muted-foreground",
-      lineHeight: "leading-[35px]"
-    }
+      lineHeight: "leading-[35px]",
+    },
   },
-  
+
   image: {
     src: "https://dalel-lovat.vercel.app/images/trusted-partner-section/house.webp",
     alt: "صورة شريك موثوق",
     style: {
       aspectRatio: "800/500",
       objectFit: "contain",
-      borderRadius: "0"
+      borderRadius: "0",
     },
     background: {
       enabled: true,
       color: "#059669",
       width: 54,
-      borderRadius: "5px"
-    }
+      borderRadius: "5px",
+    },
   },
-  
+
   responsive: {
     mobile: {
       textOrder: 2,
       imageOrder: 1,
       textWidth: "w-full",
       imageWidth: "w-full",
-      marginBottom: "mb-10"
+      marginBottom: "mb-10",
     },
     tablet: {
       textOrder: 2,
       imageOrder: 1,
       textWidth: "w-full",
       imageWidth: "w-full",
-      marginBottom: "mb-10"
+      marginBottom: "mb-10",
     },
     desktop: {
       textOrder: 1,
       imageOrder: 2,
       textWidth: "md:w-[52.8%]",
       imageWidth: "md:w-[47.2%]",
-      marginBottom: "md:mb-0"
-    }
+      marginBottom: "md:mb-0",
+    },
   },
-  
+
   animations: {
     text: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 200
+      delay: 200,
     },
     image: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 400
-    }
-  }
+      delay: 400,
+    },
+  },
 });
 ```
 
@@ -960,9 +966,9 @@ export const getDefaultHalfTextHalfImageData = (): ComponentData => ({
 ```typescript
 export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
   visible: true,
-  
+
   // ... layout, spacing similar to variant 1
-  
+
   content: {
     eyebrow: "تجربتك العقارية تبدأ هنا",
     title: "إيجاد عقار مناسب هو هدفنا",
@@ -971,10 +977,10 @@ export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
       stat1: { value: "+100", label: "عميل سعيد" },
       stat2: { value: "+50", label: "عقار تم بيعه" },
       stat3: { value: "+250", label: "عقار تم تأجيره" },
-      stat4: { value: "40", label: "تقييمات العملاء" }
-    }
+      stat4: { value: "40", label: "تقييمات العملاء" },
+    },
   },
-  
+
   // ... typography, image, responsive, animations
 });
 ```
@@ -986,25 +992,25 @@ export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
 ```typescript
 export const getDefaultHalfTextHalfImage3Data = (): ComponentData => ({
   visible: true,
-  
+
   // Legacy props for backward compatibility
   title: "رسالتنا",
   description: "نحن في الشركة العقارية العقاري نطمح...",
   imageSrc: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
   imageAlt: "Choose Us",
   imagePosition: "left",
-  
+
   // New structure - MUST match legacy props
   content: {
     title: "رسالتنا",
     description: "نحن في الشركة العقارية العقاري نطمح...",
-    imagePosition: "left"
+    imagePosition: "left",
   },
-  
+
   image: {
     src: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
-    alt: "Choose Us"
-  }
+    alt: "Choose Us",
+  },
 });
 ```
 
@@ -1022,32 +1028,32 @@ ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     existingData: state.halfTextHalfImageStates[variantId]
       ? Object.keys(state.halfTextHalfImageStates[variantId])
       : [],
-    allVariants: Object.keys(state.halfTextHalfImageStates)
+    allVariants: Object.keys(state.halfTextHalfImageStates),
   });
-  
+
   // If initial data provided, ALWAYS use it (even if exists)
   if (initial && Object.keys(initial).length > 0) {
     logEditorStore("OVERRIDE_EXISTING_DATA", variantId, "unknown", {
       oldData: state.halfTextHalfImageStates[variantId],
       newData: initial,
-      reason: "Initial data provided"
+      reason: "Initial data provided",
     });
-    
+
     const newState = {
       halfTextHalfImageStates: {
         ...state.halfTextHalfImageStates,
-        [variantId]: initial
-      }
+        [variantId]: initial,
+      },
     };
-    
+
     logEditorStore("ENSURE_VARIANT_RESULT", variantId, "unknown", {
       newState: newState,
-      allVariantsAfter: Object.keys(newState.halfTextHalfImageStates)
+      allVariantsAfter: Object.keys(newState.halfTextHalfImageStates),
     });
-    
+
     return newState as any;
   }
-  
+
   // If already exists, skip
   if (
     state.halfTextHalfImageStates[variantId] &&
@@ -1055,49 +1061,49 @@ ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
   ) {
     logEditorStore("VARIANT_ALREADY_EXISTS", variantId, "unknown", {
       existingData: state.halfTextHalfImageStates[variantId],
-      reason: "Variant already exists with data"
+      reason: "Variant already exists with data",
     });
     return {} as any;
   }
-  
+
   // Determine default data
   let defaultData;
-  
+
   if (variantId === "halfTextHalfImage2") {
     defaultData = getDefaultHalfTextHalfImage2Data();
     logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage2", {
-      defaultData: defaultData
+      defaultData: defaultData,
     });
   } else if (variantId === "halfTextHalfImage3") {
     defaultData = getDefaultHalfTextHalfImage3Data();
     logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage3", {
-      defaultData: defaultData
+      defaultData: defaultData,
     });
   } else {
     defaultData = getDefaultHalfTextHalfImageData();
     logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage1", {
       defaultData: defaultData,
-      reason: "Fallback for unknown variant"
+      reason: "Fallback for unknown variant",
     });
   }
-  
+
   const data: ComponentData = initial || state.tempData || defaultData;
-  
+
   const result = {
     halfTextHalfImageStates: {
       ...state.halfTextHalfImageStates,
-      [variantId]: data
-    }
+      [variantId]: data,
+    },
   };
-  
+
   logEditorStore("ENSURE_VARIANT_FINAL_RESULT", variantId, "unknown", {
     finalData: data,
     result: result,
-    allVariantsAfter: Object.keys(result.halfTextHalfImageStates)
+    allVariantsAfter: Object.keys(result.halfTextHalfImageStates),
   });
-  
+
   return result as any;
-}
+};
 ```
 
 #### setData (updates pageComponentsByPage too)
@@ -1113,18 +1119,18 @@ setData: (state: any, variantId: string, data: ComponentData) => {
     }
     return comp;
   });
-  
+
   return {
     halfTextHalfImageStates: {
       ...state.halfTextHalfImageStates,
-      [variantId]: data
+      [variantId]: data,
     },
     pageComponentsByPage: {
       ...state.pageComponentsByPage,
-      [currentPage]: updatedComponents
-    }
+      [currentPage]: updatedComponents,
+    },
   } as any;
-}
+};
 ```
 
 ---
@@ -1138,64 +1144,64 @@ setData: (state: any, variantId: string, data: ComponentData) => {
 ```typescript
 export const getDefaultPropertySliderData = (): ComponentData => ({
   visible: true,
-  
+
   layout: {
     maxWidth: "1600px",
     padding: {
       top: "56px",
-      bottom: "56px"
-    }
+      bottom: "56px",
+    },
   },
-  
+
   spacing: {
     titleBottom: "24px",
-    slideGap: "16px"
+    slideGap: "16px",
   },
-  
+
   content: {
     title: "أحدث العقارات للإيجار",
     description: "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع",
     viewAllText: "عرض الكل",
-    viewAllUrl: "#"
+    viewAllUrl: "#",
   },
-  
+
   typography: {
     title: {
       fontFamily: "Tajawal",
       fontSize: {
         desktop: "2xl",
         tablet: "xl",
-        mobile: "lg"
+        mobile: "lg",
       },
       fontWeight: "extrabold",
-      color: "#1f2937"
+      color: "#1f2937",
     },
     subtitle: {
       fontFamily: "Tajawal",
       fontSize: {
         desktop: "lg",
         tablet: "base",
-        mobile: "sm"
+        mobile: "sm",
       },
       fontWeight: "normal",
-      color: "#6b7280"
+      color: "#6b7280",
     },
     link: {
       fontSize: "sm",
       color: "#059669",
-      hoverColor: "#047857"
-    }
+      hoverColor: "#047857",
+    },
   },
-  
+
   carousel: {
     desktopCount: 4,
-    autoplay: true
+    autoplay: true,
   },
-  
+
   background: {
-    color: "transparent"
+    color: "transparent",
   },
-  
+
   cardSettings: {
     theme: "card1",
     showImage: true,
@@ -1206,7 +1212,7 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
     cardStyle: {
       borderRadius: "rounded-xl",
       shadow: "lg",
-      hoverEffect: "scale"
+      hoverEffect: "scale",
     },
     imageSettings: {
       aspectRatio: "16/10",
@@ -1214,30 +1220,30 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
       overlay: {
         enabled: false,
         color: "rgba(0, 0, 0, 0.3)",
-        gradient: false
-      }
+        gradient: false,
+      },
     },
     contentSettings: {
       titleStyle: {
         fontSize: "lg",
         fontWeight: "bold",
-        color: "#1f2937"
+        color: "#1f2937",
       },
       priceStyle: {
         fontSize: "xl",
         color: "#059669",
-        currency: "ريال"
-      }
+        currency: "ريال",
+      },
     },
     interactionSettings: {
       clickable: true,
       buttonText: "تفاصيل",
       buttonStyle: {
         variant: "ghost",
-        color: "#059669"
-      }
-    }
-  }
+        color: "#059669",
+      },
+    },
+  },
 });
 ```
 
@@ -1254,7 +1260,7 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
   visible: true,
   title: "آراء عملائنا",
   description: "نحن نفخر بشركائنا وعملائنا...",
-  
+
   background: {
     color: "#ffffff",
     image: "",
@@ -1262,15 +1268,15 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
     overlay: {
       enabled: false,
       opacity: "0.1",
-      color: "#000000"
-    }
+      color: "#000000",
+    },
   },
-  
+
   spacing: {
     paddingY: "py-14 sm:py-16",
-    marginBottom: "mb-8"
+    marginBottom: "mb-8",
   },
-  
+
   header: {
     alignment: "text-center md:text-right",
     maxWidth: "mx-auto px-5 sm:px-26",
@@ -1278,25 +1284,25 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
       className: "section-title",
       color: "#1f2937",
       size: "text-3xl sm:text-4xl",
-      weight: "font-bold"
+      weight: "font-bold",
     },
     description: {
       className: "section-subtitle-large",
       color: "#6b7280",
       size: "text-lg",
-      weight: "font-normal"
-    }
+      weight: "font-normal",
+    },
   },
-  
+
   carousel: {
     autoplay: true,
     intervalMs: 5000,
     slidesPerView: 1,
     showNavigation: true,
     showPagination: true,
-    loop: true
+    loop: true,
   },
-  
+
   testimonials: [
     {
       id: "1",
@@ -1306,7 +1312,7 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
       rating: 5,
       avatar: "",
       company: "",
-      date: "2024"
+      date: "2024",
     },
     {
       id: "2",
@@ -1316,7 +1322,7 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
       rating: 5,
       avatar: "",
       company: "",
-      date: "2024"
+      date: "2024",
     },
     {
       id: "3",
@@ -1326,17 +1332,17 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
       rating: 5,
       avatar: "",
       company: "",
-      date: "2024"
-    }
+      date: "2024",
+    },
   ],
-  
+
   styling: {
     cardBackground: "#ffffff",
     textColor: "#1f2937",
     quoteColor: "#374151",
     nameColor: "#059669",
-    locationColor: "#6b7280"
-  }
+    locationColor: "#6b7280",
+  },
 });
 ```
 
@@ -1353,24 +1359,24 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
 ```typescript
 export const getDefaultContactCardsData = (): ComponentData => ({
   visible: true,
-  
+
   layout: {
     container: {
       padding: {
         vertical: "py-[48px] md:py-[104px]",
-        horizontal: "px-4 sm:px-10"
-      }
+        horizontal: "px-4 sm:px-10",
+      },
     },
     grid: {
       columns: {
         mobile: "grid-cols-1",
-        desktop: "md:grid-cols-3"
+        desktop: "md:grid-cols-3",
       },
       gap: "gap-[24px]",
-      borderRadius: "rounded-[10px]"
-    }
+      borderRadius: "rounded-[10px]",
+    },
   },
-  
+
   cards: [
     {
       icon: {
@@ -1378,20 +1384,20 @@ export const getDefaultContactCardsData = (): ComponentData => ({
         alt: "address Icon",
         size: {
           mobile: "w-[40px] h-[40px]",
-          desktop: "md:w-[60px] md:h-[60px]"
-        }
+          desktop: "md:w-[60px] md:h-[60px]",
+        },
       },
       title: {
         text: "العنوان",
         style: {
           size: {
             mobile: "text-[16px]",
-            desktop: "md:text-[24px]"
+            desktop: "md:text-[24px]",
           },
           weight: "font-bold",
           color: "#525252",
-          lineHeight: "leading-[35px]"
-        }
+          lineHeight: "leading-[35px]",
+        },
       },
       content: {
         type: "text",
@@ -1399,65 +1405,65 @@ export const getDefaultContactCardsData = (): ComponentData => ({
         style: {
           size: {
             mobile: "text-[16px]",
-            desktop: "md:text-[20px]"
+            desktop: "md:text-[20px]",
           },
           weight: "font-normal",
           color: "#525252",
-          lineHeight: "leading-[35px]"
-        }
+          lineHeight: "leading-[35px]",
+        },
       },
       cardStyle: {
         height: {
           mobile: "h-[182px]",
-          desktop: "md:h-[210px]"
+          desktop: "md:h-[210px]",
         },
         gap: {
           main: "gap-y-[16px]",
           content: {
             mobile: "gap-y-[8px]",
-            desktop: "md:gap-y-[16px]"
+            desktop: "md:gap-y-[16px]",
           },
-          links: "gap-x-[50px]"
+          links: "gap-x-[50px]",
         },
         shadow: {
           enabled: true,
-          value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px"
+          value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
         },
         alignment: {
           horizontal: "items-center",
-          vertical: "justify-center"
-        }
-      }
+          vertical: "justify-center",
+        },
+      },
     },
     // ... 2 more cards (email, phone)
   ],
-  
+
   responsive: {
     breakpoints: {
       mobile: "768px",
-      desktop: "1024px"
+      desktop: "1024px",
     },
     gridColumns: {
       mobile: 1,
-      desktop: 3
-    }
+      desktop: 3,
+    },
   },
-  
+
   animations: {
     cards: {
       enabled: true,
       type: "fadeInUp",
       duration: 500,
       delay: 0,
-      stagger: 100
+      stagger: 100,
     },
     icons: {
       enabled: true,
       type: "scaleIn",
       duration: 300,
-      delay: 200
-    }
-  }
+      delay: 200,
+    },
+  },
 });
 ```
 
@@ -1472,55 +1478,55 @@ export const contactCardsFunctions = {
   getData: (state, variantId) => {...},
   setData: (state, variantId, data) => {...},
   updateByPath: (state, variantId, path, value) => {...},
-  
+
   // Helper functions
   getDefaultData: getDefaultContactCardsData,
   createNew: () => getDefaultContactCardsData(),
-  
+
   // Update functions
   update: (currentData, updates) => ({...currentData, ...updates}),
-  
+
   // Card management
   addContactCard: (currentData, card) => ({
     ...currentData,
     cards: [...(currentData.cards || []), card]
   }),
-  
+
   removeContactCard: (currentData, index) => ({
     ...currentData,
     cards: (currentData.cards || []).filter((_, i) => i !== index)
   }),
-  
+
   updateContactCard: (currentData, index, updates) => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
       i === index ? { ...card, ...updates } : card
     )
   }),
-  
+
   // Link management
   addLinkToCard: (currentData, cardIndex, link) => {...},
   removeLinkFromCard: (currentData, cardIndex, linkIndex) => {...},
-  
+
   // Style management
   updateCardIcon: (currentData, cardIndex, icon) => {...},
   updateCardTitle: (currentData, cardIndex, title) => {...},
   updateCardContent: (currentData, cardIndex, content) => {...},
   updateCardStyle: (currentData, cardIndex, style) => {...},
-  
+
   // Layout management
   updateLayout: (currentData, layout) => {...},
   updateAnimations: (currentData, animations) => {...},
   updateResponsive: (currentData, responsive) => {...},
-  
+
   // Validation
   validate: (data) => {
     const errors: string[] = [];
-    
+
     if (!data.cards || data.cards.length === 0) {
       errors.push("At least one contact card is required");
     }
-    
+
     if (data.cards) {
       data.cards.forEach((card, index) => {
         if (!card.icon?.src) {
@@ -1543,23 +1549,23 @@ export const contactCardsFunctions = {
         }
       });
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors
     };
   },
-  
+
   // Getters
   getCard: (data, index) => data.cards?.[index] || null,
   getCardsCount: (data) => data.cards?.length || 0,
-  
+
   // Reorder
   reorderCards: (currentData, fromIndex, toIndex) => {
     const cards = [...(currentData.cards || [])];
     const [movedCard] = cards.splice(fromIndex, 1);
     cards.splice(toIndex, 0, movedCard);
-    
+
     return {
       ...currentData,
       cards
@@ -1604,39 +1610,39 @@ const reorderedData = contactCardsFunctions.reorderCards(currentData, 0, 2);
 ```typescript
 export const getDefaultInputs2Data = (): ComponentData => ({
   visible: true,
-  
+
   // Generic component data (from types.ts)
   texts: {
     title: "Advanced Inputs System Title",
-    subtitle: "This is a sample subtitle for the section."
+    subtitle: "This is a sample subtitle for the section.",
   },
   colors: {
     background: "#FFFFFF",
-    textColor: "#1F2937"
+    textColor: "#1F2937",
   },
   settings: {
     enabled: true,
-    layout: "default"
+    layout: "default",
   },
-  
+
   // Component-specific data
   layout: {
     direction: "rtl",
     maxWidth: "1600px",
     padding: {
       y: "py-14",
-      smY: "sm:py-16"
+      smY: "sm:py-16",
     },
-    columns: "1"
+    columns: "1",
   },
-  
+
   theme: {
     primaryColor: "#3b82f6",
     secondaryColor: "#1e40af",
     accentColor: "#60a5fa",
-    submitButtonGradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)"
+    submitButtonGradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
   },
-  
+
   submitButton: {
     text: "إرسال",
     show: true,
@@ -1646,29 +1652,29 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     hoverColor: "#067a55",
     borderRadius: "8px",
     padding: "12px 24px",
-    apiEndpoint: "https://api.taearif.com/api/v1/property-requests/public"
+    apiEndpoint: "https://api.taearif.com/api/v1/property-requests/public",
   },
-  
+
   cardsLayout: {
     columns: "1",
     gap: "24px",
     responsive: {
       mobile: "1",
       tablet: "2",
-      desktop: "3"
-    }
+      desktop: "3",
+    },
   },
-  
+
   fieldsLayout: {
     columns: "2",
     gap: "16px",
     responsive: {
       mobile: "1",
       tablet: "2",
-      desktop: "2"
-    }
+      desktop: "2",
+    },
   },
-  
+
   // ═══════════════════════════════════════════════════════════
   // VISIBILITY CONTROLS (1% of data - but very important!)
   // ═══════════════════════════════════════════════════════════
@@ -1676,9 +1682,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     propertyInfoCard: true,
     budgetCard: true,
     additionalDetailsCard: true,
-    contactCard: true
+    contactCard: true,
   },
-  
+
   fieldVisibility: {
     propertyType: true,
     propertyCategory: true,
@@ -1695,9 +1701,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     fullName: true,
     phone: true,
     whatsapp: true,
-    notes: true
+    notes: true,
   },
-  
+
   fieldRequired: {
     propertyType: true,
     propertyCategory: true,
@@ -1714,9 +1720,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     fullName: true,
     phone: true,
     whatsapp: false,
-    notes: false
+    notes: false,
   },
-  
+
   // ═══════════════════════════════════════════════════════════
   // CARDS AND FIELDS CONFIGURATION (99% of data)
   // ═══════════════════════════════════════════════════════════
@@ -1754,11 +1760,11 @@ export const getDefaultInputs2Data = (): ComponentData => ({
             { value: "6", label: "مزرعة" },
             { value: "11", label: "معرض" },
             { value: "9", label: "مكتب" },
-            { value: "10", label: "منتجع" }
+            { value: "10", label: "منتجع" },
           ],
           validation: null,
           icon: null,
-          id: "property_type"
+          id: "property_type",
         },
         {
           label: "نوع الملكية",
@@ -1770,11 +1776,11 @@ export const getDefaultInputs2Data = (): ComponentData => ({
             { value: "زراعي", label: "زراعي" },
             { value: "صناعي", label: "صناعي" },
             { value: "تجاري", label: "تجاري" },
-            { value: "سكني", label: "سكني" }
+            { value: "سكني", label: "سكني" },
           ],
           validation: null,
           icon: null,
-          id: "category"
+          id: "category",
         },
         {
           id: "region",
@@ -1785,7 +1791,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "districts_id",
@@ -1796,7 +1802,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "area_from",
@@ -1807,7 +1813,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "area_to",
@@ -1818,9 +1824,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
-        }
-      ]
+          validation: null,
+        },
+      ],
     },
     {
       id: "معلومات الميزانية والدفع",
@@ -1843,9 +1849,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           icon: null,
           options: [
             { value: "كاش", label: "كاش" },
-            { value: "تمويل بنكي", label: "تمويل بنكي" }
+            { value: "تمويل بنكي", label: "تمويل بنكي" },
           ],
-          validation: null
+          validation: null,
         },
         {
           id: "budget_from",
@@ -1856,7 +1862,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "budget_to",
@@ -1867,9 +1873,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
-        }
-      ]
+          validation: null,
+        },
+      ],
     },
     {
       id: "تفاصيل إضافية",
@@ -1894,9 +1900,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
             { value: "مستعد فورًا", label: "مستعد فورًا" },
             { value: "خلال شهر", label: "خلال شهر" },
             { value: "خلال 3 أشهر", label: "خلال 3 أشهر" },
-            { value: "لاحقًا / استكشاف فقط", label: "لاحقًا / استكشاف فقط" }
+            { value: "لاحقًا / استكشاف فقط", label: "لاحقًا / استكشاف فقط" },
           ],
-          validation: null
+          validation: null,
         },
         {
           id: "purchase_goal",
@@ -1910,9 +1916,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
             { value: "سكن خاص", label: "سكن خاص" },
             { value: "استثمار وتأجير", label: "استثمار وتأجير" },
             { value: "بناء وبيع", label: "بناء وبيع" },
-            { value: "مشروع تجاري", label: "مشروع تجاري" }
+            { value: "مشروع تجاري", label: "مشروع تجاري" },
           ],
-          validation: null
+          validation: null,
         },
         {
           id: "wants_similar_offers",
@@ -1924,11 +1930,11 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           icon: null,
           options: [
             { value: "نعم", label: "نعم" },
-            { value: "لا", label: "لا" }
+            { value: "لا", label: "لا" },
           ],
-          validation: null
-        }
-      ]
+          validation: null,
+        },
+      ],
     },
     {
       id: "بيانات التواصل",
@@ -1950,7 +1956,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "phone",
@@ -1961,7 +1967,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: "رقم الهاتف",
           icon: null,
           options: null,
-          validation: null
+          validation: null,
         },
         {
           id: "contact_on_whatsapp",
@@ -1973,9 +1979,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           icon: null,
           options: [
             { value: "نعم", label: "نعم" },
-            { value: "لا", label: "لا" }
+            { value: "لا", label: "لا" },
           ],
-          validation: null
+          validation: null,
         },
         {
           id: "notes",
@@ -1986,11 +1992,11 @@ export const getDefaultInputs2Data = (): ComponentData => ({
           description: null,
           icon: null,
           options: null,
-          validation: null
-        }
-      ]
-    }
-  ]
+          validation: null,
+        },
+      ],
+    },
+  ],
 });
 ```
 
@@ -2152,7 +2158,7 @@ if (state.{type}States[variantId]) {
 updateByPath: (state, variantId, path, value) => {
   const source = state.{type}States[variantId] || {};
   const newData = updateDataByPath(source, path, value);
-  
+
   // Update pageComponentsByPage too
   const currentPage = state.currentPage;
   const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
@@ -2162,7 +2168,7 @@ updateByPath: (state, variantId, path, value) => {
     }
     return comp;
   });
-  
+
   return {
     {type}States: { ...state.{type}States, [variantId]: newData },
     pageComponentsByPage: {
@@ -2194,11 +2200,11 @@ import {
 
 const useEditorStore = create((set, get) => ({
   // ... all component state properties
-  
+
   // Generic functions that route to specific component functions
   getComponentData: (componentType, variantId) => {
     const state = get();
-    
+
     switch (componentType) {
       case "hero":
         return heroFunctions.getData(state, variantId);
@@ -2215,10 +2221,10 @@ const useEditorStore = create((set, get) => ({
         return state.componentStates[componentType]?.[variantId] || {};
     }
   },
-  
+
   setComponentData: (componentType, variantId, data) => {
     const state = get();
-    
+
     switch (componentType) {
       case "hero":
         set(heroFunctions.setData(state, variantId, data));
@@ -2229,10 +2235,10 @@ const useEditorStore = create((set, get) => ({
       // ... all 19 component types
     }
   },
-  
+
   updateComponentByPath: (componentType, variantId, path, value) => {
     const state = get();
-    
+
     switch (componentType) {
       case "hero":
         set(heroFunctions.updateByPath(state, variantId, path, value));
@@ -2243,10 +2249,10 @@ const useEditorStore = create((set, get) => ({
       // ... all 19 component types
     }
   },
-  
+
   ensureComponentVariant: (componentType, variantId, initial?) => {
     const state = get();
-    
+
     switch (componentType) {
       case "hero":
         set(heroFunctions.ensureVariant(state, variantId, initial));
@@ -2256,7 +2262,7 @@ const useEditorStore = create((set, get) => ({
         break;
       // ... all 19 component types
     }
-  }
+  },
 }));
 ```
 
@@ -2284,29 +2290,28 @@ const useEditorStore = create((set, get) => ({
 
 ### Component Function Files Map
 
-| Component Type | File | Variants | Special Features |
-|----------------|------|----------|------------------|
-| hero | heroFunctions.ts | 2 | Search form config |
-| header | headerFunctions.ts | 1 | Menu navigation |
-| footer | footerFunctions.ts | 1 | Social media, links |
-| halfTextHalfImage | halfTextHalfImageFunctions.ts | 3 | Logging, stats |
-| propertySlider | propertySliderFunctions.ts | 1 | Carousel config |
-| ctaValuation | ctaValuationFunctions.ts | 1 | CTA button |
-| stepsSection | stepsSectionFunctions.ts | 1 | Steps array |
-| testimonials | testimonialsFunctions.ts | 1 | Carousel, ratings |
-| whyChooseUs | whyChooseUsFunctions.ts | 1 | Features grid |
-| contactMapSection | contactMapSectionFunctions.ts | 1 | Map embed |
-| grid | gridFunctions.ts | 1 | Generic grid |
-| filterButtons | filterButtonsFunctions.ts | 1 | Filter buttons |
-| propertyFilter | propertyFilterFunctions.ts | 1 | Advanced filters |
-| mapSection | mapSectionFunctions.ts | 1 | Map display |
-| contactFormSection | contactFormSectionFunctions.ts | 1 | Contact form |
-| contactCards | contactCardsFunctions.ts | 1 | Extended helpers |
-| applicationForm | applicationFormFunctions.ts | 1 | Multi-step form |
-| inputs | inputsFunctions.ts | 1 | Simple inputs |
-| inputs2 | inputs2Functions.ts | 1 | Complex form builder |
+| Component Type     | File                           | Variants | Special Features     |
+| ------------------ | ------------------------------ | -------- | -------------------- |
+| hero               | heroFunctions.ts               | 2        | Search form config   |
+| header             | headerFunctions.ts             | 1        | Menu navigation      |
+| footer             | footerFunctions.ts             | 1        | Social media, links  |
+| halfTextHalfImage  | halfTextHalfImageFunctions.ts  | 3        | Logging, stats       |
+| propertySlider     | propertySliderFunctions.ts     | 1        | Carousel config      |
+| ctaValuation       | ctaValuationFunctions.ts       | 1        | CTA button           |
+| stepsSection       | stepsSectionFunctions.ts       | 1        | Steps array          |
+| testimonials       | testimonialsFunctions.ts       | 1        | Carousel, ratings    |
+| whyChooseUs        | whyChooseUsFunctions.ts        | 1        | Features grid        |
+| contactMapSection  | contactMapSectionFunctions.ts  | 1        | Map embed            |
+| grid               | gridFunctions.ts               | 1        | Generic grid         |
+| filterButtons      | filterButtonsFunctions.ts      | 1        | Filter buttons       |
+| propertyFilter     | propertyFilterFunctions.ts     | 1        | Advanced filters     |
+| mapSection         | mapSectionFunctions.ts         | 1        | Map display          |
+| contactFormSection | contactFormSectionFunctions.ts | 1        | Contact form         |
+| contactCards       | contactCardsFunctions.ts       | 1        | Extended helpers     |
+| applicationForm    | applicationFormFunctions.ts    | 1        | Multi-step form      |
+| inputs             | inputsFunctions.ts             | 1        | Simple inputs        |
+| inputs2            | inputs2Functions.ts            | 1        | Complex form builder |
 
 ---
 
 **For AI**: This is the complete reference for all component function files. Each follows the same pattern but with component-specific default data structures.
-

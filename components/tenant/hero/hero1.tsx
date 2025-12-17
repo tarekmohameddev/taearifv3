@@ -140,7 +140,15 @@ interface HeroProps {
 }
 
 // Search Form Component
-function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; primaryColor?: string; primaryColorHover?: string }) {
+function SearchForm({
+  config,
+  primaryColor,
+  primaryColorHover,
+}: {
+  config: any;
+  primaryColor?: string;
+  primaryColorHover?: string;
+}) {
   const [purpose, setPurpose] = useState(
     config?.fields?.purpose?.default || "rent",
   );
@@ -180,17 +188,22 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
                     onClick={() => setPurpose(option.value)}
                     style={
                       purpose === option.value
-                        ? { backgroundColor: defaultPrimaryColor, color: "#ffffff" }
+                        ? {
+                            backgroundColor: defaultPrimaryColor,
+                            color: "#ffffff",
+                          }
                         : {}
                     }
                     onMouseEnter={(e) => {
                       if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                        e.currentTarget.style.backgroundColor =
+                          defaultPrimaryColorHover;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+                        e.currentTarget.style.backgroundColor =
+                          defaultPrimaryColor;
                       }
                     }}
                     className={
@@ -284,7 +297,8 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
               type="submit"
               style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                e.currentTarget.style.backgroundColor =
+                  defaultPrimaryColorHover;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = defaultPrimaryColor;
@@ -317,26 +331,31 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
                       key={option.value}
                       type="button"
                       onClick={() => setPurpose(option.value)}
-                    style={
-                      purpose === option.value
-                        ? { backgroundColor: defaultPrimaryColor, color: "#ffffff" }
-                        : {}
-                    }
-                    onMouseEnter={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                      style={
+                        purpose === option.value
+                          ? {
+                              backgroundColor: defaultPrimaryColor,
+                              color: "#ffffff",
+                            }
+                          : {}
                       }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+                      onMouseEnter={(e) => {
+                        if (purpose === option.value) {
+                          e.currentTarget.style.backgroundColor =
+                            defaultPrimaryColorHover;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (purpose === option.value) {
+                          e.currentTarget.style.backgroundColor =
+                            defaultPrimaryColor;
+                        }
+                      }}
+                      className={
+                        purpose === option.value
+                          ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
+                          : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
                       }
-                    }}
-                    className={
-                      purpose === option.value
-                        ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
-                        : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
-                    }
                     >
                       {option.label}
                     </Button>
@@ -422,9 +441,13 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
             <div className="flex min-w-[200px] flex-1 items-center gap-3 rounded-xl px-3 py-2">
               <button
                 type="submit"
-                style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+                style={{
+                  backgroundColor: defaultPrimaryColor,
+                  color: "#ffffff",
+                }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                  e.currentTarget.style.backgroundColor =
+                    defaultPrimaryColorHover;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = defaultPrimaryColor;
@@ -455,26 +478,31 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
                   key={option.value}
                   type="button"
                   onClick={() => setPurpose(option.value)}
-                    style={
-                      purpose === option.value
-                        ? { backgroundColor: defaultPrimaryColor, color: "#ffffff" }
-                        : {}
+                  style={
+                    purpose === option.value
+                      ? {
+                          backgroundColor: defaultPrimaryColor,
+                          color: "#ffffff",
+                        }
+                      : {}
+                  }
+                  onMouseEnter={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColorHover;
                     }
-                    onMouseEnter={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColor;
-                      }
-                    }}
-                    className={
-                      purpose === option.value
-                        ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
-                        : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                  }}
+                  onMouseLeave={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColor;
                     }
+                  }}
+                  className={
+                    purpose === option.value
+                      ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
+                      : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                  }
                 >
                   {option.label}
                 </Button>
@@ -489,7 +517,8 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
               type="submit"
               style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                e.currentTarget.style.backgroundColor =
+                  defaultPrimaryColorHover;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = defaultPrimaryColor;
@@ -563,26 +592,31 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
                   key={option.value}
                   type="button"
                   onClick={() => setPurpose(option.value)}
-                    style={
-                      purpose === option.value
-                        ? { backgroundColor: defaultPrimaryColor, color: "#ffffff" }
-                        : {}
+                  style={
+                    purpose === option.value
+                      ? {
+                          backgroundColor: defaultPrimaryColor,
+                          color: "#ffffff",
+                        }
+                      : {}
+                  }
+                  onMouseEnter={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColorHover;
                     }
-                    onMouseEnter={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (purpose === option.value) {
-                        e.currentTarget.style.backgroundColor = defaultPrimaryColor;
-                      }
-                    }}
-                    className={
-                      purpose === option.value
-                        ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors flex-1"
-                        : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white flex-1"
+                  }}
+                  onMouseLeave={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColor;
                     }
+                  }}
+                  className={
+                    purpose === option.value
+                      ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors flex-1"
+                      : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white flex-1"
+                  }
                 >
                   {option.label}
                 </Button>
@@ -597,7 +631,8 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
               type="submit"
               style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                e.currentTarget.style.backgroundColor =
+                  defaultPrimaryColorHover;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = defaultPrimaryColor;
@@ -714,8 +749,8 @@ const Hero1 = (props: HeroProps = {}) => {
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default
@@ -723,17 +758,26 @@ const Hero1 = (props: HeroProps = {}) => {
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
-  
+
   const primaryColorHover = getDarkerColor(primaryColor, 20);
 
   // Get data from store or tenantData with fallback logic
@@ -938,20 +982,28 @@ const Hero1 = (props: HeroProps = {}) => {
           {/* Hero Search Form for Mobile */}
           {mergedData.searchForm?.enabled && (
             <div className="w-full max-w-2xl px-4 pb-8">
-              <HeroSearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+              <HeroSearchForm
+                config={mergedData.searchForm}
+                primaryColor={primaryColor}
+                primaryColorHover={primaryColorHover}
+              />
             </div>
           )}
         </div>
       </div>
 
-          {/* Hero Search Form for Desktop/Tablet */}
+      {/* Hero Search Form for Desktop/Tablet */}
       {mergedData.searchForm?.enabled && (
         <div
           className={cn(
             "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 bottom-32 max-w-[1600px] hidden md:block",
           )}
         >
-          <HeroSearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+          <HeroSearchForm
+            config={mergedData.searchForm}
+            primaryColor={primaryColor}
+            primaryColorHover={primaryColorHover}
+          />
         </div>
       )}
     </section>

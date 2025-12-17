@@ -379,46 +379,43 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   }, [pathname]);
 
   // Generate dynamic styles with CSS custom properties for responsive heights
-  const headerStyles = useMemo(
-    () => {
-      // إذا كانت mergedData null، استخدم القيم الافتراضية
-      if (!mergedData) {
-        return {
-          position: "sticky" as const,
-          top: "0px",
-          zIndex: 50,
-          background: "#ffffff",
-          opacity: "0.8",
-          height: "96px",
-          borderBottom: "1px solid #e5e7eb",
-          "--header-height-desktop": "96px",
-          "--header-height-tablet": "80px",
-          "--header-height-mobile": "64px",
-        } as React.CSSProperties;
-      }
-
+  const headerStyles = useMemo(() => {
+    // إذا كانت mergedData null، استخدم القيم الافتراضية
+    if (!mergedData) {
       return {
-        position: mergedData.position?.type || "sticky",
-        top: `${mergedData.position?.top || 0}px`,
-        zIndex: mergedData.position?.zIndex || 50,
-        background:
-          mergedData.background?.type === "gradient"
-            ? `linear-gradient(90deg, ${mergedData.background?.colors?.from || "#ffffff"} 0%, ${mergedData.background?.colors?.to || "#ffffff"} 100%)`
-            : mergedData.background?.colors?.from ||
-              mergedData.styling?.bgColor ||
-              "#ffffff",
-        opacity: mergedData.background?.opacity || "0.8",
-        backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
-        height: `${mergedData.height?.desktop || 96}px`,
-        borderBottom: `1px solid ${mergedData.colors?.border || "#e5e7eb"}`,
-        // CSS custom properties for responsive heights
-        "--header-height-desktop": `${mergedData.height?.desktop || 96}px`,
-        "--header-height-tablet": `${mergedData.height?.tablet || 80}px`,
-        "--header-height-mobile": `${mergedData.height?.mobile || 64}px`,
+        position: "sticky" as const,
+        top: "0px",
+        zIndex: 50,
+        background: "#ffffff",
+        opacity: "0.8",
+        height: "96px",
+        borderBottom: "1px solid #e5e7eb",
+        "--header-height-desktop": "96px",
+        "--header-height-tablet": "80px",
+        "--header-height-mobile": "64px",
       } as React.CSSProperties;
-    },
-    [mergedData],
-  );
+    }
+
+    return {
+      position: mergedData.position?.type || "sticky",
+      top: `${mergedData.position?.top || 0}px`,
+      zIndex: mergedData.position?.zIndex || 50,
+      background:
+        mergedData.background?.type === "gradient"
+          ? `linear-gradient(90deg, ${mergedData.background?.colors?.from || "#ffffff"} 0%, ${mergedData.background?.colors?.to || "#ffffff"} 100%)`
+          : mergedData.background?.colors?.from ||
+            mergedData.styling?.bgColor ||
+            "#ffffff",
+      opacity: mergedData.background?.opacity || "0.8",
+      backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
+      height: `${mergedData.height?.desktop || 96}px`,
+      borderBottom: `1px solid ${mergedData.colors?.border || "#e5e7eb"}`,
+      // CSS custom properties for responsive heights
+      "--header-height-desktop": `${mergedData.height?.desktop || 96}px`,
+      "--header-height-tablet": `${mergedData.height?.tablet || 80}px`,
+      "--header-height-mobile": `${mergedData.height?.mobile || 64}px`,
+    } as React.CSSProperties;
+  }, [mergedData]);
 
   // Generate responsive CSS classes using Tailwind responsive utilities
   const responsiveClasses = useMemo(() => {
@@ -431,36 +428,33 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     return classes.join(" ");
   }, []);
 
-  const logoStyles = useMemo(
-    () => {
-      // إذا كانت mergedData null، استخدم القيم الافتراضية
-      if (!mergedData) {
-        return {
-          fontFamily: "Tajawal",
-          fontWeight: "600",
-          fontSize: "24px",
-          color: "#1f2937",
-        };
-      }
-
+  const logoStyles = useMemo(() => {
+    // إذا كانت mergedData null، استخدم القيم الافتراضية
+    if (!mergedData) {
       return {
-        fontFamily: mergedData.logo?.font?.family || "Tajawal",
-        fontWeight: mergedData.logo?.font?.weight || "600",
-        fontSize: `${mergedData.logo?.font?.size || 24}px`,
-        color:
-          mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
+        fontFamily: "Tajawal",
+        fontWeight: "600",
+        fontSize: "24px",
+        color: "#1f2937",
       };
-    },
-    [mergedData],
-  );
+    }
+
+    return {
+      fontFamily: mergedData.logo?.font?.family || "Tajawal",
+      fontWeight: mergedData.logo?.font?.weight || "600",
+      fontSize: `${mergedData.logo?.font?.size || 24}px`,
+      color:
+        mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
+    };
+  }, [mergedData]);
 
   // منطق مبسط: عرض skeleton loading فقط عند الضرورة القصوى
   const shouldShowSkeleton = loadingTenantData || !mergedData;
-  
+
   if (shouldShowSkeleton) {
     return <HeaderSkeleton />;
   }
-  
+
   // إذا كانت mergedData موجودة وصالحة، اعرض المكون حتى لو كانت البيانات افتراضية
   // لأن المستخدم قد يكون قد قام بتخصيص البيانات الافتراضية
 
@@ -468,7 +462,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   if (!mergedData) {
     return <HeaderSkeleton />;
   }
-  
+
   // إذا كان المكون غير مرئي، لا نعرض skeleton loading بل نعرض لا شيء
   if (!mergedData.visible) {
     return null;

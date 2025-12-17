@@ -33,13 +33,20 @@ export default function PropertyFilter({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get store actions to update filters
-  const { setSearch: setStoreSearch, setPropertyType: setStorePropertyType, setPrice: setStorePrice, fetchProperties } = usePropertiesStore();
+  const {
+    setSearch: setStoreSearch,
+    setPropertyType: setStorePropertyType,
+    setPrice: setStorePrice,
+    fetchProperties,
+  } = usePropertiesStore();
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [propertyType, setPropertyType] = useState(
     searchParams.get("type_id") || "",
   );
-  const [price, setPrice] = useState(searchParams.get("max_price") || searchParams.get("price") || "");
+  const [price, setPrice] = useState(
+    searchParams.get("max_price") || searchParams.get("price") || "",
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filteredTypes, setFilteredTypes] = useState(propertyTypes);
 

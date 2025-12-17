@@ -30,24 +30,28 @@ function removeLocaleFromPathname(pathname: string) {
 
 // دالة للتحقق من Custom Domain (بدون API call للسرعة)
 function getTenantIdFromCustomDomain(host: string): string | null {
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const isDevelopment = process.env.NODE_ENV === "development";
-  
+
   // التحقق من أن المستخدم على الدومين الأساسي
-  const isOnBaseDomain = isDevelopment 
+  const isOnBaseDomain = isDevelopment
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
-  
+
   // إذا كان الدومين الأساسي، لا نعتبره custom domain
   if (isOnBaseDomain) {
     console.log("🔍 Middleware: Host is base domain, not custom domain:", host);
     return null;
   }
-  
+
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
-  
+  const isCustomDomain =
+    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+      host,
+    );
+
   if (!isCustomDomain) {
     console.log("🔍 Middleware: Host is not a custom domain:", host);
     return null;
@@ -122,7 +126,7 @@ function getTenantIdFromHost(host: string): string | null {
     if (parts.length > 2) {
       const potentialTenantId = parts[0];
       const domainPart = parts.slice(1).join(".");
-      
+
       // التحقق من أن الـ domain هو productionDomain بالضبط
       if (domainPart === productionDomain) {
         console.log(
@@ -144,7 +148,10 @@ function getTenantIdFromHost(host: string): string | null {
           );
         }
       } else {
-        console.log("❌ Middleware: Invalid subdomain - not for production domain:", domainPart);
+        console.log(
+          "❌ Middleware: Invalid subdomain - not for production domain:",
+          domainPart,
+        );
       }
     }
   }
@@ -161,13 +168,13 @@ export function middleware(request: NextRequest) {
   console.log("🔍 Middleware Debug - Request:", {
     pathname,
     host,
-    url: request.url
+    url: request.url,
   });
 
   // قائمة الصفحات التي يجب أن تكون على الدومين الأساسي فقط
   const systemPages = [
     "/dashboard",
-    "/live-editor", 
+    "/live-editor",
     "/login",
     "/oauth",
     "/onboarding",
@@ -175,34 +182,41 @@ export function middleware(request: NextRequest) {
     "/updates",
     "/solutions",
     "/landing",
-    "/about-us"
+    "/about-us",
   ];
 
   // التحقق من أن الصفحات النظامية على الدومين الأساسي
-  const isSystemPage = systemPages.some(page => pathname.startsWith(page));
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const isSystemPage = systemPages.some((page) => pathname.startsWith(page));
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const isDevelopment = process.env.NODE_ENV === "development";
-  
+
   // التحقق من أن الصفحة على الدومين الأساسي
-  const isOnBaseDomain = isDevelopment 
+  const isOnBaseDomain = isDevelopment
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
 
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ) 
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
   // لكن ليس الدومين الأساسي
-  const hasCustomDomainExtension = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  const hasCustomDomainExtension =
+    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+      host,
+    );
   const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
 
   // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant
   if (isCustomDomain) {
-    console.log("🔍 Middleware: Custom domain detected, treating all pages (including system pages) as tenant-specific:", host);
+    console.log(
+      "🔍 Middleware: Custom domain detected, treating all pages (including system pages) as tenant-specific:",
+      host,
+    );
     // لا نحتاج لإعادة توجيه، فقط نمرر للخطوة التالية
   }
 
   // Extract tenantId from subdomain or custom domain
   let tenantId = getTenantIdFromHost(host);
-  
+
   // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
   if (!tenantId) {
     tenantId = getTenantIdFromCustomDomain(host);
@@ -306,33 +320,36 @@ export function middleware(request: NextRequest) {
     pathname,
     pathnameHasLocale,
     tenantId,
-    host
+    host,
   });
 
   // If no locale in pathname, redirect to appropriate default locale
   if (!pathnameHasLocale) {
     // Use Arabic as default for all pages
     const locale = "ar";
-    
+
     // Redirect for all pages that don't have locale (including homepage, solutions, etc.)
     const shouldRedirect = true;
-    
+
     console.log("🔍 Middleware Debug - Redirect Decision:", {
       pathname,
       locale,
       tenantId,
       shouldRedirect,
-      reason: "All pages without locale should redirect to add locale"
+      reason: "All pages without locale should redirect to add locale",
     });
 
     if (shouldRedirect) {
       // Preserve query parameters during locale redirect
       const searchParams = request.nextUrl.search; // Get ?key=value
-      const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
+      const newUrl = new URL(
+        `/${locale}${pathname}${searchParams}`,
+        request.url,
+      );
       console.log("🔄 Middleware Debug - Redirecting:", {
         from: request.url,
         to: newUrl.toString(),
-        preservedParams: searchParams
+        preservedParams: searchParams,
       });
       return NextResponse.redirect(newUrl);
     }
@@ -360,9 +377,13 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for owner authentication on owner pages
-  if (pathnameWithoutLocale.startsWith("/owner/") && !pathnameWithoutLocale.startsWith("/owner/login") && !pathnameWithoutLocale.startsWith("/owner/register")) {
+  if (
+    pathnameWithoutLocale.startsWith("/owner/") &&
+    !pathnameWithoutLocale.startsWith("/owner/login") &&
+    !pathnameWithoutLocale.startsWith("/owner/register")
+  ) {
     const ownerToken = request.cookies.get("owner_token")?.value;
-    
+
     if (!ownerToken) {
       console.log("🔒 Middleware: No owner token found, redirecting to login");
       const loginUrl = new URL(`/${locale}/owner/login`, request.url);
@@ -385,11 +406,11 @@ export function middleware(request: NextRequest) {
   if (tenantId) {
     console.log("✅ Middleware: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
-    
+
     // تحديد نوع الـ domain
     const domainType = isCustomDomain ? "custom" : "subdomain";
     response.headers.set("x-domain-type", domainType);
-    
+
     console.log("✅ Middleware: Domain type:", domainType);
   } else {
     console.log("❌ Middleware: No tenant ID found for host:", host);

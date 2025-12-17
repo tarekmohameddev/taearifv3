@@ -6,7 +6,8 @@
   --foreground: #171717;
 }
 
-html, body {
+html,
+body {
   background-color: #ffffff;
 }
 
@@ -20,7 +21,7 @@ html, body {
 body {
   background: #ffffff !important;
   color: #171717;
-  font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
 .container {
@@ -106,7 +107,9 @@ body {
 
 /* Accordion smooth transitions */
 .accordion-content {
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
 }
 
 /* Hover effects */

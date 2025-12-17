@@ -16,7 +16,11 @@ export interface FieldDefinitionBase {
   placeholder?: string;
   min?: number;
   max?: number;
-  options?: { label: string; value: string; iconLibrary?: "lucide" | "react-icons" }[]; // for select
+  options?: {
+    label: string;
+    value: string;
+    iconLibrary?: "lucide" | "react-icons";
+  }[]; // for select
   showIcons?: boolean; // for select fields: show icons in dropdown
   defaultValue?: any; // default value for the field
   description?: string; // description for the field

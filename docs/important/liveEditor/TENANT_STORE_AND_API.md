@@ -1,6 +1,7 @@
 # Tenant Store and API Integration
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [tenantStore Architecture](#tenantstore-architecture)
 3. [Data Fetching Flow](#data-fetching-flow)
@@ -14,6 +15,7 @@
 ## Overview
 
 The **tenantStore** is a Zustand store responsible for:
+
 - **Fetching tenant data** from API
 - **Caching tenant data** to prevent duplicate requests
 - **Saving changes** to database via API
@@ -39,25 +41,25 @@ interface TenantStore {
   tenant: any | null;
   tenantId: string | null;
   lastFetchedWebsite: string | null;
-  
+
   // ═══════════════════════════════════════════════════════════
   // LOADING STATE
   // ═══════════════════════════════════════════════════════════
   loadingTenantData: boolean;
-  loading: boolean;  // Alias for loadingTenantData
+  loading: boolean; // Alias for loadingTenantData
   error: string | null;
-  
+
   // ═══════════════════════════════════════════════════════════
   // SETTERS
   // ═══════════════════════════════════════════════════════════
   setTenant: (tenant: any) => void;
   setTenantId: (tenantId: string) => void;
-  
+
   // ═══════════════════════════════════════════════════════════
   // DATA FETCHING
   // ═══════════════════════════════════════════════════════════
   fetchTenantData: (websiteName: string) => Promise<void>;
-  
+
   // ═══════════════════════════════════════════════════════════
   // LEGACY UPDATE FUNCTIONS (mostly unused)
   // ═══════════════════════════════════════════════════════════
@@ -65,7 +67,7 @@ interface TenantStore {
   updateHero: (heroData: any) => void;
   updateFooter: (footerData: any) => void;
   // ... more legacy functions
-  
+
   // ═══════════════════════════════════════════════════════════
   // LEGACY SAVE FUNCTIONS (mostly unused)
   // ═══════════════════════════════════════════════════════════
@@ -78,13 +80,14 @@ interface TenantStore {
 ### Key Properties
 
 **tenantData Structure**:
+
 ```typescript
 {
   _id: "tenant-mongodb-id",
   username: "tenant-username",
   websiteName: "tenant-website-name",
   email: "tenant@example.com",
-  
+
   // Component data organized by page
   componentSettings: {
     "homepage": {
@@ -107,7 +110,7 @@ interface TenantStore {
       // About page components
     }
   },
-  
+
   // Global components (shared across all pages)
   globalComponentsData: {
     header: {
@@ -120,11 +123,11 @@ interface TenantStore {
       content: {...}
     }
   },
-  
+
   // Legacy global component data (backward compatibility)
   globalHeaderData: {...},
   globalFooterData: {...},
-  
+
   // Website metadata and SEO
   WebsiteLayout: {
     metaTags: {
@@ -140,7 +143,7 @@ interface TenantStore {
       ]
     }
   },
-  
+
   // Other tenant properties
   createdAt: "2024-01-01T00:00:00.000Z",
   updatedAt: "2024-01-15T12:30:00.000Z"
@@ -156,7 +159,7 @@ interface TenantStore {
 ```typescript
 fetchTenantData: async (websiteName) => {
   const state = useTenantStore.getState();
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 1: Prevent Duplicate Requests
   // ═══════════════════════════════════════════════════════════
@@ -165,49 +168,48 @@ fetchTenantData: async (websiteName) => {
     (state.tenantData && state.tenantData.username === websiteName)
   ) {
     console.log("🚫 Skipping fetch - already loading or loaded:", websiteName);
-    return;  // Exit early
+    return; // Exit early
   }
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 2: Set Loading State
   // ═══════════════════════════════════════════════════════════
   set({
     loadingTenantData: true,
-    error: null
+    error: null,
   });
-  
+
   console.log("🔄 Fetching tenant data:", websiteName);
-  
+
   try {
     // ═══════════════════════════════════════════════════════════
     // STEP 3: API Request
     // ═══════════════════════════════════════════════════════════
-    const response = await axiosInstance.post(
-      "/v1/tenant-website/getTenant",
-      { websiteName }
-    );
-    
+    const response = await axiosInstance.post("/v1/tenant-website/getTenant", {
+      websiteName,
+    });
+
     const data = response.data || {};
-    
+
     console.log("✅ Tenant data received:", {
       username: data.username,
       hasComponentSettings: !!data.componentSettings,
       hasGlobalComponents: !!data.globalComponentsData,
-      pagesCount: Object.keys(data.componentSettings || {}).length
+      pagesCount: Object.keys(data.componentSettings || {}).length,
     });
-    
+
     // ═══════════════════════════════════════════════════════════
     // STEP 4: Load into editorStore
     // ═══════════════════════════════════════════════════════════
     const { useEditorStore } = await import("./editorStore");
     const editorStore = useEditorStore.getState();
-    
+
     // Load global components data
     if (data.globalComponentsData) {
       console.log("📦 Loading globalComponentsData into editorStore");
       editorStore.setGlobalComponentsData(data.globalComponentsData);
     }
-    
+
     // Load WebsiteLayout (meta tags)
     if (
       data.WebsiteLayout &&
@@ -217,30 +219,29 @@ fetchTenantData: async (websiteName) => {
       console.log("📦 Loading WebsiteLayout into editorStore");
       editorStore.setWebsiteLayout(data.WebsiteLayout);
     }
-    
+
     // ═══════════════════════════════════════════════════════════
     // STEP 5: Update tenantStore State
     // ═══════════════════════════════════════════════════════════
     set({
       tenantData: data,
       loadingTenantData: false,
-      lastFetchedWebsite: websiteName
+      lastFetchedWebsite: websiteName,
     });
-    
+
     console.log("✅ Tenant data loaded successfully");
-    
   } catch (error) {
     // ═══════════════════════════════════════════════════════════
     // ERROR HANDLING
     // ═══════════════════════════════════════════════════════════
     console.error("[tenantStore] Error fetching tenant data:", error);
-    
+
     set({
       error: error.message || "Failed to fetch tenant data",
-      loadingTenantData: false
+      loadingTenantData: false,
     });
   }
-}
+};
 ```
 
 ### Complete Fetch Flow
@@ -331,13 +332,13 @@ RESULT: All data loaded ✓
 // In EditorProvider or save handler
 const confirmSave = async () => {
   const state = useEditorStore.getState();
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 1: Build Payload
   // ═══════════════════════════════════════════════════════════
   const payload = {
     tenantId: tenantId || "",
-    
+
     // All pages with components
     pages: state.pageComponentsByPage,
     // {
@@ -345,42 +346,41 @@ const confirmSave = async () => {
     //   "about-us": [component1, component2, ...],
     //   "contact": [component1, component2, ...]
     // }
-    
+
     // Global components (header & footer)
-    globalComponentsData: state.globalComponentsData
+    globalComponentsData: state.globalComponentsData,
     // {
     //   header: {...},
     //   footer: {...}
     // }
   };
-  
+
   console.log("📤 Save payload:", {
     tenantId: payload.tenantId,
     pagesCount: Object.keys(payload.pages).length,
     hasGlobalHeader: !!payload.globalComponentsData?.header,
-    hasGlobalFooter: !!payload.globalComponentsData?.footer
+    hasGlobalFooter: !!payload.globalComponentsData?.footer,
   });
-  
+
   // ═══════════════════════════════════════════════════════════
   // STEP 2: API Request
   // ═══════════════════════════════════════════════════════════
   try {
     const response = await axiosInstance.post(
       "/v1/tenant-website/save-pages",
-      payload
+      payload,
     );
-    
+
     console.log("✅ Save successful:", response.data);
-    
+
     // ═══════════════════════════════════════════════════════════
     // STEP 3: Update UI
     // ═══════════════════════════════════════════════════════════
     closeDialog();
     toast.success("Changes saved successfully!");
-    
+
     // Reset change tracking
     state.setHasChangesMade(false);
-    
   } catch (error) {
     console.error("❌ Save failed:", error);
     toast.error("Failed to save changes");
@@ -401,10 +401,10 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
       {
         tenantId,
         headerData,
-        variant
-      }
+        variant,
+      },
     );
-    
+
     if (response.data.status === "success") {
       // Update local tenantData
       set((state) => ({
@@ -414,19 +414,19 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
             ...state.tenantData.componentSettings,
             header: {
               data: headerData,
-              variant
-            }
-          }
-        }
+              variant,
+            },
+          },
+        },
       }));
     }
-    
+
     return response.data;
   } catch (error) {
     console.error("Error saving header:", error);
     throw error;
   }
-}
+};
 ```
 
 **Note**: Legacy functions exist for backward compatibility but are generally NOT used. The modern approach uses `save-pages` to save all components at once.
@@ -440,6 +440,7 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
 **Endpoint**: `POST /v1/tenant-website/getTenant`
 
 **Request**:
+
 ```json
 {
   "websiteName": "tenant123"
@@ -447,6 +448,7 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
 ```
 
 **Response**:
+
 ```json
 {
   "status": "success",
@@ -518,6 +520,7 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
 ```
 
 **Error Response**:
+
 ```json
 {
   "status": "error",
@@ -532,6 +535,7 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
 **Endpoint**: `POST /v1/tenant-website/save-pages`
 
 **Request**:
+
 ```json
 {
   "tenantId": "tenant-id",
@@ -573,6 +577,7 @@ saveHeaderChanges: async (tenantId, headerData, variant) => {
 ```
 
 **Response**:
+
 ```json
 {
   "status": "success",
@@ -610,6 +615,7 @@ componentSettings: {
 ```
 
 **Example**:
+
 ```typescript
 {
   "homepage": {
@@ -628,7 +634,7 @@ componentSettings: {
       position: 0,
       layout: { row: 0, col: 0, span: 2 }
     },
-    
+
     "6g7h8i9j-0k1l-2m3n-4o5p-6q7r8s9t0u1v": {
       id: "6g7h8i9j-0k1l-2m3n-4o5p-6q7r8s9t0u1v",
       type: "halfTextHalfImage",
@@ -643,7 +649,7 @@ componentSettings: {
       layout: { row: 1, col: 0, span: 2 }
     }
   },
-  
+
   "about-us": {
     // About page components
   }
@@ -702,7 +708,7 @@ globalComponentsData: {
     };
     // ... more header configuration
   },
-  
+
   footer: {
     visible: boolean;
     background: {
@@ -792,6 +798,7 @@ if (data.WebsiteLayout) {
 ```
 
 **Why Immediate Transfer?**
+
 - editorStore is authoritative for editing
 - tenantStore just fetches from API
 - Separation of concerns (fetching vs editing)
@@ -804,43 +811,45 @@ useEffect(() => {
   if (!initialized && tenantData) {
     // Load complete database into editorStore
     editorStore.loadFromDatabase(tenantData);
-    
+
     setInitialized(true);
   }
 }, [initialized, tenantData]);
 ```
 
 **loadFromDatabase Execution**:
+
 ```typescript
-loadFromDatabase: (tenantData) => set((state) => {
-  const newState = { ...state };
-  
-  // Load global components
-  newState.globalHeaderData = tenantData.globalHeaderData || defaults;
-  newState.globalFooterData = tenantData.globalFooterData || defaults;
-  newState.globalComponentsData = tenantData.globalComponentsData || defaults;
-  
-  // Load page components
-  Object.entries(tenantData.componentSettings).forEach(([page, settings]) => {
-    // Set pageComponentsByPage
-    newState.pageComponentsByPage[page] = Object.values(settings);
-    
-    // Load into component type states
-    Object.values(settings).forEach(comp => {
-      switch (comp.type) {
-        case "hero":
-          newState.heroStates[comp.id] = comp.data;
-          break;
-        case "header":
-          newState.headerStates[comp.id] = comp.data;
-          break;
-        // ... all component types
-      }
+loadFromDatabase: (tenantData) =>
+  set((state) => {
+    const newState = { ...state };
+
+    // Load global components
+    newState.globalHeaderData = tenantData.globalHeaderData || defaults;
+    newState.globalFooterData = tenantData.globalFooterData || defaults;
+    newState.globalComponentsData = tenantData.globalComponentsData || defaults;
+
+    // Load page components
+    Object.entries(tenantData.componentSettings).forEach(([page, settings]) => {
+      // Set pageComponentsByPage
+      newState.pageComponentsByPage[page] = Object.values(settings);
+
+      // Load into component type states
+      Object.values(settings).forEach((comp) => {
+        switch (comp.type) {
+          case "hero":
+            newState.heroStates[comp.id] = comp.data;
+            break;
+          case "header":
+            newState.headerStates[comp.id] = comp.data;
+            break;
+          // ... all component types
+        }
+      });
     });
+
+    return newState;
   });
-  
-  return newState;
-});
 ```
 
 ---
@@ -854,25 +863,25 @@ loadFromDatabase: (tenantData) => set((state) => {
 ```typescript
 const findFirstHeader = (componentSettings) => {
   if (!componentSettings) return null;
-  
+
   for (const pageName in componentSettings) {
     const page = componentSettings[pageName];
-    
+
     for (const componentId in page) {
       const component = page[componentId];
-      
+
       if (
         component.type === "header" &&
         component.componentName === "header1"
       ) {
         return {
           id: componentId,
-          data: component.data
+          data: component.data,
         };
       }
     }
   }
-  
+
   return null;
 };
 ```
@@ -890,35 +899,33 @@ const findFirstHeader = (componentSettings) => {
 ```typescript
 fetchTenantData: async (websiteName) => {
   const state = useTenantStore.getState();
-  
+
   // CHECK 1: Already loading?
   if (state.loadingTenantData) {
     console.log("Already fetching, skipping");
     return;
   }
-  
+
   // CHECK 2: Already have data for this website?
-  if (
-    state.tenantData &&
-    state.tenantData.username === websiteName
-  ) {
+  if (state.tenantData && state.tenantData.username === websiteName) {
     console.log("Data already loaded for:", websiteName);
     return;
   }
-  
+
   // CHECK 3: Same as last fetched?
   if (state.lastFetchedWebsite === websiteName) {
     console.log("Recently fetched:", websiteName);
     return;
   }
-  
+
   // All checks passed - proceed with fetch
   set({ loadingTenantData: true });
   // ... fetch logic
-}
+};
 ```
 
 **Benefits**:
+
 - Avoids duplicate API calls
 - Reduces server load
 - Faster user experience
@@ -932,9 +939,9 @@ const refreshTenantData = async (websiteName) => {
   // Clear cache
   set({
     tenantData: null,
-    lastFetchedWebsite: null
+    lastFetchedWebsite: null,
   });
-  
+
   // Fetch fresh data
   await fetchTenantData(websiteName);
 };
@@ -949,17 +956,17 @@ const refreshTenantData = async (websiteName) => {
 ```typescript
 try {
   const response = await axiosInstance.post(...);
-  
+
   // Success handling
-  
+
 } catch (error) {
   console.error("[tenantStore] Error fetching:", error);
-  
+
   set({
     error: error.message || "Unknown error",
     loadingTenantData: false
   });
-  
+
   // Optionally show user notification
   toast.error("Failed to load website data");
 }
@@ -970,12 +977,11 @@ try {
 ```typescript
 try {
   await axiosInstance.post("/v1/tenant-website/save-pages", payload);
-  
+
   toast.success("Saved!");
-  
 } catch (error) {
   console.error("Save error:", error);
-  
+
   if (error.response?.status === 401) {
     toast.error("Unauthorized - please log in");
     router.push("/login");
@@ -1084,15 +1090,15 @@ No need to update tenantStore
 
 ```typescript
 // Components can access tenantStore directly
-const tenantData = useTenantStore(s => s.tenantData);
+const tenantData = useTenantStore((s) => s.tenantData);
 
 // Extract tenant-specific data
 const getTenantComponentData = () => {
   if (!tenantData?.componentSettings) return {};
-  
+
   // Search in componentSettings
   for (const [page, components] of Object.entries(
-    tenantData.componentSettings
+    tenantData.componentSettings,
   )) {
     for (const [id, comp] of Object.entries(components)) {
       if (comp.type === "hero" && comp.id === props.id) {
@@ -1100,7 +1106,7 @@ const getTenantComponentData = () => {
       }
     }
   }
-  
+
   return {};
 };
 
@@ -1110,7 +1116,7 @@ const tenantComponentData = getTenantComponentData();
 const mergedData = {
   ...defaultData,
   ...tenantComponentData,
-  ...storeData
+  ...storeData,
 };
 ```
 
@@ -1147,6 +1153,7 @@ DATABASE
 ### Common Patterns
 
 **Pattern 1**: Check if data loaded
+
 ```typescript
 const tenantData = useTenantStore(s => s.tenantData);
 const loading = useTenantStore(s => s.loadingTenantData);
@@ -1157,10 +1164,11 @@ if (loading || !tenantData) {
 ```
 
 **Pattern 2**: Extract component data
+
 ```typescript
 const getTenantComponentData = () => {
   if (!tenantData?.componentSettings) return {};
-  
+
   // Search all pages
   for (const page of Object.values(tenantData.componentSettings)) {
     for (const comp of Object.values(page)) {
@@ -1169,18 +1177,19 @@ const getTenantComponentData = () => {
       }
     }
   }
-  
+
   return {};
 };
 ```
 
 **Pattern 3**: Use as fallback
+
 ```typescript
 const mergedData = {
-  ...defaultData,          // Priority 1 (lowest)
-  ...tenantComponentData,  // Priority 2
-  ...storeData,            // Priority 3
-  ...currentStoreData      // Priority 4 (highest)
+  ...defaultData, // Priority 1 (lowest)
+  ...tenantComponentData, // Priority 2
+  ...storeData, // Priority 3
+  ...currentStoreData, // Priority 4 (highest)
 };
 ```
 
@@ -1197,6 +1206,7 @@ The tenantStore provides:
 5. **Data structure**: Organized by pages and components
 
 **Key Principles**:
+
 - tenantStore fetches, editorStore edits
 - Global components stored separately
 - componentSettings organized by page
@@ -1204,15 +1214,16 @@ The tenantStore provides:
 - Cache prevents unnecessary API calls
 
 **Integration**:
+
 - Fetched data loaded into editorStore
 - Components read from editorStore, not tenantStore
 - Saves use editorStore data, not tenantStore
 - tenantStore is initial data source only
 
 Understanding tenantStore is essential for:
+
 - API integration
 - Database synchronization
 - Initial data loading
 - Error handling
 - Performance optimization
-

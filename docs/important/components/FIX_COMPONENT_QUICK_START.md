@@ -92,7 +92,7 @@ AI: Fix component "{NAME}" - shows default data in Live Editor, not database dat
 EXECUTE:
 @FIX_COMPONENT_PROMPT.md
 Focus: Layer 4 (loadFromDatabase) + Layer 6 (useEffect initialization)
-Check: 
+Check:
 1. loadFromDatabase switch case exists
 2. Component useEffect uses tenantComponentData
 3. getTenantComponentData called before useEffect
@@ -117,30 +117,35 @@ Check: imports, types, interfaces, function signatures
 ## ⚡ ULTRA-QUICK FIX COMMANDS
 
 ### Command 1: Complete Audit & Repair
+
 ```
 AI: Run COMPLETE_REPAIR on component "{NAME}"
 Reference: @FIX_COMPONENT_PROMPT.md
 ```
 
 ### Command 2: Fix Integration Only
+
 ```
 AI: Run FIX_MISSING_INTEGRATION on component "{NAME}"
 Reference: @FIX_COMPONENT_PROMPT.md
 ```
 
 ### Command 3: Fix Component Pattern
+
 ```
 AI: Run FIX_COMPONENT_PATTERN on component "{NAME}"
 Reference: @FIX_COMPONENT_PROMPT.md
 ```
 
 ### Command 4: Fix Functions File
+
 ```
 AI: Run FIX_FUNCTIONS_FILE on component "{NAME}"
 Reference: @FIX_COMPONENT_PROMPT.md
 ```
 
 ### Command 5: Fix Structure Mismatch
+
 ```
 AI: Run FIX_STRUCTURE_MISMATCH on component "{NAME}"
 Reference: @FIX_COMPONENT_PROMPT.md
@@ -169,7 +174,7 @@ Suggest fixes but don't apply them
 Layer 1: Files Existence Check
 └─ Verify all required files exist
 
-Layer 2: Functions File Validation  
+Layer 2: Functions File Validation
 └─ Check 4 functions + default data
 
 Layer 3: Structure File Validation
@@ -193,23 +198,27 @@ Layer 7: Index/Exports Validation
 ## 🔍 ISSUE SEVERITY GUIDE
 
 **CRITICAL** - Component won't work at all
+
 - Missing files
 - Missing function logic
 - Missing store integration
 - Component doesn't follow pattern
 
 **HIGH** - Component partially broken
+
 - Missing imports
 - Incorrect structure
 - Missing exports
 - Wrong prop usage
 
 **MEDIUM** - Component works but has issues
+
 - Inconsistent naming
 - Missing simpleFields
 - Optimization opportunities
 
 **LOW** - Minor improvements
+
 - Code style
 - Comments
 - Organization
@@ -237,7 +246,7 @@ FIXES APPLIED:
 
 COMPONENT FUNCTIONALITY:
 ✓ Appears in editor
-✓ Renders correctly  
+✓ Renders correctly
 ✓ EditorSidebar works
 ✓ Updates in real-time
 ✓ Saves to database
@@ -260,6 +269,7 @@ NEXT STEPS:
 ## 🚨 WHEN TO USE MANUAL REVIEW
 
 AI should request manual review if:
+
 - ❌ Multiple CRITICAL fixes failed
 - ❌ Component logic is completely wrong
 - ❌ Database schema changes needed
@@ -292,6 +302,7 @@ AI should request manual review if:
 ### For Specific Component Types
 
 **Global Components (Header/Footer):**
+
 ```
 AI: Fix global component "{NAME}"
 SPECIAL: Check globalComponentsData integration
@@ -299,6 +310,7 @@ Reference: @FIX_COMPONENT_PROMPT.md Pattern 3
 ```
 
 **Multi-Variant Components:**
+
 ```
 AI: Fix multi-variant component "{NAME}"
 SPECIAL: Check all variant default data functions
@@ -306,6 +318,7 @@ Reference: @FIX_COMPONENT_PROMPT.md Pattern 1
 ```
 
 **Form Components:**
+
 ```
 AI: Fix form component "{NAME}"
 SPECIAL: Check validation logic and submit handlers
@@ -317,4 +330,3 @@ Reference: @FIX_COMPONENT_PROMPT.md Pattern 2
 **END OF QUICK START GUIDE**
 
 Use this for fast component repairs. For detailed protocol, see `FIX_COMPONENT_PROMPT.md`.
-

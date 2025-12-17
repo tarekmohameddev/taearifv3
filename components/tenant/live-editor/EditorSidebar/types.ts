@@ -9,7 +9,9 @@ export interface EditorSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   view: "main" | "add-section" | "edit-component" | "branding-settings";
-  setView: (view: "main" | "add-section" | "edit-component" | "branding-settings") => void;
+  setView: (
+    view: "main" | "add-section" | "edit-component" | "branding-settings",
+  ) => void;
   selectedComponent: ComponentInstance | null;
   onComponentUpdate: (id: string, newData: ComponentData) => void;
   onComponentThemeChange?: (id: string, newTheme: string) => void;

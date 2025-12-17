@@ -625,11 +625,15 @@ export const createDefaultData = (
       // Check componentName to determine which footer theme default data to use
       if (componentName === "footer2" || componentName === "StaticFooter2") {
         // Import getDefaultFooter2Data dynamically to avoid circular dependencies
-        const { getDefaultFooter2Data } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+        const {
+          getDefaultFooter2Data,
+        } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
         return getDefaultFooter2Data();
       }
       // Default to footer1/StaticFooter1
-      const { getDefaultFooterData } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+      const {
+        getDefaultFooterData,
+      } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
       return getDefaultFooterData();
 
     case "inputs2":

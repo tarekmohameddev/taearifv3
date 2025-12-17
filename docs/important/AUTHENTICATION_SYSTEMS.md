@@ -14,9 +14,11 @@ These systems use different cookies, different stores, and different APIs to mai
 ## System 1: Dashboard Users Authentication
 
 ### Purpose
+
 Authenticates users who access the **main platform dashboard** at `/dashboard/*` routes.
 
 ### Technology Stack
+
 - **State Management**: Zustand store (`context/AuthContext.js`)
 - **Cookie Name**: `next-auth.session-token` (NextAuth) + custom token storage
 - **API Base URL**: `process.env.NEXT_PUBLIC_Backend_URL` (https://api.taearif.com/api)
@@ -50,7 +52,7 @@ const useAuthStore = create((set, get) => ({
     account_type: null,
     tenant_id: null,
   },
-  
+
   // Actions
   login: async (email, password, recaptchaToken) => {},
   logout: async () => {},
@@ -80,9 +82,9 @@ POST /api/user/setAuth
 // Set cookie on server side (httpOnly)
   ↓
 // Update Zustand store
-set({ 
-  UserIslogged: true, 
-  userData: { ...user, token } 
+set({
+  UserIslogged: true,
+  userData: { ...user, token }
 })
   ↓
 // Store in localStorage for persistence
@@ -93,6 +95,7 @@ unlockAxios()
 ```
 
 **Files Involved:**
+
 - `context/AuthContext.js` - Zustand store with login action
 - `pages/api/user/setAuth.js` - Server API to set httpOnly cookie
 - `lib/axiosInstance.js` - Axios interceptor that adds Bearer token
@@ -100,22 +103,26 @@ unlockAxios()
 #### 2. Token Storage
 
 **Two-tier storage:**
+
 1. **localStorage**: For client-side persistence (page refresh)
 2. **httpOnly Cookie**: Set by server API for secure requests
 
 ```javascript
 // Client side (localStorage)
-localStorage.setItem("user", JSON.stringify({
-  email: user.email,
-  token: token,
-  username: user.username,
-  // ... other user data
-}));
+localStorage.setItem(
+  "user",
+  JSON.stringify({
+    email: user.email,
+    token: token,
+    username: user.username,
+    // ... other user data
+  }),
+);
 
 // Server side (httpOnly cookie via API)
 res.setHeader("Set-Cookie", [
   `user_token=${token}; HttpOnly; Secure; Path=/; Max-Age=604800`,
-  `user_email=${user.email}; Path=/; Max-Age=604800`
+  `user_email=${user.email}; Path=/; Max-Age=604800`,
 ]);
 ```
 
@@ -145,7 +152,7 @@ axiosInstance.interceptors.response.use(
       // Token expired - redirect to login
     }
     return Promise.reject(error);
-  }
+  },
 );
 ```
 
@@ -159,27 +166,33 @@ export default function ClientLayout({ children }) {
   const pathname = usePathname();
   const UserIslogged = useAuthStore((state) => state.UserIslogged);
   const IsLoading = useAuthStore((state) => state.IsLoading);
-  
+
   // Public pages that don't require authentication
   const publicPages = [
-    "/login", "/register", "/forgot-password", "/reset",
-    "/onboarding", "/landing", "/live-editor", "/oauth"
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset",
+    "/onboarding",
+    "/landing",
+    "/live-editor",
+    "/oauth",
   ];
-  
-  const isPublicPage = publicPages.some(page => pathname?.startsWith(page));
-  
+
+  const isPublicPage = publicPages.some((page) => pathname?.startsWith(page));
+
   useEffect(() => {
     // If not logged in and not on public page, redirect to login
     if (!IsLoading && !UserIslogged && !isPublicPage) {
       router.push("/login");
     }
   }, [IsLoading, UserIslogged, pathname]);
-  
+
   // Don't render protected content until auth check is complete
   if (!UserIslogged && !isPublicPage) {
     return null;
   }
-  
+
   return <AuthProvider>{children}</AuthProvider>;
 }
 ```
@@ -189,38 +202,38 @@ export default function ClientLayout({ children }) {
 ```javascript
 fetchUserData: async () => {
   set({ IsLoading: true });
-  
+
   try {
     // Call API to get user info from cookie
     const response = await fetch("/api/user/getUserInfo");
     const userData = await response.json();
-    
-    set({ 
-      UserIslogged: true, 
-      userData: { ...userData } 
+
+    set({
+      UserIslogged: true,
+      userData: { ...userData },
     });
-    
+
     // Also fetch subscription data
     const subscriptionRes = await axiosInstance.get("/user");
     const subscriptionData = subscriptionRes.data.data;
-    
-    set({ 
+
+    set({
       userData: {
         ...userData,
         is_free_plan: subscriptionData.membership.is_free_plan,
         package_title: subscriptionData.membership.package.title,
         // ... more subscription data
-      }
+      },
     });
   } catch (error) {
-    set({ 
-      UserIslogged: false, 
-      authenticated: false 
+    set({
+      UserIslogged: false,
+      authenticated: false,
     });
   } finally {
     set({ IsLoading: false });
   }
-}
+};
 ```
 
 #### 6. Logout Process
@@ -231,21 +244,21 @@ logout: async (options = { redirect: true, clearStore: true }) => {
     // Call logout API
     await fetch("/api/user/logout", {
       method: "POST",
-      body: JSON.stringify({ token: get().userData.token })
+      body: JSON.stringify({ token: get().userData.token }),
     });
-    
+
     // Clear store
     if (options.clearStore) {
-      set({ 
-        UserIslogged: false, 
-        authenticated: false, 
-        userData: null 
+      set({
+        UserIslogged: false,
+        authenticated: false,
+        userData: null,
       });
     }
-    
+
     // Clear localStorage
     localStorage.removeItem("user");
-    
+
     // Redirect to login
     if (options.redirect) {
       window.location.href = "/login";
@@ -253,7 +266,7 @@ logout: async (options = { redirect: true, clearStore: true }) => {
   } catch (error) {
     console.error("Logout failed:", error);
   }
-}
+};
 ```
 
 ### OAuth Integration (Google)
@@ -273,18 +286,18 @@ export default NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  
+
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account?.provider === "google" && profile) {
         // Check if user exists
         const checkUserResponse = await axios.post(
           `${process.env.NEXT_PUBLIC_Backend_URL}/auth/check-user`,
-          { email: profile.email }
+          { email: profile.email },
         );
-        
+
         let userData;
-        
+
         if (checkUserResponse.data.exists) {
           // Login existing user
           const loginResponse = await axios.post(
@@ -293,7 +306,7 @@ export default NextAuth({
               email: profile.email,
               google_id: profile.sub,
               name: profile.name,
-            }
+            },
           );
           userData = loginResponse.data;
         } else {
@@ -306,26 +319,26 @@ export default NextAuth({
               first_name: profile.given_name,
               last_name: profile.family_name,
               username: profile.name.replace(/\s+/g, "-").toLowerCase(),
-            }
+            },
           );
           userData = registerResponse.data;
         }
-        
+
         // Store in token
         token.token = userData.token;
         token.user = userData.user;
       }
-      
+
       return token;
     },
-    
+
     async session({ session, token }) {
       session.accessToken = token.token;
       session.userData = token.user;
       return session;
     },
   },
-  
+
   pages: {
     signIn: "/login",
     error: "/login",
@@ -375,12 +388,12 @@ import { useRouter } from "next/navigation";
 export default function OAuthSuccessPageContent() {
   const router = useRouter();
   const loginWithToken = useAuthStore((state) => state.loginWithToken);
-  
+
   useEffect(() => {
     // Extract token from URL
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-    
+
     if (token) {
       // Login with token
       loginWithToken(token).then((result) => {
@@ -390,7 +403,7 @@ export default function OAuthSuccessPageContent() {
       });
     }
   }, []);
-  
+
   return <div>Processing OAuth login...</div>;
 }
 ```
@@ -400,9 +413,11 @@ export default function OAuthSuccessPageContent() {
 ## System 2: Owner Authentication
 
 ### Purpose
+
 Authenticates **property owners** who access tenant-specific owner dashboards at `/owner/*` routes.
 
 ### Technology Stack
+
 - **State Management**: Zustand store (`context/OwnerAuthContext.js`)
 - **Cookie Names**: `owner_token` + `ownerRentalToken`
 - **API Base URL**: `https://api.taearif.com/api/v1/owner-rental`
@@ -425,7 +440,7 @@ const useOwnerAuthStore = create((set, get) => ({
     owner_id: null,
     permissions: [],
   },
-  
+
   // Actions
   login: async (email, password) => {},
   register: async (email, password, firstName, lastName, phone) => {},
@@ -442,19 +457,19 @@ const useOwnerAuthStore = create((set, get) => ({
 ```javascript
 login: async (email, password) => {
   set({ isLoading: true, errorLogin: null });
-  
+
   try {
     // Call owner rental API directly
     const response = await axios.post(
       "https://api.taearif.com/api/v1/owner-rental/login",
-      { email, password }
+      { email, password },
     );
-    
+
     const { success, data } = response.data;
-    
+
     if (success && data && data.token && data.owner_rental) {
       const { owner_rental: user, token } = data;
-      
+
       // Set TWO cookies (client-side)
       const cookieOptions = {
         path: "/",
@@ -462,30 +477,30 @@ login: async (email, password) => {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       };
-      
+
       document.cookie = `owner_token=${token}; path=/; max-age=${cookieOptions.maxAge}`;
       document.cookie = `ownerRentalToken=${token}; path=/; max-age=${cookieOptions.maxAge}`;
-      
+
       // Update store
       const safeOwnerData = {
         email: user.email,
         token: token,
-        first_name: user.name ? user.name.split(' ')[0] : null,
-        last_name: user.name ? user.name.split(' ').slice(1).join(' ') : null,
+        first_name: user.name ? user.name.split(" ")[0] : null,
+        last_name: user.name ? user.name.split(" ").slice(1).join(" ") : null,
         tenant_id: user.tenant_id,
         owner_id: user.id,
         permissions: user.permissions || [],
       };
-      
+
       set({
         ownerIsLogged: true,
         isAuthenticated: true,
         ownerData: safeOwnerData,
       });
-      
+
       // Store in localStorage
       localStorage.setItem("owner_user", JSON.stringify(safeOwnerData));
-      
+
       toast.success("تم تسجيل الدخول بنجاح!");
       return { success: true, user: safeOwnerData };
     }
@@ -495,10 +510,11 @@ login: async (email, password) => {
   } finally {
     set({ isLoading: false });
   }
-}
+};
 ```
 
 **Key Differences from Dashboard System:**
+
 1. **Direct API call** (no internal API wrapper)
 2. **Client-side cookie setting** (not httpOnly)
 3. **Different token storage keys** (`owner_token` vs `user_token`)
@@ -512,34 +528,35 @@ login: async (email, password) => {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
-  
+
   // Check for owner authentication on owner pages
   if (
-    pathnameWithoutLocale.startsWith("/owner/") && 
-    !pathnameWithoutLocale.startsWith("/owner/login") && 
+    pathnameWithoutLocale.startsWith("/owner/") &&
+    !pathnameWithoutLocale.startsWith("/owner/login") &&
     !pathnameWithoutLocale.startsWith("/owner/register")
   ) {
     const ownerToken = request.cookies.get("owner_token")?.value;
-    
+
     if (!ownerToken) {
       console.log("🔒 Middleware: No owner token found, redirecting to login");
       const loginUrl = new URL(`/${locale}/owner/login`, request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
-  
+
   // Continue with request if token exists
   return NextResponse.next();
 }
 ```
 
 **Flow:**
+
 ```
 User visits /owner/dashboard
   ↓
 Middleware checks for owner_token cookie
   ↓
-Token exists? 
+Token exists?
   ├─ YES → Allow access to page
   └─ NO → Redirect to /owner/login
 ```
@@ -552,17 +569,18 @@ Token exists?
 export default async function OwnerLayout({ children }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
-  
+
   // Owner pages REQUIRE a tenantId (subdomain or custom domain)
   if (!tenantId) {
     notFound(); // Show 404 if accessed on base domain
   }
-  
+
   return <>{children}</>;
 }
 ```
 
 **Important:** Owner pages can ONLY be accessed on:
+
 - Subdomain: `tenant1.localhost:3000/owner/dashboard`
 - Custom domain: `custom-domain.com/owner/dashboard`
 
@@ -577,7 +595,7 @@ export default function OwnerDashboard() {
   const { ownerData, fetchOwnerData } = useOwnerAuthStore();
   const { fetchTenantData, tenantData } = useTenantStore();
   const [dashboardData, setDashboardData] = useState(null);
-  
+
   useEffect(() => {
     const checkAuthAndLoad = async () => {
       // 1. Verify token exists in cookie
@@ -585,36 +603,36 @@ export default function OwnerDashboard() {
         .split('; ')
         .find(row => row.startsWith('owner_token='))
         ?.split('=')[1];
-        
+
       if (!token) {
         router.push("/owner/login");
         return;
       }
-      
+
       // 2. Fetch owner data
       await fetchOwnerData();
-      
+
       // 3. Fetch dashboard data
       await fetchDashboardData();
-      
+
       // 4. Extract tenant ID from hostname
       const tenantId = extractTenantId(window.location.hostname);
-      
+
       // 5. Fetch tenant data
       if (tenantId) {
         await fetchTenantData(tenantId);
       }
     };
-    
+
     checkAuthAndLoad();
   }, []);
-  
+
   const fetchDashboardData = async () => {
     const token = document.cookie
       .split('; ')
       .find(row => row.startsWith('ownerRentalToken='))
       ?.split('=')[1];
-    
+
     const response = await fetch(
       "https://api.taearif.com/api/v1/owner-rental/dashboard",
       {
@@ -624,21 +642,21 @@ export default function OwnerDashboard() {
         },
       }
     );
-    
+
     const data = await response.json();
     setDashboardData(data.data);
   };
-  
+
   return (
     <div>
       {/* Display dashboard data */}
       <h1>Welcome, {ownerData?.first_name} {ownerData?.last_name}</h1>
-      
+
       {/* Display tenant logo from tenant data */}
       {tenantData?.globalComponentsData?.header?.logo?.image && (
         <img src={tenantData.globalComponentsData.header.logo.image} />
       )}
-      
+
       {/* Display dashboard statistics */}
       {dashboardData && (
         <div>
@@ -652,6 +670,7 @@ export default function OwnerDashboard() {
 ```
 
 **Owner Dashboard Flow:**
+
 ```
 Owner visits tenant1.localhost:3000/owner/dashboard
   ↓
@@ -675,22 +694,35 @@ Displays personalized dashboard with:
 
 ```typescript
 const extractTenantId = (host: string): string | null => {
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const isDevelopment = process.env.NODE_ENV === "development";
-  
+
   const reservedWords = [
-    "www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store", 
-    "dashboard", "live-editor", "auth", "login", "register"
+    "www",
+    "api",
+    "admin",
+    "app",
+    "mail",
+    "ftp",
+    "blog",
+    "shop",
+    "store",
+    "dashboard",
+    "live-editor",
+    "auth",
+    "login",
+    "register",
   ];
-  
+
   // Check if on base domain
-  const isOnBaseDomain = isDevelopment 
+  const isOnBaseDomain = isDevelopment
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
-  
+
   if (isOnBaseDomain) return null;
-  
+
   // Extract from subdomain
   if (isDevelopment && host.includes(localDomain)) {
     const parts = host.split(".");
@@ -701,7 +733,7 @@ const extractTenantId = (host: string): string | null => {
       }
     }
   }
-  
+
   // Extract from production subdomain
   if (!isDevelopment && host.includes(productionDomain)) {
     const parts = host.split(".");
@@ -715,13 +747,15 @@ const extractTenantId = (host: string): string | null => {
       }
     }
   }
-  
+
   // Check for custom domain
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro)$/i.test(host);
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro)$/i.test(
+    host,
+  );
   if (isCustomDomain) {
     return host;
   }
-  
+
   return null;
 };
 ```
@@ -732,12 +766,14 @@ const extractTenantId = (host: string): string | null => {
 logout: async () => {
   try {
     // Clear cookies
-    document.cookie = "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    
+    document.cookie =
+      "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     // Clear localStorage
     localStorage.removeItem("owner_user");
-    
+
     // Clear store
     set({
       ownerIsLogged: false,
@@ -752,13 +788,13 @@ logout: async () => {
         permissions: [],
       },
     });
-    
+
     toast.success("تم تسجيل الخروج بنجاح");
     return { success: true };
   } catch (error) {
     return { success: false, error: "فشل تسجيل الخروج" };
   }
-}
+};
 ```
 
 ---
@@ -767,24 +803,25 @@ logout: async () => {
 
 ### Comparison Table
 
-| Feature | Dashboard Users | Owner System |
-|---------|----------------|--------------|
-| **Purpose** | Platform administration | Property owner portal |
-| **Routes** | `/dashboard/*`, `/onboarding` | `/owner/*` |
-| **Store** | `useAuthStore` | `useOwnerAuthStore` |
-| **Cookie Names** | `next-auth.session-token`, `user_token` | `owner_token`, `ownerRentalToken` |
-| **API Endpoint** | `/api/login` → `https://api.taearif.com/api/login` | Direct: `https://api.taearif.com/api/v1/owner-rental/login` |
-| **Token Storage** | localStorage (`user`) + httpOnly cookie | localStorage (`owner_user`) + client cookie |
-| **Middleware Protection** | Via `ClientLayout` (client-side) | Via `middleware.ts` (server-side) |
-| **Requires Tenant?** | NO (works on base domain) | YES (requires subdomain/custom domain) |
-| **OAuth Support** | YES (NextAuth with Google) | NO |
-| **axios Integration** | YES (interceptors) | NO (direct fetch) |
-| **Cookie Security** | httpOnly (server-set) | Client-side (less secure) |
-| **Registration** | `/register` (public) | `/owner/register` (tenant-specific) |
+| Feature                   | Dashboard Users                                    | Owner System                                                |
+| ------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| **Purpose**               | Platform administration                            | Property owner portal                                       |
+| **Routes**                | `/dashboard/*`, `/onboarding`                      | `/owner/*`                                                  |
+| **Store**                 | `useAuthStore`                                     | `useOwnerAuthStore`                                         |
+| **Cookie Names**          | `next-auth.session-token`, `user_token`            | `owner_token`, `ownerRentalToken`                           |
+| **API Endpoint**          | `/api/login` → `https://api.taearif.com/api/login` | Direct: `https://api.taearif.com/api/v1/owner-rental/login` |
+| **Token Storage**         | localStorage (`user`) + httpOnly cookie            | localStorage (`owner_user`) + client cookie                 |
+| **Middleware Protection** | Via `ClientLayout` (client-side)                   | Via `middleware.ts` (server-side)                           |
+| **Requires Tenant?**      | NO (works on base domain)                          | YES (requires subdomain/custom domain)                      |
+| **OAuth Support**         | YES (NextAuth with Google)                         | NO                                                          |
+| **axios Integration**     | YES (interceptors)                                 | NO (direct fetch)                                           |
+| **Cookie Security**       | httpOnly (server-set)                              | Client-side (less secure)                                   |
+| **Registration**          | `/register` (public)                               | `/owner/register` (tenant-specific)                         |
 
 ### When to Use Each System
 
 #### Use Dashboard Users System When:
+
 1. User needs to **manage the platform** (create websites, manage customers, etc.)
 2. User needs to access **`/dashboard/*`** routes
 3. User doesn't need tenant-specific context
@@ -792,12 +829,14 @@ logout: async () => {
 5. OAuth login is required
 
 **Example Users:**
+
 - Platform administrators
 - Website creators
 - Marketing teams
 - Support staff
 
 #### Use Owner System When:
+
 1. User is a **property owner** in a specific tenant's system
 2. User needs to access **`/owner/*`** routes
 3. User needs to view their **properties, tenants, rent collection**
@@ -805,6 +844,7 @@ logout: async () => {
 5. Access is within tenant's context
 
 **Example Users:**
+
 - Property owners
 - Real estate investors
 - Building managers
@@ -969,7 +1009,7 @@ document.cookie = "ownerRentalToken=def456...";
 6. notFound() called
    ↓
 7. 404 page displayed
-   
+
    Why? Owner pages REQUIRE tenant context
 ```
 
@@ -999,12 +1039,14 @@ Why? Different authentication systems don't recognize each other's tokens
 ## Security Considerations
 
 ### Dashboard System Security
+
 - **httpOnly cookies** - Cannot be accessed by JavaScript (XSS protection)
 - **Server-side token validation** - All requests go through `/api/user/*`
 - **Axios interceptors** - Automatic token refresh and error handling
 - **CSRF protection** - NextAuth built-in CSRF tokens
 
 ### Owner System Security
+
 - **Client-side cookies** - Accessible by JavaScript (less secure)
 - **Direct API calls** - No server-side validation layer
 - **Middleware protection** - Server-side route protection
@@ -1024,6 +1066,7 @@ Why? Different authentication systems don't recognize each other's tokens
 ⚠️ No CSRF protection
 
 **Suggested Improvements:**
+
 1. Move owner cookies to httpOnly
 2. Add server API layer (`/api/owner/*`)
 3. Implement CSRF tokens
@@ -1036,24 +1079,24 @@ Why? Different authentication systems don't recognize each other's tokens
 
 ### Dashboard User APIs
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/login` | POST | External API login |
-| `/api/user/setAuth` | POST | Set httpOnly cookie |
-| `/api/user/getUserInfo` | GET | Get user from cookie |
-| `/api/user/logout` | POST | Clear session |
-| `/auth/check-user` | POST | Check if user exists |
-| `/auth/google/login` | POST | OAuth login |
-| `/auth/google/register` | POST | OAuth register |
+| Endpoint                | Method | Purpose              |
+| ----------------------- | ------ | -------------------- |
+| `/api/login`            | POST   | External API login   |
+| `/api/user/setAuth`     | POST   | Set httpOnly cookie  |
+| `/api/user/getUserInfo` | GET    | Get user from cookie |
+| `/api/user/logout`      | POST   | Clear session        |
+| `/auth/check-user`      | POST   | Check if user exists |
+| `/auth/google/login`    | POST   | OAuth login          |
+| `/auth/google/register` | POST   | OAuth register       |
 
 ### Owner APIs
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/v1/owner-rental/login` | POST | Owner login |
-| `/v1/owner-rental/register` | POST | Owner register |
-| `/v1/owner-rental/dashboard` | GET | Get dashboard data |
-| `/api/owner/getOwnerInfo` | GET | Get owner from cookie |
+| Endpoint                     | Method | Purpose               |
+| ---------------------------- | ------ | --------------------- |
+| `/v1/owner-rental/login`     | POST   | Owner login           |
+| `/v1/owner-rental/register`  | POST   | Owner register        |
+| `/v1/owner-rental/dashboard` | GET    | Get dashboard data    |
+| `/api/owner/getOwnerInfo`    | GET    | Get owner from cookie |
 
 ---
 
@@ -1091,50 +1134,60 @@ localStorage.getItem("owner_user")
 ## Debugging Authentication Issues
 
 ### Check Dashboard User Auth Status
+
 ```javascript
 // In browser console
 const authState = JSON.parse(localStorage.getItem("user"));
 console.log("Dashboard User:", authState);
 
 // Check cookie
-document.cookie.split(';').find(c => c.includes('user_token'));
+document.cookie.split(";").find((c) => c.includes("user_token"));
 ```
 
 ### Check Owner Auth Status
+
 ```javascript
 // In browser console
 const ownerState = JSON.parse(localStorage.getItem("owner_user"));
 console.log("Owner User:", ownerState);
 
 // Check cookies
-document.cookie.split(';').find(c => c.includes('owner_token'));
-document.cookie.split(';').find(c => c.includes('ownerRentalToken'));
+document.cookie.split(";").find((c) => c.includes("owner_token"));
+document.cookie.split(";").find((c) => c.includes("ownerRentalToken"));
 ```
 
 ### Common Issues
 
 #### Issue 1: "Redirected to login after refresh"
+
 **Cause:** Token expired or localStorage cleared
 **Solution:**
+
 - Check localStorage for user/owner_user
 - Check cookie existence
 - Verify token hasn't expired (7 days for owner, session for dashboard)
 
 #### Issue 2: "Can't access owner dashboard"
+
 **Cause:** Not on a tenant domain
 **Solution:**
+
 - Owner pages require subdomain: `tenant1.localhost:3000`
 - Won't work on: `localhost:3000`
 
 #### Issue 3: "Axios requests fail with 401"
+
 **Cause:** Dashboard token not in store
 **Solution:**
+
 - Verify `useAuthStore.getState().userData.token` exists
 - Check axios interceptor is adding Bearer token
 
 #### Issue 4: "Dashboard login shows on tenant domain"
+
 **Cause:** Dashboard login is public, shows everywhere
 **Solution:**
+
 - This is expected behavior
 - Dashboard login accessible on all domains
 - Owner login only on tenant domains
@@ -1162,10 +1215,10 @@ The application uses **TWO COMPLETELY SEPARATE** authentication systems:
 **Key Principle:** These systems do NOT interact or share authentication state. A user logged into one system is NOT authenticated in the other system.
 
 **Access Patterns:**
+
 - Dashboard user on `localhost:3000/dashboard` ✓
 - Dashboard user on `tenant1.localhost:3000/dashboard` ✓
 - Owner on `tenant1.localhost:3000/owner/dashboard` ✓
 - Owner on `localhost:3000/owner/dashboard` ✗ (404 - no tenant)
 - Dashboard user trying `/owner/*` ✗ (requires owner login)
 - Owner trying `/dashboard/*` ✗ (requires dashboard login)
-

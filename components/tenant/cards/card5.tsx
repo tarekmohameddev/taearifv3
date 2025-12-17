@@ -232,7 +232,9 @@ export default function Card5(props: Card5Props) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const card5States = useEditorStore((s) => s.card5States);
 
@@ -256,7 +258,10 @@ export default function Card5(props: Card5Props) {
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "card" && component.componentName === variantId) {
+        if (
+          component.type === "card" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
@@ -267,7 +272,10 @@ export default function Card5(props: Card5Props) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -347,7 +355,7 @@ export default function Card5(props: Card5Props) {
 
   // Generate WhatsApp link
   const whatsappMessage = encodeURIComponent(
-    `مرحبًا، أود الاستفسار عن هذا الفرد: ${property.title}${property.url ? `, رابط الأفراد: ${property.url}` : ""}`
+    `مرحبًا، أود الاستفسار عن هذا الفرد: ${property.title}${property.url ? `, رابط الأفراد: ${property.url}` : ""}`,
   );
   const whatsappUrl = `https://wa.me/966542120011?text=${whatsappMessage}`;
 
@@ -658,5 +666,3 @@ export default function Card5(props: Card5Props) {
 
   return CardContent;
 }
-
-

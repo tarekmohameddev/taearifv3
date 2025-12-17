@@ -45,10 +45,11 @@ export default function ProjectPageWrapper({
   useEffect(() => {
     if (tenantId && projectSlug) {
       // ✅ للـ custom domains: استخدم username من API
-      const finalTenantId = domainType === 'custom' && tenantData?.username 
-        ? tenantData.username 
-        : tenantId;
-      
+      const finalTenantId =
+        domainType === "custom" && tenantData?.username
+          ? tenantData.username
+          : tenantId;
+
       trackProjectView(finalTenantId, projectSlug);
     }
   }, [tenantId, projectSlug, domainType, tenantData?.username]);

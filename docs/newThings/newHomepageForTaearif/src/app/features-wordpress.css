@@ -24,7 +24,7 @@
 }
 
 .ui-e-headline-text[class*=" ui-e-headline-stroke"],
-.ui-e-headline-text[class^=ui-e-headline-stroke] {
+.ui-e-headline-text[class^="ui-e-headline-stroke"] {
   display: inline-block;
 }
 
@@ -111,7 +111,7 @@
     width: 100%;
     height: auto;
   }
-  
+
   .elementor-absolute {
     position: relative;
   }
@@ -133,25 +133,25 @@
   .aspect-square {
     min-height: 500px !important;
   }
-  
+
   /* Force elements to stay at edges on square screens */
   .aspect-square .absolute {
     position: absolute !important;
   }
-  
+
   /* Ensure proper spacing from center */
   .aspect-square .absolute[class*="top-"] {
     top: 1rem !important;
   }
-  
+
   .aspect-square .absolute[class*="bottom-"] {
     bottom: 1rem !important;
   }
-  
+
   .aspect-square .absolute[class*="left-"] {
     left: 1rem !important;
   }
-  
+
   .aspect-square .absolute[class*="right-"] {
     right: 1rem !important;
   }

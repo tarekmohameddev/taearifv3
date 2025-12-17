@@ -17,7 +17,7 @@ export default (set, get) => ({
     // Matching Properties Data
     matchingProperties: [],
     selectedCustomerId: null,
-    
+
     // Match Details Data
     matchDetails: null,
     loadingMatchDetails: false,
@@ -149,10 +149,7 @@ export default (set, get) => ({
       set((state) => ({
         matchingPage: {
           ...state.matchingPage,
-          error: formatErrorMessage(
-            error,
-            "حدث خطأ أثناء جلب بيانات العملاء",
-          ),
+          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العملاء"),
           loading: false,
           isInitialized: true,
         },
@@ -185,7 +182,8 @@ export default (set, get) => ({
       const stats = {
         totalCustomers: customers.length,
         activeCustomers: customers.filter((c) => c.status === "active").length,
-        inactiveCustomers: customers.filter((c) => c.status === "inactive").length,
+        inactiveCustomers: customers.filter((c) => c.status === "inactive")
+          .length,
         newCustomers: customers.filter((c) => {
           const createdDate = new Date(c.createdAt);
           const thirtyDaysAgo = new Date();
@@ -193,12 +191,18 @@ export default (set, get) => ({
           return createdDate > thirtyDaysAgo;
         }).length,
         averageRating:
-          customers.reduce((sum, c) => sum + c.rating, 0) / customers.length || 0,
+          customers.reduce((sum, c) => sum + c.rating, 0) / customers.length ||
+          0,
         totalRequests: customers.reduce((sum, c) => sum + c.totalPurchases, 0),
-        totalMatchingProperties: customers.reduce((sum, c) => sum + c.matchingProperties, 0),
-        averageMatchingProperties: customers.length > 0 
-          ? customers.reduce((sum, c) => sum + c.matchingProperties, 0) / customers.length 
-          : 0,
+        totalMatchingProperties: customers.reduce(
+          (sum, c) => sum + c.matchingProperties,
+          0,
+        ),
+        averageMatchingProperties:
+          customers.length > 0
+            ? customers.reduce((sum, c) => sum + c.matchingProperties, 0) /
+              customers.length
+            : 0,
         recentCustomers: customers.slice(0, 5), // Last 5 customers
       };
 
@@ -522,9 +526,7 @@ export default (set, get) => ({
     try {
       const response = await retryWithBackoff(
         async () => {
-          return await axiosInstance.get(
-            `/v1/matching/matches/${matchId}`,
-          );
+          return await axiosInstance.get(`/v1/matching/matches/${matchId}`);
         },
         3,
         1000,
@@ -571,7 +573,9 @@ export default (set, get) => ({
           featuredImage: matchData.property?.featured_image,
           address: matchData.property?.address,
           forRentOrSale: matchData.property?.for_rent_or_sale,
-          rentOrBuyAmount: parseFloat(matchData.property?.rent_or_buy_amount || "0"),
+          rentOrBuyAmount: parseFloat(
+            matchData.property?.rent_or_buy_amount || "0",
+          ),
           bedrooms: matchData.property?.bedrooms || 0,
           baths: matchData.property?.baths || 0,
           area: parseFloat(matchData.property?.area || "0"),
@@ -593,10 +597,7 @@ export default (set, get) => ({
       set((state) => ({
         matchingPage: {
           ...state.matchingPage,
-          error: formatErrorMessage(
-            error,
-            "حدث خطأ أثناء جلب تفاصيل المطابقة",
-          ),
+          error: formatErrorMessage(error, "حدث خطأ أثناء جلب تفاصيل المطابقة"),
           loadingMatchDetails: false,
         },
       }));

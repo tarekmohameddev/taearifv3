@@ -9,19 +9,22 @@ export default async function handler(req, res) {
     const { email, password, first_name, last_name, phone } = req.body;
 
     if (!email || !password || !first_name || !last_name) {
-      return res.status(400).json({ 
-        message: "Email, password, first name, and last name are required" 
+      return res.status(400).json({
+        message: "Email, password, first name, and last name are required",
       });
     }
 
     // Call external API
-    const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/register", {
-      email,
-      password,
-      first_name,
-      last_name,
-      phone,
-    });
+    const response = await axios.post(
+      "https://api.taearif.com/api/v1/owner-rental/register",
+      {
+        email,
+        password,
+        first_name,
+        last_name,
+        phone,
+      },
+    );
 
     const { success, data } = response.data;
 
@@ -37,15 +40,17 @@ export default async function handler(req, res) {
 
       res.setHeader(
         "Set-Cookie",
-        `owner_token=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}, ownerRentalToken=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}`
+        `owner_token=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}, ownerRentalToken=${token}; Path=${cookieOptions.path}; Max-Age=${cookieOptions.maxAge}; ${cookieOptions.secure ? "Secure" : ""}; SameSite=${cookieOptions.sameSite}`,
       );
 
       return res.status(201).json({
         success: true,
         user: {
           email: user.email,
-          first_name: user.name ? user.name.split(' ')[0] : first_name,
-          last_name: user.name ? user.name.split(' ').slice(1).join(' ') : last_name,
+          first_name: user.name ? user.name.split(" ")[0] : first_name,
+          last_name: user.name
+            ? user.name.split(" ").slice(1).join(" ")
+            : last_name,
           tenant_id: user.tenant_id,
           owner_id: user.id,
           permissions: user.permissions || [],
@@ -57,7 +62,7 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error("❌ Error in owner register:", error);
-    
+
     let errorMessage = "فشل التسجيل";
     let statusCode = 500;
 
@@ -72,9 +77,9 @@ export default async function handler(req, res) {
       statusCode = 409;
     }
 
-    return res.status(statusCode).json({ 
+    return res.status(statusCode).json({
       success: false,
-      message: errorMessage 
+      message: errorMessage,
     });
   }
 }

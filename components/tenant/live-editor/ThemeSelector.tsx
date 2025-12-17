@@ -39,12 +39,12 @@ export function ThemeSelector({
   const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
-  
+
   // Update selectedTheme when currentTheme changes
   useEffect(() => {
     setSelectedTheme(currentTheme);
   }, [currentTheme]);
-  
+
   const [themeOptions, setThemeOptions] = useState<
     Record<string, ThemeOption[]>
   >({});

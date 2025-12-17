@@ -6,11 +6,7 @@ import { motion } from "framer-motion";
 
 const MobileAppSection = () => {
   return (
-    <section
-      id="app"
-      className=" "
-      style={{ zIndex: 50 }}
-    >
+    <section id="app" className=" " style={{ zIndex: 50 }}>
       <div className="container mx-auto">
         {/* Single Card */}
         <motion.div
@@ -63,7 +59,11 @@ const MobileAppSection = () => {
                     جرب مجاناً الأن
                   </motion.button>
                 </Link>
-                <a href="https://wa.me/966592960339" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://wa.me/966592960339"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <motion.button
                     className="bg-white text-black border-2 border-black px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-lg hover:scale-105"
                     whileHover={{ scale: 1.05 }}

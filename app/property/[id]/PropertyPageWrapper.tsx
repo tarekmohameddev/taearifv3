@@ -48,14 +48,14 @@ export default function PropertyPageWrapper({
   useEffect(() => {
     if (tenantId && propertySlug) {
       // ✅ للـ custom domains: استخدم username من API
-      const finalTenantId = domainType === 'custom' && tenantData?.username 
-        ? tenantData.username 
-        : tenantId;
-      
+      const finalTenantId =
+        domainType === "custom" && tenantData?.username
+          ? tenantData.username
+          : tenantId;
+
       trackPropertyView(finalTenantId, propertySlug);
     }
   }, [tenantId, propertySlug, domainType, tenantData?.username]);
-
 
   return (
     <GTMProvider>

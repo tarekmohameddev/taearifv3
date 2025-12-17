@@ -1,6 +1,7 @@
 # Common Patterns and Best Practices
 
 ## Table of Contents
+
 1. [Component Patterns](#component-patterns)
 2. [State Management Patterns](#state-management-patterns)
 3. [Update Patterns](#update-patterns)
@@ -36,16 +37,16 @@ export default function MyComponent(props: ComponentProps = {}) {
   // ═══════════════════════════════════════════════════════════
   const variantId = props.variant || "myComponent1";
   const uniqueId = props.id || variantId;
-  
+
   // ═══════════════════════════════════════════════════════════
   // 2. CONNECT TO STORES
   // ═══════════════════════════════════════════════════════════
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const myComponentStates = useEditorStore(s => s.myComponentStates);
-  
+
   const tenantData = useTenantStore(s => s.tenantData);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 3. INITIALIZE IN STORE
   // ═══════════════════════════════════════════════════════════
@@ -55,17 +56,17 @@ export default function MyComponent(props: ComponentProps = {}) {
         ...getDefaultMyComponentData(),
         ...props
       };
-      
+
       ensureComponentVariant("myComponent", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore]);
-  
+
   // ═══════════════════════════════════════════════════════════
   // 4. GET TENANT COMPONENT DATA
   // ═══════════════════════════════════════════════════════════
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) return {};
-    
+
     for (const [page, components] of Object.entries(tenantData.componentSettings)) {
       if (typeof components === "object") {
         for (const [id, comp] of Object.entries(components as any)) {
@@ -78,25 +79,25 @@ export default function MyComponent(props: ComponentProps = {}) {
         }
       }
     }
-    
+
     return {};
   };
-  
+
   const tenantComponentData = getTenantComponentData();
-  
+
   // ═══════════════════════════════════════════════════════════
   // 5. MERGE DATA (PRIORITY SYSTEM)
   // ═══════════════════════════════════════════════════════════
   const defaultData = getDefaultMyComponentData();
-  
+
   const storeData = props.useStore
     ? getComponentData("myComponent", uniqueId) || {}
     : {};
-  
+
   const currentStoreData = props.useStore
     ? myComponentStates[uniqueId] || {}
     : {};
-  
+
   const mergedData = {
     ...defaultData,
     ...props,
@@ -104,7 +105,7 @@ export default function MyComponent(props: ComponentProps = {}) {
     ...storeData,
     ...currentStoreData
   };
-  
+
   // ═══════════════════════════════════════════════════════════
   // 6. RENDER
   // ═══════════════════════════════════════════════════════════
@@ -128,13 +129,13 @@ export default function MyComponent(props: ComponentProps = {}) {
 export const getDefaultMyComponent1Data = (): ComponentData => ({
   // Variant 1 defaults
   layout: "grid",
-  columns: 3
+  columns: 3,
 });
 
 export const getDefaultMyComponent2Data = (): ComponentData => ({
   // Variant 2 defaults
   layout: "list",
-  columns: 1
+  columns: 1,
 });
 
 export const getDefaultMyComponentData = (variant?: string): ComponentData => {
@@ -160,23 +161,23 @@ const defaultData = getDefaultMyComponentData(props.componentName || variantId);
 ```typescript
 export default function MyComponent(props) {
   const mergedData = getMergedData();
-  
+
   return (
     <section>
       {mergedData.visible && (
         <>
           {/* Main content */}
           <h1>{mergedData.content?.title}</h1>
-          
+
           {/* Conditional sections */}
           {mergedData.settings?.showSubtitle && (
             <p>{mergedData.content?.subtitle}</p>
           )}
-          
+
           {mergedData.settings?.showCTA && (
             <button>{mergedData.cta?.text}</button>
           )}
-          
+
           {mergedData.layout?.includeBackground && (
             <div className="background" style={{
               backgroundImage: `url(${mergedData.background?.image})`
@@ -202,18 +203,16 @@ useEffect(() => {
   if (props.useStore) {
     // Prepare initial data
     const initialData = {
-      ...getDefaultData(),   // Start with defaults
-      ...props,              // Override with props
-      visible: props.visible !== undefined 
-        ? props.visible 
-        : true             // Ensure required fields
+      ...getDefaultData(), // Start with defaults
+      ...props, // Override with props
+      visible: props.visible !== undefined ? props.visible : true, // Ensure required fields
     };
-    
+
     // Ensure in store
     ensureComponentVariant(
-      "myComponent",      // type
-      uniqueId,           // component.id (UUID)
-      initialData         // initial data
+      "myComponent", // type
+      uniqueId, // component.id (UUID)
+      initialData, // initial data
     );
   }
 }, [uniqueId, props.useStore]);
@@ -228,19 +227,19 @@ useEffect(() => {
 ```typescript
 const getMyComponentData = () => {
   if (!props.useStore) {
-    return props;  // Use props directly
+    return props; // Use props directly
   }
-  
+
   const store = useEditorStore.getState();
-  
+
   // Try store first
   const storeData = store.getComponentData("myComponent", uniqueId);
-  
+
   // Fallback to props
   if (!storeData || Object.keys(storeData).length === 0) {
     return props;
   }
-  
+
   return storeData;
 };
 ```
@@ -254,12 +253,12 @@ const getMyComponentData = () => {
 ```typescript
 const updateField = (path: string, value: any) => {
   const store = useEditorStore.getState();
-  
+
   store.updateComponentByPath(
-    "myComponent",   // type
-    uniqueId,        // component.id
-    path,            // "content.title"
-    value            // "New Value"
+    "myComponent", // type
+    uniqueId, // component.id
+    path, // "content.title"
+    value, // "New Value"
   );
 };
 
@@ -279,9 +278,9 @@ updateField("settings.enabled", true);
 const deepMerge = (target: any, source: any): any => {
   if (!source || typeof source !== "object") return target || source;
   if (!target || typeof target !== "object") return source;
-  
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
       if (
@@ -295,15 +294,12 @@ const deepMerge = (target: any, source: any): any => {
       }
     }
   }
-  
+
   return result;
 };
 
 // Usage
-const mergedData = deepMerge(
-  deepMerge(defaultData, storeData),
-  tempData
-);
+const mergedData = deepMerge(deepMerge(defaultData, storeData), tempData);
 ```
 
 ---
@@ -340,17 +336,17 @@ updateByPath("testimonials[2].author.name", "John Doe");
 ```typescript
 const batchUpdate = (updates: Record<string, any>) => {
   const store = useEditorStore.getState();
-  
+
   // Get current data
   const currentData = store.getComponentData(type, id);
-  
+
   // Apply all updates
   let updatedData = { ...currentData };
-  
+
   for (const [path, value] of Object.entries(updates)) {
     updatedData = updateValueByPath(updatedData, path, value);
   }
-  
+
   // Set updated data
   store.setComponentData(type, id, updatedData);
 };
@@ -360,7 +356,7 @@ batchUpdate({
   "content.title": "New Title",
   "content.subtitle": "New Subtitle",
   "colors.background": "#FFFFFF",
-  "settings.enabled": true
+  "settings.enabled": true,
 });
 ```
 
@@ -371,7 +367,11 @@ batchUpdate({
 **Update only if condition met**:
 
 ```typescript
-const conditionalUpdate = (path: string, value: any, condition: () => boolean) => {
+const conditionalUpdate = (
+  path: string,
+  value: any,
+  condition: () => boolean,
+) => {
   if (condition()) {
     updateByPath(path, value);
   } else {
@@ -383,7 +383,7 @@ const conditionalUpdate = (path: string, value: any, condition: () => boolean) =
 conditionalUpdate(
   "content.title",
   "New Title",
-  () => mergedData.settings?.allowTitleEdit !== false
+  () => mergedData.settings?.allowTitleEdit !== false,
 );
 ```
 
@@ -397,7 +397,7 @@ conditionalUpdate(
 const handleUserAction = () => {
   // Update local state immediately
   setPageComponents(updatedComponents);
-  
+
   // Update store after render (deferred)
   setTimeout(() => {
     const store = useEditorStore.getState();
@@ -407,6 +407,7 @@ const handleUserAction = () => {
 ```
 
 **Why setTimeout(fn, 0)?**
+
 - Prevents React render cycle errors
 - Allows local state to update first
 - Store update happens in next tick
@@ -430,15 +431,15 @@ export function CachedComponent({
     () => `${componentName}-${JSON.stringify(data)}`,
     [componentName, data]
   );
-  
+
   // Memoize component
   return useMemo(() => {
     const Component = COMPONENTS[section]?.[componentName];
-    
+
     if (!Component) {
       return <div>Component not found: {componentName}</div>;
     }
-    
+
     return <Component {...data} />;
   }, [cacheKey]);
 }
@@ -480,7 +481,7 @@ useEffect(() => {
   const timer = setTimeout(() => {
     setShouldLoad(true);
   }, 100);
-  
+
   return () => clearTimeout(timer);
 }, []);
 
@@ -504,7 +505,7 @@ return (
 ```typescript
 export default function MyComponent(props) {
   const deviceType = props.deviceType || "laptop";
-  
+
   const getResponsiveValue = (values: {
     mobile?: string;
     tablet?: string;
@@ -520,7 +521,7 @@ export default function MyComponent(props) {
         return values.desktop || "";
     }
   };
-  
+
   return (
     <section
       className={
@@ -549,24 +550,23 @@ export default function MyComponent(props) {
 const handleOperation = async () => {
   try {
     console.log("🚀 Starting operation");
-    
+
     const result = await riskyOperation();
-    
+
     console.log("✅ Operation successful:", result);
     return result;
-    
   } catch (error) {
     console.error("❌ Operation failed:", error);
-    
+
     // Log to debug system
     debugLogger.log("OPERATION", "ERROR", {
       error: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
-    
+
     // Show user notification
     toast.error("Operation failed. Please try again.");
-    
+
     // Return safe fallback
     return null;
   }
@@ -585,26 +585,24 @@ const handleSave = () => {
     toast.error("Please select a component to edit");
     return;
   }
-  
+
   // Validate data
   if (!tempData || Object.keys(tempData).length === 0) {
     console.warn("No changes to save");
     toast.info("No changes detected");
     return;
   }
-  
+
   // Validate required fields
   const requiredFields = ["title", "visible"];
-  const missingFields = requiredFields.filter(
-    field => !tempData[field]
-  );
-  
+  const missingFields = requiredFields.filter((field) => !tempData[field]);
+
   if (missingFields.length > 0) {
     console.error("Missing required fields:", missingFields);
     toast.error(`Missing: ${missingFields.join(", ")}`);
     return;
   }
-  
+
   // All validations passed - proceed
   performSave();
 };
@@ -640,11 +638,11 @@ class ComponentErrorBoundary extends React.Component {
     super(props);
     this.state = { hasError: false, error: null };
   }
-  
+
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
-  
+
   componentDidCatch(error, errorInfo) {
     console.error("Component error:", error, errorInfo);
     debugLogger.log("ERROR_BOUNDARY", "CATCH", {
@@ -652,7 +650,7 @@ class ComponentErrorBoundary extends React.Component {
       componentStack: errorInfo.componentStack
     });
   }
-  
+
   render() {
     if (this.state.hasError) {
       return (
@@ -665,7 +663,7 @@ class ComponentErrorBoundary extends React.Component {
         </div>
       );
     }
-    
+
     return this.props.children;
   }
 }
@@ -687,9 +685,9 @@ class ComponentErrorBoundary extends React.Component {
 ```typescript
 const expensiveComputation = useMemo(() => {
   console.log("Computing expensive value...");
-  
+
   return processLargeDataset(mergedData);
-}, [mergedData]);  // Only recompute when mergedData changes
+}, [mergedData]); // Only recompute when mergedData changes
 ```
 
 ---
@@ -744,13 +742,13 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 function LargeList({ items }) {
   const parentRef = useRef(null);
-  
+
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 50  // Estimated item height
   });
-  
+
   return (
     <div ref={parentRef} style={{ height: "400px", overflow: "auto" }}>
       <div style={{ height: `${virtualizer.getTotalSize()}px` }}>
@@ -788,18 +786,18 @@ const updateValue = (path: string, value: any) => {
     console.error("Invalid path:", path);
     return;
   }
-  
+
   if (value === undefined) {
     console.warn("Undefined value for path:", path);
     return;
   }
-  
+
   updateByPath(path, value);
 };
 
 // ❌ BAD
 const updateValue = (path, value) => {
-  updateByPath(path, value);  // No validation!
+  updateByPath(path, value); // No validation!
 };
 ```
 
@@ -857,7 +855,7 @@ console.log("🔄 [handleSave] Merging data:", {
   existing: existingData,
   store: storeData,
   temp: tempData,
-  merged: mergedData
+  merged: mergedData,
 });
 
 // ❌ BAD - No context
@@ -874,9 +872,9 @@ useEffect(() => {
   const interval = setInterval(() => {
     updateCSSVariables();
   }, 1000);
-  
+
   const observer = observeStyleChanges();
-  
+
   // Cleanup function
   return () => {
     clearInterval(interval);
@@ -889,9 +887,9 @@ useEffect(() => {
   setInterval(() => {
     updateCSSVariables();
   }, 1000);
-  
+
   observeStyleChanges();
-  
+
   // Missing return statement!
 }, []);
 ```
@@ -904,20 +902,20 @@ useEffect(() => {
 // ✅ GOOD - Proper async handling
 const loadData = async () => {
   setLoading(true);
-  
+
   try {
     const data = await fetchData();
     setData(data);
   } catch (error) {
     setError(error);
   } finally {
-    setLoading(false);  // Always runs
+    setLoading(false); // Always runs
   }
 };
 
 // ❌ BAD - No error handling
 const loadData = async () => {
-  const data = await fetchData();  // Could fail!
+  const data = await fetchData(); // Could fail!
   setData(data);
 };
 ```
@@ -940,8 +938,8 @@ const removeItem = (index) => {
 
 // ❌ BAD - Direct mutation
 const addItem = (item) => {
-  items.push(item);  // Mutates array!
-  setItems(items);   // React won't detect change
+  items.push(item); // Mutates array!
+  setItems(items); // React won't detect change
 };
 ```
 
@@ -962,7 +960,7 @@ const getTitle = () => {
 };
 
 // ❌ BAD - Can crash
-const title = component.data.content.title;  // TypeError if undefined!
+const title = component.data.content.title; // TypeError if undefined!
 ```
 
 ---
@@ -976,13 +974,13 @@ const title = component.data.content.title;  // TypeError if undefined!
 ```typescript
 const handleOptimisticUpdate = async (id, newData) => {
   // 1. Update UI immediately
-  setPageComponents(current =>
-    current.map(c => c.id === id ? { ...c, data: newData } : c)
+  setPageComponents((current) =>
+    current.map((c) => (c.id === id ? { ...c, data: newData } : c)),
   );
-  
+
   // 2. Show optimistic feedback
   toast.success("Updated!");
-  
+
   // 3. Sync with server (in background)
   try {
     await saveToServer(id, newData);
@@ -990,8 +988,8 @@ const handleOptimisticUpdate = async (id, newData) => {
   } catch (error) {
     // 4. Revert on error
     console.error("❌ Server sync failed, reverting");
-    setPageComponents(current =>
-      current.map(c => c.id === id ? { ...c, data: oldData } : c)
+    setPageComponents((current) =>
+      current.map((c) => (c.id === id ? { ...c, data: oldData } : c)),
     );
     toast.error("Save failed. Changes reverted.");
   }
@@ -1008,48 +1006,52 @@ const handleOptimisticUpdate = async (id, newData) => {
 const useHistory = (initialState) => {
   const [history, setHistory] = useState([initialState]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const current = history[currentIndex];
-  
+
   const setState = (newState) => {
     // Remove future history (if user made changes after undo)
     const newHistory = history.slice(0, currentIndex + 1);
-    
+
     // Add new state
     newHistory.push(newState);
-    
+
     // Limit history size
     const limitedHistory = newHistory.slice(-50);
-    
+
     setHistory(limitedHistory);
     setCurrentIndex(limitedHistory.length - 1);
   };
-  
+
   const undo = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   };
-  
+
   const redo = () => {
     if (currentIndex < history.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
-  
+
   return {
     state: current,
     setState,
     undo,
     redo,
     canUndo: currentIndex > 0,
-    canRedo: currentIndex < history.length - 1
+    canRedo: currentIndex < history.length - 1,
   };
 };
 
 // Usage
-const { state: pageComponents, setState: setPageComponents, undo, redo } = 
-  useHistory(initialComponents);
+const {
+  state: pageComponents,
+  setState: setPageComponents,
+  undo,
+  redo,
+} = useHistory(initialComponents);
 ```
 
 ---
@@ -1063,17 +1065,17 @@ const useAutoSave = (data, saveFunction, delay = 3000) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  
+
   useEffect(() => {
     // Clear existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     // Set new timeout
     timeoutRef.current = setTimeout(async () => {
       setSaving(true);
-      
+
       try {
         await saveFunction(data);
         setLastSaved(new Date());
@@ -1084,7 +1086,7 @@ const useAutoSave = (data, saveFunction, delay = 3000) => {
         setSaving(false);
       }
     }, delay);
-    
+
     // Cleanup
     return () => {
       if (timeoutRef.current) {
@@ -1092,7 +1094,7 @@ const useAutoSave = (data, saveFunction, delay = 3000) => {
       }
     };
   }, [data, delay]);
-  
+
   return { saving, lastSaved };
 };
 
@@ -1100,7 +1102,7 @@ const useAutoSave = (data, saveFunction, delay = 3000) => {
 const { saving, lastSaved } = useAutoSave(
   pageComponents,
   (data) => savePagesToDatabase(data),
-  5000  // 5 seconds
+  5000, // 5 seconds
 );
 ```
 
@@ -1114,26 +1116,25 @@ const { saving, lastSaved } = useAutoSave(
 const retry = async (
   operation: () => Promise<any>,
   maxRetries = 3,
-  delayMs = 1000
+  delayMs = 1000,
 ) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 Attempt ${attempt}/${maxRetries}`);
-      
+
       const result = await operation();
-      
+
       console.log(`✅ Success on attempt ${attempt}`);
       return result;
-      
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed:`, error);
-      
+
       if (attempt === maxRetries) {
-        throw error;  // Final attempt failed
+        throw error; // Final attempt failed
       }
-      
+
       // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
 };
@@ -1141,8 +1142,8 @@ const retry = async (
 // Usage
 const data = await retry(
   () => fetchTenantData(tenantId),
-  3,     // 3 attempts
-  2000   // 2 seconds between attempts
+  3, // 3 attempts
+  2000, // 2 seconds between attempts
 );
 ```
 
@@ -1159,6 +1160,7 @@ Common patterns enable:
 5. **Clearer code**: Well-known patterns self-documenting
 
 **Key Takeaways**:
+
 - Use established patterns when possible
 - Validate all inputs and outputs
 - Handle errors gracefully
@@ -1169,10 +1171,10 @@ Common patterns enable:
 - Consistent naming conventions
 
 **When Adding Features**:
+
 1. Check if existing pattern applies
 2. Follow pattern structure
 3. Add necessary validation
 4. Include error handling
 5. Add debug logging
 6. Test thoroughly
-

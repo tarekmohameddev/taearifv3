@@ -1,5 +1,4 @@
 export const metadata = {
   title: "تسجيل الدخول",
 };
-export default function Login() {
-}
+export default function Login() {}

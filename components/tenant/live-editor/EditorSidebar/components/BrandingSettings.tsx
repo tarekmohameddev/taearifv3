@@ -6,8 +6,13 @@ import { ModernColorPicker } from "./ModernColorPicker";
 
 export function BrandingSettings() {
   const t = useEditorT();
-  const { WebsiteLayout, setWebsiteLayout, tempData, setTempData, updateByPath } =
-    useEditorStore();
+  const {
+    WebsiteLayout,
+    setWebsiteLayout,
+    tempData,
+    setTempData,
+    updateByPath,
+  } = useEditorStore();
 
   // Initialize branding data
   const [brandingData, setBrandingData] = useState({
@@ -33,7 +38,10 @@ export function BrandingSettings() {
         },
         mainBgColor: WebsiteLayout.branding.mainBgColor || "",
       };
-      console.log("📥 Loading branding data from WebsiteLayout:", newBrandingData);
+      console.log(
+        "📥 Loading branding data from WebsiteLayout:",
+        newBrandingData,
+      );
       setBrandingData(newBrandingData);
       // Update tempData immediately and also after a delay to ensure it's set
       setTempData(newBrandingData);
@@ -75,20 +83,23 @@ export function BrandingSettings() {
     }
   }, [brandingData, setTempData]);
 
-  const handleColorChange = useCallback((colorType: "primary" | "secondary" | "accent", value: string) => {
-    console.log(`🎨 Color changed: ${colorType} = ${value}`);
-    setBrandingData((prev) => {
-      const newData = {
-        ...prev,
-        colors: {
-          ...prev.colors,
-          [colorType]: value,
-        },
-      };
-      console.log("📝 New brandingData:", newData);
-      return newData;
-    });
-  }, []);
+  const handleColorChange = useCallback(
+    (colorType: "primary" | "secondary" | "accent", value: string) => {
+      console.log(`🎨 Color changed: ${colorType} = ${value}`);
+      setBrandingData((prev) => {
+        const newData = {
+          ...prev,
+          colors: {
+            ...prev.colors,
+            [colorType]: value,
+          },
+        };
+        console.log("📝 New brandingData:", newData);
+        return newData;
+      });
+    },
+    [],
+  );
 
   const handleMainBgColorChange = useCallback((value: string) => {
     console.log(`🎨 MainBgColor changed: ${value}`);
@@ -187,4 +198,3 @@ export function BrandingSettings() {
     </div>
   );
 }
-

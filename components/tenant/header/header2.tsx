@@ -2,12 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -133,7 +128,7 @@ interface Header2Props {
       delay?: number;
     };
   };
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -151,18 +146,20 @@ export default function Header2(props: Header2Props) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "header2";
   const uniqueId = props.id || variantId;
-  
+
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-  const getComponentData = useEditorStore(s => s.getComponentData);
-  const headerStates = useEditorStore(s => s.headerStates);
-  
-  const tenantData = useTenantStore(s => s.tenantData);
-  const fetchTenantData = useTenantStore(s => s.fetchTenantData);
-  const tenantId = useTenantStore(s => s.tenantId);
-  
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const headerStates = useEditorStore((s) => s.headerStates);
+
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -176,32 +173,39 @@ export default function Header2(props: Header2Props) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check if this is a global header - read from globalComponentsData
     if (uniqueId === "global-header" || variantId === "global-header") {
       const globalHeaderData = tenantData?.globalComponentsData?.header;
       if (globalHeaderData && Object.keys(globalHeaderData).length > 0) {
         // Remove variant from data if it exists (variant is metadata, not part of component data)
-        const { variant: _variant, ...headerDataWithoutVariant } = globalHeaderData;
+        const { variant: _variant, ...headerDataWithoutVariant } =
+          globalHeaderData;
         return headerDataWithoutVariant;
       }
     }
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "header" && component.componentName === variantId) {
+        if (
+          component.type === "header" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -215,7 +219,7 @@ export default function Header2(props: Header2Props) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -224,67 +228,81 @@ export default function Header2(props: Header2Props) {
   useEffect(() => {
     if (props.useStore) {
       // ✅ Use database data if available
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultHeader2Data(),
-            ...tenantComponentData,  // Database data takes priority
-            ...props
-          }
-        : {
-            ...getDefaultHeader2Data(),
-            ...props
-          };
-      
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultHeader2Data(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultHeader2Data(),
+              ...props,
+            };
+
       // Initialize in store
       ensureComponentVariant("header", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
-  
+
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = headerStates[uniqueId];
   const currentStoreData = getComponentData("header", uniqueId);
-  
+
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = useMemo(() => {
     // Check if this is a global header - also check globalHeaderData from tenantData
-    const isGlobalHeader = uniqueId === "global-header" || variantId === "global-header";
-    const tenantGlobalHeaderData = isGlobalHeader 
-      ? tenantData?.globalComponentsData?.header 
+    const isGlobalHeader =
+      uniqueId === "global-header" || variantId === "global-header";
+    const tenantGlobalHeaderData = isGlobalHeader
+      ? tenantData?.globalComponentsData?.header
       : null;
-    
+
     // Remove variant from tenantGlobalHeaderData if it exists
-    const tenantGlobalHeaderDataWithoutVariant = tenantGlobalHeaderData 
+    const tenantGlobalHeaderDataWithoutVariant = tenantGlobalHeaderData
       ? (() => {
           const { variant: _variant, ...data } = tenantGlobalHeaderData;
           return data;
         })()
       : null;
-    
+
     const merged = {
-      ...getDefaultHeader2Data(),    // 1. Defaults (lowest priority)
-      ...storeData,                   // 2. Store state
-      ...currentStoreData,            // 3. Current store data
-      ...tenantComponentData,         // 4. Database data
+      ...getDefaultHeader2Data(), // 1. Defaults (lowest priority)
+      ...storeData, // 2. Store state
+      ...currentStoreData, // 3. Current store data
+      ...tenantComponentData, // 4. Database data
       ...(tenantGlobalHeaderDataWithoutVariant || {}), // 5. Global header data from tenantData (if global header)
-      ...props,                       // 6. Props
-      ...(props.overrideData || {})   // 7. OverrideData (highest priority)
+      ...props, // 6. Props
+      ...(props.overrideData || {}), // 7. OverrideData (highest priority)
     };
-    
+
     // Convert menu (StaticHeader1 format) to links (Header2 format) if needed
-    if (merged.menu && Array.isArray(merged.menu) && (!merged.links || merged.links.length === 0)) {
+    if (
+      merged.menu &&
+      Array.isArray(merged.menu) &&
+      (!merged.links || merged.links.length === 0)
+    ) {
       merged.links = merged.menu.map((item: any) => ({
         name: item.text || item.name || "",
         path: item.url || item.path || "#",
       }));
     }
-    
+
     return merged;
-  }, [storeData, currentStoreData, tenantComponentData, props, uniqueId, variantId, tenantData]);
-  
+  }, [
+    storeData,
+    currentStoreData,
+    tenantComponentData,
+    props,
+    uniqueId,
+    variantId,
+    tenantData,
+  ]);
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
@@ -381,8 +399,9 @@ export default function Header2(props: Header2Props) {
   };
 
   const getButtonClass = (link: any, index: number) => {
-    if (!pathname) return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
-    
+    if (!pathname)
+      return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
+
     const isActive =
       link.path == pathname ||
       (pathname && pathname.startsWith(link.path) && link.path != "/");
@@ -440,10 +459,10 @@ export default function Header2(props: Header2Props) {
             }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.5, 
-              ease: "easeOut", 
-              delay: 0.2 
+            transition={{
+              duration: 0.5,
+              ease: "easeOut",
+              delay: 0.2,
             }}
           >
             <Image
@@ -454,18 +473,24 @@ export default function Header2(props: Header2Props) {
             />
           </motion.div>
         </Link>
-        
+
         {/* قائمة الروابط مع التأثير التدريجي */}
         <div className="hidden lg:flex gap-8">
           {links.map((link: any, index: number) => {
             // Check if animations are enabled - default to false if animations config doesn't exist
             // This ensures links are visible even if animations fail
-            const hasAnimationsConfig = mergedData.animations?.menuItems !== undefined;
-            const animationsEnabled = hasAnimationsConfig && mergedData.animations?.menuItems?.enabled === true;
-            const animationDuration = mergedData.animations?.menuItems?.duration || 0.3;
-            const animationDelay = mergedData.animations?.menuItems?.delay || 0.1;
-            const animationStagger = mergedData.animations?.menuItems?.stagger || 0.05;
-            
+            const hasAnimationsConfig =
+              mergedData.animations?.menuItems !== undefined;
+            const animationsEnabled =
+              hasAnimationsConfig &&
+              mergedData.animations?.menuItems?.enabled === true;
+            const animationDuration =
+              mergedData.animations?.menuItems?.duration || 0.3;
+            const animationDelay =
+              mergedData.animations?.menuItems?.delay || 0.1;
+            const animationStagger =
+              mergedData.animations?.menuItems?.stagger || 0.05;
+
             // If animations are disabled or not configured, show links immediately
             if (!animationsEnabled) {
               return (
@@ -485,14 +510,14 @@ export default function Header2(props: Header2Props) {
                 </div>
               );
             }
-            
+
             return (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration:  0.5,
+                  duration: 0.5,
                   ease: "easeOut",
                   delay: 0.4 * index,
                 }}
@@ -524,10 +549,10 @@ export default function Header2(props: Header2Props) {
               }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: mergedData.animations?.logoutButton?.duration || 0.5, 
-                ease: "easeOut", 
-                delay: mergedData.animations?.logoutButton?.delay || 1.7 
+              transition={{
+                duration: mergedData.animations?.logoutButton?.duration || 0.5,
+                ease: "easeOut",
+                delay: mergedData.animations?.logoutButton?.delay || 1.7,
               }}
               onClick={handleLogout}
             >
@@ -543,52 +568,55 @@ export default function Header2(props: Header2Props) {
               }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: mergedData.animations?.languageButton?.duration || 0.5, 
-                ease: "easeOut", 
-                delay: mergedData.animations?.languageButton?.delay || 2.7 
+              transition={{
+                duration:
+                  mergedData.animations?.languageButton?.duration || 0.5,
+                ease: "easeOut",
+                delay: mergedData.animations?.languageButton?.delay || 2.7,
               }}
               onClick={handleChangeLanguage}
             >
-              {i18n.language === "en" 
-                ? (mergedData.actions?.languageToggle?.text?.ar || "عربي")
-                : (mergedData.actions?.languageToggle?.text?.en || "EN")
-              }
+              {i18n.language === "en"
+                ? mergedData.actions?.languageToggle?.text?.ar || "عربي"
+                : mergedData.actions?.languageToggle?.text?.en || "EN"}
             </motion.button>
           )}
         </div>
 
         {/* زر القائمة المنبثقة */}
-        {pathname && !pathname.startsWith("/dashboard") && mergedData.mobileMenu?.enabled && (
-          <motion.button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`fixed lg:hidden text-3xl`}
-            style={{
-              [i18n.language === "en" ? "right" : "left"]: "3rem",
-            }}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: mergedData.animations?.mobileMenuButton?.duration || 0.5, 
-              ease: "easeOut", 
-              delay: mergedData.animations?.mobileMenuButton?.delay || 0.4 
-            }}
-          >
-            {isMenuOpen ? (
-              <FiX
-                style={{
-                  color: mergedData.styling?.menuIconColor || "#e5e7eb",
-                }}
-              />
-            ) : (
-              <FiMenu
-                style={{
-                  color: mergedData.styling?.menuIconColor || "#e5e7eb",
-                }}
-              />
-            )}
-          </motion.button>
-        )}
+        {pathname &&
+          !pathname.startsWith("/dashboard") &&
+          mergedData.mobileMenu?.enabled && (
+            <motion.button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`fixed lg:hidden text-3xl`}
+              style={{
+                [i18n.language === "en" ? "right" : "left"]: "3rem",
+              }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration:
+                  mergedData.animations?.mobileMenuButton?.duration || 0.5,
+                ease: "easeOut",
+                delay: mergedData.animations?.mobileMenuButton?.delay || 0.4,
+              }}
+            >
+              {isMenuOpen ? (
+                <FiX
+                  style={{
+                    color: mergedData.styling?.menuIconColor || "#e5e7eb",
+                  }}
+                />
+              ) : (
+                <FiMenu
+                  style={{
+                    color: mergedData.styling?.menuIconColor || "#e5e7eb",
+                  }}
+                />
+              )}
+            </motion.button>
+          )}
 
         {/* القائمة الجانبية */}
         {isMenuOpen && mergedData.mobileMenu?.enabled && (
@@ -598,7 +626,8 @@ export default function Header2(props: Header2Props) {
             } bottom-0 h-screen w-64 bg-white shadow-lg lg:hidden transition-transform transform translate-x-0 z-40`}
             style={{
               width: `${mergedData.mobileMenu?.width || 256}px`,
-              backgroundColor: mergedData.mobileMenu?.backgroundColor || "#ffffff",
+              backgroundColor:
+                mergedData.mobileMenu?.backgroundColor || "#ffffff",
             }}
           >
             <div className="p-4 flex flex-col gap-6">
@@ -613,9 +642,11 @@ export default function Header2(props: Header2Props) {
                         : "text-gray-900"
                     }`}
                     style={{
-                      color: link.path === pathname
-                        ? (mergedData.styling?.mobileLinkActiveColor || "#7c3aed")
-                        : (mergedData.styling?.mobileLinkColor || "#111827"),
+                      color:
+                        link.path === pathname
+                          ? mergedData.styling?.mobileLinkActiveColor ||
+                            "#7c3aed"
+                          : mergedData.styling?.mobileLinkColor || "#111827",
                     }}
                   >
                     {link.name}
@@ -638,10 +669,9 @@ export default function Header2(props: Header2Props) {
                   }}
                   onClick={handleChangeLanguage}
                 >
-                  {i18n.language === "en" 
-                    ? (mergedData.actions?.languageToggle?.text?.ar || "عربي")
-                    : (mergedData.actions?.languageToggle?.text?.en || "EN")
-                  }
+                  {i18n.language === "en"
+                    ? mergedData.actions?.languageToggle?.text?.ar || "عربي"
+                    : mergedData.actions?.languageToggle?.text?.en || "EN"}
                 </button>
               )}
             </div>
@@ -651,4 +681,3 @@ export default function Header2(props: Header2Props) {
     </nav>
   );
 }
-

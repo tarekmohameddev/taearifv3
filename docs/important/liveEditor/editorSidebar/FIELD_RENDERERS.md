@@ -1,6 +1,7 @@
 # Field Renderers - Complete Reference
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Field Type System](#field-type-system)
 3. [Simple Field Renderers](#simple-field-renderers)
@@ -13,6 +14,7 @@
 ## Overview
 
 Field Renderers are specialized React components responsible for rendering and managing specific field types in the EditorSidebar. Each renderer:
+
 - Displays appropriate UI for the field type
 - Handles user input and validation
 - Updates data via path-based callbacks
@@ -47,32 +49,33 @@ Inline Renderers (in DynamicFieldsRenderer.tsx)
 
 ```typescript
 export type FieldType =
-  | "text"        // Single-line text input
-  | "textarea"    // Multi-line text input
-  | "number"      // Numeric input with +/- buttons
-  | "boolean"     // Toggle switch
-  | "color"       // Color picker
-  | "image"       // Image URL input with upload
-  | "select"      // Dropdown with options
-  | "array"       // Array of objects/primitives
-  | "object";     // Nested object with fields
+  | "text" // Single-line text input
+  | "textarea" // Multi-line text input
+  | "number" // Numeric input with +/- buttons
+  | "boolean" // Toggle switch
+  | "color" // Color picker
+  | "image" // Image URL input with upload
+  | "select" // Dropdown with options
+  | "array" // Array of objects/primitives
+  | "object"; // Nested object with fields
 ```
 
 ### Base Field Definition
 
 ```typescript
 interface FieldDefinitionBase {
-  key: string;          // "content.title" or "menu[0].text"
-  label: string;        // "Title"
-  type: FieldType;      // "text"
+  key: string; // "content.title" or "menu[0].text"
+  label: string; // "Title"
+  type: FieldType; // "text"
   placeholder?: string; // "Enter title..."
-  min?: number;         // Minimum value/length
-  max?: number;         // Maximum value/length
-  defaultValue?: any;   // Default when field is empty
+  min?: number; // Minimum value/length
+  max?: number; // Maximum value/length
+  defaultValue?: any; // Default when field is empty
   description?: string; // Help text
-  condition?: {         // Conditional rendering
-    field: string;      // "background.type"
-    value: any;         // "gradient"
+  condition?: {
+    // Conditional rendering
+    field: string; // "background.type"
+    value: any; // "gradient"
   };
 }
 ```
@@ -82,12 +85,12 @@ interface FieldDefinitionBase {
 ```typescript
 interface ArrayFieldDefinition extends FieldDefinitionBase {
   type: "array";
-  of: FieldDefinition[];      // Field definitions for each item
-  minItems?: number;          // Minimum array length
-  maxItems?: number;          // Maximum array length
-  addLabel?: string;          // "Add Menu Item"
-  itemLabel?: string;         // "Menu Item"
-  itemType?: "text" | "object";  // Array element type
+  of: FieldDefinition[]; // Field definitions for each item
+  minItems?: number; // Minimum array length
+  maxItems?: number; // Maximum array length
+  addLabel?: string; // "Add Menu Item"
+  itemLabel?: string; // "Menu Item"
+  itemType?: "text" | "object"; // Array element type
 }
 ```
 
@@ -96,7 +99,7 @@ interface ArrayFieldDefinition extends FieldDefinitionBase {
 ```typescript
 interface ObjectFieldDefinition extends FieldDefinitionBase {
   type: "object";
-  fields: FieldDefinition[];  // Nested field definitions
+  fields: FieldDefinition[]; // Nested field definitions
 }
 ```
 
@@ -109,6 +112,7 @@ interface ObjectFieldDefinition extends FieldDefinitionBase {
 **Purpose**: Color picker with hex input and transparency support
 
 **Props**:
+
 ```typescript
 {
   label: string;      // "Background Color"
@@ -124,12 +128,12 @@ interface ObjectFieldDefinition extends FieldDefinitionBase {
 export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
   const hasHex = typeof value === "string" && value.startsWith("#");
   const colorValue = hasHex ? value : "#000000";
-  
+
   return (
     <div className="color-field">
       {/* Label */}
       <span>{label}</span>
-      
+
       {/* Color circle preview */}
       <div className="relative w-16 h-16">
         <div
@@ -138,7 +142,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
         >
           {!hasHex && <span>Transparent</span>}
         </div>
-        
+
         {/* Hidden color input */}
         <input
           type="color"
@@ -147,7 +151,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
           className="absolute inset-0 opacity-0 cursor-pointer"
         />
       </div>
-      
+
       {/* Hex code input */}
       <input
         type="text"
@@ -156,7 +160,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
         className="hex-input"
         placeholder="#FFFFFF"
       />
-      
+
       {/* Transparent button */}
       <button
         onClick={() => updateValue(path, "transparent")}
@@ -164,7 +168,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
       >
         Transparent
       </button>
-      
+
       {/* Copy button */}
       <button onClick={() => navigator.clipboard.writeText(value)}>
         Copy Color
@@ -175,6 +179,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
 ```
 
 **Features**:
+
 - Visual color circle with current color
 - Click to open native color picker
 - Manual hex code input
@@ -187,6 +192,7 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
 **Purpose**: Image URL input with upload capability
 
 **Props**:
+
 ```typescript
 {
   label: string;      // "Background Image"
@@ -202,19 +208,19 @@ export const ColorFieldRenderer = ({ label, path, value, updateValue }) => {
 export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("context", "template");
-      
+
       const response = await axiosInstance.post("/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      
+
       if (response.data.status === "success") {
         updateValue(path, response.data.data.url);
       }
@@ -224,11 +230,11 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
       setIsUploading(false);
     }
   };
-  
+
   return (
     <div className="image-field">
       <span>{label}</span>
-      
+
       {/* Preview */}
       <div className="w-20 h-20 preview">
         {value ? (
@@ -237,7 +243,7 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
           <div>No image</div>
         )}
       </div>
-      
+
       {/* URL input */}
       <input
         type="text"
@@ -245,12 +251,12 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
         onChange={(e) => updateValue(path, e.target.value)}
         placeholder="https://example.com/image.jpg"
       />
-      
+
       {/* Upload button */}
       <button onClick={() => fileInputRef.current?.click()}>
         {isUploading ? "Uploading..." : "Upload Image"}
       </button>
-      
+
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -259,7 +265,7 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
         onChange={(e) => handleFileUpload(e.target.files[0])}
         className="hidden"
       />
-      
+
       {/* Open in new tab */}
       {value && (
         <a href={value} target="_blank">Open Image</a>
@@ -270,6 +276,7 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
 ```
 
 **Features**:
+
 - Image preview (20x20 thumbnail)
 - Manual URL input
 - File upload to server
@@ -277,6 +284,7 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
 - Open image in new tab
 
 **Upload Flow**:
+
 ```
 1. User clicks "Upload Image"
    ↓
@@ -304,6 +312,7 @@ export const ImageFieldRenderer = ({ label, path, value, updateValue }) => {
 **Purpose**: Toggle switch for boolean values
 
 **Props**:
+
 ```typescript
 {
   label: string;      // "Visible"
@@ -326,7 +335,7 @@ export const BooleanFieldRenderer = ({ label, path, value, updateValue }) => {
         </div>
         <span>{label}</span>
       </label>
-      
+
       {/* Toggle switch */}
       <button
         onClick={() => updateValue(path, !value)}
@@ -334,7 +343,7 @@ export const BooleanFieldRenderer = ({ label, path, value, updateValue }) => {
       >
         <span className={`slider ${value ? "right" : "left"}`} />
       </button>
-      
+
       {/* Status text */}
       <p>{value ? "Enabled" : "Disabled"}</p>
     </div>
@@ -343,6 +352,7 @@ export const BooleanFieldRenderer = ({ label, path, value, updateValue }) => {
 ```
 
 **Features**:
+
 - Visual toggle switch
 - Color-coded states (green = on, gray = off)
 - Icon feedback (checkmark or X)
@@ -353,6 +363,7 @@ export const BooleanFieldRenderer = ({ label, path, value, updateValue }) => {
 **Purpose**: Numeric input with increment/decrement buttons
 
 **Props**:
+
 ```typescript
 {
   label: string;      // "Opacity"
@@ -369,13 +380,13 @@ export const NumberFieldRenderer = ({ label, path, value, updateValue }) => {
   return (
     <div className="number-field">
       <label>{label}</label>
-      
+
       <div className="controls">
         {/* Decrement */}
         <button onClick={() => updateValue(path, (value || 0) - 1)}>
           <MinusIcon />
         </button>
-        
+
         {/* Number input */}
         <input
           type="number"
@@ -383,13 +394,13 @@ export const NumberFieldRenderer = ({ label, path, value, updateValue }) => {
           onChange={(e) => updateValue(path, parseInt(e.target.value) || 0)}
           className="number-input"
         />
-        
+
         {/* Increment */}
         <button onClick={() => updateValue(path, (value || 0) + 1)}>
           <PlusIcon />
         </button>
       </div>
-      
+
       <p>Current value: {value ?? 0}</p>
     </div>
   );
@@ -397,6 +408,7 @@ export const NumberFieldRenderer = ({ label, path, value, updateValue }) => {
 ```
 
 **Features**:
+
 - +/- buttons for easy incrementing
 - Direct number input
 - Current value display
@@ -413,6 +425,7 @@ export const NumberFieldRenderer = ({ label, path, value, updateValue }) => {
 **Location**: `FieldRenderers/ArrayFieldRenderer.tsx`
 
 **Props**:
+
 ```typescript
 {
   def: FieldDefinition;          // Array field definition
@@ -444,24 +457,25 @@ For simple string arrays:
 ```
 
 **Implementation**:
+
 ```typescript
 if (arrDef.itemType === "text") {
   const items = Array.isArray(value) ? value : [];
-  
+
   const addItem = () => updateValue(path, [...items, ""]);
-  
+
   const updateItem = (idx, v) => {
     const next = items.slice();
     next[idx] = v;
     updateValue(path, next);
   };
-  
+
   const removeItem = (idx) => {
     const next = items.slice();
     next.splice(idx, 1);
     updateValue(path, next);
   };
-  
+
   return (
     <div>
       <div className="header">
@@ -540,7 +554,7 @@ return (
       <button onClick={collapseAll}>Collapse All</button>
       <button onClick={addItem}>Add</button>
     </div>
-    
+
     {/* Items */}
     {items.map((item, idx) => (
       <div key={idx} className="array-item">
@@ -550,7 +564,7 @@ return (
             {expanded[idx] ? "▼" : "▶"}
           </button>
           <span>{getItemTitle(item, idx)}</span>
-          
+
           {/* Actions */}
           <button onClick={() => move(idx, -1)}>Move Up</button>
           <button onClick={() => move(idx, 1)}>Move Down</button>
@@ -558,7 +572,7 @@ return (
           <button onClick={() => clear(idx)}>Clear</button>
           <button onClick={() => remove(idx)}>Delete</button>
         </div>
-        
+
         {/* Item fields (when expanded) */}
         {expanded[idx] && (
           <div className="item-fields">
@@ -571,7 +585,7 @@ return (
         )}
       </div>
     ))}
-    
+
     {/* Empty state */}
     {items.length === 0 && (
       <div className="empty-state">
@@ -586,6 +600,7 @@ return (
 ```
 
 **Features**:
+
 - **Expand/Collapse**: Individual items and all at once
 - **Reorder**: Move up/down buttons
 - **Duplicate**: Copy item
@@ -629,14 +644,15 @@ For complex structures like menu with submenus:
 ```
 
 **Rendering**:
+
 ```typescript
 const renderNestedArray = (field, itemPath, item) => {
   if (field.type !== "array") return null;
-  
-  const nestedItems = Array.isArray(item[field.key]) 
-    ? item[field.key] 
+
+  const nestedItems = Array.isArray(item[field.key])
+    ? item[field.key]
     : [];
-  
+
   return (
     <div className="nested-array">
       <div className="header">
@@ -646,13 +662,13 @@ const renderNestedArray = (field, itemPath, item) => {
           Add {field.itemLabel}
         </button>
       </div>
-      
+
       {nestedItems.map((nestedItem, idx) => (
         <div key={idx} className="nested-item">
           <button onClick={() => toggleNested(idx)}>Expand/Collapse</button>
           <span>{field.itemLabel} {idx + 1}</span>
           <button onClick={() => removeNested(idx)}>Remove</button>
-          
+
           {expanded[idx] && field.of.map((nestedField) => (
             <div key={nestedField.key}>
               {renderField(nestedField, `${itemPath}.${field.key}.${idx}`)}
@@ -672,6 +688,7 @@ const renderNestedArray = (field, itemPath, item) => {
 **Location**: `FieldRenderers/ObjectFieldRenderer.tsx`
 
 **Props**:
+
 ```typescript
 {
   def: FieldDefinition;          // Object field definition
@@ -696,12 +713,12 @@ export function ObjectFieldRenderer({
 }) {
   const [expanded, setExpanded] = useState({});
   const objDef = def as ObjectFieldDefinition;
-  
+
   const isOpen = expanded[normalizedPath] ?? false;
   const toggle = () => {
     setExpanded(s => ({ ...s, [normalizedPath]: !isOpen }));
   };
-  
+
   return (
     <div className="object-field">
       {/* Header */}
@@ -710,7 +727,7 @@ export function ObjectFieldRenderer({
         <span>{objDef.fields?.length || 0} fields</span>
         <span className={isOpen ? "rotate-180" : ""}>▼</span>
       </button>
-      
+
       {/* Fields (when expanded) */}
       {isOpen && (
         <div className="object-fields">
@@ -718,12 +735,12 @@ export function ObjectFieldRenderer({
           {def.key === "card" && (
             <CardThemeSelector
               currentTheme={getValueByPath(`${normalizedPath}.theme`)}
-              onThemeChange={(theme) => 
+              onThemeChange={(theme) =>
                 updateValue(`${normalizedPath}.theme`, theme)
               }
             />
           )}
-          
+
           {/* Special: Background controls */}
           {def.key === "background" && (
             <div>
@@ -732,7 +749,7 @@ export function ObjectFieldRenderer({
                 objDef.fields.find(f => f.key === "type"),
                 normalizedPath
               )}
-              
+
               {/* Conditional color pickers */}
               {getValueByPath(`${normalizedPath}.type`) === "solid" && (
                 <ColorFieldRenderer
@@ -742,7 +759,7 @@ export function ObjectFieldRenderer({
                   updateValue={updateValue}
                 />
               )}
-              
+
               {getValueByPath(`${normalizedPath}.type`) === "gradient" && (
                 <>
                   <ColorFieldRenderer
@@ -761,7 +778,7 @@ export function ObjectFieldRenderer({
               )}
             </div>
           )}
-          
+
           {/* Render all other fields */}
           {objDef.fields
             .filter(f => {
@@ -785,6 +802,7 @@ export function ObjectFieldRenderer({
 ```
 
 **Features**:
+
 - **Collapsible**: Click header to expand/collapse
 - **Field count**: Shows number of nested fields
 - **Special handling**: card, background, menu objects
@@ -805,6 +823,7 @@ export function ObjectFieldRenderer({
 **Purpose**: Specialized renderer for background configuration
 
 **Types Supported**:
+
 - **solid**: Single color background
 - **gradient**: Two-color gradient
 - **image**: Background image with overlay
@@ -822,13 +841,13 @@ export function BackgroundFieldRenderer({
   return (
     <div className="background-field">
       <label>Background</label>
-      
+
       {/* Background Type Selector */}
       {renderField(
         backgroundField.fields.find(f => f.key === "type"),
         "background"
       )}
-      
+
       {/* Solid: Single color */}
       {getValueByPath("background.type") === "solid" && (
         <ColorFieldRenderer
@@ -838,7 +857,7 @@ export function BackgroundFieldRenderer({
           updateValue={updateValue}
         />
       )}
-      
+
       {/* Gradient: Two colors */}
       {getValueByPath("background.type") === "gradient" && (
         <div className="gradient-colors">
@@ -856,7 +875,7 @@ export function BackgroundFieldRenderer({
           />
         </div>
       )}
-      
+
       {/* Other background fields (image, overlay, etc.) */}
       {backgroundField.fields
         .filter(f => f.key !== "type" && f.key !== "colors")
@@ -872,6 +891,7 @@ export function BackgroundFieldRenderer({
 ```
 
 **Conditional Rendering**:
+
 - Type selector ALWAYS shown
 - Color fields shown ONLY when type matches
 - Other fields shown based on type
@@ -881,6 +901,7 @@ export function BackgroundFieldRenderer({
 **Purpose**: Handle flattened background fields (for simpleFields mode)
 
 **Structure**:
+
 ```typescript
 // Simple mode fields (flattened)
 [
@@ -898,6 +919,7 @@ export function BackgroundFieldRenderer({
 ```
 
 **Implementation**:
+
 ```typescript
 export function SimpleBackgroundFieldRenderer({
   fields,
@@ -908,18 +930,18 @@ export function SimpleBackgroundFieldRenderer({
   const hasBgType = fields.some(f => f.key === "background.type");
   const hasBgFrom = fields.some(f => f.key === "background.colors.from");
   const hasBgTo = fields.some(f => f.key === "background.colors.to");
-  
+
   if (!hasBgType && !hasBgFrom && !hasBgTo) return null;
-  
+
   return (
     <div className="simple-background">
       <label>Background</label>
-      
+
       {/* Type selector */}
       {hasBgType && renderField(
         fields.find(f => f.key === "background.type")
       )}
-      
+
       {/* Conditional colors */}
       {getValueByPath("background.type") === "solid" && (
         <ColorFieldRenderer
@@ -929,7 +951,7 @@ export function SimpleBackgroundFieldRenderer({
           updateValue={updateValue}
         />
       )}
-      
+
       {getValueByPath("background.type") === "gradient" && (
         <>
           <ColorFieldRenderer label="From" ... />
@@ -977,6 +999,7 @@ Switch on field.type
 ### Path Building
 
 **Simple Path**:
+
 ```typescript
 def.key = "title"
 basePath = undefined
@@ -984,6 +1007,7 @@ basePath = undefined
 ```
 
 **Nested Path**:
+
 ```typescript
 def.key = "title"
 basePath = "content"
@@ -991,6 +1015,7 @@ basePath = "content"
 ```
 
 **Array Element Path**:
+
 ```typescript
 def.key = "text"
 basePath = "menu.0"
@@ -998,6 +1023,7 @@ basePath = "menu.0"
 ```
 
 **Deep Nesting**:
+
 ```typescript
 def.key = "value"
 basePath = "content.stats.stat1"
@@ -1005,10 +1031,11 @@ basePath = "content.stats.stat1"
 ```
 
 **Duplicate Key Prevention**:
+
 ```typescript
 // If basePath already ends with def.key, don't add again
 if (basePath.endsWith(`.${def.key}`) || basePath === def.key) {
-  path = basePath;  // Don't duplicate
+  path = basePath; // Don't duplicate
 } else {
   path = `${basePath}.${def.key}`;
 }
@@ -1023,13 +1050,13 @@ getValueByPath(path) {
     console.warn("Invalid path:", path);
     return undefined;
   }
-  
+
   // 2. Normalize and split path
   const segments = normalizePath(path).split(".").filter(Boolean);
-  
+
   // 3. Determine data source
   let cursor;
-  
+
   if (currentData && Object.keys(currentData).length > 0) {
     // Priority 1: currentData (passed from parent)
     cursor = currentData;
@@ -1042,7 +1069,7 @@ getValueByPath(path) {
   } else if (componentType && variantId) {
     // Priority 4: Component state data
     const componentData = getComponentData(componentType, variantId);
-    
+
     // Use tempData if available (for live editing)
     cursor = tempData && Object.keys(tempData).length > 0
       ? tempData
@@ -1051,18 +1078,19 @@ getValueByPath(path) {
     // Fallback: tempData
     cursor = tempData || {};
   }
-  
+
   // 4. Navigate path
   for (const seg of segments) {
     if (cursor == null) return undefined;
     cursor = cursor[seg];
   }
-  
+
   return cursor;
 }
 ```
 
 **Priority Order**:
+
 1. currentData (explicit override)
 2. globalComponentsData (for global components)
 3. tempData (during editing)
@@ -1088,7 +1116,7 @@ updateValue(path, value) {
     }
     return;
   }
-  
+
   // Regular flow
   if (onUpdateByPath) {
     // For regular components, update tempData
@@ -1116,6 +1144,7 @@ updateValue(path, value) {
 ```
 
 **Update Flow**:
+
 ```
 User changes field
   ↓
@@ -1150,7 +1179,7 @@ case "text":
         <span>{def.label}</span>
         {def.description && <p>{def.description}</p>}
       </label>
-      
+
       <div className="input-wrapper">
         <input
           type="text"
@@ -1159,23 +1188,23 @@ case "text":
           placeholder={def.placeholder}
           className={value ? "has-value" : ""}
         />
-        
+
         {value && <CheckIcon className="success-icon" />}
       </div>
-      
+
       {/* Validation */}
       {def.min && value && value.length < def.min && (
         <p className="error">
           Minimum {def.min} characters required ({value.length}/{def.min})
         </p>
       )}
-      
+
       {def.max && value && value.length > def.max && (
         <p className="error">
           Maximum {def.max} characters ({value.length}/{def.max})
         </p>
       )}
-      
+
       {def.max && value && value.length <= def.max && (
         <p className="info">
           {value.length}/{def.max} characters
@@ -1186,6 +1215,7 @@ case "text":
 ```
 
 **Features**:
+
 - Success icon when field has value
 - Character count validation
 - Min/max length enforcement
@@ -1201,7 +1231,7 @@ case "textarea":
         <span>{def.label}</span>
         {def.description && <p>{def.description}</p>}
       </label>
-      
+
       <div className="textarea-wrapper">
         <textarea
           value={value || ""}
@@ -1210,10 +1240,10 @@ case "textarea":
           rows={4}
           className={value ? "has-value" : ""}
         />
-        
+
         {value && <CheckIcon className="success-icon" />}
       </div>
-      
+
       {/* Validation (same as text) */}
     </div>
   );
@@ -1229,7 +1259,7 @@ case "select":
         <span>{def.label}</span>
         {def.description && <p>{def.description}</p>}
       </label>
-      
+
       <div className="select-wrapper">
         <select
           value={value || def.options?.[0]?.value || ""}
@@ -1242,11 +1272,11 @@ case "select":
             </option>
           ))}
         </select>
-        
+
         <DropdownIcon className="dropdown-arrow" />
         {value && <CheckIcon className="success-icon" />}
       </div>
-      
+
       {/* Debug info (development only) */}
       {process.env.NODE_ENV === "development" && (
         <div className="debug-info">
@@ -1260,6 +1290,7 @@ case "select":
 ```
 
 **Features**:
+
 - Custom styled dropdown
 - Shows first option as default if no value
 - Visual feedback when value selected
@@ -1293,6 +1324,7 @@ if (def.condition) {
 ```
 
 **Use Cases**:
+
 - Show gradient colors only when type is "gradient"
 - Show submenu fields only when type is "dropdown" or "mega_menu"
 - Show options only when type is "select" or "radio"
@@ -1311,17 +1343,17 @@ const getItemTitle = (item, idx) => {
     item?.text,
     item?.name,
     item?.label,
-    item?.id
+    item?.id,
   ];
-  
+
   const candidate = patterns.find(
-    p => p && typeof p === "string" && p.trim().length > 0
+    (p) => p && typeof p === "string" && p.trim().length > 0,
   );
-  
-  const base = candidate 
+
+  const base = candidate
     ? candidate.trim()
     : `${arrDef.itemLabel || "Item"} ${idx + 1}`;
-  
+
   // Truncate long titles
   return base.length > 50 ? base.substring(0, 47) + "..." : base;
 };
@@ -1335,12 +1367,12 @@ For arrays within array items:
 // menu[0].submenu[0].items[0]
 renderNestedArray(field, itemPath, item) {
   const nestedItems = item[field.key] || [];
-  
+
   return (
     <div>
       <h5>{field.label}</h5>
       <span>{nestedItems.length} items</span>
-      
+
       {nestedItems.map((nested, idx) => (
         <div key={idx}>
           {/* Render nested item fields */}
@@ -1352,7 +1384,7 @@ renderNestedArray(field, itemPath, item) {
           ))}
         </div>
       ))}
-      
+
       <button onClick={addNestedItem}>Add Nested Item</button>
     </div>
   );
@@ -1364,13 +1396,10 @@ renderNestedArray(field, itemPath, item) {
 ```typescript
 const validateItem = (item, index) => {
   const errors = [];
-  
+
   if (arrDef.of && Array.isArray(arrDef.of)) {
     for (const f of arrDef.of) {
-      if (
-        f.type === "text" &&
-        (!item[f.key] || item[f.key].trim() === "")
-      ) {
+      if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
         // Check if it's a critical field
         if (
           f.key.includes("title") ||
@@ -1382,15 +1411,16 @@ const validateItem = (item, index) => {
       }
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 ```
 
 **Visual Feedback**:
+
 ```typescript
 const validation = validateItem(item, idx);
 
@@ -1408,16 +1438,14 @@ const validation = validateItem(item, idx);
 ### Special Case 1: halfTextHalfImage imagePosition
 
 **Problem**: Component has TWO paths for same data:
+
 - `content.imagePosition`
 - `imagePosition` (top-level)
 
 **Solution**: Update BOTH paths simultaneously
 
 ```typescript
-if (
-  path === "content.imagePosition" &&
-  componentType === "halfTextHalfImage"
-) {
+if (path === "content.imagePosition" && componentType === "halfTextHalfImage") {
   onUpdateByPath("content.imagePosition", value);
   onUpdateByPath("imagePosition", value);
   return;
@@ -1432,11 +1460,11 @@ if (
 
 ```typescript
 if (selectedComponent.type === "contactCards") {
-  const hasCards = 
+  const hasCards =
     selectedComponent.data?.cards &&
     Array.isArray(selectedComponent.data.cards) &&
     selectedComponent.data.cards.length > 0;
-  
+
   dataToUse = hasCards ? selectedComponent.data : defaultData;
 }
 ```
@@ -1483,6 +1511,7 @@ if (!backgroundField) {
 ### When Creating New Field Renderer
 
 1. **Accept standard props**:
+
    ```typescript
    {
      label: string;
@@ -1493,15 +1522,17 @@ if (!backgroundField) {
    ```
 
 2. **Call updateValue, not onChange**:
+
    ```typescript
    // ✅ CORRECT
    <input onChange={(e) => updateValue(path, e.target.value)} />
-   
+
    // ❌ WRONG
    <input onChange={(e) => onChange(e.target.value)} />
    ```
 
 3. **Handle null/undefined values**:
+
    ```typescript
    value={value || ""}          // For strings
    value={value ?? 0}           // For numbers
@@ -1516,12 +1547,14 @@ if (!backgroundField) {
 ### When Using Field Renderers
 
 1. **Pass normalized path**:
+
    ```typescript
    const normalizedPath = normalizePath(path);
    <ColorFieldRenderer path={normalizedPath} ... />
    ```
 
 2. **Get value before passing**:
+
    ```typescript
    const value = getValueByPath(normalizedPath);
    <ColorFieldRenderer value={value} ... />
@@ -1537,15 +1570,17 @@ if (!backgroundField) {
 ### Common Mistakes to Avoid
 
 ❌ **Mistake 1**: Using componentName as identifier
+
 ```typescript
 // WRONG
-renderField(def, selectedComponent.componentName)
+renderField(def, selectedComponent.componentName);
 
 // CORRECT
-renderField(def, selectedComponent.id)
+renderField(def, selectedComponent.id);
 ```
 
 ❌ **Mistake 2**: Shallow object spread in nested updates
+
 ```typescript
 // WRONG
 const updated = { ...obj, content: { title: "New" } };
@@ -1555,6 +1590,7 @@ const updated = updateValueByPath(obj, "content.title", "New");
 ```
 
 ❌ **Mistake 3**: Not handling undefined in arrays
+
 ```typescript
 // WRONG
 value.map(...)  // Crashes if value is undefined
@@ -1564,6 +1600,7 @@ value.map(...)  // Crashes if value is undefined
 ```
 
 ❌ **Mistake 4**: Forgetting to normalize paths
+
 ```typescript
 // WRONG
 const value = getValueByPath("menu.[0].text");
@@ -1588,4 +1625,3 @@ Field Renderers are the core UI layer of the EditorSidebar:
 7. **Special cases handled explicitly** (global components, imagePosition)
 
 Understanding these renderers is crucial for extending the EditorSidebar with new field types or component types.
-

@@ -135,8 +135,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default
@@ -144,25 +144,34 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to convert hex color to CSS filter for SVG coloring
   const hexToFilter = (hex: string): string => {
-    if (!hex || !hex.startsWith('#')) {
+    if (!hex || !hex.startsWith("#")) {
       // Default emerald-600 filter
       return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)";
     }
-    
-    const cleanHex = hex.replace('#', '');
+
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) {
       return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)";
     }
@@ -182,7 +191,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
+
       switch (max) {
         case r:
           h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
@@ -202,11 +211,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
     const lightness = Math.round(l * 100);
 
     const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
-    const contrast = 100 + (saturation * 0.5);
+    const contrast = 100 + saturation * 0.5;
 
     return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
   };
-  
+
   const primaryColorHover = getDarkerColor(primaryColor, 20);
   const primaryColorFilter = hexToFilter(primaryColor);
 
@@ -700,7 +709,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
             <div className="flex flex-col gap-y-8 lg:gap-y-10">
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
-                <h1 
+                <h1
                   className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white px-3 py-2 flex items-center justify-center md:text-xl lg:text-2xl md:px-4 md:py-3 whitespace-nowrap"
                   style={{ backgroundColor: primaryColor }}
                 >
@@ -731,7 +740,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   project.maxPrice.trim() !== "" &&
                   parseFloat(project.maxPrice) > 0) ||
                 (project.price && project.price.trim() !== "") ? (
-                  <p 
+                  <p
                     className="text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2"
                     style={{ color: primaryColor }}
                   >
@@ -762,8 +771,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7 whitespace-pre-line">
                   {project.description || "لا يوجد وصف متاح لهذا المشروع"}
-</p>
-
+                </p>
               </div>
 
               {/* تفاصيل المشروع في شبكة */}
@@ -772,8 +780,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.address && project.address.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <MapPinIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         العنوان:
                       </p>
                     </div>
@@ -787,8 +801,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.developer && project.developer.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <BuildingIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <BuildingIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         المطور:
                       </p>
                     </div>
@@ -796,14 +816,20 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.developer}
                     </p>
                   </div>
-                  ) : null}
+                ) : null}
 
                 {/* عدد الوحدات */}
                 {project.units && project.units > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <HomeIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <HomeIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         عدد الوحدات:
                       </p>
                     </div>
@@ -815,55 +841,68 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
                 {/* تاريخ التسليم */}
                 {project.completionDate &&
-                  project.completionDate.trim() !== "" ? (
-                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                      <div className="flex flex-row gap-x-2">
-                        <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
-                          تاريخ التسليم:
-                        </p>
-                      </div>
-                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                        {new Date(project.completionDate).toLocaleDateString(
-                          "ar-US",
-                        )}
+                project.completionDate.trim() !== "" ? (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <CalendarIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
+                        تاريخ التسليم:
                       </p>
                     </div>
-                  ) : null}
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {new Date(project.completionDate).toLocaleDateString(
+                        "ar-US",
+                      )}
+                    </p>
+                  </div>
+                ) : null}
 
                 {/* حالة الإكمال */}
                 {project.completeStatus &&
-                  project.completeStatus.trim() !== "" ? (
-                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                      <div className="flex flex-row gap-x-2">
-                        <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
-                          حالة الإكمال:
-                        </p>
-                      </div>
-                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                        {project.completeStatus === "1"
-                          ? "مكتمل"
-                          : "قيد الإنشاء"}
+                project.completeStatus.trim() !== "" ? (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <WrenchIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
+                        حالة الإكمال:
                       </p>
                     </div>
-                  ) : null}
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء"}
+                    </p>
+                  </div>
+                ) : null}
 
                 {/* السعر الأدنى */}
                 {project.minPrice &&
-                  project.minPrice.trim() !== "" &&
-                  parseFloat(project.minPrice) > 0 ? (
-                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                      <div className="flex flex-row gap-x-2">
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
-                          السعر الأدنى:
-                        </p>
-                      </div>
-                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                        {project.minPrice} ريال
+                project.minPrice.trim() !== "" &&
+                parseFloat(project.minPrice) > 0 ? (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
+                        السعر الأدنى:
                       </p>
                     </div>
-                  ) : null}
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.minPrice} ريال
+                    </p>
+                  </div>
+                ) : null}
 
                 {/* السعر الأعلى */}
                 {project.maxPrice &&
@@ -871,7 +910,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   parseFloat(project.maxPrice) > 0 && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                        <p
+                          className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                          style={{ color: primaryColor }}
+                        >
                           السعر الأعلى:
                         </p>
                       </div>
@@ -885,8 +927,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.videoUrl && project.videoUrl.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <PlayIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <PlayIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         فيديو المشروع:
                       </p>
                     </div>
@@ -909,7 +957,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       project.location.address.trim() !== "")) && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <MapPinIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                       </div>
                       {project.location.lat && project.location.lng ? (
                         <a
@@ -933,8 +984,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.createdAt && project.createdAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <CalendarIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         تاريخ الإنشاء:
                       </p>
                     </div>
@@ -948,8 +1005,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.updatedAt && project.updatedAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <ClockIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <ClockIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         آخر تحديث:
                       </p>
                     </div>
@@ -964,8 +1027,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <StarIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                        <StarIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
+                        <p
+                          className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                          style={{ color: primaryColor }}
+                        >
                           المرافق:
                         </p>
                       </div>
@@ -988,39 +1057,50 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 ) : null}
 
                 {/* المواصفات */}
-                {project.specifications &&
-                  project.specifications.length > 0 ? (
-                    <div className="col-span-2">
-                      <div className="flex flex-row gap-x-2 md:gap-x-6">
-                        <div className="flex flex-row gap-x-2">
-                          <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                          <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
-                            المواصفات:
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {project.specifications.map((spec, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                            >
-                              {typeof spec === "object"
-                                ? spec.name || spec.title
-                                : spec}
-                            </span>
-                          ))}
-                        </div>
+                {project.specifications && project.specifications.length > 0 ? (
+                  <div className="col-span-2">
+                    <div className="flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <WrenchIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
+                        <p
+                          className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                          style={{ color: primaryColor }}
+                        >
+                          المواصفات:
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {project.specifications.map((spec, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                          >
+                            {typeof spec === "object"
+                              ? spec.name || spec.title
+                              : spec}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  ) : null}
+                  </div>
+                ) : null}
 
                 {/* الأنواع */}
                 {project.types && project.types.length > 0 ? (
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <TagIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                        <TagIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
+                        <p
+                          className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                          style={{ color: primaryColor }}
+                        >
                           الأنواع:
                         </p>
                       </div>
@@ -1043,8 +1123,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.features && project.features.length > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 rounded" style={{ backgroundColor: primaryColor }}></div>
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <div
+                        className="w-4 h-4 rounded"
+                        style={{ backgroundColor: primaryColor }}
+                      ></div>
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         المميزات:
                       </p>
                     </div>
@@ -1057,8 +1143,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.status ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 rounded" style={{ backgroundColor: primaryColor }}></div>
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <div
+                        className="w-4 h-4 rounded"
+                        style={{ backgroundColor: primaryColor }}
+                      ></div>
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         الحالة:
                       </p>
                     </div>
@@ -1071,8 +1163,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.createdAt ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <CalendarDaysIcon className="w-4 h-4" style={{ color: primaryColor }} />
-                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
+                      <CalendarDaysIcon
+                        className="w-4 h-4"
+                        style={{ color: primaryColor }}
+                      />
+                      <p
+                        className="font-normal text-xs xs:text-sm md:text-base leading-4"
+                        style={{ color: primaryColor }}
+                      >
                         تاريخ الإضافة:
                       </p>
                     </div>
@@ -1150,11 +1248,16 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
                           fill
                           className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
-                            mainImage === imageSrc
-                              ? ""
-                              : "border-transparent"
+                            mainImage === imageSrc ? "" : "border-transparent"
                           }`}
-                          style={mainImage === imageSrc ? { borderColor: primaryColor, borderWidth: '2px' } : {}}
+                          style={
+                            mainImage === imageSrc
+                              ? {
+                                  borderColor: primaryColor,
+                                  borderWidth: "2px",
+                                }
+                              : {}
+                          }
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
                         <div className="absolute bottom-2 right-2 opacity-80">
@@ -1184,7 +1287,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   (plan) => plan && plan.trim() !== "",
                 ) && (
                   <div className="mt-8">
-                    <h3 
+                    <h3
                       className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
                       style={{ backgroundColor: primaryColor }}
                     >
@@ -1219,9 +1322,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 )}
 
               {/* خريطة الموقع */}
-              {project.location && project.location.lat && project.location.lng ? (
+              {project.location &&
+              project.location.lat &&
+              project.location.lng ? (
                 <div className="mt-8">
-                  <h3 
+                  <h3
                     className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
                     style={{ backgroundColor: primaryColor }}
                   >
@@ -1247,7 +1352,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
                       style={{ backgroundColor: primaryColor }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorHover;
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = primaryColor;
@@ -1267,183 +1373,46 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
           {/* المشاريع المشابهة */}
           {loadingSimilar ? (
-          <div className="flex-1">
-            <div>
-              <h3 
-                className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                style={{ backgroundColor: primaryColor }}
-              >
-                مشاريع مشابهة
-              </h3>
+            <div className="flex-1">
+              <div>
+                <h3
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  مشاريع مشابهة
+                </h3>
 
-              {/* عرض المشاريع المشابهة للديسكتوب */}
-              <div className="hidden md:block">
-                {loadingSimilar ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div
-                        key={i}
-                        className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-pulse"
-                      >
-                        <div className="relative w-full h-96 bg-gray-200"></div>
-                        <div className="p-6">
-                          <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
-                          <div className="flex gap-2">
-                            <div className="h-8 bg-gray-200 rounded w-16"></div>
-                            <div className="h-8 bg-gray-200 rounded w-16"></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {similarProjects.map((similarProject) => (
-                      <Link
-                        key={similarProject.id}
-                        href={`/project/${similarProject.slug || similarProject.id}`}
-                        className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer"
-                      >
-                        {/* Image Container */}
-                        <div className="relative w-full h-96 overflow-hidden">
-                          <Image
-                            src={similarProject.image ?? "/placeholder.jpg"}
-                            alt={similarProject.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-
-                          {/* Gradient Overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                          {/* Views Counter - Top Right */}
-                          {similarProject.views && (
-                            <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm backdrop-blur-sm">
-                              <>
-                                <Eye className="w-4 h-4" />
-                                <span>{similarProject.views}</span>
-                              </>
-                            </div>
-                          )}
-                          {/* Content Overlay - Bottom */}
-                          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                            {/* Title */}
-                            <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-300 transition-colors">
-                              {similarProject.title}
-                            </h3>
-
-                            {/* District */}
-                            {similarProject.district &&
-                              similarProject.district.trim() !== "" && (
-                                <div className="flex items-center gap-2 mb-3">
-                                  <MapPin className="w-4 h-4 text-blue-300" />
-                                  <span className="text-sm text-gray-200">
-                                    {similarProject.district}
-                                  </span>
-                                </div>
-                              )}
-
-                            {/* Project Details */}
-                            <div className="flex items-center gap-4 mb-4 flex-wrap">
-                              {similarProject.developer &&
-                                similarProject.developer.trim() !== "" &&
-                                similarProject.developer !==
-                                  "Unknown Developer" && (
-                                  <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                    <BuildingIcon className="w-4 h-4" />
-                                    <span className="text-sm font-medium">
-                                      {similarProject.developer}
-                                    </span>
-                                  </div>
-                                )}
-                              {similarProject.completionDate && (
-                                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                  <CalendarIcon className="w-4 h-4" />
-                                  <span className="text-sm font-medium">
-                                    {new Date(
-                                      similarProject.completionDate,
-                                    ).toLocaleDateString("ar-US")}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Price */}
-                            {((similarProject.minPrice &&
-                              similarProject.minPrice.trim() !== "" &&
-                              parseFloat(similarProject.minPrice) > 0) ||
-                              (similarProject.maxPrice &&
-                                similarProject.maxPrice.trim() !== "" &&
-                                parseFloat(similarProject.maxPrice) > 0) ||
-                              (similarProject.price &&
-                                similarProject.price.trim() !== "")) && (
-                              <div className="flex items-center gap-2">
-                                <p className="text-2xl font-bold text-white">
-                                  {similarProject.minPrice &&
-                                  similarProject.maxPrice &&
-                                  parseFloat(similarProject.minPrice) > 0 &&
-                                  parseFloat(similarProject.maxPrice) > 0
-                                    ? `${similarProject.minPrice} - ${similarProject.maxPrice}`
-                                    : similarProject.price
-                                      ? similarProject.price
-                                      : similarProject.minPrice &&
-                                          parseFloat(similarProject.minPrice) >
-                                            0
-                                        ? similarProject.minPrice
-                                        : similarProject.maxPrice &&
-                                            parseFloat(
-                                              similarProject.maxPrice,
-                                            ) > 0
-                                          ? similarProject.maxPrice
-                                          : null}
-                                </p>
-                                <img
-                                  src="/Saudi_Riyal_Symbol.svg"
-                                  alt="ريال سعودي"
-                                  className="w-6 h-6"
-                                  style={{
-                                    filter: "brightness(100)",
-                                  }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* عرض المشاريع المشابهة للموبايل */}
-              <div className="block md:hidden">
-                <div className="flex gap-4 overflow-x-auto">
-                  {loadingSimilar
-                    ? [1, 2, 3].map((i) => (
+                {/* عرض المشاريع المشابهة للديسكتوب */}
+                <div className="hidden md:block">
+                  {loadingSimilar ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
                         <div
                           key={i}
-                          className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 min-w-[300px] animate-pulse"
+                          className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-pulse"
                         >
-                          <div className="relative w-full h-64 bg-gray-200"></div>
-                          <div className="p-4">
-                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                          <div className="relative w-full h-96 bg-gray-200"></div>
+                          <div className="p-6">
+                            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
                             <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
                             <div className="flex gap-2">
-                              <div className="h-6 bg-gray-200 rounded w-12"></div>
-                              <div className="h-6 bg-gray-200 rounded w-12"></div>
+                              <div className="h-8 bg-gray-200 rounded w-16"></div>
+                              <div className="h-8 bg-gray-200 rounded w-16"></div>
                             </div>
                           </div>
                         </div>
-                      ))
-                    : similarProjects.map((similarProject) => (
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {similarProjects.map((similarProject) => (
                         <Link
                           key={similarProject.id}
                           href={`/project/${similarProject.slug || similarProject.id}`}
-                          className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer min-w-[300px]"
+                          className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer"
                         >
                           {/* Image Container */}
-                          <div className="relative w-full h-64 overflow-hidden">
+                          <div className="relative w-full h-96 overflow-hidden">
                             <Image
                               src={similarProject.image ?? "/placeholder.jpg"}
                               alt={similarProject.title}
@@ -1456,57 +1425,48 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
                             {/* Views Counter - Top Right */}
                             {similarProject.views && (
-                              <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-lg flex items-center gap-1 text-xs backdrop-blur-sm">
-                                <Eye className="w-3 h-3" />
-                                <span>{similarProject.views}</span>
+                              <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm backdrop-blur-sm">
+                                <>
+                                  <Eye className="w-4 h-4" />
+                                  <span>{similarProject.views}</span>
+                                </>
                               </div>
                             )}
-
                             {/* Content Overlay - Bottom */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                               {/* Title */}
-                              <h3 className="text-lg font-bold mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
+                              <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-300 transition-colors">
                                 {similarProject.title}
                               </h3>
 
                               {/* District */}
                               {similarProject.district &&
                                 similarProject.district.trim() !== "" && (
-                                  <div className="flex items-center gap-1 mb-2">
-                                    <MapPin className="w-3 h-3 text-blue-300" />
-                                    <span className="text-xs text-gray-200">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <MapPin className="w-4 h-4 text-blue-300" />
+                                    <span className="text-sm text-gray-200">
                                       {similarProject.district}
                                     </span>
                                   </div>
                                 )}
 
                               {/* Project Details */}
-                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <div className="flex items-center gap-4 mb-4 flex-wrap">
                                 {similarProject.developer &&
                                   similarProject.developer.trim() !== "" &&
                                   similarProject.developer !==
                                     "Unknown Developer" && (
                                     <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                      <BuildingIcon className="w-3 h-3" />
-                                      <span className="text-xs font-medium">
+                                      <BuildingIcon className="w-4 h-4" />
+                                      <span className="text-sm font-medium">
                                         {similarProject.developer}
-                                      </span>
-                                    </div>
-                                  )}
-                                {similarProject.units &&
-                                  typeof similarProject.units === 'number' &&
-                                  similarProject.units > 0 && (
-                                    <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                      <HomeIcon className="w-3 h-3" />
-                                      <span className="text-xs font-medium">
-                                        {similarProject.units} وحدة
                                       </span>
                                     </div>
                                   )}
                                 {similarProject.completionDate && (
                                   <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                    <CalendarIcon className="w-3 h-3" />
-                                    <span className="text-xs font-medium">
+                                    <CalendarIcon className="w-4 h-4" />
+                                    <span className="text-sm font-medium">
                                       {new Date(
                                         similarProject.completionDate,
                                       ).toLocaleDateString("ar-US")}
@@ -1524,8 +1484,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                   parseFloat(similarProject.maxPrice) > 0) ||
                                 (similarProject.price &&
                                   similarProject.price.trim() !== "")) && (
-                                <div className="flex items-center gap-1">
-                                  <p className="text-lg font-bold text-white">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-2xl font-bold text-white">
                                     {similarProject.minPrice &&
                                     similarProject.maxPrice &&
                                     parseFloat(similarProject.minPrice) > 0 &&
@@ -1548,9 +1508,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                   <img
                                     src="/Saudi_Riyal_Symbol.svg"
                                     alt="ريال سعودي"
-                                    className="w-4 h-4"
+                                    className="w-6 h-6"
                                     style={{
-                                      filter: "brightness(0) saturate(100%)",
+                                      filter: "brightness(100)",
                                     }}
                                   />
                                 </div>
@@ -1559,10 +1519,157 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           </div>
                         </Link>
                       ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* عرض المشاريع المشابهة للموبايل */}
+                <div className="block md:hidden">
+                  <div className="flex gap-4 overflow-x-auto">
+                    {loadingSimilar
+                      ? [1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 min-w-[300px] animate-pulse"
+                          >
+                            <div className="relative w-full h-64 bg-gray-200"></div>
+                            <div className="p-4">
+                              <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                              <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                              <div className="flex gap-2">
+                                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      : similarProjects.map((similarProject) => (
+                          <Link
+                            key={similarProject.id}
+                            href={`/project/${similarProject.slug || similarProject.id}`}
+                            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer min-w-[300px]"
+                          >
+                            {/* Image Container */}
+                            <div className="relative w-full h-64 overflow-hidden">
+                              <Image
+                                src={similarProject.image ?? "/placeholder.jpg"}
+                                alt={similarProject.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+
+                              {/* Gradient Overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                              {/* Views Counter - Top Right */}
+                              {similarProject.views && (
+                                <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-lg flex items-center gap-1 text-xs backdrop-blur-sm">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{similarProject.views}</span>
+                                </div>
+                              )}
+
+                              {/* Content Overlay - Bottom */}
+                              <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                                {/* Title */}
+                                <h3 className="text-lg font-bold mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
+                                  {similarProject.title}
+                                </h3>
+
+                                {/* District */}
+                                {similarProject.district &&
+                                  similarProject.district.trim() !== "" && (
+                                    <div className="flex items-center gap-1 mb-2">
+                                      <MapPin className="w-3 h-3 text-blue-300" />
+                                      <span className="text-xs text-gray-200">
+                                        {similarProject.district}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                {/* Project Details */}
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  {similarProject.developer &&
+                                    similarProject.developer.trim() !== "" &&
+                                    similarProject.developer !==
+                                      "Unknown Developer" && (
+                                      <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                        <BuildingIcon className="w-3 h-3" />
+                                        <span className="text-xs font-medium">
+                                          {similarProject.developer}
+                                        </span>
+                                      </div>
+                                    )}
+                                  {similarProject.units &&
+                                    typeof similarProject.units === "number" &&
+                                    similarProject.units > 0 && (
+                                      <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                        <HomeIcon className="w-3 h-3" />
+                                        <span className="text-xs font-medium">
+                                          {similarProject.units} وحدة
+                                        </span>
+                                      </div>
+                                    )}
+                                  {similarProject.completionDate && (
+                                    <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                      <CalendarIcon className="w-3 h-3" />
+                                      <span className="text-xs font-medium">
+                                        {new Date(
+                                          similarProject.completionDate,
+                                        ).toLocaleDateString("ar-US")}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Price */}
+                                {((similarProject.minPrice &&
+                                  similarProject.minPrice.trim() !== "" &&
+                                  parseFloat(similarProject.minPrice) > 0) ||
+                                  (similarProject.maxPrice &&
+                                    similarProject.maxPrice.trim() !== "" &&
+                                    parseFloat(similarProject.maxPrice) > 0) ||
+                                  (similarProject.price &&
+                                    similarProject.price.trim() !== "")) && (
+                                  <div className="flex items-center gap-1">
+                                    <p className="text-lg font-bold text-white">
+                                      {similarProject.minPrice &&
+                                      similarProject.maxPrice &&
+                                      parseFloat(similarProject.minPrice) > 0 &&
+                                      parseFloat(similarProject.maxPrice) > 0
+                                        ? `${similarProject.minPrice} - ${similarProject.maxPrice}`
+                                        : similarProject.price
+                                          ? similarProject.price
+                                          : similarProject.minPrice &&
+                                              parseFloat(
+                                                similarProject.minPrice,
+                                              ) > 0
+                                            ? similarProject.minPrice
+                                            : similarProject.maxPrice &&
+                                                parseFloat(
+                                                  similarProject.maxPrice,
+                                                ) > 0
+                                              ? similarProject.maxPrice
+                                              : null}
+                                    </p>
+                                    <img
+                                      src="/Saudi_Riyal_Symbol.svg"
+                                      alt="ريال سعودي"
+                                      className="w-4 h-4"
+                                      style={{
+                                        filter: "brightness(0) saturate(100%)",
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           ) : null}
         </div>
       </div>

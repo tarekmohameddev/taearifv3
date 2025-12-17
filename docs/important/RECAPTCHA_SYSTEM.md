@@ -5,6 +5,7 @@
 The application uses **Google reCAPTCHA v3** to protect forms from spam and bot attacks. reCAPTCHA v3 works **invisibly** in the background without requiring user interaction (no "I'm not a robot" checkbox).
 
 ### Key Configuration
+
 ```bash
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=6Ldqrg0rAAAAAKOdI-d1m5hUJ7fQ4QbDmq7lRgUb
 ```
@@ -12,20 +13,24 @@ NEXT_PUBLIC_RECAPTCHA_SITE_KEY=6Ldqrg0rAAAAAKOdI-d1m5hUJ7fQ4QbDmq7lRgUb
 ### Recent Update (Fixed Client Navigation Bug)
 
 **Previous Issue:**
+
 - Opening `/login` via direct URL worked ✓
 - Opening `/login` via `<Link>` from another page failed ✗
 
 **Root Cause:**
+
 - Server component in layout used `headers()` for pathname
 - `headers()` only updates on server requests, not client navigation
 - Stale pathname caused wrong reCAPTCHA loading decision
 
 **Solution:**
+
 - Created `ClientReCaptchaLoader` component
 - Uses `usePathname()` which updates on ALL navigation types
 - Real-time pathname tracking for accurate loading decisions
 
 **Result:**
+
 - ✅ Works with direct URL access
 - ✅ Works with `<Link>` navigation
 - ✅ Works with `router.push()`
@@ -45,6 +50,7 @@ The application uses a **client-side dynamic loading** approach that solves the 
 2. **Component-Level Loading** (fallback) - For additional safety
 
 **Why Client-Side?**
+
 - ✅ Works with `<Link>` navigation (client-side routing)
 - ✅ Works with direct URL access
 - ✅ Updates in real-time on route changes
@@ -67,7 +73,7 @@ import { DynamicReCaptcha } from "@/components/DynamicReCaptcha";
 
 export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) {
   const pathname = usePathname(); // ✅ Updates on ALL navigation types
-  
+
   // List of pages that need reCAPTCHA
   const recaptchaPages = [
     "/dashboard/affiliate",
@@ -101,28 +107,28 @@ export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) 
     "/landing",
     "/get-started",
   ];
-  
+
   // Determine if current page needs reCAPTCHA
   const shouldLoadReCaptcha = useMemo(() => {
     let cleanPathname = pathname;
-    
+
     // Remove locale prefix (/ar/ or /en/)
     const localePattern = /^\/(en|ar)\//;
     if (localePattern.test(pathname)) {
       cleanPathname = pathname.replace(/^\/(en|ar)/, "");
     }
-    
+
     // Check if matches any reCAPTCHA page
     return recaptchaPages.some((page) => {
       return cleanPathname === page || cleanPathname.startsWith(page + "/");
     });
   }, [pathname]);
-  
+
   // Conditionally wrap children
   if (shouldLoadReCaptcha) {
     return <DynamicReCaptcha>{children}</DynamicReCaptcha>;
   }
-  
+
   return <>{children}</>;
 }
 ```
@@ -155,13 +161,13 @@ export default async function RootLayout({ children }) {
 ```typescript
 const shouldLoadReCaptcha = useMemo(() => {
   let cleanPathname = pathname;
-  
+
   // Remove locale prefix if present
   const localePattern = /^\/(en|ar)\//;
   if (localePattern.test(pathname)) {
     cleanPathname = pathname.replace(/^\/(en|ar)/, "");
   }
-  
+
   // Check if current path matches any reCAPTCHA page
   return recaptchaPages.some((page) => {
     return cleanPathname === page || cleanPathname.startsWith(page + "/");
@@ -170,6 +176,7 @@ const shouldLoadReCaptcha = useMemo(() => {
 ```
 
 **Examples:**
+
 - `/login` → shouldLoadReCaptcha = `true`
 - `/ar/login` → shouldLoadReCaptcha = `true` ✓ (locale removed)
 - `/en/register` → shouldLoadReCaptcha = `true` ✓
@@ -206,6 +213,7 @@ Is page in recaptchaPages list?
 ### Why This Works for Client Navigation
 
 **Old System (Broken):**
+
 ```
 Server Component uses headers() → pathname from middleware
   ↓
@@ -217,6 +225,7 @@ reCAPTCHA doesn't load on <Link> navigation ✗
 ```
 
 **New System (Fixed):**
+
 ```
 Client Component uses usePathname() → pathname from Next.js router
   ↓
@@ -256,7 +265,7 @@ function LocalReCaptchaWrapper({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Wait 1 second to check if ReCAPTCHA is available from layout
     const timer = setTimeout(() => {
       if (!executeRecaptcha) {
@@ -303,6 +312,7 @@ export function LoginPageWithReCaptcha({ children }: { children: ReactNode }) {
 ```
 
 **Why this fallback?**
+
 - Ensures reCAPTCHA always loads, even if page is not in ClientReCaptchaLoader's list
 - Prevents errors if logic changes
 - Provides redundancy for critical auth pages
@@ -338,20 +348,21 @@ import { DynamicReCaptcha } from "@/components/DynamicReCaptcha";
 
 export function ClientReCaptchaLoader({ children }: { children: ReactNode }) {
   const pathname = usePathname(); // Real-time pathname tracking
-  
+
   const shouldLoadReCaptcha = useMemo(() => {
     // Remove locale, check if page needs reCAPTCHA
   }, [pathname]);
-  
+
   if (shouldLoadReCaptcha) {
     return <DynamicReCaptcha>{children}</DynamicReCaptcha>;
   }
-  
+
   return <>{children}</>;
 }
 ```
 
 **Key Features:**
+
 - **Client-side component** (`"use client"`)
 - **Real-time pathname tracking** via `usePathname()`
 - **Works with all navigation types**
@@ -381,6 +392,7 @@ export function DynamicReCaptcha({ children }: { children: ReactNode }) {
 ```
 
 **Key Features:**
+
 - Dynamic import (client-side only)
 - SSR disabled (`ssr: false`)
 - No loading fallback (loads transparently)
@@ -414,7 +426,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
     // Only when pathname changes
     if (prevPathname.current !== pathname) {
       prevPathname.current = pathname;
-      
+
       // Cleanup old ReCAPTCHA
       const cleanupReCaptcha = () => {
         try {
@@ -424,7 +436,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
             const parent = badge.parentElement;
             if (parent) parent.remove();
           });
-          
+
           // Remove old iframes
           const iframes = document.querySelectorAll('iframe[src*="recaptcha"]');
           iframes.forEach(iframe => iframe.remove());
@@ -443,7 +455,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
       };
 
       cleanupReCaptcha();
-      
+
       // Remount with new key
       const timer = setTimeout(() => {
         setKey(prev => prev + 1);
@@ -467,6 +479,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
 ```
 
 **Key Features:**
+
 - **Automatic cleanup** on route change
 - **Remounts with new key** to prevent stale state
 - **Removes duplicate badges** and iframes
@@ -490,7 +503,7 @@ export function ReCaptchaWrapper({ children }: { children: ReactNode }) {
     return () => {
       const recaptchaScripts = document.querySelectorAll('script[src*="recaptcha"]');
       const recaptchaBadges = document.querySelectorAll('.grecaptcha-badge');
-      
+
       // Don't remove scripts/badges - let library handle it
     };
   }, []);
@@ -520,13 +533,13 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export function MyFormComponent() {
   const { executeRecaptcha } = useGoogleReCaptcha();
-  
+
   const handleSubmit = async () => {
     if (!executeRecaptcha) {
       console.error("reCAPTCHA not available");
       return;
     }
-    
+
     const token = await executeRecaptcha("form_submit");
     // Use token in API call
   };
@@ -561,6 +574,7 @@ const token = await executeRecaptcha("get_started_registration");
 ```
 
 **Why unique names?**
+
 - Better analytics in Google reCAPTCHA Admin Console
 - Can track which forms have bot issues
 - Can set different score thresholds per action
@@ -584,7 +598,7 @@ function LoginPageContent() {
   useEffect(() => {
     let retryCount = 0;
     const maxRetries = 10;
-    
+
     const checkRecaptcha = () => {
       if (executeRecaptcha) {
         setRecaptchaReady(true);
@@ -599,7 +613,7 @@ function LoginPageContent() {
     // Retry every 500ms
     const interval = setInterval(() => {
       retryCount++;
-      
+
       if (checkRecaptcha()) {
         clearInterval(interval);
       } else if (retryCount >= maxRetries) {
@@ -650,11 +664,11 @@ function LoginPageContent() {
           جاري تحميل التحقق الأمني...
         </div>
       )}
-      
+
       {/* Input fields */}
-      
-      <Button 
-        type="submit" 
+
+      <Button
+        type="submit"
         disabled={isLoading || !recaptchaReady}
       >
         تسجيل الدخول
@@ -674,6 +688,7 @@ export function LoginPage() {
 ```
 
 **Key Points:**
+
 1. **Readiness check** with retry mechanism (up to 10 attempts)
 2. **Loading indicator** shown while reCAPTCHA initializes
 3. **Button disabled** until reCAPTCHA is ready
@@ -720,23 +735,23 @@ export function RegisterPage() {
       // Call register API
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/register`,
-        payload
+        payload,
       );
 
       // Handle success
       if (response.status === 200) {
         const { user, token: UserToken } = response.data;
-        
+
         // Set auth
         await setAuth(user, UserToken);
-        
+
         // Redirect to onboarding
         router.push("/onboarding");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
-        
+
         // Handle specific errors
         if (/recaptcha failed/i.test(errorMessage)) {
           setErrors({
@@ -788,7 +803,7 @@ export function ForgotPasswordPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const data = await response.json();
@@ -850,7 +865,7 @@ export function ResetPasswordPage() {
             new_password_confirmation: confirmPassword,
             recaptcha_token: recaptchaToken,
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -899,7 +914,7 @@ export function GoogleRegisterPage() {
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/register`,
-        payload
+        payload,
       );
 
       // Handle success
@@ -944,7 +959,7 @@ export function LandingPage() {
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/register`,
-        payload
+        payload,
       );
 
       if (response.ok) {
@@ -973,7 +988,7 @@ export default function GetStartedPage() {
   useEffect(() => {
     let retryCount = 0;
     const maxRetries = 10;
-    
+
     const checkRecaptcha = () => {
       if (executeRecaptcha) {
         setRecaptchaReady(true);
@@ -986,7 +1001,7 @@ export default function GetStartedPage() {
 
     const interval = setInterval(() => {
       retryCount++;
-      
+
       if (checkRecaptcha()) {
         clearInterval(interval);
       } else if (retryCount >= maxRetries) {
@@ -1033,7 +1048,7 @@ export default function GetStartedPage() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error;
-        
+
         if (errorMessage && /recaptcha/i.test(errorMessage)) {
           setMessage('فشل التحقق الأمني. يرجى إعادة المحاولة أو تحديث الصفحة.');
         } else {
@@ -1055,9 +1070,9 @@ export default function GetStartedPage() {
       )}
 
       {/* Input fields */}
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         disabled={loading || !recaptchaReady}
       >
         {loading ? 'جارٍ التسجيل...' : !recaptchaReady ? 'جاري التحميل...' : 'تسجيل'}
@@ -1068,6 +1083,7 @@ export default function GetStartedPage() {
 ```
 
 **Key Points:**
+
 1. **Event-specific registration** - Used for PropTech exhibition
 2. **Status code handling** - Checks both `success` flag and 2xx status codes (200, 201)
 3. **Readiness monitoring** - 10 retries over 5 seconds
@@ -1186,12 +1202,14 @@ if (!executeRecaptcha) {
 ```
 
 **Causes:**
+
 - Script not loaded yet
 - Network issues
 - Script blocked by ad blocker
 - CSP (Content Security Policy) blocking Google domains
 
 **Solution:**
+
 - Show loading indicator
 - Disable submit button
 - Retry mechanism
@@ -1202,7 +1220,7 @@ if (!executeRecaptcha) {
 ```typescript
 if (axios.isAxiosError(error)) {
   const errorMessage = error.response?.data?.message;
-  
+
   if (/recaptcha failed/i.test(errorMessage)) {
     setErrors({
       api: "فشل التحقق من reCAPTCHA. يرجى إعادة المحاولة أو تحديث الصفحة.",
@@ -1212,6 +1230,7 @@ if (axios.isAxiosError(error)) {
 ```
 
 **Causes:**
+
 - Low score (bot detected)
 - Token expired (tokens valid for 2 minutes)
 - Token used multiple times
@@ -1219,6 +1238,7 @@ if (axios.isAxiosError(error)) {
 - Network issues between backend and Google
 
 **Solution:**
+
 - Ask user to try again
 - Refresh page to get new token
 - Check backend logs for actual failure reason
@@ -1230,17 +1250,21 @@ if (axios.isAxiosError(error)) {
 const token = await executeRecaptcha("login");
 
 // If API call takes too long, token may expire
-setTimeout(() => {
-  await apiCall(token); // May fail if > 2 minutes
-}, 3 * 60 * 1000); // 3 minutes - TOO LATE
+setTimeout(
+  () => {
+    await apiCall(token); // May fail if > 2 minutes
+  },
+  3 * 60 * 1000,
+); // 3 minutes - TOO LATE
 ```
 
 **Best Practice:**
+
 ```typescript
 // Execute reCAPTCHA immediately before API call
 const handleSubmit = async () => {
   const token = await executeRecaptcha("login");
-  
+
   // Call API immediately (don't delay)
   await loginAPI(token);
 };
@@ -1252,17 +1276,17 @@ const handleSubmit = async () => {
 
 ### Summary Table
 
-| Page | Action Name | Wrapper Source | Notes |
-|------|-------------|----------------|-------|
-| `/login` | `"login"` | ClientReCaptchaLoader + Fallback | Retry mechanism |
-| `/register` | `"register"` | ClientReCaptchaLoader | Basic implementation |
-| `/landing` | `"register"` | ClientReCaptchaLoader | Landing page registration form |
-| `/get-started` | `"get_started_registration"` | ClientReCaptchaLoader | Event registration form (PropTech exhibition) |
-| `/forgot-password` | `"forgot_password"` | ClientReCaptchaLoader | Used twice (send + resend) |
-| `/oauth/social/extra-info` | `"google_register"` | ClientReCaptchaLoader | Completes Google OAuth |
-| `/dashboard/*` | Various | ClientReCaptchaLoader | All dashboard pages |
-| `/live-editor` | N/A | ClientReCaptchaLoader (loaded) | Future use |
-| `/onboarding` | N/A | ClientReCaptchaLoader (loaded) | Future use |
+| Page                       | Action Name                  | Wrapper Source                   | Notes                                         |
+| -------------------------- | ---------------------------- | -------------------------------- | --------------------------------------------- |
+| `/login`                   | `"login"`                    | ClientReCaptchaLoader + Fallback | Retry mechanism                               |
+| `/register`                | `"register"`                 | ClientReCaptchaLoader            | Basic implementation                          |
+| `/landing`                 | `"register"`                 | ClientReCaptchaLoader            | Landing page registration form                |
+| `/get-started`             | `"get_started_registration"` | ClientReCaptchaLoader            | Event registration form (PropTech exhibition) |
+| `/forgot-password`         | `"forgot_password"`          | ClientReCaptchaLoader            | Used twice (send + resend)                    |
+| `/oauth/social/extra-info` | `"google_register"`          | ClientReCaptchaLoader            | Completes Google OAuth                        |
+| `/dashboard/*`             | Various                      | ClientReCaptchaLoader            | All dashboard pages                           |
+| `/live-editor`             | N/A                          | ClientReCaptchaLoader (loaded)   | Future use                                    |
+| `/onboarding`              | N/A                          | ClientReCaptchaLoader (loaded)   | Future use                                    |
 
 ### Pages NOT Using reCAPTCHA
 
@@ -1286,7 +1310,7 @@ const [recaptchaReady, setRecaptchaReady] = useState(false);
 useEffect(() => {
   let retryCount = 0;
   const maxRetries = 10;
-  
+
   const checkRecaptcha = () => {
     if (executeRecaptcha) {
       setRecaptchaReady(true);
@@ -1301,12 +1325,12 @@ useEffect(() => {
   // Retry every 500ms up to 10 times (5 seconds total)
   const interval = setInterval(() => {
     retryCount++;
-    
+
     if (checkRecaptcha()) {
       clearInterval(interval);
     } else if (retryCount >= maxRetries) {
       clearInterval(interval);
-      console.warn('ReCAPTCHA failed to load after 5 seconds');
+      console.warn("ReCAPTCHA failed to load after 5 seconds");
     }
   }, 500);
 
@@ -1315,6 +1339,7 @@ useEffect(() => {
 ```
 
 **Benefits:**
+
 - Handles slow network connections
 - Provides user feedback
 - Prevents form submission before ready
@@ -1325,27 +1350,28 @@ useEffect(() => {
 useEffect(() => {
   if (prevPathname.current !== pathname) {
     // Cleanup old ReCAPTCHA instances
-    const badges = document.querySelectorAll('.grecaptcha-badge');
-    badges.forEach(badge => {
+    const badges = document.querySelectorAll(".grecaptcha-badge");
+    badges.forEach((badge) => {
       const parent = badge.parentElement;
       if (parent) parent.remove();
     });
-    
+
     const iframes = document.querySelectorAll('iframe[src*="recaptcha"]');
-    iframes.forEach(iframe => iframe.remove());
+    iframes.forEach((iframe) => iframe.remove());
 
     // Reset grecaptcha
     if ((window as any).grecaptcha) {
       (window as any).grecaptcha.reset?.();
     }
-    
+
     // Remount with new key
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }
 }, [pathname]);
 ```
 
 **Prevents:**
+
 - Multiple reCAPTCHA badges on screen
 - Memory leaks from old instances
 - Stale tokens from previous pages
@@ -1367,6 +1393,7 @@ useEffect(() => {
 ```
 
 **Badge Positions:**
+
 - `bottomright` - Bottom right corner (default)
 - `bottomleft` - Bottom left corner
 - `inline` - Inline with form (for custom positioning)
@@ -1613,7 +1640,7 @@ const handleSubmit = async () => {
 
 // ❌ BAD
 const token = await executeRecaptcha("login");
-await new Promise(resolve => setTimeout(resolve, 5000)); // Long delay
+await new Promise((resolve) => setTimeout(resolve, 5000)); // Long delay
 await loginAPI(token); // Token may have expired
 ```
 
@@ -1652,7 +1679,10 @@ try {
 
 ```typescript
 // ✅ GOOD - Handles both success patterns
-if (response.data.success || (response.status >= 200 && response.status < 300)) {
+if (
+  response.data.success ||
+  (response.status >= 200 && response.status < 300)
+) {
   // Success! Handle both:
   // - APIs that return { success: true }
   // - APIs that just return 2xx status (200, 201, etc.)
@@ -1670,6 +1700,7 @@ if (response.status === 200) {
 ```
 
 **Why Both?**
+
 - Different APIs have different response patterns
 - Some return `{ success: true }` with 200
 - Others just return 201 Created without body
@@ -1686,7 +1717,7 @@ if (response.status === 200) {
 console.log(window.grecaptcha); // Should be object, not undefined
 
 // Check for badge
-document.querySelector('.grecaptcha-badge'); // Should exist
+document.querySelector(".grecaptcha-badge"); // Should exist
 
 // Check for script
 document.querySelector('script[src*="recaptcha"]'); // Should exist
@@ -1715,7 +1746,7 @@ const testRecaptcha = async () => {
     console.error("executeRecaptcha not available");
     return;
   }
-  
+
   try {
     const token = await executeRecaptcha("test");
     console.log("Token generated:", token.substring(0, 50) + "...");
@@ -1732,18 +1763,20 @@ const testRecaptcha = async () => {
 **Cause:** Component not wrapped in GoogleReCaptchaProvider
 
 **Solution:**
+
 - Check if page is in `recaptchaPages` list in `ClientReCaptchaLoader`
 - Verify ClientReCaptchaLoader is wrapping app in layout
 - Add fallback wrapper (like LoginPageWithReCaptcha)
 - Check browser console for errors
 
 **Debug:**
+
 ```javascript
 // Check current pathname
 console.log("Current pathname:", window.location.pathname);
 
 // Check if in recaptchaPages
-const recaptchaPages = ["/login", "/register", /* ... */];
+const recaptchaPages = ["/login", "/register" /* ... */];
 const cleanPath = window.location.pathname.replace(/^\/(en|ar)/, "");
 console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 ```
@@ -1753,6 +1786,7 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 **Cause:** This was the main bug - now FIXED with ClientReCaptchaLoader
 
 **Verification:**
+
 ```javascript
 // Test the fix:
 // 1. Go to /about-us
@@ -1764,6 +1798,7 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 ```
 
 **If still broken:**
+
 - Verify ClientReCaptchaLoader is imported in layout
 - Check component wrapping order in layout
 - Ensure no conditional rendering of ClientReCaptchaLoader
@@ -1773,6 +1808,7 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 **Cause:** Script blocked or slow to load
 
 **Solution:**
+
 - Check browser console for errors
 - Disable ad blockers
 - Check network tab for failed requests to Google
@@ -1783,6 +1819,7 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 **Cause:** Provider mounted multiple times without cleanup
 
 **Solution:**
+
 - ReCaptchaClientWrapper handles cleanup automatically
 - Check for duplicate ClientReCaptchaLoader instances
 - Verify DynamicReCaptcha not used elsewhere
@@ -1792,6 +1829,7 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 **Cause:** Token expired, invalid, or low score
 
 **Solution:**
+
 - Execute reCAPTCHA immediately before API call
 - Check backend logs for Google's response
 - Verify backend has correct SECRET_KEY
@@ -1804,11 +1842,13 @@ console.log("Should load reCAPTCHA:", recaptchaPages.includes(cleanPath));
 ### reCAPTCHA v3 Scoring
 
 Google returns a score from **0.0 to 1.0**:
+
 - **1.0**: Very likely human
 - **0.5**: Uncertain (recommended threshold)
 - **0.0**: Very likely bot
 
 **Backend should:**
+
 ```javascript
 if (googleResponse.score >= 0.5) {
   // Allow action
@@ -1820,12 +1860,14 @@ if (googleResponse.score >= 0.5) {
 ### Token Security
 
 **DO:**
+
 - ✅ Send token over HTTPS only
 - ✅ Validate token on backend (never trust client)
 - ✅ Use token immediately (2-minute expiration)
 - ✅ Use unique action names for analytics
 
 **DON'T:**
+
 - ❌ Store token in localStorage
 - ❌ Reuse tokens across requests
 - ❌ Trust client-side validation only
@@ -1859,6 +1901,7 @@ RECAPTCHA_SECRET_KEY=6Ldqrg0rAAAAAK... (different key)
 ```
 
 **Benefits:**
+
 - Reduces script load on pages that don't need it
 - Faster page load for informational pages
 - Better Core Web Vitals scores
@@ -1867,12 +1910,13 @@ RECAPTCHA_SECRET_KEY=6Ldqrg0rAAAAAK... (different key)
 
 ```typescript
 const ReCaptchaClientWrapper = dynamic(
-  () => import('./ReCaptchaClientWrapper'),
-  { ssr: false, loading: () => null }
+  () => import("./ReCaptchaClientWrapper"),
+  { ssr: false, loading: () => null },
 );
 ```
 
 **Benefits:**
+
 - Client-side only (no SSR overhead)
 - Lazy loaded (not in initial bundle)
 - No loading flash (null fallback)
@@ -1894,6 +1938,7 @@ scriptProps={{
 ### When reCAPTCHA Loads
 
 **Loaded on these pages (via ClientReCaptchaLoader):**
+
 - All `/dashboard/*` pages (20+ pages)
 - `/login` - Login page
 - `/register` - Registration page
@@ -1908,6 +1953,7 @@ scriptProps={{
 **Total: 30 pages** with reCAPTCHA protection
 
 **NOT loaded on these pages:**
+
 - `/` - Homepage (Taearif landing)
 - `/about-us`, `/solutions`, `/updates` - Marketing pages
 - `/privacy-policy` - Legal page
@@ -1917,14 +1963,14 @@ scriptProps={{
 
 ### reCAPTCHA Actions Used
 
-| Action Name | Used In | Purpose |
-|-------------|---------|---------|
-| `login` | Login page | User authentication |
-| `register` | Register page, Landing page | Account creation |
-| `google_register` | Google OAuth completion | OAuth account creation |
-| `forgot_password` | Forgot password page | Password reset request |
-| `reset_password` | Reset password page | Password reset confirmation |
-| `get_started_registration` | Get Started page | Event registration (PropTech exhibition) |
+| Action Name                | Used In                     | Purpose                                  |
+| -------------------------- | --------------------------- | ---------------------------------------- |
+| `login`                    | Login page                  | User authentication                      |
+| `register`                 | Register page, Landing page | Account creation                         |
+| `google_register`          | Google OAuth completion     | OAuth account creation                   |
+| `forgot_password`          | Forgot password page        | Password reset request                   |
+| `reset_password`           | Reset password page         | Password reset confirmation              |
+| `get_started_registration` | Get Started page            | Event registration (PropTech exhibition) |
 
 ### Key Components
 
@@ -1961,4 +2007,3 @@ app/layout.tsx (Server Component)
 ```
 
 This system provides robust bot protection while maintaining excellent user experience with no interaction required, and works correctly with both server and client navigation.
-

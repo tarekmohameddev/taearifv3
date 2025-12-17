@@ -92,8 +92,21 @@ export default function PropertyFilter2({
   }, [uniqueId, useStore, ensureComponentVariant]);
 
   // Store state
-  const { search, cityId, district, propertyType, categoryId, price, setSearch, setCityId, setDistrict, setPropertyType, setCategoryId, setPrice, setTransactionType } =
-    usePropertiesStore();
+  const {
+    search,
+    cityId,
+    district,
+    propertyType,
+    categoryId,
+    price,
+    setSearch,
+    setCityId,
+    setDistrict,
+    setPropertyType,
+    setCategoryId,
+    setPrice,
+    setTransactionType,
+  } = usePropertiesStore();
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
@@ -105,30 +118,29 @@ export default function PropertyFilter2({
   const storeData = useStore
     ? getComponentData("propertyFilter", uniqueId) || {}
     : {};
-  const currentStoreData = useStore
-    ? propertyFilterStates[uniqueId] || {}
-    : {};
+  const currentStoreData = useStore ? propertyFilterStates[uniqueId] || {} : {};
 
   // Merge content prop with store data (store data takes priority)
-  const mergedContent = useStore && storeData && Object.keys(storeData).length > 0
-    ? { ...content, ...storeData }
-    : content;
+  const mergedContent =
+    useStore && storeData && Object.keys(storeData).length > 0
+      ? { ...content, ...storeData }
+      : content;
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -137,114 +149,150 @@ export default function PropertyFilter2({
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedContent (which includes store data)
     const styling = mergedContent?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "searchButton.bgColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = styling;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = styling;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
       if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor")) {
+      } else if (
+        fieldPath.includes("Button") ||
+        fieldPath.includes("button") ||
+        fieldPath.includes("hoverBgColor")
+      ) {
         defaultGlobalColorType = "primary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to get contrast text color (black or white) based on background color
   const getContrastTextColor = (backgroundColor: string): string => {
-    if (!backgroundColor || !backgroundColor.startsWith('#')) return "#ffffff";
-    const cleanHex = backgroundColor.replace('#', '');
+    if (!backgroundColor || !backgroundColor.startsWith("#")) return "#ffffff";
+    const cleanHex = backgroundColor.replace("#", "");
     if (cleanHex.length !== 6) return "#ffffff";
-    
+
     // Parse RGB values
     const r = parseInt(cleanHex.substr(0, 2), 16);
     const g = parseInt(cleanHex.substr(2, 2), 16);
     const b = parseInt(cleanHex.substr(4, 2), 16);
-    
+
     // Calculate relative luminance using WCAG formula
     const getLuminance = (value: number): number => {
       const normalized = value / 255;
@@ -252,9 +300,12 @@ export default function PropertyFilter2({
         ? normalized / 12.92
         : Math.pow((normalized + 0.055) / 1.055, 2.4);
     };
-    
-    const luminance = 0.2126 * getLuminance(r) + 0.7152 * getLuminance(g) + 0.0722 * getLuminance(b);
-    
+
+    const luminance =
+      0.2126 * getLuminance(r) +
+      0.7152 * getLuminance(g) +
+      0.0722 * getLuminance(b);
+
     // If luminance is less than 0.5, use white text, otherwise use black text
     return luminance < 0.5 ? "#ffffff" : "#000000";
   };
@@ -262,12 +313,17 @@ export default function PropertyFilter2({
   // Get colors for search button
   const searchButtonBgColor = getColor("searchButton.bgColor", "#059669");
   const searchButtonTextColor = getContrastTextColor(searchButtonBgColor);
-  const searchButtonHoverBgColor = getColor("searchButton.hoverBgColor", getDarkerColor(searchButtonBgColor, 20));
-  const searchButtonHoverTextColor = getContrastTextColor(searchButtonHoverBgColor);
-  
+  const searchButtonHoverBgColor = getColor(
+    "searchButton.hoverBgColor",
+    getDarkerColor(searchButtonBgColor, 20),
+  );
+  const searchButtonHoverTextColor = getContrastTextColor(
+    searchButtonHoverBgColor,
+  );
+
   // Get colors for inputs
   const inputTextColor = getColor("inputs.textColor", "#1f2937");
-  
+
   // Get colors for dropdown
   const dropdownTextColor = getColor("dropdown.textColor", "#1f2937");
   const dropdownHoverBgColor = getColor("dropdown.hoverBgColor", "#f3f4f6");
@@ -303,11 +359,16 @@ export default function PropertyFilter2({
       try {
         setCityLoading(true);
         setCityError(null);
-        const res = await fetch("https://nzl-backend.com/api/cities?country_id=1");
+        const res = await fetch(
+          "https://nzl-backend.com/api/cities?country_id=1",
+        );
         if (!res.ok) throw new Error(`Failed to load cities: ${res.status}`);
         const data = await res.json();
         const list: CityOption[] = Array.isArray(data?.data)
-          ? data.data.map((c: any) => ({ id: c.id, name: c.name_ar || c.name_en || String(c.id) }))
+          ? data.data.map((c: any) => ({
+              id: c.id,
+              name: c.name_ar || c.name_en || String(c.id),
+            }))
           : [];
         if (isMounted) setCityOptions(list);
       } catch (e: any) {
@@ -335,9 +396,9 @@ export default function PropertyFilter2({
       try {
         setDistrictLoading(true);
         setDistrictError(null);
-        
+
         // البحث عن city_id للمدينة المختارة
-        const selectedCity = cityOptions.find(city => city.name === search);
+        const selectedCity = cityOptions.find((city) => city.name === search);
         if (!selectedCity) {
           setDistrictOptions([]);
           setDistrict("");
@@ -345,11 +406,16 @@ export default function PropertyFilter2({
           return;
         }
 
-        const res = await fetch(`https://nzl-backend.com/api/districts?city_id=${selectedCity.id}`);
+        const res = await fetch(
+          `https://nzl-backend.com/api/districts?city_id=${selectedCity.id}`,
+        );
         if (!res.ok) throw new Error(`Failed to load districts: ${res.status}`);
         const data = await res.json();
         const list: DistrictOption[] = Array.isArray(data?.data)
-          ? data.data.map((d: any) => ({ id: d.id, name: d.name_ar || d.name_en || String(d.id) }))
+          ? data.data.map((d: any) => ({
+              id: d.id,
+              name: d.name_ar || d.name_en || String(d.id),
+            }))
           : [];
         if (isMounted) {
           setDistrictOptions(list);
@@ -392,11 +458,12 @@ export default function PropertyFilter2({
         );
 
         // Use backend URL from environment variable
-        const backendUrl = process.env.NEXT_PUBLIC_Backend_URL || "https://api.taearif.com/api";
-        
+        const backendUrl =
+          process.env.NEXT_PUBLIC_Backend_URL || "https://api.taearif.com/api";
+
         // Extract path after /api from the original URL
         const apiMatch = apiUrl.match(/\/api(\/.*)/);
-        
+
         if (apiMatch && apiMatch[1]) {
           // Construct new URL: backend URL + path
           apiUrl = backendUrl + apiMatch[1];
@@ -421,18 +488,22 @@ export default function PropertyFilter2({
         actualStaticPropertyTypes?.length > 0
       ) {
         // استخدام القائمة الثابتة - تحويل إلى PropertyType format
-        const staticTypes = actualStaticPropertyTypes.map((name: string, index: number) => ({
-          id: index + 1,
-          name: name
-        }));
+        const staticTypes = actualStaticPropertyTypes.map(
+          (name: string, index: number) => ({
+            id: index + 1,
+            name: name,
+          }),
+        );
         setPropertyTypes(staticTypes);
         setFilteredTypes(staticTypes);
       } else {
         // استخدام القائمة الافتراضية كـ fallback
-        const defaultTypes = defaultPropertyTypes.map((name: string, index: number) => ({
-          id: index + 1,
-          name: name
-        }));
+        const defaultTypes = defaultPropertyTypes.map(
+          (name: string, index: number) => ({
+            id: index + 1,
+            name: name,
+          }),
+        );
         setPropertyTypes(defaultTypes);
         setFilteredTypes(defaultTypes);
       }
@@ -442,10 +513,12 @@ export default function PropertyFilter2({
         err instanceof Error ? err.message : "حدث خطأ في جلب أنواع العقارات",
       );
       // في حالة الخطأ، استخدم القائمة الافتراضية
-      const defaultTypes = defaultPropertyTypes.map((name: string, index: number) => ({
-        id: index + 1,
-        name: name
-      }));
+      const defaultTypes = defaultPropertyTypes.map(
+        (name: string, index: number) => ({
+          id: index + 1,
+          name: name,
+        }),
+      );
       setPropertyTypes(defaultTypes);
       setFilteredTypes(defaultTypes);
     } finally {
@@ -486,10 +559,12 @@ export default function PropertyFilter2({
       actualPropertyTypesSource === "static" &&
       actualStaticPropertyTypes?.length > 0
     ) {
-      const staticTypes = actualStaticPropertyTypes.map((name: string, index: number) => ({
-        id: index + 1,
-        name: name
-      }));
+      const staticTypes = actualStaticPropertyTypes.map(
+        (name: string, index: number) => ({
+          id: index + 1,
+          name: name,
+        }),
+      );
       setPropertyTypes(staticTypes);
       setFilteredTypes(staticTypes);
     }
@@ -566,7 +641,6 @@ export default function PropertyFilter2({
       setTransactionType("rent");
     }
   }, [selectedStatus, setTransactionType]);
-
 
   return (
     <div className={` ${className || ""} max-w-[1600px] mx-auto`}>
@@ -880,4 +954,3 @@ export default function PropertyFilter2({
     </div>
   );
 }
-

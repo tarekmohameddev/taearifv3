@@ -18,6 +18,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ## 📋 Test Cases
 
 ### Test 1: Single Parameter - City Filter
+
 **URL:** `/for-rent?city_id=5`
 
 - [ ] Page loads without errors
@@ -29,6 +30,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 2: Single Parameter - Price Filter
+
 **URL:** `/for-sale?max_price=5000`
 
 - [ ] Page loads successfully
@@ -39,6 +41,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 3: Single Parameter - District Filter
+
 **URL:** `/for-rent?state_id=10200005003`
 
 - [ ] District filter applied
@@ -48,6 +51,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 4: Multiple Parameters Combined
+
 **URL:** `/for-sale?city_id=5&state_id=10200005003&max_price=5000&category_id=3`
 
 - [ ] All form fields auto-fill correctly
@@ -58,6 +62,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 5: Search Parameter
+
 **URL:** `/for-rent?search=الرياض`
 
 - [ ] Search field contains "الرياض"
@@ -67,6 +72,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 6: Property Type Filter
+
 **URL:** `/for-sale?type_id=شقة`
 
 - [ ] Property type dropdown shows "شقة"
@@ -76,12 +82,15 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 7: Form Submission Creates URL
+
 **Steps:**
+
 1. Go to `/for-rent` (no parameters)
 2. Fill in: City="الرياض", Price="3000"
 3. Click Search
 
 **Verify:**
+
 - [ ] URL updates to `/for-rent?search=الرياض&max_price=3000`
 - [ ] Results filter correctly
 - [ ] URL is shareable
@@ -89,12 +98,15 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 8: URL Sharing
+
 **Steps:**
+
 1. Create filtered URL: `/for-rent?city_id=5&max_price=5000`
 2. Copy URL
 3. Open in new browser tab (or incognito)
 
 **Verify:**
+
 - [ ] Same filtered results appear
 - [ ] Form auto-fills identically
 - [ ] No need to re-search
@@ -102,12 +114,15 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 9: Manual URL Edit
+
 **Steps:**
+
 1. Start at `/for-rent?max_price=5000`
 2. Manually change URL to `/for-rent?max_price=3000`
 3. Press Enter
 
 **Verify:**
+
 - [ ] Results update to new price
 - [ ] Form updates to 3000
 - [ ] No page refresh flicker
@@ -115,11 +130,14 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 10: Pagination Preserves Filters
+
 **Steps:**
+
 1. Navigate to `/for-rent?city_id=5`
 2. Go to page 2 (via pagination)
 
 **Verify:**
+
 - [ ] URL becomes `/for-rent?city_id=5&page=2` (or similar)
 - [ ] Page 2 results still filtered by city_id=5
 - [ ] Back to page 1 maintains filter
@@ -127,12 +145,15 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 11: Browser Back/Forward
+
 **Steps:**
+
 1. Go to `/for-rent?city_id=5`
 2. Change to `/for-rent?city_id=10`
 3. Press browser Back button
 
 **Verify:**
+
 - [ ] Returns to city_id=5 URL
 - [ ] Results update to city_id=5
 - [ ] Form updates correctly
@@ -141,6 +162,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 12: Empty/No Parameters
+
 **URL:** `/for-rent`
 
 - [ ] Shows all rental properties
@@ -151,6 +173,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 13: Invalid Parameters
+
 **URL:** `/for-rent?invalid_param=test&city_id=5`
 
 - [ ] Invalid params ignored
@@ -161,6 +184,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 14: For-Rent Page
+
 **URL:** `/for-rent?city_id=5&max_price=3000`
 
 - [ ] Shows only rental properties
@@ -170,6 +194,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 15: For-Sale Page
+
 **URL:** `/for-sale?city_id=5&max_price=500000`
 
 - [ ] Shows only sale properties
@@ -179,6 +204,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 16: Special Characters in Search
+
 **URL:** `/for-rent?search=الرياض&category_id=3`
 
 - [ ] Arabic text handled correctly
@@ -188,6 +214,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 17: Very Long URL
+
 **URL:** `/for-rent?city_id=5&state_id=10200005003&max_price=5000&category_id=3&type_id=شقة&search=الرياض`
 
 - [ ] All parameters work
@@ -197,12 +224,15 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 18: Clear Filters
+
 **Steps:**
+
 1. Start with `/for-rent?city_id=5&max_price=5000`
 2. Clear all form fields
 3. Submit search
 
 **Verify:**
+
 - [ ] URL becomes `/for-rent` (no params)
 - [ ] Shows all properties
 - [ ] Filters removed
@@ -210,6 +240,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ---
 
 ### Test 19: Mobile Testing
+
 **Repeat key tests on mobile:**
 
 - [ ] Test 1 (single param)
@@ -218,6 +249,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 - [ ] Test 8 (URL sharing)
 
 **Mobile-Specific:**
+
 - [ ] Form auto-fill works on mobile
 - [ ] URL copying works
 - [ ] Touch interactions smooth
@@ -227,6 +259,7 @@ Use this checklist to verify URL parameter functionality is working correctly on
 ### Test 20: Performance Check
 
 **With Filters:**
+
 - [ ] Page loads in < 2 seconds
 - [ ] No console warnings
 - [ ] Smooth transitions
@@ -246,11 +279,13 @@ Use this checklist to verify URL parameter functionality is working correctly on
 - [ ] Pagination data correct
 
 **Example Expected Request:**
+
 ```
 GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=10200005003&max_price=5000&page=1
 ```
 
 **Example Expected Response:**
+
 ```json
 {
   "success": true,
@@ -271,20 +306,26 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 ## 🐛 Common Issues & Solutions
 
 ### Issue: Parameters not applying
+
 **Check:**
+
 - [ ] Console for JavaScript errors
 - [ ] Network tab for API calls
 - [ ] Store state in React DevTools
 - [ ] Backend receives parameters
 
 ### Issue: Form not auto-filling
+
 **Check:**
+
 - [ ] URL parameters are correctly formatted
 - [ ] Component uses useSearchParams hook
 - [ ] State updates on URL change
 
 ### Issue: Filters lost on pagination
+
 **Check:**
+
 - [ ] Pagination component preserves params
 - [ ] Store maintains filter state
 - [ ] API includes filters in request
@@ -293,36 +334,38 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 
 ## 📊 Results Summary
 
-**Date Tested:** _________________
+**Date Tested:** ********\_********
 
-**Tester:** _________________
+**Tester:** ********\_********
 
-**Environment:** _________________
+**Environment:** ********\_********
 
 ### Test Results
 
 - **Total Tests:** 20
-- **Passed:** _____ / 20
-- **Failed:** _____ / 20
-- **Skipped:** _____ / 20
+- **Passed:** **\_** / 20
+- **Failed:** **\_** / 20
+- **Skipped:** **\_** / 20
 
 ### Critical Issues Found
 
-1. ___________________________________
-2. ___________________________________
-3. ___________________________________
+1. ***
+2. ***
+3. ***
 
 ### Minor Issues Found
 
-1. ___________________________________
-2. ___________________________________
-3. ___________________________________
+1. ***
+2. ***
+3. ***
 
 ### Notes
 
-_________________________________________
-_________________________________________
-_________________________________________
+---
+
+---
+
+---
 
 ---
 
@@ -330,9 +373,9 @@ _________________________________________
 
 **Feature Ready for Production:** ☐ Yes ☐ No
 
-**Approved By:** _________________
+**Approved By:** ********\_********
 
-**Date:** _________________
+**Date:** ********\_********
 
 ---
 
@@ -342,4 +385,3 @@ _________________________________________
 - Component Architecture: `docs/important/liveEditor/COMPONENT_ARCHITECTURE.md`
 - Properties Store: `store/propertiesStore.ts`
 - URL Filters Hook: `hooks-liveeditor/use-url-filters.ts`
-

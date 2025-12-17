@@ -56,14 +56,14 @@ STEP 9: Test
 
 When using templates, replace these variables:
 
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `{ComponentType}` | `pricing` | Lowercase component type name |
-| `{ComponentTypeCamel}` | `Pricing` | PascalCase component type name |
-| `{componentType}States` | `pricingStates` | State property name |
-| `{ComponentType}Functions` | `pricingFunctions` | Functions object name |
-| `{componentType}Structure` | `pricingStructure` | Structure object name |
-| `{ComponentType}1` | `Pricing1` | Component React name |
+| Variable                   | Example            | Description                    |
+| -------------------------- | ------------------ | ------------------------------ |
+| `{ComponentType}`          | `pricing`          | Lowercase component type name  |
+| `{ComponentTypeCamel}`     | `Pricing`          | PascalCase component type name |
+| `{componentType}States`    | `pricingStates`    | State property name            |
+| `{ComponentType}Functions` | `pricingFunctions` | Functions object name          |
+| `{componentType}Structure` | `pricingStructure` | Structure object name          |
+| `{ComponentType}1`         | `Pricing1`         | Component React name           |
 
 ### Files You'll Create (3 new files)
 
@@ -86,6 +86,7 @@ When using templates, replace these variables:
 ### Verification Checklist
 
 After completing all steps, verify:
+
 - [ ] Component appears in Live Editor component list
 - [ ] Can drag and drop to canvas
 - [ ] Component renders correctly
@@ -160,30 +161,30 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 export const getDefaultPricingData = (): ComponentData => ({
   visible: true,
-  
+
   // Layout configuration
   layout: {
     maxWidth: "1600px",
     columns: {
       mobile: 1,
       tablet: 2,
-      desktop: 3
+      desktop: 3,
     },
     gap: "2rem",
     padding: {
       top: "4rem",
-      bottom: "4rem"
-    }
+      bottom: "4rem",
+    },
   },
-  
+
   // Content
   content: {
     title: "Our Pricing Plans",
     subtitle: "Choose the perfect plan for your needs",
     ctaText: "Get Started",
-    ctaUrl: "#"
+    ctaUrl: "#",
   },
-  
+
   // Pricing plans array
   plans: [
     {
@@ -193,14 +194,10 @@ export const getDefaultPricingData = (): ComponentData => ({
       currency: "$",
       period: "month",
       description: "Perfect for individuals",
-      features: [
-        "Feature 1",
-        "Feature 2",
-        "Feature 3"
-      ],
+      features: ["Feature 1", "Feature 2", "Feature 3"],
       highlighted: false,
       buttonText: "Choose Plan",
-      buttonUrl: "#"
+      buttonUrl: "#",
     },
     {
       id: "pro",
@@ -209,15 +206,10 @@ export const getDefaultPricingData = (): ComponentData => ({
       currency: "$",
       period: "month",
       description: "Best for professionals",
-      features: [
-        "Everything in Basic",
-        "Feature 4",
-        "Feature 5",
-        "Feature 6"
-      ],
+      features: ["Everything in Basic", "Feature 4", "Feature 5", "Feature 6"],
       highlighted: true,
       buttonText: "Choose Plan",
-      buttonUrl: "#"
+      buttonUrl: "#",
     },
     {
       id: "enterprise",
@@ -231,14 +223,14 @@ export const getDefaultPricingData = (): ComponentData => ({
         "Feature 7",
         "Feature 8",
         "Feature 9",
-        "Feature 10"
+        "Feature 10",
       ],
       highlighted: false,
       buttonText: "Contact Us",
-      buttonUrl: "#"
-    }
+      buttonUrl: "#",
+    },
   ],
-  
+
   // Styling
   styling: {
     backgroundColor: "#ffffff",
@@ -248,54 +240,54 @@ export const getDefaultPricingData = (): ComponentData => ({
     cardBorderColor: "#e5e7eb",
     highlightColor: "#059669",
     priceColor: "#1f2937",
-    featureColor: "#6b7280"
+    featureColor: "#6b7280",
   },
-  
+
   // Typography
   typography: {
     title: {
       fontSize: {
         mobile: "2xl",
         tablet: "3xl",
-        desktop: "4xl"
+        desktop: "4xl",
       },
       fontWeight: "bold",
-      fontFamily: "Tajawal"
+      fontFamily: "Tajawal",
     },
     subtitle: {
       fontSize: {
         mobile: "base",
         tablet: "lg",
-        desktop: "xl"
+        desktop: "xl",
       },
       fontWeight: "normal",
-      fontFamily: "Tajawal"
-    }
+      fontFamily: "Tajawal",
+    },
   },
-  
+
   // Responsive behavior
   responsive: {
     mobileBreakpoint: "640px",
     tabletBreakpoint: "1024px",
-    desktopBreakpoint: "1280px"
+    desktopBreakpoint: "1280px",
   },
-  
+
   // Animations
   animations: {
     header: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 200
+      delay: 200,
     },
     cards: {
       enabled: true,
       type: "fade-up",
       duration: 600,
       delay: 300,
-      stagger: 100
-    }
-  }
+      stagger: 100,
+    },
+  },
 });
 
 // If you have multiple variants, create more default data functions:
@@ -308,7 +300,7 @@ export const getDefaultPricingData = (): ComponentData => ({
 export const pricingFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -320,50 +312,50 @@ export const pricingFunctions = {
       state.pricingStates[variantId] &&
       Object.keys(state.pricingStates[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data
     // If you have multiple variants, add logic here:
     // const defaultData = variantId === "pricing2"
     //   ? getDefaultPricing2Data()
     //   : getDefaultPricingData();
     const defaultData = getDefaultPricingData();
-    
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      pricingStates: { ...state.pricingStates, [variantId]: data }
+      pricingStates: { ...state.pricingStates, [variantId]: data },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
     state.pricingStates[variantId] || getDefaultPricingData(),
-  
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    pricingStates: { ...state.pricingStates, [variantId]: data }
+    pricingStates: { ...state.pricingStates, [variantId]: data },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "content.title")
@@ -373,11 +365,11 @@ export const pricingFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.pricingStates[variantId] || getDefaultPricingData();
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
-      pricingStates: { ...state.pricingStates, [variantId]: newData }
+      pricingStates: { ...state.pricingStates, [variantId]: newData },
     } as any;
-  }
+  },
 };
 ```
 
@@ -410,12 +402,12 @@ export const pricingStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
@@ -428,7 +420,7 @@ export const pricingStructure: ComponentStructure = {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "1600px"
+              placeholder: "1600px",
             },
             {
               key: "columns",
@@ -439,27 +431,27 @@ export const pricingStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile Columns",
                   type: "number",
-                  placeholder: "1"
+                  placeholder: "1",
                 },
                 {
                   key: "tablet",
                   label: "Tablet Columns",
                   type: "number",
-                  placeholder: "2"
+                  placeholder: "2",
                 },
                 {
                   key: "desktop",
                   label: "Desktop Columns",
                   type: "number",
-                  placeholder: "3"
-                }
-              ]
+                  placeholder: "3",
+                },
+              ],
             },
             {
               key: "gap",
               label: "Gap Between Cards",
               type: "text",
-              placeholder: "2rem"
+              placeholder: "2rem",
             },
             {
               key: "padding",
@@ -470,19 +462,19 @@ export const pricingStructure: ComponentStructure = {
                   key: "top",
                   label: "Top Padding",
                   type: "text",
-                  placeholder: "4rem"
+                  placeholder: "4rem",
                 },
                 {
                   key: "bottom",
                   label: "Bottom Padding",
                   type: "text",
-                  placeholder: "4rem"
-                }
-              ]
-            }
-          ]
+                  placeholder: "4rem",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CONTENT
         // ═══════════════════════════════════════════════════════════
@@ -495,29 +487,29 @@ export const pricingStructure: ComponentStructure = {
               key: "title",
               label: "Section Title",
               type: "text",
-              placeholder: "Our Pricing Plans"
+              placeholder: "Our Pricing Plans",
             },
             {
               key: "subtitle",
               label: "Section Subtitle",
               type: "text",
-              placeholder: "Choose the perfect plan"
+              placeholder: "Choose the perfect plan",
             },
             {
               key: "ctaText",
               label: "CTA Button Text",
               type: "text",
-              placeholder: "Get Started"
+              placeholder: "Get Started",
             },
             {
               key: "ctaUrl",
               label: "CTA Button URL",
               type: "text",
-              placeholder: "#"
-            }
-          ]
+              placeholder: "#",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // PRICING PLANS - ARRAY OF OBJECTS
         // ═══════════════════════════════════════════════════════════
@@ -532,37 +524,37 @@ export const pricingStructure: ComponentStructure = {
               key: "id",
               label: "Plan ID",
               type: "text",
-              placeholder: "basic"
+              placeholder: "basic",
             },
             {
               key: "name",
               label: "Plan Name",
               type: "text",
-              placeholder: "Basic"
+              placeholder: "Basic",
             },
             {
               key: "price",
               label: "Price",
               type: "number",
-              placeholder: "99"
+              placeholder: "99",
             },
             {
               key: "currency",
               label: "Currency",
               type: "text",
-              placeholder: "$"
+              placeholder: "$",
             },
             {
               key: "period",
               label: "Billing Period",
               type: "text",
-              placeholder: "month"
+              placeholder: "month",
             },
             {
               key: "description",
               label: "Plan Description",
               type: "text",
-              placeholder: "Perfect for individuals"
+              placeholder: "Perfect for individuals",
             },
             {
               key: "features",
@@ -575,30 +567,30 @@ export const pricingStructure: ComponentStructure = {
                   key: "value",
                   label: "Feature Text",
                   type: "text",
-                  placeholder: "Feature description"
-                }
-              ]
+                  placeholder: "Feature description",
+                },
+              ],
             },
             {
               key: "highlighted",
               label: "Highlight This Plan",
-              type: "boolean"
+              type: "boolean",
             },
             {
               key: "buttonText",
               label: "Button Text",
               type: "text",
-              placeholder: "Choose Plan"
+              placeholder: "Choose Plan",
             },
             {
               key: "buttonUrl",
               label: "Button URL",
               type: "text",
-              placeholder: "#"
-            }
-          ]
+              placeholder: "#",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -610,46 +602,46 @@ export const pricingStructure: ComponentStructure = {
             {
               key: "backgroundColor",
               label: "Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "titleColor",
               label: "Title Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "subtitleColor",
               label: "Subtitle Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardBackgroundColor",
               label: "Card Background",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardBorderColor",
               label: "Card Border",
-              type: "color"
+              type: "color",
             },
             {
               key: "highlightColor",
               label: "Highlight Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "priceColor",
               label: "Price Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "featureColor",
               label: "Feature Text Color",
-              type: "color"
-            }
-          ]
+              type: "color",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // TYPOGRAPHY
         // ═══════════════════════════════════════════════════════════
@@ -672,35 +664,35 @@ export const pricingStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "2xl"
+                      placeholder: "2xl",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "3xl"
+                      placeholder: "3xl",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "4xl"
-                    }
-                  ]
+                      placeholder: "4xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold"
+                  placeholder: "bold",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
-                }
-              ]
+                  placeholder: "Tajawal",
+                },
+              ],
             },
             {
               key: "subtitle",
@@ -716,39 +708,39 @@ export const pricingStructure: ComponentStructure = {
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
-                      placeholder: "base"
+                      placeholder: "base",
                     },
                     {
                       key: "tablet",
                       label: "Tablet",
                       type: "text",
-                      placeholder: "lg"
+                      placeholder: "lg",
                     },
                     {
                       key: "desktop",
                       label: "Desktop",
                       type: "text",
-                      placeholder: "xl"
-                    }
-                  ]
+                      placeholder: "xl",
+                    },
+                  ],
                 },
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal"
+                  placeholder: "normal",
                 },
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal"
-                }
-              ]
-            }
-          ]
+                  placeholder: "Tajawal",
+                },
+              ],
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // RESPONSIVE
         // ═══════════════════════════════════════════════════════════
@@ -761,23 +753,23 @@ export const pricingStructure: ComponentStructure = {
               key: "mobileBreakpoint",
               label: "Mobile Breakpoint",
               type: "text",
-              placeholder: "640px"
+              placeholder: "640px",
             },
             {
               key: "tabletBreakpoint",
               label: "Tablet Breakpoint",
               type: "text",
-              placeholder: "1024px"
+              placeholder: "1024px",
             },
             {
               key: "desktopBreakpoint",
               label: "Desktop Breakpoint",
               type: "text",
-              placeholder: "1280px"
-            }
-          ]
+              placeholder: "1280px",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // ANIMATIONS
         // ═══════════════════════════════════════════════════════════
@@ -794,27 +786,27 @@ export const pricingStructure: ComponentStructure = {
                 {
                   key: "enabled",
                   label: "Enabled",
-                  type: "boolean"
+                  type: "boolean",
                 },
                 {
                   key: "type",
                   label: "Animation Type",
                   type: "text",
-                  placeholder: "fade-up"
+                  placeholder: "fade-up",
                 },
                 {
                   key: "duration",
                   label: "Duration (ms)",
                   type: "number",
-                  placeholder: "600"
+                  placeholder: "600",
                 },
                 {
                   key: "delay",
                   label: "Delay (ms)",
                   type: "number",
-                  placeholder: "200"
-                }
-              ]
+                  placeholder: "200",
+                },
+              ],
             },
             {
               key: "cards",
@@ -824,38 +816,38 @@ export const pricingStructure: ComponentStructure = {
                 {
                   key: "enabled",
                   label: "Enabled",
-                  type: "boolean"
+                  type: "boolean",
                 },
                 {
                   key: "type",
                   label: "Animation Type",
                   type: "text",
-                  placeholder: "fade-up"
+                  placeholder: "fade-up",
                 },
                 {
                   key: "duration",
                   label: "Duration (ms)",
                   type: "number",
-                  placeholder: "600"
+                  placeholder: "600",
                 },
                 {
                   key: "delay",
                   label: "Delay (ms)",
                   type: "number",
-                  placeholder: "300"
+                  placeholder: "300",
                 },
                 {
                   key: "stagger",
                   label: "Stagger (ms)",
                   type: "number",
-                  placeholder: "100"
-                }
-              ]
-            }
-          ]
-        }
+                  placeholder: "100",
+                },
+              ],
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
@@ -863,17 +855,17 @@ export const pricingStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.subtitle", label: "Subtitle", type: "text" },
-        { key: "plans", label: "Pricing Plans", type: "array" }
-      ]
-    }
-    
+        { key: "plans", label: "Pricing Plans", type: "array" },
+      ],
+    },
+
     // If you have multiple variants, add them here:
     // {
     //   id: "pricing2",
     //   name: "Pricing 2 - Comparison Table",
     //   fields: [...]
     // }
-  ]
+  ],
 };
 ```
 
@@ -905,14 +897,14 @@ import { pricingFunctions } from "./editorStoreFunctions/pricingFunctions";
 // Add to EditorStore interface (around line 82-200)
 interface EditorStore {
   // ... existing properties ...
-  
+
   // Add your component state
   pricingStates: Record<string, ComponentData>;
   ensurePricingVariant: (variantId: string, initial?: ComponentData) => void;
   getPricingData: (variantId: string) => ComponentData;
   setPricingData: (variantId: string, data: ComponentData) => void;
   updatePricingByPath: (variantId: string, path: string, value: any) => void;
-  
+
   // ... rest of properties ...
 }
 ```
@@ -923,10 +915,10 @@ interface EditorStore {
 // In the create() function (around line 300-400)
 export const useEditorStore = create<EditorStore>((set, get) => ({
   // ... existing state ...
-  
+
   // Add your component state initialization
   pricingStates: {},
-  
+
   // ... rest of state ...
 }));
 ```
@@ -937,61 +929,61 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 // In ensureComponentVariant function (around line 600-700)
 ensureComponentVariant: (componentType, variantId, initial?) => {
   const state = get();
-  
+
   switch (componentType) {
     // ... existing cases ...
-    
+
     case "pricing":
       set(pricingFunctions.ensureVariant(state, variantId, initial));
       break;
-    
+
     // ... rest of cases ...
   }
-}
+};
 
 // In getComponentData function (around line 750-850)
 getComponentData: (componentType, variantId) => {
   const state = get();
-  
+
   switch (componentType) {
     // ... existing cases ...
-    
+
     case "pricing":
       return pricingFunctions.getData(state, variantId);
-    
+
     // ... rest of cases ...
   }
-}
+};
 
 // In setComponentData function (around line 900-1000)
 setComponentData: (componentType, variantId, data) => {
   const state = get();
-  
+
   switch (componentType) {
     // ... existing cases ...
-    
+
     case "pricing":
       set(pricingFunctions.setData(state, variantId, data));
       break;
-    
+
     // ... rest of cases ...
   }
-}
+};
 
 // In updateComponentByPath function (around line 1050-1150)
 updateComponentByPath: (componentType, variantId, path, value) => {
   const state = get();
-  
+
   switch (componentType) {
     // ... existing cases ...
-    
+
     case "pricing":
       set(pricingFunctions.updateByPath(state, variantId, path, value));
       break;
-    
+
     // ... rest of cases ...
   }
-}
+};
 ```
 
 ### 3.5: Add Specific Component Functions (Legacy Support)
@@ -1041,7 +1033,7 @@ export const getComponents = (
   t: (key: string) => string,
 ): Record<string, any> => ({
   // ... existing components ...
-  
+
   pricing: {
     id: "pricing",
     name: "pricing",
@@ -1060,7 +1052,7 @@ export const getComponents = (
     defaultTheme: "pricing1",
     ...pricingStructure,
   },
-  
+
   // ... rest of components ...
 });
 ```
@@ -1071,7 +1063,7 @@ export const getComponents = (
 // In COMPONENTS constant (around line 400-600)
 export const COMPONENTS: Record<string, any> = {
   // ... existing components ...
-  
+
   pricing: {
     id: "pricing",
     name: "pricing",
@@ -1090,7 +1082,7 @@ export const COMPONENTS: Record<string, any> = {
     defaultTheme: "pricing1",
     ...pricingStructure,
   },
-  
+
   // ... rest of components ...
 };
 ```
@@ -1200,7 +1192,7 @@ interface PricingProps {
   typography?: any;
   responsive?: any;
   animations?: any;
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -1216,16 +1208,16 @@ export default function Pricing1(props: PricingProps) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "pricing1";
   const uniqueId = props.id || variantId;
-  
+
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const pricingStates = useEditorStore(s => s.pricingStates);
-  
+
   const tenantData = useTenantStore(s => s.tenantData);
-  
+
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -1243,7 +1235,7 @@ export default function Pricing1(props: PricingProps) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
@@ -1252,7 +1244,7 @@ export default function Pricing1(props: PricingProps) {
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
@@ -1272,7 +1264,7 @@ export default function Pricing1(props: PricingProps) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -1291,18 +1283,18 @@ export default function Pricing1(props: PricingProps) {
             ...getDefaultPricingData(),
             ...props
           };
-      
+
       // Initialize in store
       ensureComponentVariant("pricing", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);  // ✅ Add tenantComponentData dependency
-  
+
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = pricingStates[uniqueId];
   const currentStoreData = getComponentData("pricing", uniqueId);
-  
+
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
@@ -1312,14 +1304,14 @@ export default function Pricing1(props: PricingProps) {
     ...currentStoreData,            // 3. Current store data
     ...props                        // 4. Props (highest priority)
   };
-  
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
-  
+
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
@@ -1332,22 +1324,22 @@ export default function Pricing1(props: PricingProps) {
         paddingBottom: mergedData.layout?.padding?.bottom
       }}
     >
-      <div 
+      <div
         className="container mx-auto px-4"
         style={{ maxWidth: mergedData.layout?.maxWidth }}
       >
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 
-            style={{ 
+          <h2
+            style={{
               color: mergedData.styling?.titleColor,
               fontSize: mergedData.typography?.title?.fontSize?.desktop
             }}
           >
             {mergedData.content?.title}
           </h2>
-          <p 
-            style={{ 
+          <p
+            style={{
               color: mergedData.styling?.subtitleColor,
               fontSize: mergedData.typography?.subtitle?.fontSize?.desktop
             }}
@@ -1355,9 +1347,9 @@ export default function Pricing1(props: PricingProps) {
             {mergedData.content?.subtitle}
           </p>
         </div>
-        
+
         {/* Pricing Cards Grid */}
-        <div 
+        <div
           className="grid gap-8"
           style={{
             gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
@@ -1371,8 +1363,8 @@ export default function Pricing1(props: PricingProps) {
               style={{
                 backgroundColor: mergedData.styling?.cardBackgroundColor,
                 borderColor: mergedData.styling?.cardBorderColor,
-                border: plan.highlighted 
-                  ? `2px solid ${mergedData.styling?.highlightColor}` 
+                border: plan.highlighted
+                  ? `2px solid ${mergedData.styling?.highlightColor}`
                   : `1px solid ${mergedData.styling?.cardBorderColor}`,
                 borderRadius: "0.5rem",
                 padding: "2rem",
@@ -1391,38 +1383,38 @@ export default function Pricing1(props: PricingProps) {
                   Popular
                 </div>
               )}
-              
+
               {/* Plan Name */}
               <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-              
+
               {/* Plan Description */}
-              <p 
+              <p
                 className="text-sm mb-4"
                 style={{ color: mergedData.styling?.subtitleColor }}
               >
                 {plan.description}
               </p>
-              
+
               {/* Price */}
               <div className="mb-6">
-                <span 
+                <span
                   className="text-4xl font-bold"
                   style={{ color: mergedData.styling?.priceColor }}
                 >
                   {plan.currency}{plan.price}
                 </span>
-                <span 
+                <span
                   className="text-sm ml-2"
                   style={{ color: mergedData.styling?.subtitleColor }}
                 >
                   / {plan.period}
                 </span>
               </div>
-              
+
               {/* Features List */}
               <ul className="mb-6 space-y-3">
                 {plan.features?.map((feature: string, fIndex: number) => (
-                  <li 
+                  <li
                     key={fIndex}
                     className="flex items-start"
                     style={{ color: mergedData.styling?.featureColor }}
@@ -1432,17 +1424,17 @@ export default function Pricing1(props: PricingProps) {
                   </li>
                 ))}
               </ul>
-              
+
               {/* CTA Button */}
               <a
                 href={plan.buttonUrl}
                 className="block text-center py-3 rounded-md font-semibold transition-colors"
                 style={{
-                  backgroundColor: plan.highlighted 
-                    ? mergedData.styling?.highlightColor 
+                  backgroundColor: plan.highlighted
+                    ? mergedData.styling?.highlightColor
                     : "transparent",
-                  color: plan.highlighted 
-                    ? "#ffffff" 
+                  color: plan.highlighted
+                    ? "#ffffff"
                     : mergedData.styling?.highlightColor,
                   border: `2px solid ${mergedData.styling?.highlightColor}`
                 }}
@@ -1560,13 +1552,11 @@ Use this checklist to ensure you've completed all steps:
   - [ ] Exported `getDefaultPricingData` function
   - [ ] Exported `pricingFunctions` object with 4 functions
   - [ ] All functions follow the template
-  
 - [ ] Step 2: Created `componentsStructure/pricing.ts`
   - [ ] Exported `pricingStructure` object
   - [ ] Defined `componentType`
   - [ ] Defined all `fields` for advanced mode
   - [ ] Defined `simpleFields` for simple mode
-  
 - [ ] Step 3: Updated `context-liveeditor/editorStore.ts`
   - [ ] Imported `pricingFunctions`
   - [ ] Added `pricingStates` to interface
@@ -1576,28 +1566,22 @@ Use this checklist to ensure you've completed all steps:
   - [ ] Added case to `setComponentData`
   - [ ] Added case to `updateComponentByPath`
   - [ ] Added specific functions (ensurePricingVariant, etc.)
-  
 - [ ] Step 4: Updated `lib-liveeditor/ComponentsList.tsx`
   - [ ] Imported `pricingStructure`
   - [ ] Added to `getComponents` function
   - [ ] Added to `COMPONENTS` constant
   - [ ] Added to relevant section
-  
 - [ ] Step 5: Updated `componentsStructure/index.ts`
   - [ ] Exported `pricingStructure`
-  
 - [ ] Step 6: Created `components/tenant/pricing/pricing1.tsx`
   - [ ] Defined props interface
   - [ ] Followed 7-step component pattern
   - [ ] Used `mergedData` for rendering
-  
 - [ ] Step 7: Updated `context-liveeditor/editorStoreFunctions/index.ts`
   - [ ] Exported `pricingFunctions`
-  
 - [ ] Step 8: Added translations
   - [ ] Updated `ar.json`
   - [ ] Updated `en.json`
-  
 - [ ] Step 9: Tested integration
   - [ ] Component appears in Live Editor
   - [ ] Can add to canvas
@@ -1614,6 +1598,7 @@ Use this checklist to ensure you've completed all steps:
 If your component has multiple design variations:
 
 **In pricingFunctions.ts**:
+
 ```typescript
 export const getDefaultPricing2Data = (): ComponentData => ({
   // Different structure for variant 2
@@ -1622,16 +1607,18 @@ export const getDefaultPricing2Data = (): ComponentData => ({
 export const pricingFunctions = {
   ensureVariant: (state, variantId, initial?) => {
     // Variant detection
-    const defaultData = variantId === "pricing2"
-      ? getDefaultPricing2Data()
-      : getDefaultPricingData();
+    const defaultData =
+      variantId === "pricing2"
+        ? getDefaultPricing2Data()
+        : getDefaultPricingData();
     // ...
-  }
+  },
   // ... rest of functions
 };
 ```
 
 **In pricing.ts**:
+
 ```typescript
 export const pricingStructure: ComponentStructure = {
   componentType: "pricing",
@@ -1651,6 +1638,7 @@ export const pricingStructure: ComponentStructure = {
 ```
 
 **Create separate component files**:
+
 - `components/tenant/pricing/pricing1.tsx`
 - `components/tenant/pricing/pricing2.tsx`
 
@@ -1661,6 +1649,7 @@ export const pricingStructure: ComponentStructure = {
 If you need validation, manipulation, etc. (like contactCardsFunctions):
 
 **In pricingFunctions.ts**:
+
 ```typescript
 export const pricingFunctions = {
   // Standard 4 functions
@@ -1668,25 +1657,25 @@ export const pricingFunctions = {
   getData: (...) => {...},
   setData: (...) => {...},
   updateByPath: (...) => {...},
-  
+
   // Extended helper functions
   addPlan: (currentData, plan) => ({
     ...currentData,
     plans: [...(currentData.plans || []), plan]
   }),
-  
+
   removePlan: (currentData, index) => ({
     ...currentData,
     plans: (currentData.plans || []).filter((_, i) => i !== index)
   }),
-  
+
   updatePlan: (currentData, index, updates) => ({
     ...currentData,
     plans: (currentData.plans || []).map((plan, i) =>
       i === index ? { ...plan, ...updates } : plan
     )
   }),
-  
+
   validate: (data) => {
     const errors = [];
     if (!data.plans || data.plans.length === 0) {
@@ -1707,6 +1696,7 @@ export const pricingFunctions = {
 If your component should be shared across all pages:
 
 **In editorStore.ts**:
+
 ```typescript
 interface EditorStore {
   // Add global component data
@@ -1730,14 +1720,15 @@ updateGlobalPricingByPath: (path, value) => {
 ```
 
 **In component**:
+
 ```typescript
-const globalPricingData = useEditorStore(s => s.globalPricingData);
+const globalPricingData = useEditorStore((s) => s.globalPricingData);
 
 const mergedData = {
   ...getDefaultPricingData(),
   ...storeData,
-  ...globalPricingData,  // Global data priority
-  ...props
+  ...globalPricingData, // Global data priority
+  ...props,
 };
 ```
 
@@ -1748,37 +1739,40 @@ const mergedData = {
 If your component fetches data from API:
 
 **In default data**:
+
 ```typescript
 export const getDefaultPricingData = (): ComponentData => ({
   // ... other data ...
-  
+
   dataSource: {
-    type: "api",  // or "static"
+    type: "api", // or "static"
     apiUrl: "/api/pricing/plans",
     enabled: true,
     cache: {
       enabled: true,
-      duration: 3600  // seconds
-    }
-  }
+      duration: 3600, // seconds
+    },
+  },
 });
 ```
 
 **In component**:
+
 ```typescript
 const [apiData, setApiData] = useState(null);
 
 useEffect(() => {
   if (mergedData.dataSource?.enabled && mergedData.dataSource?.type === "api") {
     fetch(mergedData.dataSource.apiUrl)
-      .then(res => res.json())
-      .then(data => setApiData(data));
+      .then((res) => res.json())
+      .then((data) => setApiData(data));
   }
 }, [mergedData.dataSource]);
 
-const finalData = mergedData.dataSource?.enabled && apiData 
-  ? { ...mergedData, plans: apiData } 
-  : mergedData;
+const finalData =
+  mergedData.dataSource?.enabled && apiData
+    ? { ...mergedData, plans: apiData }
+    : mergedData;
 ```
 
 ---
@@ -1788,6 +1782,7 @@ const finalData = mergedData.dataSource?.enabled && apiData
 ### Mistake 1: Wrong Component Type Name
 
 ❌ **Wrong**:
+
 ```typescript
 // pricingFunctions.ts
 export const priceFunctions = {  // Wrong name!
@@ -1801,6 +1796,7 @@ pricing: {
 ```
 
 ✅ **Correct**:
+
 ```typescript
 // pricingFunctions.ts
 export const pricingFunctions = {  // Matches componentType!
@@ -1818,23 +1814,27 @@ pricing: {
 ### Mistake 2: Forgetting to Update All Switch Cases
 
 ❌ **Wrong**:
+
 ```typescript
 // Updated getComponentData but forgot setComponentData
 getComponentData: (type, id) => {
   switch (type) {
-    case "pricing":  // Added
+    case "pricing": // Added
       return pricingFunctions.getData(state, id);
   }
-}
+};
 
 setComponentData: (type, id, data) => {
-  switch (type) {
+  switch (
+    type
     // Missing "pricing" case!
+  ) {
   }
-}
+};
 ```
 
 ✅ **Correct**:
+
 ```typescript
 // Add to ALL 4 switch statements
 ensureComponentVariant: ...case "pricing"...
@@ -1848,6 +1848,7 @@ updateComponentByPath: ...case "pricing"...
 ### Mistake 3: Not Matching Structure to Default Data
 
 ❌ **Wrong**:
+
 ```typescript
 // Default data has "plans" array
 getDefaultPricingData = () => ({
@@ -1864,6 +1865,7 @@ fields: [
 ```
 
 ✅ **Correct**:
+
 ```typescript
 // Keys must match exactly
 getDefaultPricingData = () => ({
@@ -1883,6 +1885,7 @@ fields: [
 ### Mistake 4: Not Following Component Pattern
 
 ❌ **Wrong**:
+
 ```typescript
 export default function Pricing1(props) {
   // Directly using props
@@ -1891,15 +1894,16 @@ export default function Pricing1(props) {
 ```
 
 ✅ **Correct**:
+
 ```typescript
 export default function Pricing1(props) {
   // Follow 7-step pattern
   const uniqueId = props.id || "pricing1";
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   // ... rest of pattern
-  
+
   const mergedData = {...};  // Merge data
-  
+
   return <div>{mergedData.content?.title}</div>;  // Use mergedData
 }
 ```
@@ -1916,24 +1920,26 @@ Some components (like halfTextHalfImage) update `pageComponentsByPage` in additi
 updateByPath: (state, variantId, path, value) => {
   const source = state.pricingStates[variantId] || {};
   const newData = updateDataByPath(source, path, value);
-  
+
   // Update pageComponentsByPage too
   const currentPage = state.currentPage;
-  const updatedComponents = state.pageComponentsByPage[currentPage].map(comp => {
-    if (comp.type === "pricing" && comp.id === variantId) {
-      return { ...comp, data: newData };
-    }
-    return comp;
-  });
-  
+  const updatedComponents = state.pageComponentsByPage[currentPage].map(
+    (comp) => {
+      if (comp.type === "pricing" && comp.id === variantId) {
+        return { ...comp, data: newData };
+      }
+      return comp;
+    },
+  );
+
   return {
     pricingStates: { ...state.pricingStates, [variantId]: newData },
     pageComponentsByPage: {
       ...state.pageComponentsByPage,
-      [currentPage]: updatedComponents
-    }
+      [currentPage]: updatedComponents,
+    },
   };
-}
+};
 ```
 
 **When to use**: If your component's save payload needs immediate sync.
@@ -1951,15 +1957,15 @@ ensureVariant: (state, variantId, initial?) => {
   logEditorStore("ENSURE_VARIANT_CALLED", variantId, "pricing", {
     variantId,
     hasInitial: !!(initial && Object.keys(initial).length > 0),
-    initialKeys: initial ? Object.keys(initial) : []
+    initialKeys: initial ? Object.keys(initial) : [],
   });
-  
+
   // ... rest of function
-  
+
   logEditorStore("ENSURE_VARIANT_RESULT", variantId, "pricing", {
-    finalData: data
+    finalData: data,
   });
-}
+};
 ```
 
 ---
@@ -1976,8 +1982,8 @@ fields: [
     type: "select",
     options: [
       { value: "static", label: "Static" },
-      { value: "api", label: "API" }
-    ]
+      { value: "api", label: "API" },
+    ],
   },
   {
     key: "dataSource.apiUrl",
@@ -1985,10 +1991,10 @@ fields: [
     type: "text",
     condition: {
       field: "dataSource.type",
-      value: "api"
-    }
-  }
-]
+      value: "api",
+    },
+  },
+];
 ```
 
 The field `dataSource.apiUrl` only shows when `dataSource.type === "api"`.
@@ -2008,21 +2014,25 @@ The field `dataSource.apiUrl` only shows when `dataSource.type === "api"`.
 ### Example Components to Study
 
 **Simple Component**: `testimonials`
+
 - Single variant
 - Basic array handling
 - Good starting point
 
 **Complex Component**: `halfTextHalfImage`
+
 - Multiple variants (3)
 - Extensive logging
 - Updates pageComponentsByPage
 
 **Extended Functions**: `contactCards`
+
 - Helper functions for manipulation
 - Validation
 - Reordering
 
 **Form Builder**: `inputs2`
+
 - Most complex default data
 - Dynamic form generation
 - Visibility controls
@@ -2055,4 +2065,3 @@ To add a new component:
 **Version**: 1.0  
 **Last Updated**: 2025-10-26  
 **Maintenance**: Update when adding new integration points
-

@@ -118,7 +118,11 @@ export default function CustomerCard({
     if (type.includes("أرض") || type.includes("land")) {
       return "border-green-500 text-green-700 bg-green-50";
     }
-    if (type.includes("محل") || type.includes("shop") || type.includes("store")) {
+    if (
+      type.includes("محل") ||
+      type.includes("shop") ||
+      type.includes("store")
+    ) {
       return "border-orange-500 text-orange-700 bg-orange-50";
     }
     if (type.includes("مكتب") || type.includes("office")) {
@@ -163,11 +167,12 @@ export default function CustomerCard({
               <div className="font-medium text-sm truncate">
                 {customer.name}
               </div>
-              {customer.customer_type && customer.customer_type !== "غير محدد" && (
-                <div className="text-xs text-muted-foreground">
-                  {customer.customer_type}
-                </div>
-              )}
+              {customer.customer_type &&
+                customer.customer_type !== "غير محدد" && (
+                  <div className="text-xs text-muted-foreground">
+                    {customer.customer_type}
+                  </div>
+                )}
             </div>
           </div>
           <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -301,11 +306,12 @@ export default function CustomerCard({
               <div className="font-medium text-sm truncate">
                 {customer.name}
               </div>
-              {customer.customer_type && customer.customer_type !== "غير محدد" && (
-                <div className="text-xs text-muted-foreground">
-                  {customer.customer_type}
-                </div>
-              )}
+              {customer.customer_type &&
+                customer.customer_type !== "غير محدد" && (
+                  <div className="text-xs text-muted-foreground">
+                    {customer.customer_type}
+                  </div>
+                )}
             </div>
           </div>
           <DropdownMenu open={tabletMenuOpen} onOpenChange={setTabletMenuOpen}>

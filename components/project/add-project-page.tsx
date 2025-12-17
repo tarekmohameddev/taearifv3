@@ -541,8 +541,12 @@ export default function AddProjectPage(): JSX.Element {
       }
 
       // تحويل أرقام الأسعار من العربية إلى الإنجليزية ثم إلى أرقام
-      const minPriceStr = newProject.minprice ? newProject.minprice.toString() : "";
-      const maxPriceStr = newProject.maxprice ? newProject.maxprice.toString() : "";
+      const minPriceStr = newProject.minprice
+        ? newProject.minprice.toString()
+        : "";
+      const maxPriceStr = newProject.maxprice
+        ? newProject.maxprice.toString()
+        : "";
 
       const convertedMinPriceStr = hasArabicNumbers(minPriceStr)
         ? convertArabicToEnglishNumbers(minPriceStr)

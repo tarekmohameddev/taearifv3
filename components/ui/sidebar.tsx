@@ -58,7 +58,14 @@ const SidebarProvider = ({
 
   return (
     <SidebarContext.Provider
-      value={{ expanded, setExpanded, mobileOpen, setMobileOpen, isShortScreen, isVeryShortScreen }}
+      value={{
+        expanded,
+        setExpanded,
+        mobileOpen,
+        setMobileOpen,
+        isShortScreen,
+        isVeryShortScreen,
+      }}
     >
       {children}
     </SidebarContext.Provider>
@@ -113,14 +120,14 @@ const SidebarContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { isVeryShortScreen } = useSidebar();
-  
+
   return (
     <div
       ref={ref}
       className={cn(
         "flex-1 overflow-y-auto overflow-x-hidden py-2 min-h-0",
         isVeryShortScreen && "hide-scrollbar",
-        className
+        className,
       )}
       {...props}
     />
@@ -132,7 +139,11 @@ const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mt-auto border-t p-4 flex-shrink-0", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn("mt-auto border-t p-4 flex-shrink-0", className)}
+    {...props}
+  />
 ));
 SidebarFooter.displayName = "SidebarFooter";
 

@@ -602,16 +602,14 @@ export function RentalDetailsDialog() {
         // إعادة تحميل البيانات للتأكد من التحديث
         await fetchRentalDetails();
       } else if (error.response?.status === 404) {
-        toast.error(
-          "الدفعة غير موجودة. يرجى تحديث الصفحة.",
-          { duration: 5000 },
-        );
+        toast.error("الدفعة غير موجودة. يرجى تحديث الصفحة.", {
+          duration: 5000,
+        });
         await fetchRentalDetails();
       } else if (error.response?.status === 403) {
-        toast.error(
-          "ليس لديك صلاحية للتراجع عن هذه الدفعة.",
-          { duration: 5000 },
-        );
+        toast.error("ليس لديك صلاحية للتراجع عن هذه الدفعة.", {
+          duration: 5000,
+        });
       } else {
         toast.error(
           "خطأ في التراجع عن الدفعة: " +
@@ -1194,9 +1192,7 @@ export function RentalDetailsDialog() {
                                   onClick={() =>
                                     handleReversePayment(payment.id)
                                   }
-                                  disabled={
-                                    reversingPaymentId === payment.id
-                                  }
+                                  disabled={reversingPaymentId === payment.id}
                                   className="text-xs sm:text-sm h-6 sm:h-7 px-2 sm:px-3 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 "
                                   dir="rtl"
                                 >
@@ -1210,7 +1206,6 @@ export function RentalDetailsDialog() {
                                   )}
                                 </Button>
                               )}
-                              
                             </div>
                           </div>
                         ))}

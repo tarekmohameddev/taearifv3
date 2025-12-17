@@ -309,10 +309,12 @@ export function EnhancedSidebar({
           </TooltipProvider>
         </div>
 
-        <div className={cn(
-          "flex-1 py-2 px-1 overflow-y-auto overflow-x-hidden min-h-0",
-          isVeryShortScreen && "hide-scrollbar"
-        )}>
+        <div
+          className={cn(
+            "flex-1 py-2 px-1 overflow-y-auto overflow-x-hidden min-h-0",
+            isVeryShortScreen && "hide-scrollbar",
+          )}
+        >
           {error && (
             <div className="px-3 py-2">
               <span className="text-sm text-red-500">{error}</span>

@@ -1,6 +1,7 @@
 # Core Concepts - Essential Understanding for AI
 
 ## Table of Contents
+
 1. [Critical Identifiers](#critical-identifiers)
 2. [Data Priority System](#data-priority-system)
 3. [Store Architecture](#store-architecture)
@@ -33,16 +34,18 @@ Every component instance has THREE identifiers:
 **Format**: UUID v4 (e.g., `"3f4a8b2c-5d6e-4f7a-8b9c-0d1e2f3a4b5c"`)
 
 **Usage**:
+
 ```typescript
 // ✅ ALWAYS use for store operations
-getComponentData("hero", component.id)
-updateComponentByPath("hero", component.id, path, value)
+getComponentData("hero", component.id);
+updateComponentByPath("hero", component.id, path, value);
 
 // ❌ NEVER use componentName
-getComponentData("hero", component.componentName)  // WRONG!
+getComponentData("hero", component.componentName); // WRONG!
 ```
 
-**Critical Rule**: 
+**Critical Rule**:
+
 ```
 component.id = UNIQUE IDENTIFIER (like primary key in database)
 Use for ALL store operations
@@ -55,6 +58,7 @@ Use for ALL store operations
 **Format**: camelCase string (e.g., `"hero"`, `"halfTextHalfImage"`)
 
 **Usage**:
+
 ```typescript
 // Determines which store to use
 switch (component.type) {
@@ -69,6 +73,7 @@ switch (component.type) {
 ```
 
 **Critical Rule**:
+
 ```
 component.type = CATEGORY (determines store and functions)
 Used for routing to correct component functions
@@ -81,19 +86,20 @@ Used for routing to correct component functions
 **Format**: type + number (e.g., `"hero1"`, `"hero2"`, `"halfTextHalfImage3"`)
 
 **Usage**:
+
 ```typescript
 // Determines which React component to render
-const Component = dynamic(() => 
-  import(`@/components/tenant/${type}/${componentName}`)
+const Component = dynamic(
+  () => import(`@/components/tenant/${type}/${componentName}`),
 );
 
 // Determines default data function
-const defaultData = componentName === "hero2"
-  ? getDefaultHero2Data()
-  : getDefaultHeroData();
+const defaultData =
+  componentName === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
 ```
 
 **Critical Rule**:
+
 ```
 component.componentName = VARIANT (determines visual theme and defaults)
 Used for rendering and default data selection
@@ -138,32 +144,34 @@ When component renders, data merged in this order:
 
 5. currentStoreData          ← HIGHEST PRIORITY
    (from heroStates[id])
-   
+
 4. storeData
    (from getComponentData)
-   
+
 3. tenantComponentData
    (from database)
-   
+
 2. props
    (passed to component)
-   
+
 1. defaultData               ← LOWEST PRIORITY
    (from getDefaultHeroData)
 ```
 
 **Example**:
+
 ```typescript
 const mergedData = {
-  ...defaultData,           // Priority 1
-  ...props,                 // Priority 2
-  ...tenantComponentData,   // Priority 3
-  ...storeData,             // Priority 4
-  ...currentStoreData       // Priority 5 (wins!)
+  ...defaultData, // Priority 1
+  ...props, // Priority 2
+  ...tenantComponentData, // Priority 3
+  ...storeData, // Priority 4
+  ...currentStoreData, // Priority 5 (wins!)
 };
 ```
 
 **Result**:
+
 ```
 defaultData = { visible: true, title: "Default" }
 props = { title: "Prop Title" }
@@ -183,19 +191,20 @@ When saving edits, data merged in this order:
 
 3. tempData                  ← HIGHEST PRIORITY
    (latest edits)
-   
+
 2. storeData
    (previous edits)
-   
+
 1. existingComponent.data    ← LOWEST PRIORITY
    (original data)
 ```
 
 **Example**:
+
 ```typescript
 const mergedData = deepMerge(
   deepMerge(existingComponent.data, storeData),
-  tempData
+  tempData,
 );
 ```
 
@@ -255,6 +264,7 @@ const mergedData = deepMerge(
 5. **Persistence**: Original database data
 
 **Flow**:
+
 ```
 Database → tenantStore → editorStore → tempData → UI
          (load)        (init)        (edit)    (display)
@@ -366,13 +376,13 @@ updateGlobalComponentByPath("header", path, value)
 
 ### Critical Differences
 
-| Aspect | Page Components | Global Components |
-|--------|----------------|-------------------|
-| ID | UUID (e.g., "uuid-abc") | Special ("global-header") |
-| Storage | pageComponentsByPage | globalComponentsData |
-| Update Function | updateComponentByPath | updateGlobalComponentByPath |
-| Save Location | pages field in payload | globalComponentsData field |
-| Scope | Single page | All pages |
+| Aspect          | Page Components         | Global Components           |
+| --------------- | ----------------------- | --------------------------- |
+| ID              | UUID (e.g., "uuid-abc") | Special ("global-header")   |
+| Storage         | pageComponentsByPage    | globalComponentsData        |
+| Update Function | updateComponentByPath   | updateGlobalComponentByPath |
+| Save Location   | pages field in payload  | globalComponentsData field  |
+| Scope           | Single page             | All pages                   |
 
 **Rule**: ALWAYS check if component is global before operations
 
@@ -409,15 +419,16 @@ Data comes from three sources when saving:
 ```
 
 **Problem with Shallow Merge**:
+
 ```typescript
 const existing = {
   visible: true,
   content: { title: "Old", subtitle: "Old Sub" },
-  layout: { padding: "16px" }
+  layout: { padding: "16px" },
 };
 
 const temp = {
-  content: { title: "New" }
+  content: { title: "New" },
 };
 
 // ❌ Shallow merge
@@ -448,15 +459,15 @@ const deepMerge = (target: any, source: any): any => {
   if (!target || typeof target !== "object") {
     return source;
   }
-  
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
       if (
         source[key] &&
         typeof source[key] === "object" &&
-        !Array.isArray(source[key])  // Don't deep merge arrays
+        !Array.isArray(source[key]) // Don't deep merge arrays
       ) {
         // Recursively merge nested objects
         result[key] = deepMerge(target[key], source[key]);
@@ -466,16 +477,17 @@ const deepMerge = (target: any, source: any): any => {
       }
     }
   }
-  
+
   return result;
 };
 ```
 
 **Usage**:
+
 ```typescript
 const merged = deepMerge(
   deepMerge(existingComponent.data, storeData),
-  tempData
+  tempData,
 );
 ```
 
@@ -520,7 +532,7 @@ for (const segment of segments) {
 ### Path-Based Update
 
 ```typescript
-updateByPath("menu[0].text", "New Text")
+updateByPath("menu[0].text", "New Text");
 
 // Internally:
 // 1. Parse: ["menu", "0", "text"]
@@ -530,6 +542,7 @@ updateByPath("menu[0].text", "New Text")
 ```
 
 **Benefits**:
+
 - Precise updates to nested data
 - No need to know structure beforehand
 - Consistent API across all components
@@ -681,36 +694,36 @@ Benefit: Can cancel without affecting preview ✓
 ### Simple Paths
 
 ```typescript
-"visible"              // Top-level property
-"title"                // Top-level property
+"visible"; // Top-level property
+"title"; // Top-level property
 ```
 
 ### Nested Paths
 
 ```typescript
-"content.title"        // data.content.title
-"colors.background"    // data.colors.background
-"layout.padding.top"   // data.layout.padding.top
+"content.title"; // data.content.title
+"colors.background"; // data.colors.background
+"layout.padding.top"; // data.layout.padding.top
 ```
 
 ### Array Paths
 
 ```typescript
-"menu[0]"              // data.menu[0] (entire object)
-"menu[0].text"         // data.menu[0].text
-"menu[0].url"          // data.menu[0].url
+"menu[0]"; // data.menu[0] (entire object)
+"menu[0].text"; // data.menu[0].text
+"menu[0].url"; // data.menu[0].url
 ```
 
 ### Complex Paths
 
 ```typescript
-"menu[0].submenu[0].items[0].text"
+"menu[0].submenu[0].items[0].text";
 // data.menu[0].submenu[0].items[0].text
 
-"content.stats.stat1.value"
+"content.stats.stat1.value";
 // data.content.stats.stat1.value
 
-"background.overlay.colors.from"
+"background.overlay.colors.from";
 // data.background.overlay.colors.from
 ```
 
@@ -736,21 +749,21 @@ normalizePath("menu[0].[1].text")  → "menu.0.1.text"
 
 ```typescript
 // ✅ CORRECT - Use component.id
-store.getComponentData(component.type, component.id)
-store.updateComponentByPath(component.type, component.id, path, value)
+store.getComponentData(component.type, component.id);
+store.updateComponentByPath(component.type, component.id, path, value);
 
 // ❌ WRONG - Don't use componentName
-store.getComponentData(component.type, component.componentName)
+store.getComponentData(component.type, component.componentName);
 ```
 
 ### Rule 2: Deep Merge When Saving
 
 ```typescript
 // ✅ CORRECT
-const merged = deepMerge(deepMerge(a, b), c)
+const merged = deepMerge(deepMerge(a, b), c);
 
 // ❌ WRONG
-const merged = { ...a, ...b, ...c }
+const merged = { ...a, ...b, ...c };
 ```
 
 ### Rule 3: Update ALL Stores
@@ -759,13 +772,13 @@ const merged = { ...a, ...b, ...c }
 // ✅ CORRECT - Both stores updated
 return {
   heroStates: { ...state.heroStates, [id]: data },
-  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated }
-}
+  pageComponentsByPage: { ...state.pageComponentsByPage, [page]: updated },
+};
 
 // ❌ WRONG - Only one store
 return {
-  heroStates: { ...state.heroStates, [id]: data }
-}
+  heroStates: { ...state.heroStates, [id]: data },
+};
 ```
 
 ### Rule 4: Check for Global Components
@@ -788,7 +801,7 @@ updateComponentByPath(type, id, path, value);
 // ✅ CORRECT
 handleClick() {
   setLocalState(value);
-  
+
   setTimeout(() => {
     store.updateStore(value);
   }, 0);
@@ -813,7 +826,7 @@ if (!component || !component.id) {
 performOperation(component);
 
 // ❌ WRONG - No validation
-performOperation(component);  // Could crash!
+performOperation(component); // Could crash!
 ```
 
 ### Rule 7: Use Normalized Paths
@@ -842,6 +855,7 @@ const title = data.content.title;
 ## Quick Reference Card
 
 ### Component Identifiers
+
 ```
 component.id          → UUID (unique identifier) → USE FOR STORE OPS
 component.type        → "hero" (category) → USE FOR ROUTING
@@ -849,26 +863,31 @@ component.componentName → "hero1" (variant) → USE FOR RENDERING
 ```
 
 ### Data Priority (Rendering)
+
 ```
 currentStoreData > storeData > tenantData > props > defaults
 ```
 
 ### Data Priority (Saving)
+
 ```
 tempData > storeData > existingData
 ```
 
 ### Store Layers
+
 ```
 pageComponents (local) → tempData → componentStates → pageComponentsByPage → database
 ```
 
 ### Update Flow
+
 ```
 Edit → tempData → Save → componentStates → Preview
 ```
 
 ### Global Components
+
 ```
 IDs: "global-header", "global-footer"
 Storage: globalComponentsData
@@ -876,6 +895,7 @@ Update: updateGlobalComponentByPath
 ```
 
 ### Path Syntax
+
 ```
 "title"                    → Simple
 "content.title"            → Nested
@@ -884,6 +904,7 @@ Update: updateGlobalComponentByPath
 ```
 
 ### Common Functions
+
 ```
 ensureComponentVariant(type, id, initial)
 getComponentData(type, id)
@@ -956,14 +977,15 @@ These core concepts are ESSENTIAL for AI understanding:
 8. **Store synchronization** - Update all relevant stores
 
 **For AI**:
+
 - Memorize these concepts
 - Apply in all Live Editor operations
 - Reference when uncertain
 - Follow rules strictly
 
 **For Development**:
+
 - Quick reference for key concepts
 - Mental model for system design
 - Decision tree for operations
 - Rules to prevent bugs
-

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import axiosInstance from "@/lib/axiosInstance"
+import { useState, useEffect, useCallback } from "react";
+import axiosInstance from "@/lib/axiosInstance";
 import {
   Home,
   MapPin,
@@ -27,59 +27,95 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 // Added Table components
 
 interface Reservation {
-  id: string
-  type: "rent" | "buy"
-  status: "pending" | "accepted" | "rejected"
+  id: string;
+  type: "rent" | "buy";
+  status: "pending" | "accepted" | "rejected";
   customer: {
-    id: string
-    name: string
-    email: string
-    phone: string
-    avatar: string
-  }
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    avatar: string;
+  };
   property: {
-    id: string
-    title: string
-    address: string
-    price: number
-    type: string
-    bedrooms: number
-    bathrooms: number
-    image: string
-    projectName: string
-    buildingName: string
-  }
-  requestDate: string
-  desiredDate?: string
-  duration?: number
-  paymentRequired: boolean
-  depositAmount?: number
-  notes: string
-  documents?: Array<{ id: string; name: string; type: string; uploadedAt: string }>
-  messages?: Array<{ id: string; sender: string; content: string; timestamp: string }>
-  timeline?: Array<{ id: string; action: string; timestamp: string; actor: string }>
+    id: string;
+    title: string;
+    address: string;
+    price: number;
+    type: string;
+    bedrooms: number;
+    bathrooms: number;
+    image: string;
+    projectName: string;
+    buildingName: string;
+  };
+  requestDate: string;
+  desiredDate?: string;
+  duration?: number;
+  paymentRequired: boolean;
+  depositAmount?: number;
+  notes: string;
+  documents?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    uploadedAt: string;
+  }>;
+  messages?: Array<{
+    id: string;
+    sender: string;
+    content: string;
+    timestamp: string;
+  }>;
+  timeline?: Array<{
+    id: string;
+    action: string;
+    timestamp: string;
+    actor: string;
+  }>;
 }
 
 export function PropertyReservationsPage() {
-  const [reservations, setReservations] = useState<Reservation[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -88,63 +124,68 @@ export function PropertyReservationsPage() {
     totalRevenue: 0,
     byType: { rent: 0, buy: 0 },
     byMonth: [] as Array<{ month: string; reservations: number }>,
-  })
+  });
 
-  const [selectedReservations, setSelectedReservations] = useState<Set<string>>(new Set())
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterType, setFilterType] = useState<"all" | "rent" | "buy">("all")
-  const [filterCustomerTier, setFilterCustomerTier] = useState<string>("all")
-  const [sortBy, setSortBy] = useState<"date" | "price" | "name">("date")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [selectedReservations, setSelectedReservations] = useState<Set<string>>(
+    new Set(),
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<"all" | "rent" | "buy">("all");
+  const [filterCustomerTier, setFilterCustomerTier] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "price" | "name">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [perPage, setPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [pagination, setPagination] = useState({
     total: 0,
     lastPage: 1,
     from: 0,
     to: 0,
-  })
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
-  const [showDetailDialog, setShowDetailDialog] = useState(false)
-  const [showActionDialog, setShowActionDialog] = useState(false)
-  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false)
-  const [action, setAction] = useState<"accept" | "reject" | null>(null)
-  const [actionReason, setActionReason] = useState("")
-  const [confirmPayment, setConfirmPayment] = useState(false)
-  const [messageText, setMessageText] = useState("")
-  const [detailTab, setDetailTab] = useState("overview")
+  });
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [showActionDialog, setShowActionDialog] = useState(false);
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [action, setAction] = useState<"accept" | "reject" | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [confirmPayment, setConfirmPayment] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [detailTab, setDetailTab] = useState("overview");
 
   // Fetch reservations from API
   const fetchReservations = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const params = new URLSearchParams()
-      if (filterType !== "all") params.append("type", filterType)
-      if (searchQuery) params.append("search", searchQuery)
-      params.append("sort_by", sortBy)
-      params.append("sort_order", sortOrder)
-      params.append("page", currentPage.toString())
-      params.append("per_page", perPage.toString())
+      const params = new URLSearchParams();
+      if (filterType !== "all") params.append("type", filterType);
+      if (searchQuery) params.append("search", searchQuery);
+      params.append("sort_by", sortBy);
+      params.append("sort_order", sortOrder);
+      params.append("page", currentPage.toString());
+      params.append("per_page", perPage.toString());
 
-      const response = await axiosInstance.get(`/api/v1/reservations?${params.toString()}`)
+      const response = await axiosInstance.get(
+        `/api/v1/reservations?${params.toString()}`,
+      );
 
       if (response.data.success && response.data.data) {
-        const reservationsData = response.data.data.reservations || []
-        setReservations(reservationsData)
+        const reservationsData = response.data.data.reservations || [];
+        setReservations(reservationsData);
 
         // Update pagination from response
         if (response.data.data.pagination) {
-          const paginationData = response.data.data.pagination
+          const paginationData = response.data.data.pagination;
           setPagination({
             total: paginationData.total || 0,
             lastPage: paginationData.last_page || 1,
             from: paginationData.from || 0,
             to: paginationData.to || 0,
-          })
+          });
         }
 
         // Update stats if available in response
@@ -157,26 +198,26 @@ export function PropertyReservationsPage() {
             totalRevenue: response.data.data.stats.totalRevenue || 0,
             byType: response.data.data.stats.byType || { rent: 0, buy: 0 },
             byMonth: response.data.data.stats.byMonth || [],
-          })
+          });
         }
       }
     } catch (err: any) {
-      console.error("Error fetching reservations:", err)
-      setError(err.response?.data?.message || "حدث خطأ أثناء جلب الحجوزات")
+      console.error("Error fetching reservations:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء جلب الحجوزات");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [filterType, searchQuery, sortBy, sortOrder, currentPage, perPage])
+  }, [filterType, searchQuery, sortBy, sortOrder, currentPage, perPage]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
-    setCurrentPage(1)
-  }, [filterType, searchQuery, sortBy, sortOrder])
+    setCurrentPage(1);
+  }, [filterType, searchQuery, sortBy, sortOrder]);
 
   // Fetch stats from API
   const fetchReservationsStats = useCallback(async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/reservations/stats")
+      const response = await axiosInstance.get("/api/v1/reservations/stats");
 
       if (response.data.success && response.data.data) {
         setStats({
@@ -187,41 +228,41 @@ export function PropertyReservationsPage() {
           totalRevenue: response.data.data.totalRevenue || 0,
           byType: response.data.data.byType || { rent: 0, buy: 0 },
           byMonth: response.data.data.byMonth || [],
-        })
+        });
       }
     } catch (err: any) {
-      console.error("Error fetching stats:", err)
+      console.error("Error fetching stats:", err);
     }
-  }, [])
+  }, []);
 
   // Fetch single reservation details
   const fetchReservationDetails = useCallback(async (id: string) => {
     try {
-      const response = await axiosInstance.get(`/api/v1/reservations/${id}`)
+      const response = await axiosInstance.get(`/api/v1/reservations/${id}`);
 
       if (response.data.success && response.data.data) {
-        setSelectedReservation(response.data.data)
-        setShowDetailDialog(true)
-        setDetailTab("overview")
+        setSelectedReservation(response.data.data);
+        setShowDetailDialog(true);
+        setDetailTab("overview");
       }
     } catch (err: any) {
-      console.error("Error fetching reservation details:", err)
-      setError(err.response?.data?.message || "حدث خطأ أثناء جلب تفاصيل الحجز")
+      console.error("Error fetching reservation details:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء جلب تفاصيل الحجز");
     }
-  }, [])
+  }, []);
 
   // Load data on mount
   useEffect(() => {
-    fetchReservations()
-    fetchReservationsStats()
+    fetchReservations();
+    fetchReservationsStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   // Refetch when filters change
   useEffect(() => {
-    fetchReservations()
+    fetchReservations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterType, searchQuery, sortBy, sortOrder])
+  }, [filterType, searchQuery, sortBy, sortOrder]);
 
   const filteredReservations = reservations
     .filter((r) => {
@@ -229,242 +270,285 @@ export function PropertyReservationsPage() {
         r.property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.property.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.property.projectName.toLowerCase().includes(searchQuery.toLowerCase()) || // Added search by project name
-        r.property.buildingName.toLowerCase().includes(searchQuery.toLowerCase()) // Added search by building name
+        r.property.projectName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) || // Added search by project name
+        r.property.buildingName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()); // Added search by building name
 
-      const matchesType = filterType === "all" || r.type === filterType
-      const matchesTier = filterCustomerTier === "all" || r.customer.id === filterCustomerTier
+      const matchesType = filterType === "all" || r.type === filterType;
+      const matchesTier =
+        filterCustomerTier === "all" || r.customer.id === filterCustomerTier;
 
-      return matchesSearch && matchesType && matchesTier
+      return matchesSearch && matchesType && matchesTier;
     })
     .sort((a, b) => {
-      let compareValue = 0
+      let compareValue = 0;
 
       switch (sortBy) {
         case "date":
-          compareValue = new Date(a.requestDate).getTime() - new Date(b.requestDate).getTime()
-          break
+          compareValue =
+            new Date(a.requestDate).getTime() -
+            new Date(b.requestDate).getTime();
+          break;
         case "price":
-          compareValue = a.property.price - b.property.price
-          break
+          compareValue = a.property.price - b.property.price;
+          break;
         case "name":
-          compareValue = a.property.title.localeCompare(b.property.title)
-          break
+          compareValue = a.property.title.localeCompare(b.property.title);
+          break;
       }
 
-      return sortOrder === "asc" ? compareValue : -compareValue
-    })
+      return sortOrder === "asc" ? compareValue : -compareValue;
+    });
 
-  const pendingReservations = filteredReservations.filter((r) => r.status === "pending")
-  const acceptedReservations = filteredReservations.filter((r) => r.status === "accepted")
-  const rejectedReservations = filteredReservations.filter((r) => r.status === "rejected")
+  const pendingReservations = filteredReservations.filter(
+    (r) => r.status === "pending",
+  );
+  const acceptedReservations = filteredReservations.filter(
+    (r) => r.status === "accepted",
+  );
+  const rejectedReservations = filteredReservations.filter(
+    (r) => r.status === "rejected",
+  );
 
   // Adaptive font sizing in px: decreases size as text length grows
-  const getAdaptiveFontSizePx = (text: string, options?: { base?: number; min?: number; step?: number; charsPerStep?: number }) => {
-    const t = text || ""
-    const base = options?.base ?? 16 // px
-    const min = options?.min ?? 11 // px
-    const step = options?.step ?? 1 // px decrease per step
-    const charsPerStep = options?.charsPerStep ?? 10 // characters per step
-    const steps = Math.floor(t.length / charsPerStep)
-    const size = Math.max(min, base - steps * step)
-    return size
-  }
+  const getAdaptiveFontSizePx = (
+    text: string,
+    options?: {
+      base?: number;
+      min?: number;
+      step?: number;
+      charsPerStep?: number;
+    },
+  ) => {
+    const t = text || "";
+    const base = options?.base ?? 16; // px
+    const min = options?.min ?? 11; // px
+    const step = options?.step ?? 1; // px decrease per step
+    const charsPerStep = options?.charsPerStep ?? 10; // characters per step
+    const steps = Math.floor(t.length / charsPerStep);
+    const size = Math.max(min, base - steps * step);
+    return size;
+  };
 
   const handleSelectReservation = (id: string) => {
-    const newSelected = new Set(selectedReservations)
+    const newSelected = new Set(selectedReservations);
     if (newSelected.has(id)) {
-      newSelected.delete(id)
+      newSelected.delete(id);
     } else {
-      newSelected.add(id)
+      newSelected.add(id);
     }
-    setSelectedReservations(newSelected)
-  }
+    setSelectedReservations(newSelected);
+  };
 
   const handleSelectAll = (reservations: Reservation[]) => {
     if (selectedReservations.size === reservations.length) {
-      setSelectedReservations(new Set())
+      setSelectedReservations(new Set());
     } else {
-      setSelectedReservations(new Set(reservations.map((r) => r.id)))
+      setSelectedReservations(new Set(reservations.map((r) => r.id)));
     }
-  }
+  };
 
   const handleBulkAction = async (actionType: "accept" | "reject") => {
-    const selectedIds = Array.from(selectedReservations)
-    if (selectedIds.length === 0) return
+    const selectedIds = Array.from(selectedReservations);
+    if (selectedIds.length === 0) return;
 
     try {
-      const response = await axiosInstance.post("/api/v1/reservations/bulk-action", {
-        action: actionType,
-        reservationIds: selectedIds,
-        notes: actionType === "accept" ? "قبول جماعي" : "رفض جماعي",
-      })
+      const response = await axiosInstance.post(
+        "/api/v1/reservations/bulk-action",
+        {
+          action: actionType,
+          reservationIds: selectedIds,
+          notes: actionType === "accept" ? "قبول جماعي" : "رفض جماعي",
+        },
+      );
 
       if (response.data.success) {
         // Refresh reservations list
-        await fetchReservations()
-        await fetchReservationsStats()
-        setSelectedReservations(new Set())
+        await fetchReservations();
+        await fetchReservationsStats();
+        setSelectedReservations(new Set());
       }
     } catch (err: any) {
-      console.error("Error performing bulk action:", err)
-      setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء")
+      console.error("Error performing bulk action:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء");
     }
-  }
+  };
 
   const handleExport = async (format: "csv" | "pdf") => {
     if (format === "csv") {
       try {
-        setLoading(true)
-        setError(null)
+        setLoading(true);
+        setError(null);
 
         // بناء معاملات البحث والفلترة
-        const params = new URLSearchParams()
-        if (filterType !== "all") params.append("type", filterType)
-        if (searchQuery) params.append("search", searchQuery)
-        if (sortBy) params.append("sort_by", sortBy)
-        if (sortOrder) params.append("sort_order", sortOrder)
+        const params = new URLSearchParams();
+        if (filterType !== "all") params.append("type", filterType);
+        if (searchQuery) params.append("search", searchQuery);
+        if (sortBy) params.append("sort_by", sortBy);
+        if (sortOrder) params.append("sort_order", sortOrder);
 
         // جلب ملف CSV
-        const response = await axiosInstance.get(`/api/v1/reservations/export/csv?${params.toString()}`, {
-          responseType: "blob",
-          headers: {
-            Accept: "text/csv",
+        const response = await axiosInstance.get(
+          `/api/v1/reservations/export/csv?${params.toString()}`,
+          {
+            responseType: "blob",
+            headers: {
+              Accept: "text/csv",
+            },
           },
-        })
+        );
 
         // التحقق من أن الاستجابة هي blob
         if (response.data instanceof Blob) {
           // الحصول على اسم الملف من headers أو استخدام اسم افتراضي
-          const contentDisposition = response.headers["content-disposition"]
-          let filename = `reservations-${new Date().toISOString().split("T")[0]}.csv`
+          const contentDisposition = response.headers["content-disposition"];
+          let filename = `reservations-${new Date().toISOString().split("T")[0]}.csv`;
 
           if (contentDisposition) {
-            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+            const filenameMatch = contentDisposition.match(
+              /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+            );
             if (filenameMatch && filenameMatch[1]) {
-              filename = filenameMatch[1].replace(/['"]/g, "")
+              filename = filenameMatch[1].replace(/['"]/g, "");
             }
           }
 
           // إنشاء رابط للتحميل
-          const url = window.URL.createObjectURL(response.data)
-          const link = document.createElement("a")
-          link.href = url
-          link.download = filename
-          document.body.appendChild(link)
-          link.click()
+          const url = window.URL.createObjectURL(response.data);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
 
           // تنظيف
-          document.body.removeChild(link)
-          window.URL.revokeObjectURL(url)
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
         } else {
-          throw new Error("استجابة غير صحيحة من الخادم")
+          throw new Error("استجابة غير صحيحة من الخادم");
         }
       } catch (err: any) {
-        console.error("Error exporting reservations:", err)
-        
+        console.error("Error exporting reservations:", err);
+
         // معالجة الأخطاء
         if (err.response) {
           // محاولة قراءة رسالة الخطأ من blob response
           if (err.response.data instanceof Blob) {
-            const reader = new FileReader()
+            const reader = new FileReader();
             reader.onload = async () => {
               try {
-                const text = reader.result as string
-                const errorData = JSON.parse(text)
-                setError(errorData.message || "حدث خطأ أثناء تصدير الحجوزات")
+                const text = reader.result as string;
+                const errorData = JSON.parse(text);
+                setError(errorData.message || "حدث خطأ أثناء تصدير الحجوزات");
               } catch {
-                setError("حدث خطأ أثناء تصدير الحجوزات")
+                setError("حدث خطأ أثناء تصدير الحجوزات");
               }
-            }
-            reader.readAsText(err.response.data)
+            };
+            reader.readAsText(err.response.data);
           } else {
-            setError(err.response?.data?.message || "حدث خطأ أثناء تصدير الحجوزات")
+            setError(
+              err.response?.data?.message || "حدث خطأ أثناء تصدير الحجوزات",
+            );
           }
         } else if (err.request) {
-          setError("تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت")
+          setError("تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت");
         } else {
-          setError(err.message || "حدث خطأ أثناء تصدير الحجوزات")
+          setError(err.message || "حدث خطأ أثناء تصدير الحجوزات");
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
     // PDF export غير مدعوم حالياً
-  }
+  };
 
   const handleAddMessage = async () => {
-    if (!selectedReservation || !messageText.trim()) return
+    if (!selectedReservation || !messageText.trim()) return;
 
     try {
       // Note: Add message API endpoint should be implemented in backend
       // For now, we'll refresh the reservation details
-      await fetchReservationDetails(selectedReservation.id)
-      setMessageText("")
+      await fetchReservationDetails(selectedReservation.id);
+      setMessageText("");
     } catch (err: any) {
-      console.error("Error adding message:", err)
-      setError(err.response?.data?.message || "حدث خطأ أثناء إضافة الرسالة")
+      console.error("Error adding message:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء إضافة الرسالة");
     }
-  }
+  };
 
   const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
-    const dayName = days[date.getDay()]
-    const dateFormatted = date.toLocaleDateString("ar-US")
-    const time = date.toLocaleTimeString("ar-US", { hour: "2-digit", minute: "2-digit", hour12: true })
-    return `${dayName} ${dateFormatted} - ${time}`
-  }
+    const date = new Date(dateString);
+    const days = [
+      "الأحد",
+      "الإثنين",
+      "الثلاثاء",
+      "الأربعاء",
+      "الخميس",
+      "الجمعة",
+      "السبت",
+    ];
+    const dayName = days[date.getDay()];
+    const dateFormatted = date.toLocaleDateString("ar-US");
+    const time = date.toLocaleTimeString("ar-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return `${dayName} ${dateFormatted} - ${time}`;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300"
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
       case "accepted":
-        return "bg-green-100 text-green-800 border-green-300"
+        return "bg-green-100 text-green-800 border-green-300";
       case "rejected":
-        return "bg-red-100 text-red-800 border-red-300"
+        return "bg-red-100 text-red-800 border-red-300";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300"
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
-  }
+  };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
-        return "قيد الانتظار"
+        return "قيد الانتظار";
       case "accepted":
-        return "مقبول"
+        return "مقبول";
       case "rejected":
-        return "مرفوض"
+        return "مرفوض";
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   const getTypeLabel = (type: string) => {
-    return type === "rent" ? "إيجار" : "شراء"
-  }
+    return type === "rent" ? "إيجار" : "شراء";
+  };
 
   const handleViewDetails = async (reservation: Reservation) => {
     // Fetch full details from API
-    await fetchReservationDetails(reservation.id)
-  }
+    await fetchReservationDetails(reservation.id);
+  };
 
   const handleActionClick = (actionType: "accept" | "reject") => {
-    setAction(actionType)
-    setActionReason("")
-    setShowActionDialog(true)
-  }
+    setAction(actionType);
+    setActionReason("");
+    setShowActionDialog(true);
+  };
 
   const handleConfirmAction = async () => {
-    if (!selectedReservation) return
+    if (!selectedReservation) return;
 
     try {
       const endpoint =
         action === "accept"
           ? `/api/v1/reservations/${selectedReservation.id}/accept`
-          : `/api/v1/reservations/${selectedReservation.id}/reject`
+          : `/api/v1/reservations/${selectedReservation.id}/reject`;
 
       const payload =
         action === "accept"
@@ -474,36 +558,36 @@ export function PropertyReservationsPage() {
             }
           : {
               reason: actionReason || undefined,
-            }
+            };
 
-      const response = await axiosInstance.post(endpoint, payload)
+      const response = await axiosInstance.post(endpoint, payload);
 
       if (response.data.success) {
         // Refresh reservations list and stats
-        await fetchReservations()
-        await fetchReservationsStats()
+        await fetchReservations();
+        await fetchReservationsStats();
 
         // Update selected reservation if dialog is still open
         if (showDetailDialog) {
-          await fetchReservationDetails(selectedReservation.id)
+          await fetchReservationDetails(selectedReservation.id);
         }
 
-        setShowActionDialog(false)
-        setActionReason("")
-        setConfirmPayment(false)
+        setShowActionDialog(false);
+        setActionReason("");
+        setConfirmPayment(false);
       }
     } catch (err: any) {
-      console.error("Error confirming action:", err)
-      setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء")
+      console.error("Error confirming action:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء");
     }
-  }
+  };
 
   // Use stats from API instead of calculating from reservations
-  const totalReservations = stats.total
-  const totalPending = stats.pending
-  const totalAccepted = stats.accepted
-  const totalRejected = stats.rejected
-  const totalRevenue = stats.totalRevenue
+  const totalReservations = stats.total;
+  const totalPending = stats.pending;
+  const totalAccepted = stats.accepted;
+  const totalRejected = stats.rejected;
+  const totalRevenue = stats.totalRevenue;
 
   const chartData = {
     byType: [
@@ -538,56 +622,95 @@ export function PropertyReservationsPage() {
     byMonth: stats.byMonth
       ? stats.byMonth.map((item) => {
           try {
-            const monthDate = new Date(item.month + "-01")
+            const monthDate = new Date(item.month + "-01");
             if (isNaN(monthDate.getTime())) {
-              return { month: item.month, reservations: item.reservations || 0 }
+              return {
+                month: item.month,
+                reservations: item.reservations || 0,
+              };
             }
             return {
               month: monthDate.toLocaleDateString("ar-US", { month: "long" }),
               reservations: item.reservations || 0,
-            }
+            };
           } catch {
-            return { month: item.month, reservations: item.reservations || 0 }
+            return { month: item.month, reservations: item.reservations || 0 };
           }
         })
       : [],
-  }
+  };
 
   // Removed ReservationCard component as it's replaced by ReservationsTable
   // const ReservationCard = ({ reservation }: { reservation: Reservation }) => ( ... )
 
-  const ReservationsTable = ({ reservations }: { reservations: Reservation[] }) => (
-    <Card className="flex max-w-full overflow-hidden" style={{ maxWidth: '100%' }}>
-      <CardContent className="p-0 max-w-full flex overflow-hidden" style={{ maxWidth: '100%' }}>
-        <div 
-          className="overflow-x-auto w-full" 
-          style={{ 
-            maxWidth: '100%', 
-            width: '100%',
-            overflowX: 'auto',
-            overflowY: 'hidden'
+  const ReservationsTable = ({
+    reservations,
+  }: {
+    reservations: Reservation[];
+  }) => (
+    <Card
+      className="flex max-w-full overflow-hidden"
+      style={{ maxWidth: "100%" }}
+    >
+      <CardContent
+        className="p-0 max-w-full flex overflow-hidden"
+        style={{ maxWidth: "100%" }}
+      >
+        <div
+          className="overflow-x-auto w-full"
+          style={{
+            maxWidth: "100%",
+            width: "100%",
+            overflowX: "auto",
+            overflowY: "hidden",
           }}
         >
-          <table className="border-collapse" style={{ minWidth: '1200px', width: '100%' }}>
+          <table
+            className="border-collapse"
+            style={{ minWidth: "1200px", width: "100%" }}
+          >
             <thead>
               <tr className="border-b bg-muted/50">
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
                   <Checkbox
-                    checked={selectedReservations.size === reservations.length && reservations.length > 0}
+                    checked={
+                      selectedReservations.size === reservations.length &&
+                      reservations.length > 0
+                    }
                     onCheckedChange={() => handleSelectAll(reservations)}
                     className="w-5 h-5"
                   />
                 </th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العقار</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم المشروع</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم العمارة</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العميل</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">النوع</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">التاريخ والوقت</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">السعر</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">الدفعة</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">الحالة</th>
-                <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground text-sm">الإجراءات</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  العقار
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  اسم المشروع
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  اسم العمارة
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  العميل
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  النوع
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  التاريخ والوقت
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  السعر
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  الدفعة
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
+                  الحالة
+                </th>
+                <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground text-sm">
+                  الإجراءات
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -603,7 +726,9 @@ export function PropertyReservationsPage() {
                   <td className="p-4 align-middle">
                     <Checkbox
                       checked={selectedReservations.has(reservation.id)}
-                      onCheckedChange={() => handleSelectReservation(reservation.id)}
+                      onCheckedChange={() =>
+                        handleSelectReservation(reservation.id)
+                      }
                       onClick={(e) => e.stopPropagation()}
                       className="w-5 h-5"
                     />
@@ -620,7 +745,10 @@ export function PropertyReservationsPage() {
                       <div>
                         <p
                           className="font-medium"
-                          style={{ fontSize: `${getAdaptiveFontSizePx(reservation.property.title, { base: 16, min: 11, step: 1, charsPerStep: 10 })}px`, lineHeight: "1.25" }}
+                          style={{
+                            fontSize: `${getAdaptiveFontSizePx(reservation.property.title, { base: 16, min: 11, step: 1, charsPerStep: 10 })}px`,
+                            lineHeight: "1.25",
+                          }}
                         >
                           {reservation.property.title}
                         </p>
@@ -630,19 +758,27 @@ export function PropertyReservationsPage() {
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{reservation.property.projectName}</span>
+                      <span className="text-sm">
+                        {reservation.property.projectName}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{reservation.property.buildingName}</span>
+                      <span className="text-sm">
+                        {reservation.property.buildingName}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4 align-middle">
                     <div>
-                      <p className="font-medium text-sm">{reservation.customer.name}</p>
-                      <p className="text-xs text-muted-foreground">{reservation.customer.phone}</p>
+                      <p className="font-medium text-sm">
+                        {reservation.customer.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {reservation.customer.phone}
+                      </p>
                     </div>
                   </td>
                   <td className="p-4 align-middle">
@@ -653,7 +789,9 @@ export function PropertyReservationsPage() {
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="whitespace-nowrap">{formatDateTime(reservation.requestDate)}</span>
+                      <span className="whitespace-nowrap">
+                        {formatDateTime(reservation.requestDate)}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4 align-middle">
@@ -670,11 +808,16 @@ export function PropertyReservationsPage() {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-muted-foreground">لا يوجد</span>
+                      <span className="text-xs text-muted-foreground">
+                        لا يوجد
+                      </span>
                     )}
                   </td>
                   <td className="p-4 align-middle">
-                    <Badge variant="outline" className={`text-xs ${getStatusColor(reservation.status)}`}>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${getStatusColor(reservation.status)}`}
+                    >
                       {getStatusLabel(reservation.status)}
                     </Badge>
                   </td>
@@ -684,8 +827,8 @@ export function PropertyReservationsPage() {
                         size="sm"
                         variant="ghost"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          handleViewDetails(reservation)
+                          e.stopPropagation();
+                          handleViewDetails(reservation);
                         }}
                         className="h-8 px-2"
                       >
@@ -697,9 +840,9 @@ export function PropertyReservationsPage() {
                             size="sm"
                             className="h-8 px-3 bg-green-500 hover:bg-green-600 text-white"
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedReservation(reservation)
-                              handleActionClick("accept")
+                              e.stopPropagation();
+                              setSelectedReservation(reservation);
+                              handleActionClick("accept");
                             }}
                           >
                             <Check className="h-4 w-4" />
@@ -709,9 +852,9 @@ export function PropertyReservationsPage() {
                             variant="destructive"
                             className="h-8 px-3"
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedReservation(reservation)
-                              handleActionClick("reject")
+                              e.stopPropagation();
+                              setSelectedReservation(reservation);
+                              handleActionClick("reject");
                             }}
                           >
                             <X className="h-4 w-4" />
@@ -727,10 +870,13 @@ export function PropertyReservationsPage() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 
   return (
-    <div className="w-full min-h-screen overflow-x-hidden" style={{ maxWidth: '100vw' }}>
+    <div
+      className="w-full min-h-screen overflow-x-hidden"
+      style={{ maxWidth: "100vw" }}
+    >
       <div className="mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-6 max-w-full">
         {/* Error Message */}
         {error && (
@@ -753,7 +899,9 @@ export function PropertyReservationsPage() {
         {loading && (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-muted-foreground">جاري تحميل البيانات...</p>
+              <p className="text-sm text-muted-foreground">
+                جاري تحميل البيانات...
+              </p>
             </CardContent>
           </Card>
         )}
@@ -762,7 +910,9 @@ export function PropertyReservationsPage() {
         <div className="space-y-2 min-w-0 ">
           <div className="flex flex-col gap-4">
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">حجوزات العقارات</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
+                حجوزات العقارات
+              </h1>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 إدارة طلبات الإيجار والشراء من العملاء
               </p>
@@ -776,18 +926,22 @@ export function PropertyReservationsPage() {
                 }}
                 onMouseEnter={(e) => {
                   if (totalReservations === 0 || !totalReservations) {
-                    const tooltip = e.currentTarget.querySelector('[data-tooltip]') as HTMLElement
+                    const tooltip = e.currentTarget.querySelector(
+                      "[data-tooltip]",
+                    ) as HTMLElement;
                     if (tooltip) {
-                      tooltip.style.opacity = "1"
-                      tooltip.style.visibility = "visible"
+                      tooltip.style.opacity = "1";
+                      tooltip.style.visibility = "visible";
                     }
                   }
                 }}
                 onMouseLeave={(e) => {
-                  const tooltip = e.currentTarget.querySelector('[data-tooltip]') as HTMLElement
+                  const tooltip = e.currentTarget.querySelector(
+                    "[data-tooltip]",
+                  ) as HTMLElement;
                   if (tooltip) {
-                    tooltip.style.opacity = "0"
-                    tooltip.style.visibility = "hidden"
+                    tooltip.style.opacity = "0";
+                    tooltip.style.visibility = "hidden";
                   }
                 }}
               >
@@ -819,7 +973,8 @@ export function PropertyReservationsPage() {
                       pointerEvents: "none",
                       opacity: 0,
                       visibility: "hidden",
-                      transition: "opacity 0.2s ease-in-out, visibility 0.2s ease-in-out",
+                      transition:
+                        "opacity 0.2s ease-in-out, visibility 0.2s ease-in-out",
                       direction: "rtl",
                       textAlign: "right",
                     }}
@@ -850,8 +1005,12 @@ export function PropertyReservationsPage() {
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-600 truncate">إجمالي الحجوزات</p>
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">{totalReservations}</p>
+                  <p className="text-xs font-medium text-slate-600 truncate">
+                    إجمالي الحجوزات
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+                    {totalReservations}
+                  </p>
                 </div>
                 <div className="p-2 bg-slate-200 rounded-lg flex-shrink-0">
                   <Home className="h-4 w-4 sm:h-5 sm:w-5 text-slate-700" />
@@ -864,8 +1023,12 @@ export function PropertyReservationsPage() {
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-yellow-700 truncate">قيد الانتظار</p>
-                  <p className="text-xl sm:text-2xl font-bold text-yellow-900 mt-1">{totalPending}</p>
+                  <p className="text-xs font-medium text-yellow-700 truncate">
+                    قيد الانتظار
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-900 mt-1">
+                    {totalPending}
+                  </p>
                 </div>
                 <div className="p-2 bg-yellow-200 rounded-lg flex-shrink-0">
                   <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-700" />
@@ -878,8 +1041,12 @@ export function PropertyReservationsPage() {
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-green-700 truncate">مقبولة</p>
-                  <p className="text-xl sm:text-2xl font-bold text-green-900 mt-1">{totalAccepted}</p>
+                  <p className="text-xs font-medium text-green-700 truncate">
+                    مقبولة
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-900 mt-1">
+                    {totalAccepted}
+                  </p>
                 </div>
                 <div className="p-2 bg-green-200 rounded-lg flex-shrink-0">
                   <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-700" />
@@ -893,12 +1060,16 @@ export function PropertyReservationsPage() {
         <div className="space-y-3 sm:space-y-4 ">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-            <h3 className="font-semibold text-sm sm:text-base truncate">تقارير وتحليلات</h3>
+            <h3 className="font-semibold text-sm sm:text-base truncate">
+              تقارير وتحليلات
+            </h3>
           </div>
 
           <Card className="">
             <CardHeader className="p-3 sm:p-4 md:p-6">
-              <CardTitle className="text-xs sm:text-sm md:text-base truncate">اتجاهات الحجوزات الشهرية</CardTitle>
+              <CardTitle className="text-xs sm:text-sm md:text-base truncate">
+                اتجاهات الحجوزات الشهرية
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-2 sm:p-3 md:p-6 ">
               <div className="w-full h-56 sm:h-64 md:h-80">
@@ -930,7 +1101,9 @@ export function PropertyReservationsPage() {
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                <h3 className="font-semibold text-sm sm:text-base truncate">البحث والتصفية</h3>
+                <h3 className="font-semibold text-sm sm:text-base truncate">
+                  البحث والتصفية
+                </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
@@ -944,7 +1117,10 @@ export function PropertyReservationsPage() {
                   />
                 </div>
 
-                <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                <Select
+                  value={filterType}
+                  onValueChange={(value: any) => setFilterType(value)}
+                >
                   <SelectTrigger className="bg-white border-slate-200 text-xs sm:text-sm h-9 sm:h-10">
                     <SelectValue placeholder="نوع الحجز" />
                   </SelectTrigger>
@@ -955,7 +1131,10 @@ export function PropertyReservationsPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value: any) => setSortBy(value)}
+                >
                   <SelectTrigger className="bg-white border-slate-200 text-xs sm:text-sm h-9 sm:h-10">
                     <SelectValue placeholder="ترتيب حسب" />
                   </SelectTrigger>
@@ -969,7 +1148,9 @@ export function PropertyReservationsPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
                   className="bg-white border-slate-200 h-9 sm:h-10"
                 >
                   <ArrowUpDown className="h-4 w-4" />
@@ -984,7 +1165,9 @@ export function PropertyReservationsPage() {
           <Card className="bg-blue-50 border-blue-200">
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <p className="text-xs sm:text-sm font-medium text-blue-900">تم تحديد {selectedReservations.size} حجز</p>
+                <p className="text-xs sm:text-sm font-medium text-blue-900">
+                  تم تحديد {selectedReservations.size} حجز
+                </p>
                 <div className="flex gap-2 flex-wrap">
                   <Button
                     size="sm"
@@ -1038,7 +1221,10 @@ export function PropertyReservationsPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pending" className="space-y-4 mt-4 sm:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl mx-auto">
+          <TabsContent
+            value="pending"
+            className="space-y-4 mt-4 sm:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl mx-auto"
+          >
             {pendingReservations.length > 0 ? (
               <>
                 <ReservationsTable reservations={pendingReservations} />
@@ -1052,8 +1238,8 @@ export function PropertyReservationsPage() {
                     from={pagination.from}
                     to={pagination.to}
                     onPageChange={(page) => {
-                      setCurrentPage(page)
-                      window.scrollTo({ top: 0, behavior: "smooth" })
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     onPerPageChange={setPerPage}
                     loading={loading}
@@ -1064,7 +1250,9 @@ export function PropertyReservationsPage() {
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
                   <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                  <p className="text-xs sm:text-sm text-muted-foreground">لا توجد حجوزات قيد الانتظار</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    لا توجد حجوزات قيد الانتظار
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -1084,8 +1272,8 @@ export function PropertyReservationsPage() {
                     from={pagination.from}
                     to={pagination.to}
                     onPageChange={(page) => {
-                      setCurrentPage(page)
-                      window.scrollTo({ top: 0, behavior: "smooth" })
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     onPerPageChange={setPerPage}
                     loading={loading}
@@ -1096,7 +1284,9 @@ export function PropertyReservationsPage() {
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
                   <Check className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                  <p className="text-xs sm:text-sm text-muted-foreground">لا توجد حجوزات مقبولة</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    لا توجد حجوزات مقبولة
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -1116,8 +1306,8 @@ export function PropertyReservationsPage() {
                     from={pagination.from}
                     to={pagination.to}
                     onPageChange={(page) => {
-                      setCurrentPage(page)
-                      window.scrollTo({ top: 0, behavior: "smooth" })
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     onPerPageChange={setPerPage}
                     loading={loading}
@@ -1128,7 +1318,9 @@ export function PropertyReservationsPage() {
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
                   <X className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                  <p className="text-xs sm:text-sm text-muted-foreground">لا توجد حجوزات مرفوضة</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    لا توجد حجوزات مرفوضة
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -1141,7 +1333,9 @@ export function PropertyReservationsPage() {
             {selectedReservation && (
               <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <DialogTitle className="text-lg sm:text-2xl mb-2">تفاصيل الحجز</DialogTitle>
+                  <DialogTitle className="text-lg sm:text-2xl mb-2">
+                    تفاصيل الحجز
+                  </DialogTitle>
                   <DialogDescription className="text-xs sm:text-sm">
                     معلومات كاملة عن طلب الحجز مع الوثائق والرسائل
                   </DialogDescription>
@@ -1170,50 +1364,75 @@ export function PropertyReservationsPage() {
                         <h3 className="font-semibold flex items-center gap-2">
                           <Home className="h-5 w-5" /> العقار
                         </h3>
-                        <Badge className={getStatusColor(selectedReservation.status)}>
+                        <Badge
+                          className={getStatusColor(selectedReservation.status)}
+                        >
                           {getStatusLabel(selectedReservation.status)}
                         </Badge>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                          <p className="text-sm text-muted-foreground">اسم العقار</p>
-                          <p className="font-medium">{selectedReservation.property.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            اسم العقار
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.property.title}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">النوع</p>
-                          <p className="font-medium">{selectedReservation.property.type}</p>
+                          <p className="font-medium">
+                            {selectedReservation.property.type}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">العنوان</p>
-                          <p className="font-medium">{selectedReservation.property.address}</p>
+                          <p className="text-sm text-muted-foreground">
+                            العنوان
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.property.address}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">السعر</p>
                           <p className="font-medium text-lg">
-                            {selectedReservation.property.price.toLocaleString()} ر.س
+                            {selectedReservation.property.price.toLocaleString()}{" "}
+                            ر.س
                             {selectedReservation.type === "rent" && "/شهر"}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">غرف النوم</p>
-                          <p className="font-medium">{selectedReservation.property.bedrooms}</p>
+                          <p className="text-sm text-muted-foreground">
+                            غرف النوم
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.property.bedrooms}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">الحمامات</p>
-                          <p className="font-medium">{selectedReservation.property.bathrooms}</p>
+                          <p className="text-sm text-muted-foreground">
+                            الحمامات
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.property.bathrooms}
+                          </p>
                         </div>
                       </div>
                       {/* Displaying Project and Building Names */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t">
                         <div>
-                          <p className="text-sm text-muted-foreground">اسم المشروع</p>
+                          <p className="text-sm text-muted-foreground">
+                            اسم المشروع
+                          </p>
                           <p className="font-medium flex items-center gap-2">
                             <Building2 className="h-4 w-4 text-muted-foreground" />{" "}
                             {selectedReservation.property.projectName}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">اسم العمارة</p>
+                          <p className="text-sm text-muted-foreground">
+                            اسم العمارة
+                          </p>
                           <p className="font-medium flex items-center gap-2">
                             <Building className="h-4 w-4 text-muted-foreground" />{" "}
                             {selectedReservation.property.buildingName}
@@ -1230,15 +1449,25 @@ export function PropertyReservationsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <p className="text-sm text-muted-foreground">الاسم</p>
-                          <p className="font-medium">{selectedReservation.customer.name}</p>
+                          <p className="font-medium">
+                            {selectedReservation.customer.name}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">البريد</p>
-                          <p className="font-medium text-sm">{selectedReservation.customer.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            البريد
+                          </p>
+                          <p className="font-medium text-sm">
+                            {selectedReservation.customer.email}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">الهاتف</p>
-                          <p className="font-medium">{selectedReservation.customer.phone}</p>
+                          <p className="text-sm text-muted-foreground">
+                            الهاتف
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.customer.phone}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1250,25 +1479,42 @@ export function PropertyReservationsPage() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                          <p className="text-sm text-muted-foreground">نوع الحجز</p>
-                          <p className="font-medium">{getTypeLabel(selectedReservation.type)}</p>
+                          <p className="text-sm text-muted-foreground">
+                            نوع الحجز
+                          </p>
+                          <p className="font-medium">
+                            {getTypeLabel(selectedReservation.type)}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">تاريخ الطلب</p>
-                          <p className="font-medium">{selectedReservation.requestDate}</p>
+                          <p className="text-sm text-muted-foreground">
+                            تاريخ الطلب
+                          </p>
+                          <p className="font-medium">
+                            {selectedReservation.requestDate}
+                          </p>
                         </div>
-                        {selectedReservation.type === "rent" && selectedReservation.desiredDate && (
-                          <>
-                            <div>
-                              <p className="text-sm text-muted-foreground">البداية المطلوبة</p>
-                              <p className="font-medium">{selectedReservation.desiredDate}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">المدة</p>
-                              <p className="font-medium">{selectedReservation.duration} شهر</p>
-                            </div>
-                          </>
-                        )}
+                        {selectedReservation.type === "rent" &&
+                          selectedReservation.desiredDate && (
+                            <>
+                              <div>
+                                <p className="text-sm text-muted-foreground">
+                                  البداية المطلوبة
+                                </p>
+                                <p className="font-medium">
+                                  {selectedReservation.desiredDate}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">
+                                  المدة
+                                </p>
+                                <p className="font-medium">
+                                  {selectedReservation.duration} شهر
+                                </p>
+                              </div>
+                            </>
+                          )}
                       </div>
                     </div>
 
@@ -1280,15 +1526,20 @@ export function PropertyReservationsPage() {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
-                            <p className="text-sm text-blue-700">المبلغ المطلوب</p>
+                            <p className="text-sm text-blue-700">
+                              المبلغ المطلوب
+                            </p>
                             <p className="font-bold text-lg text-blue-900">
-                              {selectedReservation.depositAmount?.toLocaleString()} ر.س
+                              {selectedReservation.depositAmount?.toLocaleString()}{" "}
+                              ر.س
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-blue-700">نوع الدفعة</p>
                             <p className="font-medium text-blue-900">
-                              {selectedReservation.type === "rent" ? "عربون إيجار" : "عربون شراء"}
+                              {selectedReservation.type === "rent"
+                                ? "عربون إيجار"
+                                : "عربون شراء"}
                             </p>
                           </div>
                         </div>
@@ -1304,7 +1555,11 @@ export function PropertyReservationsPage() {
                         >
                           <Check className="h-4 w-4 ml-2" /> قبول الحجز
                         </Button>
-                        <Button variant="destructive" className="flex-1" onClick={() => handleActionClick("reject")}>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={() => handleActionClick("reject")}
+                        >
                           <X className="h-4 w-4 ml-2" /> رفض الحجز
                         </Button>
                       </div>
@@ -1314,7 +1569,8 @@ export function PropertyReservationsPage() {
                   {/* Documents Tab */}
                   <TabsContent value="documents" className="space-y-4">
                     <div className="space-y-3">
-                      {selectedReservation.documents && selectedReservation.documents.length > 0 ? (
+                      {selectedReservation.documents &&
+                      selectedReservation.documents.length > 0 ? (
                         selectedReservation.documents.map((doc) => (
                           <div
                             key={doc.id}
@@ -1323,8 +1579,12 @@ export function PropertyReservationsPage() {
                             <div className="flex items-center gap-3">
                               <File className="h-5 w-5 text-blue-500" />
                               <div>
-                                <p className="font-medium text-sm">{doc.name}</p>
-                                <p className="text-xs text-muted-foreground">رفع في: {doc.uploadedAt}</p>
+                                <p className="font-medium text-sm">
+                                  {doc.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  رفع في: {doc.uploadedAt}
+                                </p>
                               </div>
                             </div>
                             <Button size="sm" variant="outline">
@@ -1333,11 +1593,16 @@ export function PropertyReservationsPage() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-sm">لا توجد وثائق مرفوعة</p>
+                        <p className="text-muted-foreground text-sm">
+                          لا توجد وثائق مرفوعة
+                        </p>
                       )}
                     </div>
 
-                    <Button className="w-full gap-2 bg-transparent" variant="outline">
+                    <Button
+                      className="w-full gap-2 bg-transparent"
+                      variant="outline"
+                    >
                       <Upload className="h-4 w-4" /> رفع وثيقة جديدة
                     </Button>
                   </TabsContent>
@@ -1345,7 +1610,8 @@ export function PropertyReservationsPage() {
                   {/* Messages Tab */}
                   <TabsContent value="messages" className="space-y-4">
                     <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {selectedReservation.messages && selectedReservation.messages.length > 0 ? (
+                      {selectedReservation.messages &&
+                      selectedReservation.messages.length > 0 ? (
                         selectedReservation.messages.map((msg) => (
                           <div
                             key={msg.id}
@@ -1357,14 +1623,20 @@ export function PropertyReservationsPage() {
                             )}
                           >
                             <div className="flex justify-between items-start">
-                              <p className="font-medium text-sm">{msg.sender}</p>
-                              <p className="text-xs text-muted-foreground">{msg.timestamp}</p>
+                              <p className="font-medium text-sm">
+                                {msg.sender}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {msg.timestamp}
+                              </p>
                             </div>
                             <p className="text-sm mt-2">{msg.content}</p>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-sm">لا توجد رسائل</p>
+                        <p className="text-muted-foreground text-sm">
+                          لا توجد رسائل
+                        </p>
                       )}
                     </div>
 
@@ -1374,10 +1646,14 @@ export function PropertyReservationsPage() {
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === "Enter") handleAddMessage()
+                          if (e.key === "Enter") handleAddMessage();
                         }}
                       />
-                      <Button size="icon" onClick={handleAddMessage} disabled={!messageText.trim()}>
+                      <Button
+                        size="icon"
+                        onClick={handleAddMessage}
+                        disabled={!messageText.trim()}
+                      >
                         <Send className="h-4 w-4" />
                       </Button>
                     </div>
@@ -1386,22 +1662,34 @@ export function PropertyReservationsPage() {
                   {/* Timeline Tab */}
                   <TabsContent value="timeline" className="space-y-4">
                     <div className="space-y-3">
-                      {selectedReservation.timeline && selectedReservation.timeline.length > 0 ? (
+                      {selectedReservation.timeline &&
+                      selectedReservation.timeline.length > 0 ? (
                         selectedReservation.timeline.map((event) => (
-                          <div key={event.id} className="flex gap-3 pb-4 border-b last:border-b-0">
+                          <div
+                            key={event.id}
+                            className="flex gap-3 pb-4 border-b last:border-b-0"
+                          >
                             <div className="flex flex-col items-center">
                               <div className="w-3 h-3 bg-blue-500 rounded-full mt-2"></div>
                               <div className="w-0.5 h-12 bg-slate-200 mt-2"></div>
                             </div>
                             <div className="flex-1 pt-1">
-                              <p className="font-medium text-sm">{event.action}</p>
-                              <p className="text-xs text-muted-foreground">{event.timestamp}</p>
-                              <p className="text-xs text-muted-foreground mt-1">بواسطة: {event.actor}</p>
+                              <p className="font-medium text-sm">
+                                {event.action}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {event.timestamp}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                بواسطة: {event.actor}
+                              </p>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-sm">لا يوجد سجل</p>
+                        <p className="text-muted-foreground text-sm">
+                          لا يوجد سجل
+                        </p>
                       )}
                     </div>
                   </TabsContent>
@@ -1424,27 +1712,43 @@ export function PropertyReservationsPage() {
               {selectedReservation && (
                 <>
                   <div className="bg-muted p-3 rounded-lg text-sm">
-                    <p className="font-medium mb-1">{selectedReservation.property.title}</p>
-                    <p className="text-muted-foreground">العميل: {selectedReservation.customer.name}</p>
+                    <p className="font-medium mb-1">
+                      {selectedReservation.property.title}
+                    </p>
+                    <p className="text-muted-foreground">
+                      العميل: {selectedReservation.customer.name}
+                    </p>
                   </div>
 
-                  {action === "accept" && selectedReservation.paymentRequired && (
-                    <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="confirm-payment"
-                          checked={confirmPayment}
-                          onCheckedChange={(checked) => setConfirmPayment(checked === true)}
-                        />
-                        <Label htmlFor="confirm-payment" className="text-sm cursor-pointer">
-                          تأكيد استلام الدفعة ({selectedReservation.depositAmount?.toLocaleString()} ر.س)
-                        </Label>
+                  {action === "accept" &&
+                    selectedReservation.paymentRequired && (
+                      <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            id="confirm-payment"
+                            checked={confirmPayment}
+                            onCheckedChange={(checked) =>
+                              setConfirmPayment(checked === true)
+                            }
+                          />
+                          <Label
+                            htmlFor="confirm-payment"
+                            className="text-sm cursor-pointer"
+                          >
+                            تأكيد استلام الدفعة (
+                            {selectedReservation.depositAmount?.toLocaleString()}{" "}
+                            ر.س)
+                          </Label>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   <div className="space-y-2">
-                    <Label>{action === "accept" ? "ملاحظات القبول (اختياري)" : "سبب الرفض (اختياري)"}</Label>
+                    <Label>
+                      {action === "accept"
+                        ? "ملاحظات القبول (اختياري)"
+                        : "سبب الرفض (اختياري)"}
+                    </Label>
                     <Textarea
                       placeholder="أدخل تفاصيلك..."
                       value={actionReason}
@@ -1464,10 +1768,16 @@ export function PropertyReservationsPage() {
                     <Button
                       className={cn(
                         "flex-1",
-                        action === "accept" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600",
+                        action === "accept"
+                          ? "bg-green-500 hover:bg-green-600"
+                          : "bg-red-500 hover:bg-red-600",
                       )}
                       onClick={handleConfirmAction}
-                      disabled={action === "accept" && selectedReservation.paymentRequired && !confirmPayment}
+                      disabled={
+                        action === "accept" &&
+                        selectedReservation.paymentRequired &&
+                        !confirmPayment
+                      }
                     >
                       {action === "accept" ? "تأكيد القبول" : "تأكيد الرفض"}
                     </Button>
@@ -1479,20 +1789,20 @@ export function PropertyReservationsPage() {
         </Dialog>
       </div>
     </div>
-  )
+  );
 }
 
 // Pagination Component
 interface ReservationsPaginationProps {
-  currentPage: number
-  lastPage: number
-  total: number
-  perPage: number
-  from: number
-  to: number
-  onPageChange: (page: number) => void
-  onPerPageChange: (perPage: number) => void
-  loading?: boolean
+  currentPage: number;
+  lastPage: number;
+  total: number;
+  perPage: number;
+  from: number;
+  to: number;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
+  loading?: boolean;
 }
 
 function ReservationsPagination({
@@ -1508,59 +1818,63 @@ function ReservationsPagination({
 }: ReservationsPaginationProps) {
   // Generate page numbers to show
   const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxVisiblePages = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5 // Less pages on mobile
+    const pages: (number | string)[] = [];
+    const maxVisiblePages =
+      typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5; // Less pages on mobile
 
     if (lastPage <= maxVisiblePages) {
       // Show all pages if total pages is less than max visible
       for (let i = 1; i <= lastPage; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
       // Always show first page
-      pages.push(1)
+      pages.push(1);
 
       // Calculate start and end
-      let start = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2))
-      let end = Math.min(lastPage - 1, currentPage + Math.floor(maxVisiblePages / 2))
+      let start = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+      let end = Math.min(
+        lastPage - 1,
+        currentPage + Math.floor(maxVisiblePages / 2),
+      );
 
       // Adjust if near start
       if (currentPage <= Math.floor(maxVisiblePages / 2) + 1) {
-        end = Math.min(maxVisiblePages, lastPage - 1)
-        start = 2
+        end = Math.min(maxVisiblePages, lastPage - 1);
+        start = 2;
       }
 
       // Adjust if near end
       if (currentPage > lastPage - Math.floor(maxVisiblePages / 2)) {
-        start = Math.max(2, lastPage - maxVisiblePages + 1)
-        end = lastPage - 1
+        start = Math.max(2, lastPage - maxVisiblePages + 1);
+        end = lastPage - 1;
       }
 
       // Add ellipsis after first page if needed
       if (start > 2) {
-        pages.push("...")
+        pages.push("...");
       }
 
       // Add page numbers
       for (let i = start; i <= end; i++) {
-        pages.push(i)
+        pages.push(i);
       }
 
       // Add ellipsis before last page if needed
       if (end < lastPage - 1) {
-        pages.push("...")
+        pages.push("...");
       }
 
       // Always show last page
       if (lastPage > 1) {
-        pages.push(lastPage)
+        pages.push(lastPage);
       }
     }
 
-    return pages
-  }
+    return pages;
+  };
 
-  const pageNumbers = getPageNumbers()
+  const pageNumbers = getPageNumbers();
 
   return (
     <Card className="mt-4">
@@ -1575,8 +1889,13 @@ function ReservationsPagination({
           <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
             {/* Per page selector - hidden on mobile */}
             <div className="hidden sm:flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">عدد النتائج:</span>
-              <Select value={perPage.toString()} onValueChange={(value) => onPerPageChange(Number(value))}>
+              <span className="text-xs text-muted-foreground">
+                عدد النتائج:
+              </span>
+              <Select
+                value={perPage.toString()}
+                onValueChange={(value) => onPerPageChange(Number(value))}
+              >
                 <SelectTrigger className="h-8 w-20 text-xs">
                   <SelectValue />
                 </SelectTrigger>
@@ -1619,10 +1938,13 @@ function ReservationsPagination({
               {pageNumbers.map((page, index) => {
                 if (page === "...") {
                   return (
-                    <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+                    <span
+                      key={`ellipsis-${index}`}
+                      className="px-2 text-muted-foreground"
+                    >
                       ...
                     </span>
-                  )
+                  );
                 }
                 return (
                   <Button
@@ -1635,7 +1957,7 @@ function ReservationsPagination({
                   >
                     {page}
                   </Button>
-                )
+                );
               })}
             </div>
 
@@ -1664,5 +1986,5 @@ function ReservationsPagination({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -52,7 +52,7 @@ interface PartnersProps {
     duration?: number;
     threshold?: number;
   };
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -138,16 +138,17 @@ export default function Partners1(props: PartnersProps = {}) {
   useEffect(() => {
     if (props.useStore) {
       // If we have tenant data, use it; otherwise use props or defaults
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultPartnersData(),
-            ...tenantComponentData,
-            ...props,
-          }
-        : {
-            ...getDefaultPartnersData(),
-            ...props,
-          };
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPartnersData(),
+              ...tenantComponentData,
+              ...props,
+            }
+          : {
+              ...getDefaultPartnersData(),
+              ...props,
+            };
       ensureComponentVariant("partners", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
@@ -156,25 +157,23 @@ export default function Partners1(props: PartnersProps = {}) {
   const storeData = props.useStore
     ? getComponentData("partners", uniqueId) || {}
     : {};
-  const currentStoreData = props.useStore
-    ? partnersStates[uniqueId] || {}
-    : {};
-  
+  const currentStoreData = props.useStore ? partnersStates[uniqueId] || {} : {};
+
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -267,104 +266,138 @@ export default function Partners1(props: PartnersProps = {}) {
       },
     },
     // Partners array - use the one with highest priority
-    partners: props?.partners || 
-              tenantComponentData?.partners || 
-              storeData?.partners || 
-              currentStoreData?.partners || 
-              defaultData.partners,
+    partners:
+      props?.partners ||
+      tenantComponentData?.partners ||
+      storeData?.partners ||
+      currentStoreData?.partners ||
+      defaultData.partners,
   };
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData (check styling.colors, and colors)
     const styling = mergedData?.styling || {};
-    
+
     // For other paths, use existing logic
     const colors = styling?.colors || mergedData?.colors || {};
-    
+
     // Navigate to the field using the path (e.g., "titleColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = colors;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = colors;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = colors;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
       if (fieldPath.includes("titleColor")) {
-        defaultGlobalColorType = "primary";  // Title color uses primary color
-      } else if (fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+        defaultGlobalColorType = "primary"; // Title color uses primary color
+      } else if (
+        fieldPath.includes("descriptionColor") ||
+        fieldPath.includes("textColor")
+      ) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("iconColor") || fieldPath.includes("ringColor") || fieldPath.includes("primary")) {
+      } else if (
+        fieldPath.includes("iconColor") ||
+        fieldPath.includes("ringColor") ||
+        fieldPath.includes("primary")
+      ) {
         defaultGlobalColorType = "primary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("titleColor")) {
-      defaultGlobalColorType = "primary";  // Title color uses primary color
-    } else if (fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+      defaultGlobalColorType = "primary"; // Title color uses primary color
+    } else if (
+      fieldPath.includes("descriptionColor") ||
+      fieldPath.includes("textColor")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
@@ -377,8 +410,10 @@ export default function Partners1(props: PartnersProps = {}) {
   const titleColor = getColor("titleColor", brandingColors.primary);
   const descriptionColor = mergedData.styling?.descriptionColor || "#6E6E75";
   const backgroundColor = mergedData.styling?.backgroundColor || "transparent";
-  const cardBackgroundColor = mergedData.styling?.cardBackgroundColor || "#f9fafb";
-  const cardHoverBackgroundColor = mergedData.styling?.cardHoverBackgroundColor || "#f3f4f6";
+  const cardBackgroundColor =
+    mergedData.styling?.cardBackgroundColor || "#f9fafb";
+  const cardHoverBackgroundColor =
+    mergedData.styling?.cardHoverBackgroundColor || "#f3f4f6";
   const logoOpacity = mergedData.styling?.logoOpacity || 0.7;
   const logoHoverOpacity = mergedData.styling?.logoHoverOpacity || 1.0;
 
@@ -391,31 +426,32 @@ export default function Partners1(props: PartnersProps = {}) {
   const desktopColumns = mergedData.grid?.columns?.desktop || 6;
 
   return (
-    <section 
+    <section
       id={`partners-${uniqueId}`}
       className="relative overflow-hidden"
       style={{
-        backgroundColor: backgroundColor === "transparent" ? "transparent" : backgroundColor,
+        backgroundColor:
+          backgroundColor === "transparent" ? "transparent" : backgroundColor,
         paddingTop: mergedData.layout?.padding?.top || "5rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "5rem"
+        paddingBottom: mergedData.layout?.padding?.bottom || "5rem",
       }}
     >
-      <div 
+      <div
         className="container mx-auto px-4 relative z-10"
-         dir="rtl"
+        dir="rtl"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1600px"
+          maxWidth: mergedData.layout?.maxWidth || "1600px",
         }}
       >
         {/* Main heading */}
         <div className="text-center mb-16" dir="rtl">
-          <h2 
+          <h2
             className="font-bold mb-8 leading-tight text-2xl lg:text-3xl"
-            style={{ 
+            style={{
               color: titleColor,
               fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
-              lineHeight: mergedData.typography?.title?.lineHeight || "tight"
+              lineHeight: mergedData.typography?.title?.lineHeight || "tight",
             }}
           >
             {mergedData.content?.title}
@@ -429,13 +465,13 @@ export default function Partners1(props: PartnersProps = {}) {
             grid-template-columns: repeat(${mobileColumns}, 1fr);
             gap: ${mergedData.grid?.gap || "2rem"};
           }
-          
+
           @media (min-width: 768px) {
             .partners-grid-${uniqueId} {
               grid-template-columns: repeat(${tabletColumns}, 1fr);
             }
           }
-          
+
           @media (min-width: 1024px) {
             .partners-grid-${uniqueId} {
               grid-template-columns: repeat(${desktopColumns}, 1fr);
@@ -444,42 +480,46 @@ export default function Partners1(props: PartnersProps = {}) {
         `}</style>
 
         {/* Partners logos grid */}
-        <div
-          className={`partners-grid-${uniqueId}`}
-        >
-          {partners.map((partner: { id?: string; src: string; alt?: string }, index: number) => (
-            <div 
-              key={partner.id+"-"+index || index}
-              className="flex items-center justify-center p-6 rounded-lg transition-colors duration-300 group"
-              style={{
-                backgroundColor: cardBackgroundColor
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = cardHoverBackgroundColor;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = cardBackgroundColor;
-              }}
-            >
-              <Image
-                src={partner.src || "/logo.svg"}
-                alt={partner.alt || `Partner Logo ${index + 1}`}
-                width={120}
-                height={60}
-                className="max-w-full h-auto transition-opacity duration-300"
+        <div className={`partners-grid-${uniqueId}`}>
+          {partners.map(
+            (
+              partner: { id?: string; src: string; alt?: string },
+              index: number,
+            ) => (
+              <div
+                key={partner.id + "-" + index || index}
+                className="flex items-center justify-center p-6 rounded-lg transition-colors duration-300 group"
                 style={{
-                  opacity: logoOpacity
+                  backgroundColor: cardBackgroundColor,
                 }}
-                unoptimized={true}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = logoHoverOpacity.toString();
+                  e.currentTarget.style.backgroundColor =
+                    cardHoverBackgroundColor;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = logoOpacity.toString();
+                  e.currentTarget.style.backgroundColor = cardBackgroundColor;
                 }}
-            />
-          </div>
-          ))}
+              >
+                <Image
+                  src={partner.src || "/logo.svg"}
+                  alt={partner.alt || `Partner Logo ${index + 1}`}
+                  width={120}
+                  height={60}
+                  className="max-w-full h-auto transition-opacity duration-300"
+                  style={{
+                    opacity: logoOpacity,
+                  }}
+                  unoptimized={true}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = logoHoverOpacity.toString();
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = logoOpacity.toString();
+                  }}
+                />
+              </div>
+            ),
+          )}
         </div>
       </div>
     </section>

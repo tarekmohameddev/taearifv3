@@ -1,12 +1,14 @@
 ## Tenant Website Reservations API (Full Reference)
 
 This document is the comprehensive reference for the Reservations feature across:
+
 - Public Tenant Website endpoint (create reservation by property slug)
 - Authenticated Dashboard APIs (list, show, accept/reject, bulk, stats, export)
 
 It follows the style used by `Tenant Website Properties API`, under `/api/v1/tenant-website` for public endpoints and `/api/v1` for dashboard endpoints.
 
 ### Overview
+
 - Public Base: `/api/v1/tenant-website/{tenantId}`
 - Dashboard Base: `/api/v1`
 - Public Middleware: `api`, `tenant.resolve`, `tenant.id.response`, `throttle:5,1`
@@ -24,6 +26,7 @@ It follows the style used by `Tenant Website Properties API`, under `/api/v1/ten
   - `status`: `pending` | `accepted` | `rejected`
 
 ### Data Model (simplified)
+
 - `reservations`:
   - `id`: bigint
   - `tenant_id`: bigint → `users.id`
@@ -40,9 +43,11 @@ It follows the style used by `Tenant Website Properties API`, under `/api/v1/ten
 
 ### Public Tenant Website Endpoint
 
-1) POST `/api/v1/tenant-website/{tenantId}/reservations`
+1. POST `/api/v1/tenant-website/{tenantId}/reservations`
+
 - Purpose: Create a reservation for a property identified by its slug
 - Request body (JSON):
+
 ```json
 {
   "propertySlug": "astdyo-mothth-hy-alaaard-rkm-19-1",
@@ -52,6 +57,7 @@ It follows the style used by `Tenant Website Properties API`, under `/api/v1/ten
   "message": "أرغب في المعاينة يوم السبت"
 }
 ```
+
 - Validation:
   - `propertySlug`: required, string, max 200
   - `customerName`: required, string, max 100
@@ -65,18 +71,21 @@ It follows the style used by `Tenant Website Properties API`, under `/api/v1/ten
   - Creates `Reservation` with `status=pending`
   - Captures `ip` and `user_agent` in `metadata`
 - Response (201):
+
 ```json
 {
   "success": true,
   "data": { "id": "1", "status": "pending" }
 }
 ```
+
 - Errors:
   - 404 when property not found for slug/tenant
   - 422 for validation errors
   - 429 if rate-limited (`throttle:5,1`)
 
 Example (curl):
+
 ```bash
 curl -X POST "https://your-app.test/api/v1/tenant-website/{tenantId}/reservations" \
   -H "Content-Type: application/json" \
@@ -90,9 +99,11 @@ curl -X POST "https://your-app.test/api/v1/tenant-website/{tenantId}/reservation
 ```
 
 ### Dashboard Reservations API (Authenticated)
+
 All endpoints require `Authorization: Bearer {access_token}` and enforce tenant isolation.
 
-2) GET `/api/v1/reservations`
+2. GET `/api/v1/reservations`
+
 - Purpose: Retrieve all reservations with filtering, search, sorting, pagination; returns stats summary
 - Query Parameters:
   - `status`: `pending|accepted|rejected|all` (default `all`)
@@ -103,10 +114,13 @@ All endpoints require `Authorization: Bearer {access_token}` and enforce tenant 
   - `page`: default `1`
   - `per_page`: default `20`, max `100`
 - Request Example:
+
 ```json
 GET /api/v1/reservations?status=pending&type=rent&search=نرجس&sort_by=date&sort_order=desc&page=1&per_page=10
 ```
+
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -161,13 +175,17 @@ GET /api/v1/reservations?status=pending&type=rent&search=نرجس&sort_by=date&s
 }
 ```
 
-3) GET `/api/v1/reservations/{id}`
+3. GET `/api/v1/reservations/{id}`
+
 - Purpose: Get detailed information for a single reservation
 - Request Example:
+
 ```json
 GET /api/v1/reservations/res-001
 ```
+
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -229,16 +247,20 @@ GET /api/v1/reservations/res-001
 }
 ```
 
-4) POST `/api/v1/reservations/{id}/accept`
+4. POST `/api/v1/reservations/{id}/accept`
+
 - Purpose: Accept a reservation
 - Request Body:
+
 ```json
 {
   "confirmPayment": true,
   "notes": "تم قبول الحجز بعد تأكيد الدفعة"
 }
 ```
+
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -258,15 +280,19 @@ GET /api/v1/reservations/res-001
 }
 ```
 
-5) POST `/api/v1/reservations/{id}/reject`
+5. POST `/api/v1/reservations/{id}/reject`
+
 - Purpose: Reject a reservation
 - Request Body:
+
 ```json
 {
   "reason": "السعر أعلى من ميزانية العميل"
 }
 ```
+
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -286,9 +312,11 @@ GET /api/v1/reservations/res-001
 }
 ```
 
-6) POST `/api/v1/reservations/bulk-action`
+6. POST `/api/v1/reservations/bulk-action`
+
 - Purpose: Perform bulk actions on multiple reservations
 - Request Body:
+
 ```json
 {
   "action": "accept",
@@ -296,7 +324,9 @@ GET /api/v1/reservations/res-001
   "notes": "دفعة قبول جماعي"
 }
 ```
+
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -310,9 +340,11 @@ GET /api/v1/reservations/res-001
 }
 ```
 
-7) GET `/api/v1/reservations/stats`
+7. GET `/api/v1/reservations/stats`
+
 - Purpose: Get reservation statistics
 - Response Example (200 OK):
+
 ```json
 {
   "success": true,
@@ -336,7 +368,8 @@ GET /api/v1/reservations/res-001
 }
 ```
 
-8) GET `/api/v1/reservations/export/csv`
+8. GET `/api/v1/reservations/export/csv`
+
 - Purpose: Export reservations as CSV (applies same filters as list)
 - Query Parameters: same as GET `/api/v1/reservations`
 - Response:
@@ -344,16 +377,20 @@ GET /api/v1/reservations/res-001
   - Headers: `Content-Disposition: attachment; filename="reservations-YYYY-MM-DD_HHMMSS.csv"`
   - Body: CSV file
 - Example:
+
 ```json
 GET /api/v1/reservations/export/csv?status=pending&type=all
 ```
+
 - CSV example (first line + one row):
+
 ```text
 ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 1,pending,rent,أحمد محمد,+966501234567,فيلا فاخرة بحي النرجس,حي النرجس، الرياض,5000,2025-01-08 10:30:00
 ```
 
 ### Authentication and Security
+
 - Public endpoint: no auth, protected with `throttle:5,1` rate limiting (5 req/min).
 - Dashboard endpoints: require `Authorization: Bearer {access_token}` (Sanctum).
 - Tenant isolation: enforced via policy; only the owning tenant can access their reservations.
@@ -361,7 +398,9 @@ ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 - No CAPTCHA enabled by default on the public endpoint (can be added later).
 
 ### Error Responses (common)
+
 - 400 Bad Request:
+
 ```json
 {
   "success": false,
@@ -369,33 +408,49 @@ ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
   "errors": { "reservationIds": ["حقل الحجوزات مطلوب"] }
 }
 ```
+
 - 401 Unauthorized:
+
 ```json
 { "message": "Unauthenticated." }
 ```
+
 - 403 Forbidden:
+
 ```json
 { "message": "This action is unauthorized." }
 ```
+
 - 404 Not Found:
+
 ```json
 {
   "success": false,
   "message": "الحجز غير موجود"
 }
 ```
+
 - 422 Validation Error:
+
 ```json
 {
   "message": "The given data was invalid.",
-  "errors": { "customerPhone": ["Invalid phone format. Use international format like +9665XXXXXXX"] }
+  "errors": {
+    "customerPhone": [
+      "Invalid phone format. Use international format like +9665XXXXXXX"
+    ]
+  }
 }
 ```
+
 - 429 Too Many Requests:
+
 ```json
 { "message": "Too Many Attempts." }
 ```
+
 - 500 Internal Server Error:
+
 ```json
 {
   "success": false,
@@ -404,6 +459,7 @@ ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 ```
 
 ### Internal (Implementation Pointers)
+
 - Public Controller: `app/Http/Controllers/Api/V1/TenantWebsite/ReservationController.php`
 - Public Request: `app/Http/Requests/TenantWebsite/Reservation/StoreRequest.php`
 - Dashboard Controller: `app/Http/Controllers/Api/V1/ReservationsController.php`
@@ -417,5 +473,3 @@ ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 - Routes:
   - Public: `routes/api.php` under `v1/tenant-website`
   - Dashboard: `routes/api.php` under `v1` + `auth:sanctum`
-
-

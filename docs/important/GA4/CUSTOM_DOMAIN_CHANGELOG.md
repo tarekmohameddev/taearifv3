@@ -9,11 +9,13 @@
 ## 🎯 Problem Statement
 
 **Before**: Custom domains like `liraksa.com` would send the full domain name as `tenant_id` to GA4, resulting in:
+
 - Inconsistent tracking between subdomain (`lira.taearif.com`) and custom domain (`liraksa.com`)
 - Full domain names cluttering GA4 reports
 - Difficulty in unifying analytics for the same tenant
 
 **Example**:
+
 ```
 Subdomain: lira.taearif.com → GA4 tenant_id: "lira"
 Custom:    liraksa.com       → GA4 tenant_id: "liraksa.com"  ❌
@@ -26,6 +28,7 @@ Custom:    liraksa.com       → GA4 tenant_id: "liraksa.com"  ❌
 Fetch tenant data via `getTenant` API and use the `username` field from the response as `tenant_id` for custom domains.
 
 **After**:
+
 ```
 Subdomain: lira.taearif.com → GA4 tenant_id: "lira"
 Custom:    liraksa.com       → API username: "lira" → GA4 tenant_id: "lira" ✅
@@ -38,6 +41,7 @@ Custom:    liraksa.com       → API username: "lira" → GA4 tenant_id: "lira" 
 ### 1. **components/GA4Provider.tsx**
 
 **Added**:
+
 - `domainType` prop to interface
 - `useTenantStore` subscription
 - Logic to use `username` from API for custom domains
@@ -47,13 +51,17 @@ Custom:    liraksa.com       → API username: "lira" → GA4 tenant_id: "lira" 
 const tenantData = useTenantStore((s) => s.tenantData);
 
 // NEW: For custom domains, use username from API
-if (domainType === 'custom' && tenantData?.username) {
+if (domainType === "custom" && tenantData?.username) {
   finalTenantId = tenantData.username;
-  console.log('🌐 GA4: Using username from API for custom domain:', finalTenantId);
+  console.log(
+    "🌐 GA4: Using username from API for custom domain:",
+    finalTenantId,
+  );
 }
 ```
 
 **Modified**:
+
 - `shouldTrackDomain()` - Added custom domain detection regex
 - Effect dependencies - Added `domainType` and `tenantData?.username`
 
@@ -62,6 +70,7 @@ if (domainType === 'custom' && tenantData?.username) {
 ### 2. **app/HomePageWrapper.tsx**
 
 **Changed**:
+
 ```typescript
 // Before
 <GA4Provider tenantId={tenantId}>
@@ -75,6 +84,7 @@ if (domainType === 'custom' && tenantData?.username) {
 ### 3. **app/TenantPageWrapper.tsx**
 
 **Changed**:
+
 ```typescript
 // Before
 <GA4Provider tenantId={tenantId}>
@@ -88,15 +98,20 @@ if (domainType === 'custom' && tenantData?.username) {
 ### 4. **app/property/[id]/page.tsx**
 
 **Added**:
+
 ```typescript
-const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+const domainType = headersList.get("x-domain-type") as
+  | "subdomain"
+  | "custom"
+  | null;
 ```
 
 **Updated interface**:
+
 ```typescript
 interface PropertyPageWrapperProps {
   tenantId: string | null;
-  domainType?: "subdomain" | "custom" | null;  // NEW
+  domainType?: "subdomain" | "custom" | null; // NEW
   propertySlug: string;
 }
 ```
@@ -106,14 +121,16 @@ interface PropertyPageWrapperProps {
 ### 5. **app/property/[id]/PropertyPageWrapper.tsx**
 
 **Added**:
+
 ```typescript
 // Track property view with username for custom domains
 useEffect(() => {
   if (tenantId && propertySlug) {
-    const finalTenantId = domainType === 'custom' && tenantData?.username 
-      ? tenantData.username 
-      : tenantId;
-    
+    const finalTenantId =
+      domainType === "custom" && tenantData?.username
+        ? tenantData.username
+        : tenantId;
+
     trackPropertyView(finalTenantId, propertySlug);
   }
 }, [tenantId, propertySlug, domainType, tenantData?.username]);
@@ -124,8 +141,12 @@ useEffect(() => {
 ### 6. **app/project/[id]/page.tsx**
 
 **Added**:
+
 ```typescript
-const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+const domainType = headersList.get("x-domain-type") as
+  | "subdomain"
+  | "custom"
+  | null;
 ```
 
 ---
@@ -133,14 +154,16 @@ const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | 
 ### 7. **app/project/[id]/ProjectPageWrapper.tsx**
 
 **Added**:
+
 ```typescript
 // Track project view with username for custom domains
 useEffect(() => {
   if (tenantId && projectSlug) {
-    const finalTenantId = domainType === 'custom' && tenantData?.username 
-      ? tenantData.username 
-      : tenantId;
-    
+    const finalTenantId =
+      domainType === "custom" && tenantData?.username
+        ? tenantData.username
+        : tenantId;
+
     trackProjectView(finalTenantId, projectSlug);
   }
 }, [tenantId, projectSlug, domainType, tenantData?.username]);
@@ -153,17 +176,32 @@ useEffect(() => {
 **Fixed**: Added validation to prevent sending `"www"` as tenant_id
 
 **Added**:
+
 ```typescript
 const reservedWords = [
-  "www", "api", "admin", "app", "mail", 
-  "ftp", "blog", "shop", "store", 
-  "dashboard", "live-editor", "auth", 
-  "login", "register"
+  "www",
+  "api",
+  "admin",
+  "app",
+  "mail",
+  "ftp",
+  "blog",
+  "shop",
+  "store",
+  "dashboard",
+  "live-editor",
+  "auth",
+  "login",
+  "register",
 ];
 
 // Validate subdomain before returning
-if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.toLowerCase())) {
-  console.warn('⚠️ GTM: Invalid subdomain:', subdomain);
+if (
+  !subdomain ||
+  subdomain.trim() === "" ||
+  reservedWords.includes(subdomain.toLowerCase())
+) {
+  console.warn("⚠️ GTM: Invalid subdomain:", subdomain);
   return null;
 }
 ```
@@ -175,12 +213,14 @@ if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.to
 ### 1. **docs/important/GA4/README.md**
 
 **Updated**:
+
 - Key Characteristics section
 - Multi-Tenant Tracking Strategy
 - Tracking Flow diagram
 - Contact & Maintenance section (version 2.1)
 
 **Added**:
+
 - Custom Domain Support explanation
 - API Integration notes
 - Custom Domain Handling section with examples
@@ -190,6 +230,7 @@ if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.to
 ### 2. **docs/important/GA4/ARCHITECTURE.md**
 
 **Updated**:
+
 - GA4Provider Component section
 - Key Features list
 - Props interface
@@ -197,6 +238,7 @@ if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.to
 - Key Insights section
 
 **Added**:
+
 - Complete Custom Domain Integration section
 - Custom Domain flow diagram
 - Comparison table
@@ -211,13 +253,15 @@ if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.to
 ## 🔄 Data Flow
 
 ### Before (Custom Domain)
+
 ```
 liraksa.com → Middleware: "liraksa.com" → GA4: "liraksa.com" ❌
 ```
 
 ### After (Custom Domain)
+
 ```
-liraksa.com 
+liraksa.com
   → Middleware: "liraksa.com" + domainType: "custom"
   → fetchTenantData("liraksa.com")
   → API returns: { username: "lira", ... }
@@ -235,6 +279,7 @@ liraksa.com
 1. **Open custom domain**: `https://liraksa.com/ar`
 
 2. **Check Console** for:
+
    ```
    ✅ Middleware: Custom domain detected: liraksa.com
    ✅ Middleware: Domain type: custom
@@ -254,12 +299,12 @@ liraksa.com
 
 ## 📊 Comparison Table
 
-| Domain | Type | Middleware | API Call | API Response | GA4 tenant_id | Status |
-|--------|------|------------|----------|--------------|---------------|--------|
-| `www.taearif.com` | Base | `null` | ❌ | - | - | ❌ No tracking |
-| `lira.taearif.com` | Subdomain | `"lira"` | ✅ | `username: "lira"` | `"lira"` | ✅ Works |
-| `liraksa.com` | Custom | `"liraksa.com"` | ✅ | `username: "lira"` | **`"lira"`** | ✅ Fixed! |
-| `hey.taearif.com` | Subdomain | `"hey"` | ✅ | `username: "hey"` | `"hey"` | ✅ Works |
+| Domain             | Type      | Middleware      | API Call | API Response       | GA4 tenant_id | Status         |
+| ------------------ | --------- | --------------- | -------- | ------------------ | ------------- | -------------- |
+| `www.taearif.com`  | Base      | `null`          | ❌       | -                  | -             | ❌ No tracking |
+| `lira.taearif.com` | Subdomain | `"lira"`        | ✅       | `username: "lira"` | `"lira"`      | ✅ Works       |
+| `liraksa.com`      | Custom    | `"liraksa.com"` | ✅       | `username: "lira"` | **`"lira"`**  | ✅ Fixed!      |
+| `hey.taearif.com`  | Subdomain | `"hey"`         | ✅       | `username: "hey"`  | `"hey"`       | ✅ Works       |
 
 ---
 
@@ -279,9 +324,10 @@ liraksa.com
 Potential improvements (not implemented):
 
 1. **Domain Normalization**: Remove `www.` prefix from custom domains
+
    ```typescript
-   const normalizedHost = host.startsWith('www.') 
-     ? host.replace('www.', '') 
+   const normalizedHost = host.startsWith("www.")
+     ? host.replace("www.", "")
      : host;
    ```
 
@@ -306,15 +352,3 @@ For issues with custom domain tracking:
 **Author**: Development Team  
 **Reviewed**: December 28, 2024  
 **Status**: ✅ Implemented and Documented
-
-
-
-
-
-
-
-
-
-
-
-

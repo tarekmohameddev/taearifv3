@@ -130,7 +130,7 @@ export default function HalfTextHalfImage5(props: HalfTextHalfImage5Props) {
     if (props.useStore) {
       // Get tenant component data inside useEffect to avoid infinite loops
       const tenantComponentData = getTenantComponentData();
-      
+
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -188,8 +188,7 @@ export default function HalfTextHalfImage5(props: HalfTextHalfImage5Props) {
     <section
       className="w-full flex items-center justify-center py-12 md:py-16"
       style={{
-        backgroundColor:
-          mergedData.styling?.backgroundColor || "#f5f0e8",
+        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
         paddingTop: mergedData.spacing?.padding?.top || "3rem",
         paddingBottom: mergedData.spacing?.padding?.bottom || "4rem",
         paddingLeft: mergedData.spacing?.padding?.left || "1rem",
@@ -229,7 +228,10 @@ export default function HalfTextHalfImage5(props: HalfTextHalfImage5Props) {
             {/* Bulleted List with Checkmarks */}
             <ul className="space-y-4">
               {(mergedData.content?.items || []).map((item, index) => (
-                <li key={item.id || index} className="flex items-start gap-3 text-right">
+                <li
+                  key={item.id || index}
+                  className="flex items-start gap-3 text-right"
+                >
                   <span className="flex-shrink-0 mt-1">
                     <svg
                       aria-hidden="true"
@@ -280,4 +282,3 @@ export default function HalfTextHalfImage5(props: HalfTextHalfImage5Props) {
     </section>
   );
 }
-

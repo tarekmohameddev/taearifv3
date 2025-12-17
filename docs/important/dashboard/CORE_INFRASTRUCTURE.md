@@ -5,6 +5,7 @@
 This document covers the foundational components and stores that power the Dashboard System.
 
 **Contents:**
+
 1. Axios Instance - HTTP client with token injection
 2. AuthContext/AuthStore - Dashboard authentication
 3. Store - Modular dashboard stores
@@ -50,7 +51,7 @@ axiosInstance.interceptors.request.use(
     // Security check: Reject if axios is locked
     if (axiosLocked) {
       return Promise.reject(
-        new Error("Authentication required. Please login again.")
+        new Error("Authentication required. Please login again."),
       );
     }
 
@@ -64,7 +65,7 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // ============================================
@@ -123,7 +124,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // ============================================
@@ -146,21 +147,25 @@ export default axiosInstance;
 ### Key Features
 
 **1. Automatic Token Injection:**
+
 - Every request automatically gets `Authorization: Bearer {token}` header
 - Token read from AuthStore in real-time
 - No manual token management needed in components
 
 **2. Request Locking Mechanism:**
+
 - Prevents API calls when user is unauthenticated
 - `unlockAxios()` called after successful login
 - Protects against unauthorized request attempts
 
 **3. Error Enhancement:**
+
 - Categorizes errors: server, client, network, unknown
 - Adds metadata: timestamp, URL, status
 - Provides detailed error info for debugging
 
 **4. HTTPS Agent Configuration:**
+
 - Development: Skip SSL verification (self-signed certs)
 - Production: Full SSL verification
 
@@ -197,7 +202,7 @@ try {
 ### Integration Points
 
 - **Used by:** ALL dashboard modules (properties, analytics, CRM, etc.)
-- **Unlocked in:** 
+- **Unlocked in:**
   - `AuthStore.login()` function
   - `AuthStore.fetchUserData()` function
   - `AuthStore.loginWithToken()` function
@@ -210,6 +215,7 @@ try {
 **Purpose:** Main authentication store for Dashboard User system
 
 **Architecture:** Dual export pattern
+
 - **Primary:** Zustand store (`useAuthStore`)
 - **Legacy:** React Context (`AuthProvider` + `useAuth()`)
 
@@ -224,15 +230,15 @@ const useAuthStore = create((set, get) => ({
   // ============================================
   // STATE - User Session
   // ============================================
-  UserIslogged: false,           // Is user authenticated?
-  IsLoading: true,               // Loading state for async operations
-  IsDone: false,                 // Fetch completion flag (prevents duplicate calls)
-  authenticated: false,          // Alternative auth flag
-  error: null,                   // General error message
-  errorLogin: null,              // Login-specific error
-  errorLoginATserver: null,      // Server-side login error
-  onboarding_completed: false,   // Onboarding status
-  
+  UserIslogged: false, // Is user authenticated?
+  IsLoading: true, // Loading state for async operations
+  IsDone: false, // Fetch completion flag (prevents duplicate calls)
+  authenticated: false, // Alternative auth flag
+  error: null, // General error message
+  errorLogin: null, // Login-specific error
+  errorLoginATserver: null, // Server-side login error
+  onboarding_completed: false, // Onboarding status
+
   // ============================================
   // STATE - User Data
   // ============================================
@@ -245,41 +251,51 @@ const useAuthStore = create((set, get) => ({
     last_name: null,
     company_name: null,
     domain: null,
-    
+
     // Subscription Data
     is_free_plan: null,
     is_expired: false,
     days_remaining: null,
-    package_title: null,           // "Free", "Pro", "Enterprise"
-    package_features: [],          // Array of feature flags
-    project_limit_number: null,    // Max projects allowed
+    package_title: null, // "Free", "Pro", "Enterprise"
+    package_features: [], // Array of feature flags
+    project_limit_number: null, // Max projects allowed
     real_estate_limit_number: null, // Max properties allowed
-    
+
     // Permissions & Access
-    permissions: [],               // Array of permission strings
-    account_type: null,            // "admin", "manager", "editor"
-    tenant_id: null,               // Associated tenant (if any)
-    
+    permissions: [], // Array of permission strings
+    account_type: null, // "admin", "manager", "editor"
+    tenant_id: null, // Associated tenant (if any)
+
     // Messages
-    message: null,                 // System message to display
+    message: null, // System message to display
   },
-  
+
   // ============================================
   // STATE - Google OAuth
   // ============================================
   googleUrlFetched: false,
   googleAuthUrl: null,
-  
+
   // ============================================
   // ACTIONS - Core
   // ============================================
-  
-  login: async (email, password, recaptchaToken) => { /* ... */ },
-  logout: async (options) => { /* ... */ },
-  fetchUserData: async () => { /* ... */ },
-  loginWithToken: async (token) => { /* ... */ },
-  fetchGoogleAuthUrl: async () => { /* ... */ },
-  
+
+  login: async (email, password, recaptchaToken) => {
+    /* ... */
+  },
+  logout: async (options) => {
+    /* ... */
+  },
+  fetchUserData: async () => {
+    /* ... */
+  },
+  loginWithToken: async (token) => {
+    /* ... */
+  },
+  fetchGoogleAuthUrl: async () => {
+    /* ... */
+  },
+
   // ============================================
   // SETTERS
   // ============================================
@@ -289,12 +305,14 @@ const useAuthStore = create((set, get) => ({
   setUserData: (data) => set({ userData: data }),
   setUserIsLogged: (isLogged) => set({ UserIslogged: isLogged }),
   setIsLoading: (loading) => set({ IsLoading: loading }),
-  clearMessage: () => set((state) => ({
-    userData: { ...state.userData, message: null }
-  })),
-  setMessage: (message) => set((state) => ({
-    userData: { ...state.userData, message }
-  })),
+  clearMessage: () =>
+    set((state) => ({
+      userData: { ...state.userData, message: null },
+    })),
+  setMessage: (message) =>
+    set((state) => ({
+      userData: { ...state.userData, message },
+    })),
 }));
 
 export default useAuthStore;
@@ -305,6 +323,7 @@ export default useAuthStore;
 #### login(email, password, recaptchaToken)
 
 **Flow:**
+
 ```
 1. Call external API: POST /login
 2. Receive: { user, token }
@@ -317,11 +336,12 @@ export default useAuthStore;
 ```
 
 **Implementation:**
+
 ```javascript
 login: async (email, password, recaptchaToken) => {
   set({ IsLoading: true, errorLogin: null });
   unlockAxios();
-  
+
   try {
     // External API call
     const externalResponse = await fetch(
@@ -329,32 +349,36 @@ login: async (email, password, recaptchaToken) => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, recaptcha_token: recaptchaToken }),
-      }
+        body: JSON.stringify({
+          email,
+          password,
+          recaptcha_token: recaptchaToken,
+        }),
+      },
     );
-    
+
     if (!externalResponse.ok) {
       // Handle errors
       const errorData = await externalResponse.json();
       set({ errorLogin: errorData.message });
       return { success: false, error: errorData.message };
     }
-    
+
     const { user, token: UserToken } = await externalResponse.json();
-    
+
     // Set httpOnly cookie via internal API
     await fetch("/api/user/setAuth", {
       method: "POST",
       body: JSON.stringify({ user, UserToken }),
     });
-    
+
     // Update store
     set({ UserIslogged: true, userData: { ...user, token: UserToken } });
-    
+
     // Persist
     localStorage.setItem("user", JSON.stringify(safeUserData));
     unlockAxios();
-    
+
     return { success: true };
   } catch (error) {
     set({ errorLoginATserver: "حدث خطأ أثناء الاتصال بالخادم" });
@@ -362,12 +386,13 @@ login: async (email, password, recaptchaToken) => {
   } finally {
     set({ IsLoading: false });
   }
-}
+};
 ```
 
 #### fetchUserData()
 
 **Flow:**
+
 ```
 1. Fetch user info from cookie: GET /api/user/getUserInfo
 2. Update store with basic data
@@ -377,27 +402,28 @@ login: async (email, password, recaptchaToken) => {
 ```
 
 **Implementation:**
+
 ```javascript
 fetchUserData: async () => {
   set({ IsLoading: true });
   if (get().IsDone) return; // Prevent duplicates
   set({ IsDone: true });
-  
+
   unlockAxios();
-  
+
   try {
     // Get user from cookie
     const userInfoResponse = await fetch("/api/user/getUserInfo");
     const userData = await userInfoResponse.json();
-    
+
     set({ UserIslogged: true, userData });
     localStorage.setItem("user", JSON.stringify(userData));
-    
+
     // Fetch subscription if needed
     if (get().userData.is_free_plan == null) {
       const ress = await axiosInstance.get("/user");
       const subscriptionDATA = ress.data.data;
-      
+
       set({
         userData: {
           ...userData,
@@ -412,12 +438,13 @@ fetchUserData: async () => {
   } finally {
     set({ IsLoading: false, IsDone: false });
   }
-}
+};
 ```
 
 #### logout(options)
 
 **Flow:**
+
 ```
 1. Call logout API: POST /api/user/logout
 2. Clear server-side cookies
@@ -427,6 +454,7 @@ fetchUserData: async () => {
 ```
 
 **Implementation:**
+
 ```javascript
 logout: async (options = { redirect: true, clearStore: true }) => {
   try {
@@ -434,20 +462,20 @@ logout: async (options = { redirect: true, clearStore: true }) => {
       method: "POST",
       body: JSON.stringify({ token: get().userData.token }),
     });
-    
+
     if (options.clearStore) {
       set({ UserIslogged: false, authenticated: false, userData: null });
     }
-    
+
     localStorage.removeItem("user");
-    
+
     if (options.redirect) {
       window.location.href = "/login";
     }
   } catch (error) {
     console.error("Logout error:", error);
   }
-}
+};
 ```
 
 #### loginWithToken(token)
@@ -455,6 +483,7 @@ logout: async (options = { redirect: true, clearStore: true }) => {
 **Purpose:** OAuth callback handler (Google login)
 
 **Flow:**
+
 ```
 1. Set token temporarily in store
 2. Fetch user data using token: GET /user
@@ -474,7 +503,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -482,7 +511,7 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
-  
+
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
@@ -504,10 +533,10 @@ function MyComponent() {
   // Subscribe to specific state
   const UserIslogged = useAuthStore((state) => state.UserIslogged);
   const userData = useAuthStore((state) => state.userData);
-  
+
   // OR: Subscribe to multiple values
   const { UserIslogged, userData, login } = useAuthStore();
-  
+
   // Call actions
   const handleLogin = async () => {
     const result = await login(email, password, recaptchaToken);
@@ -525,13 +554,14 @@ import { useAuth } from "@/context/AuthContext";
 
 function MyComponent() {
   const { user, loading } = useAuth();
-  
+
   // Simple data access only
   console.log(user?.email);
 }
 ```
 
 **When to use each:**
+
 - **Zustand Store**: All new code, need actions, performance-critical
 - **React Context**: Legacy components, simple read-only access
 
@@ -554,37 +584,37 @@ const axiosInstance = require("@/lib/axiosInstance");
 const useStore = create((set, get) => ({
   // Global state
   loading: false,
-  
+
   // ============================================
   // HOMEPAGE DASHBOARD STORES
   // ============================================
   homepage: {
     // Device statistics
     ...require("./store/homepage/dashboardDevice")(set),
-    
+
     // Summary cards (visitors, pageviews, etc.)
     ...require("./store/homepage/dashboardSummary")(set),
-    
+
     // Visitor analytics data
     ...require("./store/homepage/visitorData")(set),
-    
+
     // Setup progress tracking
     ...require("./store/homepage/setupProgress")(set),
-    
+
     // Traffic sources data
     ...require("./store/homepage/trafficSources")(set),
-    
+
     // Time range selector
     setSelectedTimeRange: (range) =>
       set((state) => ({
         homepage: { ...state.homepage, selectedTimeRange: range },
       })),
   },
-  
+
   // ============================================
   // MODULE-SPECIFIC STORES
   // ============================================
-  
+
   ...require("./store/contentManagement")(set),
   ...require("./store/recentActivity")(set),
   ...require("./store/projectsManagement")(set),
@@ -639,21 +669,21 @@ module.exports = (set, get) => ({
     loading: false,
     error: null,
   },
-  
+
   fetchSideMenus: async () => {
     const currentState = get();
-    set({ 
-      sidebarData: { 
-        ...currentState.sidebarData, 
-        loading: true, 
-        error: null 
-      } 
+    set({
+      sidebarData: {
+        ...currentState.sidebarData,
+        loading: true,
+        error: null,
+      },
     });
-    
+
     try {
       const response = await axiosInstance.get("/dashboard/menu");
       const menuItems = response.data.mainNavItems || [];
-      
+
       set({
         sidebarData: {
           mainNavItems: menuItems,
@@ -683,16 +713,16 @@ function DashboardComponent() {
   // Access sidebar data
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
-  
+
   // Access homepage data
   const { homepage } = useStore();
   const setTimeRange = useStore((state) => state.homepage.setSelectedTimeRange);
-  
+
   // Call actions
   useEffect(() => {
     fetchSideMenus();
   }, []);
-  
+
   // Use data
   return (
     <Sidebar items={mainNavItems} loading={loading} />
@@ -716,6 +746,7 @@ function DashboardComponent() {
 **Purpose:** Permission-focused user data store
 
 **Why Separate from AuthStore?**
+
 - **AuthStore:** Authentication, login, logout, session
 - **UserStore:** Permissions, access control, page authorization
 - **Separation of concerns:** Auth vs Authorization
@@ -731,16 +762,16 @@ import axiosInstance from "@/lib/axiosInstance";
 
 interface Permission {
   id: number;
-  name: string;              // e.g., "properties.view"
-  name_ar: string;           // "عرض العقارات"
-  name_en: string;           // "View Properties"
+  name: string; // e.g., "properties.view"
+  name_ar: string; // "عرض العقارات"
+  name_en: string; // "View Properties"
   description: string | null;
 }
 
 interface UserData {
   id: number;
   tenant_id: number | null;
-  account_type: string;      // "admin", "manager", "editor", "tenant"
+  account_type: string; // "admin", "manager", "editor", "tenant"
   username: string;
   first_name: string;
   last_name: string;
@@ -761,12 +792,16 @@ export const useUserStore = create<UserState & UserActions>()(
       isInitialized: false,
 
       // ACTIONS
-      
+
       fetchUserData: async () => {
         const { lastFetched, userData } = get();
 
         // Return cached data if still valid
-        if (userData && lastFetched && Date.now() - lastFetched < CACHE_DURATION) {
+        if (
+          userData &&
+          lastFetched &&
+          Date.now() - lastFetched < CACHE_DURATION
+        ) {
           set({ isInitialized: true });
           return;
         }
@@ -776,7 +811,7 @@ export const useUserStore = create<UserState & UserActions>()(
         try {
           const response = await axiosInstance.get("/user");
           const userData = response.data.data;
-          
+
           set({
             userData,
             loading: false,
@@ -797,7 +832,7 @@ export const useUserStore = create<UserState & UserActions>()(
         if (!userData?.permissions) return false;
 
         return userData.permissions.some(
-          (permission) => permission.name === permissionName
+          (permission) => permission.name === permissionName,
         );
       },
 
@@ -817,13 +852,14 @@ export const useUserStore = create<UserState & UserActions>()(
 
         // Permission mapping
         const permissionMap = {
-          "properties": "properties.view",
-          "analytics": "analytics.view",
+          properties: "properties.view",
+          analytics: "analytics.view",
           "rental-management": "rental.management",
           // ... all mappings
         };
 
-        const requiredPermission = permissionMap[pageSlug] || `${pageSlug}.view`;
+        const requiredPermission =
+          permissionMap[pageSlug] || `${pageSlug}.view`;
         return get().checkPermission(requiredPermission);
       },
 
@@ -839,14 +875,15 @@ export const useUserStore = create<UserState & UserActions>()(
         lastFetched: state.lastFetched,
         isInitialized: state.isInitialized,
       }),
-    }
-  )
+    },
+  ),
 );
 ```
 
 ### Key Features
 
 **1. 5-Minute Caching:**
+
 ```typescript
 // Prevents excessive API calls
 if (Date.now() - lastFetched < 5 * 60 * 1000) {
@@ -855,15 +892,17 @@ if (Date.now() - lastFetched < 5 * 60 * 1000) {
 ```
 
 **2. Permission Checking:**
+
 ```typescript
 // Check specific permission
-checkPermission("properties.view") // → true/false
+checkPermission("properties.view"); // → true/false
 
 // Check page access (used by PermissionWrapper)
-hasAccessToPage("properties") // → true/false
+hasAccessToPage("properties"); // → true/false
 ```
 
 **3. Account Type Privileges:**
+
 ```typescript
 // Tenant account = full access
 if (userData.account_type === "tenant") {
@@ -872,6 +911,7 @@ if (userData.account_type === "tenant") {
 ```
 
 **4. Persistence:**
+
 - Zustand persist middleware
 - localStorage key: `user-store`
 - Survives page refreshes
@@ -895,27 +935,28 @@ return <>{children}</>;
 export const usePermissions = () => {
   const pathname = usePathname();
   const { userData, loading, error, hasAccessToPage } = useUserStore();
-  
+
   const pageSlug = getPageSlug(pathname); // "properties"
   const hasPermission = hasAccessToPage(pageSlug);
-  
+
   return { hasPermission, loading, userData, error };
 };
 ```
 
 ### Relationship with AuthStore
 
-| Feature | AuthStore | UserStore |
-|---------|-----------|-----------|
-| **Purpose** | Authentication & session | Permissions & access |
-| **Login/Logout** | ✅ Yes | ❌ No |
-| **Token Storage** | ✅ Yes | ❌ No |
-| **Permissions Check** | ❌ No | ✅ Yes |
-| **Caching** | ❌ No | ✅ Yes (5 min) |
-| **Used By** | Login flow, API calls | PermissionWrapper |
-| **Fetch Endpoint** | `/api/user/getUserInfo` + `/user` | `/user` only |
+| Feature               | AuthStore                         | UserStore            |
+| --------------------- | --------------------------------- | -------------------- |
+| **Purpose**           | Authentication & session          | Permissions & access |
+| **Login/Logout**      | ✅ Yes                            | ❌ No                |
+| **Token Storage**     | ✅ Yes                            | ❌ No                |
+| **Permissions Check** | ❌ No                             | ✅ Yes               |
+| **Caching**           | ❌ No                             | ✅ Yes (5 min)       |
+| **Used By**           | Login flow, API calls             | PermissionWrapper    |
+| **Fetch Endpoint**    | `/api/user/getUserInfo` + `/user` | `/user` only         |
 
 **Both fetch `/user` endpoint but:**
+
 - AuthStore: Stores token, subscription, session data
 - UserStore: Focuses on permissions array and access logic
 
@@ -943,39 +984,41 @@ const useOwnerAuthStore = create((set, get) => ({
   isAuthenticated: false,
   errorLogin: null,
   errorRegister: null,
-  
+
   ownerData: {
     email: null,
     token: null,
     first_name: null,
     last_name: null,
-    tenant_id: null,      // ← Always has tenant context
+    tenant_id: null, // ← Always has tenant context
     owner_id: null,
     permissions: [],
   },
-  
+
   // ACTIONS
-  
+
   login: async (email, password) => {
     // Direct API call (NO internal wrapper)
     const response = await axios.post(
       "https://api.taearif.com/api/v1/owner-rental/login",
-      { email, password }
+      { email, password },
     );
-    
+
     const { owner_rental: user, token } = response.data.data;
-    
+
     // Set CLIENT-SIDE cookies (NOT httpOnly)
     document.cookie = `owner_token=${token}; path=/; max-age=604800`;
     document.cookie = `ownerRentalToken=${token}; path=/; max-age=604800`;
-    
+
     set({ ownerIsLogged: true, ownerData: { ...user, token } });
     localStorage.setItem("owner_user", JSON.stringify(ownerData));
   },
-  
+
   logout: async () => {
-    document.cookie = "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "owner_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "ownerRentalToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem("owner_user");
     set({ ownerIsLogged: false, ownerData: null });
   },
@@ -986,18 +1029,18 @@ export default useOwnerAuthStore;
 
 ### Critical Differences from Dashboard AuthStore
 
-| Feature | Dashboard (AuthStore) | Owner (OwnerAuthStore) |
-|---------|----------------------|------------------------|
-| **Routes** | `/dashboard/*` | `/owner/*` |
-| **Cookie Names** | `authToken`, `next-auth.session-token` | `owner_token`, `ownerRentalToken` |
-| **Cookie Type** | ✅ httpOnly (server-set, secure) | ❌ Client-side (JavaScript accessible) |
-| **API Endpoint** | `/api/login` → `/login` | Direct: `/v1/owner-rental/login` |
-| **API Wrapper** | ✅ Internal `/api/user/*` | ❌ No wrapper |
-| **localStorage Key** | `user` | `owner_user` |
-| **Requires Tenant?** | ❌ NO (works on base domain) | ✅ YES (subdomain/custom domain only) |
-| **Middleware Check** | Via ClientLayout (client) | Via middleware.ts (server) |
-| **Security** | ✅ High (httpOnly) | ⚠️ Lower (client cookies) |
-| **OAuth Support** | ✅ Yes (NextAuth + Google) | ❌ No |
+| Feature              | Dashboard (AuthStore)                  | Owner (OwnerAuthStore)                 |
+| -------------------- | -------------------------------------- | -------------------------------------- |
+| **Routes**           | `/dashboard/*`                         | `/owner/*`                             |
+| **Cookie Names**     | `authToken`, `next-auth.session-token` | `owner_token`, `ownerRentalToken`      |
+| **Cookie Type**      | ✅ httpOnly (server-set, secure)       | ❌ Client-side (JavaScript accessible) |
+| **API Endpoint**     | `/api/login` → `/login`                | Direct: `/v1/owner-rental/login`       |
+| **API Wrapper**      | ✅ Internal `/api/user/*`              | ❌ No wrapper                          |
+| **localStorage Key** | `user`                                 | `owner_user`                           |
+| **Requires Tenant?** | ❌ NO (works on base domain)           | ✅ YES (subdomain/custom domain only)  |
+| **Middleware Check** | Via ClientLayout (client)              | Via middleware.ts (server)             |
+| **Security**         | ✅ High (httpOnly)                     | ⚠️ Lower (client cookies)              |
+| **OAuth Support**    | ✅ Yes (NextAuth + Google)             | ❌ No                                  |
 
 ### Why They Don't Interact
 
@@ -1051,12 +1094,14 @@ Result:
 ### Security Implications
 
 **Dashboard (Better Security):**
+
 - ✅ httpOnly cookies (XSS protection)
 - ✅ Server-side validation
 - ✅ CSRF protection (NextAuth)
 - ✅ Secure token storage
 
 **Owner (Weaker Security):**
+
 - ⚠️ Client-side cookies (XSS vulnerable)
 - ⚠️ No server-side validation layer
 - ⚠️ No CSRF protection
@@ -1132,26 +1177,26 @@ Result:
 
 ### AuthStore Endpoints
 
-| Endpoint | Method | Purpose | Returns |
-|----------|--------|---------|---------|
-| `/login` | POST | External login API | `{ user, token }` |
-| `/api/user/setAuth` | POST | Set httpOnly cookie | `{ success: true }` |
-| `/api/user/getUserInfo` | GET | Get user from cookie | `{ email, token, username, ... }` |
-| `/api/user/logout` | POST | Clear session | `{ message: "..." }` |
-| `/user` | GET | Get user + subscription | `{ data: { membership, ... } }` |
-| `/auth/google/redirect` | GET | Get Google OAuth URL | `{ url: "..." }` |
+| Endpoint                | Method | Purpose                 | Returns                           |
+| ----------------------- | ------ | ----------------------- | --------------------------------- |
+| `/login`                | POST   | External login API      | `{ user, token }`                 |
+| `/api/user/setAuth`     | POST   | Set httpOnly cookie     | `{ success: true }`               |
+| `/api/user/getUserInfo` | GET    | Get user from cookie    | `{ email, token, username, ... }` |
+| `/api/user/logout`      | POST   | Clear session           | `{ message: "..." }`              |
+| `/user`                 | GET    | Get user + subscription | `{ data: { membership, ... } }`   |
+| `/auth/google/redirect` | GET    | Get Google OAuth URL    | `{ url: "..." }`                  |
 
 ### Store (sidebar) Endpoints
 
-| Endpoint | Method | Purpose | Returns |
-|----------|--------|---------|---------|
-| `/dashboard/menu` | GET | Get sidebar structure | `{ mainNavItems: [...] }` |
+| Endpoint          | Method | Purpose               | Returns                   |
+| ----------------- | ------ | --------------------- | ------------------------- |
+| `/dashboard/menu` | GET    | Get sidebar structure | `{ mainNavItems: [...] }` |
 
 ### UserStore Endpoints
 
-| Endpoint | Method | Purpose | Returns |
-|----------|--------|---------|---------|
-| `/user` | GET | Get user + permissions | `{ data: { permissions: [...], account_type, ... } }` |
+| Endpoint | Method | Purpose                | Returns                                               |
+| -------- | ------ | ---------------------- | ----------------------------------------------------- |
+| `/user`  | GET    | Get user + permissions | `{ data: { permissions: [...], account_type, ... } }` |
 
 ---
 
@@ -1160,6 +1205,7 @@ Result:
 ### Store Responsibilities
 
 **AuthStore (`context/AuthContext.js`):**
+
 - ✅ Login/logout
 - ✅ Session management
 - ✅ Token storage
@@ -1168,18 +1214,21 @@ Result:
 - ❌ NOT permissions checking
 
 **Store (`context/Store.js`):**
+
 - ✅ Sidebar menu
 - ✅ Dashboard analytics
 - ✅ Module-specific data (properties, CRM, etc.)
 - ❌ NOT authentication
 
 **UserStore (`store/userStore.ts`):**
+
 - ✅ Permission checking
 - ✅ Page access control
 - ✅ Data caching (5 min)
 - ❌ NOT login/logout
 
 **OwnerAuthStore (`context/OwnerAuthContext.js`):**
+
 - ⚠️ SEPARATE SYSTEM for `/owner/*` routes
 - ❌ NOT used in dashboard
 - Different cookies, different API, different purpose
@@ -1207,6 +1256,6 @@ Result:
 ---
 
 **See Also:**
+
 - [AUTHENTICATION.md](./AUTHENTICATION.md) - Auth flows in detail
 - [../AUTHENTICATION_SYSTEMS.md](../AUTHENTICATION_SYSTEMS.md) - Complete auth architecture
-

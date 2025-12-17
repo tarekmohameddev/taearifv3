@@ -52,7 +52,7 @@ interface BlogsSectionsProps {
       desktop?: number;
     };
   };
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -68,14 +68,16 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "blogsSections1";
   const uniqueId = props.id || variantId;
-  
+
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-  const getComponentData = useEditorStore(s => s.getComponentData);
-  const blogsSectionsStates = useEditorStore(s => s.blogsSectionsStates);
-  
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const blogsSectionsStates = useEditorStore((s) => s.blogsSectionsStates);
+
   // Get tenant data FIRST
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -90,22 +92,28 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "blogsSections" && component.componentName === variantId) {
+        if (
+          component.type === "blogsSections" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -119,7 +127,7 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -131,50 +139,51 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
   useEffect(() => {
     if (props.useStore) {
       // ✅ Use database data if available
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultBlogsSectionsData(),
-            ...tenantComponentData,  // Database data takes priority
-            ...props
-          }
-        : {
-            ...getDefaultBlogsSectionsData(),
-            ...props
-          };
-      
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultBlogsSectionsData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultBlogsSectionsData(),
+              ...props,
+            };
+
       // Initialize in store
       ensureComponentVariant("blogsSections", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);  // ✅ Add tenantComponentData dependency
-  
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]); // ✅ Add tenantComponentData dependency
+
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = blogsSectionsStates[uniqueId];
   const currentStoreData = getComponentData("blogsSections", uniqueId);
-  
+
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultBlogsSectionsData(),    // 1. Defaults (lowest priority)
-    ...storeData,                         // 2. Store state
-    ...currentStoreData,                  // 3. Current store data
-    ...props                              // 4. Props (highest priority)
+    ...getDefaultBlogsSectionsData(), // 1. Defaults (lowest priority)
+    ...storeData, // 2. Store state
+    ...currentStoreData, // 3. Current store data
+    ...props, // 4. Props (highest priority)
   };
-  
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
-  
+
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   return (
-    <section 
+    <section
       className="w-full py-12 md:py-16"
       style={{
         backgroundColor: mergedData.styling?.backgroundColor || "#8b5f46",
@@ -182,30 +191,38 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
         paddingBottom: mergedData.layout?.padding?.bottom || "3rem",
       }}
     >
-      <div 
+      <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
         style={{ maxWidth: mergedData.layout?.maxWidth || "1280px" }}
       >
         {/* Header Section - Two Paragraphs */}
-        <div 
+        <div
           className="mb-8 md:mb-12 flex flex-col md:flex-row gap-6 md:gap-8 text-right"
           style={{ gap: mergedData.layout?.gap?.paragraphs || "2rem" }}
         >
           {/* First Paragraph - 50% */}
           <div className="w-full md:w-1/2">
-            <p 
+            <p
               className="text-sm md:text-base leading-relaxed"
-              style={{ color: mergedData.styling?.paragraphColor || "rgba(255, 255, 255, 0.9)" }}
+              style={{
+                color:
+                  mergedData.styling?.paragraphColor ||
+                  "rgba(255, 255, 255, 0.9)",
+              }}
             >
               {mergedData.paragraph1}
             </p>
           </div>
-          
+
           {/* Second Paragraph - 50% */}
           <div className="w-full md:w-1/2">
-            <p 
+            <p
               className="text-sm md:text-base leading-relaxed"
-              style={{ color: mergedData.styling?.paragraphColor || "rgba(255, 255, 255, 0.9)" }}
+              style={{
+                color:
+                  mergedData.styling?.paragraphColor ||
+                  "rgba(255, 255, 255, 0.9)",
+              }}
             >
               {mergedData.paragraph2}
             </p>
@@ -213,13 +230,16 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
         </div>
 
         {/* Divider */}
-        <div 
+        <div
           className="w-full h-[1px] my-8 md:my-12"
-          style={{ backgroundColor: mergedData.styling?.dividerColor || "rgba(255, 255, 255, 0.3)" }}
+          style={{
+            backgroundColor:
+              mergedData.styling?.dividerColor || "rgba(255, 255, 255, 0.3)",
+          }}
         ></div>
 
         {/* Cards Grid */}
-        <div 
+        <div
           className="grid gap-6 md:gap-8"
           style={{
             gridTemplateColumns: `repeat(${mergedData.layout?.gridColumns?.desktop || 3}, 1fr)`,
@@ -231,7 +251,8 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
               key={card.id || index}
               className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
               style={{
-                backgroundColor: mergedData.styling?.cardBackgroundColor || "#ffffff",
+                backgroundColor:
+                  mergedData.styling?.cardBackgroundColor || "#ffffff",
               }}
             >
               {/* Card Image */}
@@ -251,16 +272,18 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
               <div className="p-6">
                 {/* Title */}
                 <Link href={card.readMoreUrl || "#"}>
-                  <h3 
+                  <h3
                     className="text-lg md:text-xl font-bold mb-3 transition-colors"
                     style={{
                       color: mergedData.styling?.cardTitleColor || "#1f2937",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = mergedData.styling?.cardTitleHoverColor || "#8b5f46";
+                      e.currentTarget.style.color =
+                        mergedData.styling?.cardTitleHoverColor || "#8b5f46";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = mergedData.styling?.cardTitleColor || "#1f2937";
+                      e.currentTarget.style.color =
+                        mergedData.styling?.cardTitleColor || "#1f2937";
                     }}
                   >
                     {card.title}
@@ -268,9 +291,12 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
                 </Link>
 
                 {/* Description */}
-                <p 
+                <p
                   className="text-sm md:text-base leading-relaxed mb-4"
-                  style={{ color: mergedData.styling?.cardDescriptionColor || "#4b5563" }}
+                  style={{
+                    color:
+                      mergedData.styling?.cardDescriptionColor || "#4b5563",
+                  }}
                 >
                   {card.description}
                 </p>
@@ -283,10 +309,12 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
                     color: mergedData.styling?.readMoreColor || "#8b5f46",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = mergedData.styling?.readMoreHoverColor || "#6b4630";
+                    e.currentTarget.style.color =
+                      mergedData.styling?.readMoreHoverColor || "#6b4630";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = mergedData.styling?.readMoreColor || "#8b5f46";
+                    e.currentTarget.style.color =
+                      mergedData.styling?.readMoreColor || "#8b5f46";
                   }}
                 >
                   قراءة المزيد...
@@ -294,9 +322,11 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
 
                 {/* Date */}
                 <div className="pt-4 border-t border-gray-200">
-                  <span 
+                  <span
                     className="text-xs md:text-sm"
-                    style={{ color: mergedData.styling?.dateColor || "#6b7280" }}
+                    style={{
+                      color: mergedData.styling?.dateColor || "#6b7280",
+                    }}
                   >
                     {card.date}
                   </span>
@@ -309,4 +339,3 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
     </section>
   );
 }
-

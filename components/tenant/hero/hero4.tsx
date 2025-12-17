@@ -54,7 +54,10 @@ export default function Hero4(props: Hero4Props = {}) {
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "hero" && component.componentName === variantId) {
+        if (
+          component.type === "hero" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
@@ -65,7 +68,10 @@ export default function Hero4(props: Hero4Props = {}) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -104,12 +110,7 @@ export default function Hero4(props: Hero4Props = {}) {
       // Initialize in store
       ensureComponentVariant("hero", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    props.useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-  ]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -138,14 +139,24 @@ export default function Hero4(props: Hero4Props = {}) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   return (
-    <div className={`relative w-full flex items-center justify-center pb-20  ${
-      mergedData.barType === "contact" || mergedData.contact ? "sm:pb-[400px]" : mergedData.barType === "propertyFilter" ? "sm:pb-[50px]" : "sm:pb-[50px] "
-    }`}>
+    <div
+      className={`relative w-full flex items-center justify-center pb-20  ${
+        mergedData.barType === "contact" || mergedData.contact
+          ? "sm:pb-[400px]"
+          : mergedData.barType === "propertyFilter"
+            ? "sm:pb-[50px]"
+            : "sm:pb-[50px] "
+      }`}
+    >
       {/* Hero Section - Image with max height 200px */}
       <section className="relative w-full h-[300px] overflow-visible">
         {/* Background Image */}
         <Image
-          src={mergedData.backgroundImage || mergedData.background?.image || "https://dalel-lovat.vercel.app/images/hero.webp"}
+          src={
+            mergedData.backgroundImage ||
+            mergedData.background?.image ||
+            "https://dalel-lovat.vercel.app/images/hero.webp"
+          }
           alt="صورة خلفية"
           fill
           priority
@@ -159,7 +170,9 @@ export default function Hero4(props: Hero4Props = {}) {
         {/* Title */}
         <div className="absolute inset-0 z-[2] flex items-center justify-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
-            {mergedData.title || mergedData.content?.title || "عن باهية العقارية"}
+            {mergedData.title ||
+              mergedData.content?.title ||
+              "عن باهية العقارية"}
           </h2>
         </div>
       </section>
@@ -167,7 +180,11 @@ export default function Hero4(props: Hero4Props = {}) {
       {/* Floating Contact Form Bar - طائرة بين القسمين */}
       <div
         className={`absolute top-0   ${
-          mergedData.barType === "contact" || mergedData.contact ? "max-w-6xl mt-[13rem]" : mergedData.barType === "propertyFilter" ? "max-w-[1000px] mt-[15rem]" : "max-w-7xl mt-[16rem]"
+          mergedData.barType === "contact" || mergedData.contact
+            ? "max-w-6xl mt-[13rem]"
+            : mergedData.barType === "propertyFilter"
+              ? "max-w-[1000px] mt-[15rem]"
+              : "max-w-7xl mt-[16rem]"
         }  z-[10] w-full  px-4 sm:px-6 lg:px-8`}
       >
         {mergedData.barType === "propertyFilter" ? (
@@ -535,5 +552,3 @@ export default function Hero4(props: Hero4Props = {}) {
     </div>
   );
 }
-
-

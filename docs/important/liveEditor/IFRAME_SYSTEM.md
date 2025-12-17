@@ -1,6 +1,7 @@
 # iframe System - Complete Reference
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [AutoFrame Component](#autoframe-component)
 3. [Style Synchronization](#style-synchronization)
@@ -13,6 +14,7 @@
 ## Overview
 
 The Live Editor uses an **isolated iframe** to render the website preview. This provides:
+
 - **Style isolation**: Editor UI styles don't affect preview
 - **Real-world simulation**: Preview matches production environment
 - **Responsive testing**: Switch between device sizes
@@ -21,6 +23,7 @@ The Live Editor uses an **isolated iframe** to render the website preview. This 
 ### Why iframe?
 
 **Without iframe**:
+
 ```
 ┌─────────────────────────────────────┐
 │  Editor UI                          │
@@ -33,6 +36,7 @@ The Live Editor uses an **isolated iframe** to render the website preview. This 
 ```
 
 **With iframe**:
+
 ```
 ┌─────────────────────────────────────┐
 │  Editor UI                          │
@@ -91,7 +95,7 @@ const AutoFrame = ({
   const [mountTarget, setMountTarget] = useState(null);
   const [stylesLoaded, setStylesLoaded] = useState(false);
   const stylesInitializedRef = useRef(false);
-  
+
   // ═══════════════════════════════════════════════════════════
   // FUNCTION 1: Copy Styles from Parent Window to iframe
   // ═══════════════════════════════════════════════════════════
@@ -100,23 +104,23 @@ const AutoFrame = ({
     if (stylesInitializedRef.current) {
       return;
     }
-    
+
     // Get all style elements from parent
     const styleElements = document.querySelectorAll(
       'style, link[rel="stylesheet"]'
     );
     const iframeHead = iframeDoc.head;
-    
+
     // Clear iframe head first
     iframeHead.innerHTML = "";
-    
+
     // Copy all styles
     styleElements.forEach(styleEl => {
       if (styleEl.tagName === "STYLE") {
         // Clone inline <style> tags
         const clonedStyle = styleEl.cloneNode(true) as HTMLStyleElement;
         iframeHead.appendChild(clonedStyle);
-        
+
       } else if (styleEl.tagName === "LINK") {
         // Clone <link rel="stylesheet"> tags
         const linkEl = styleEl as HTMLLinkElement;
@@ -124,19 +128,19 @@ const AutoFrame = ({
         iframeHead.appendChild(clonedLink);
       }
     });
-    
+
     // Copy CSS custom properties (variables)
     const parentComputedStyle = getComputedStyle(document.documentElement);
-    
+
     for (let i = 0; i < parentComputedStyle.length; i++) {
       const property = parentComputedStyle[i];
-      
+
       if (property.startsWith("--")) {
         const value = parentComputedStyle.getPropertyValue(property);
         iframeDoc.documentElement.style.setProperty(property, value);
       }
     }
-    
+
     // Add iframe-specific styles
     const additionalStyles = document.createElement("style");
     additionalStyles.textContent = `
@@ -164,7 +168,7 @@ const AutoFrame = ({
       }
     `;
     iframeHead.appendChild(additionalStyles);
-    
+
     // Copy important meta tags
     const metaTags = document.querySelectorAll(
       'meta[name="viewport"], meta[charset]'
@@ -173,11 +177,11 @@ const AutoFrame = ({
       const clonedMeta = metaTag.cloneNode(true) as HTMLMetaElement;
       iframeHead.appendChild(clonedMeta);
     });
-    
+
     // Mark as initialized
     stylesInitializedRef.current = true;
   }, []);
-  
+
   // ═══════════════════════════════════════════════════════════
   // FUNCTION 2: Observe Style Changes in Parent
   // ═══════════════════════════════════════════════════════════
@@ -188,7 +192,7 @@ const AutoFrame = ({
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const element = node as Element;
-              
+
               if (element.matches('style, link[rel="stylesheet"]')) {
                 // New style added to parent - copy to iframe
                 const clonedElement = element.cloneNode(true) as HTMLElement;
@@ -199,32 +203,32 @@ const AutoFrame = ({
         }
       });
     });
-    
+
     // Watch parent document.head for changes
     observer.observe(document.head, {
       childList: true,
       subtree: true
     });
-    
+
     return observer;
   }, []);
-  
+
   // ═══════════════════════════════════════════════════════════
   // FUNCTION 3: Update CSS Variables Periodically
   // ═══════════════════════════════════════════════════════════
   const updateCSSVariables = useCallback((iframeDoc: Document) => {
     const parentComputedStyle = getComputedStyle(document.documentElement);
-    
+
     for (let i = 0; i < parentComputedStyle.length; i++) {
       const property = parentComputedStyle[i];
-      
+
       if (property.startsWith("--")) {
         const value = parentComputedStyle.getPropertyValue(property);
         iframeDoc.documentElement.style.setProperty(property, value);
       }
     }
   }, []);
-  
+
   // ═══════════════════════════════════════════════════════════
   // EFFECT: Initialize iframe When Loaded
   // ═══════════════════════════════════════════════════════════
@@ -232,22 +236,22 @@ const AutoFrame = ({
     if (frameRef.current && loaded) {
       const doc = frameRef.current.contentDocument;
       const win = frameRef.current.contentWindow;
-      
+
       if (doc && win) {
         // STEP 1: Copy styles
         copyStylesToIframe(doc);
-        
+
         // STEP 2: Set mount target
         setMountTarget(doc.getElementById("frame-root"));
-        
+
         // STEP 3: Observe style changes
         const styleObserver = observeStyleChanges(doc);
-        
+
         // STEP 4: Update CSS variables periodically
         const cssVariablesInterval = setInterval(() => {
           updateCSSVariables(doc);
         }, 1000);  // Every 1 second
-        
+
         // STEP 5: Check if styles loaded
         const checkStylesLoaded = () => {
           const iframeStyles = doc.querySelectorAll(
@@ -256,7 +260,7 @@ const AutoFrame = ({
           const parentStyles = document.querySelectorAll(
             'style, link[rel="stylesheet"]'
           );
-          
+
           if (iframeStyles.length >= parentStyles.length) {
             setStylesLoaded(true);
             if (onReady) onReady();
@@ -264,9 +268,9 @@ const AutoFrame = ({
             setTimeout(checkStylesLoaded, 50);
           }
         };
-        
+
         setTimeout(checkStylesLoaded, 100);
-        
+
         // CLEANUP
         return () => {
           styleObserver.disconnect();
@@ -277,7 +281,7 @@ const AutoFrame = ({
       }
     }
   }, [frameRef, loaded, copyStylesToIframe, observeStyleChanges]);
-  
+
   // ═══════════════════════════════════════════════════════════
   // CLEANUP: Reset on Unmount
   // ═══════════════════════════════════════════════════════════
@@ -286,7 +290,7 @@ const AutoFrame = ({
       stylesInitializedRef.current = false;
     };
   }, []);
-  
+
   // ═══════════════════════════════════════════════════════════
   // RENDER: iframe with Portal
   // ═══════════════════════════════════════════════════════════
@@ -313,6 +317,7 @@ const AutoFrame = ({
 ### Why Synchronize Styles?
 
 React components in iframe need the same styles as parent window:
+
 - Tailwind CSS classes
 - Component styles
 - CSS variables
@@ -357,7 +362,7 @@ styleElements.forEach(styleEl => {
     // Inline styles
     const clonedStyle = styleEl.cloneNode(true);
     iframeDoc.head.appendChild(clonedStyle);
-    
+
   } else if (styleEl.tagName === "LINK") {
     // External stylesheets
     const clonedLink = styleEl.cloneNode(true);
@@ -370,7 +375,7 @@ Result:
     <style>/* Tailwind */</style>
     <style>/* Global CSS */</style>
     <link rel="stylesheet" href="/styles.css" />
-  
+
   iframe <head>:
     <style>/* Tailwind */</style>  ← Copied
     <style>/* Global CSS */</style>  ← Copied
@@ -383,7 +388,7 @@ const parentComputedStyle = getComputedStyle(document.documentElement);
 
 for (let i = 0; i < parentComputedStyle.length; i++) {
   const property = parentComputedStyle[i];
-  
+
   if (property.startsWith("--")) {
     const value = parentComputedStyle.getPropertyValue(property);
     iframeDoc.documentElement.style.setProperty(property, value);
@@ -395,7 +400,7 @@ Result:
     --primary-color: #3B82F6
     --secondary-color: #10B981
     --font-family: "Tajawal"
-  
+
   iframe:
     --primary-color: #3B82F6  ← Copied
     --secondary-color: #10B981  ← Copied
@@ -413,7 +418,7 @@ additionalStyles.textContent = `
     overflow-x: hidden;
     overflow-y: auto;
   }
-  
+
   #frame-root {
     width: 100%;
     height: 100%;
@@ -549,7 +554,7 @@ STEP 3: Wait for Styles
 checkStylesLoaded():
   const iframeStyles = doc.querySelectorAll('style, link');
   const parentStyles = document.querySelectorAll('style, link');
-  
+
   if (iframeStyles.length >= parentStyles.length) {
     setStylesLoaded(true);
   } else {
@@ -580,6 +585,7 @@ RESULT: React components render inside iframe ✓
 4. **Hooks Work**: useState, useEffect, custom hooks all functional
 
 **Example**:
+
 ```typescript
 // Parent component (outside iframe)
 const [count, setCount] = useState(0);
@@ -606,18 +612,18 @@ const getDeviceDimensions = (t) => ({
   phone: {
     width: 375,
     height: 667,
-    name: t("live_editor.responsive.mobile")
+    name: t("live_editor.responsive.mobile"),
   },
   tablet: {
     width: 768,
     height: 1024,
-    name: t("live_editor.responsive.tablet")
+    name: t("live_editor.responsive.tablet"),
   },
   laptop: {
     width: "100%",
     height: "100%",
-    name: t("live_editor.responsive.desktop")
-  }
+    name: t("live_editor.responsive.desktop"),
+  },
 });
 ```
 
@@ -628,13 +634,13 @@ const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
 
 const handleDeviceChange = (device: DeviceType) => {
   setSelectedDevice(device);
-  
+
   // Force re-render of specific components
   setTimeout(() => {
     const componentsToRefresh = [
       "hero1", "hero2", "header1", ...
     ];
-    
+
     const updatedComponents = pageComponents.map(comp => {
       if (componentsToRefresh.includes(comp.componentName)) {
         return {
@@ -645,9 +651,9 @@ const handleDeviceChange = (device: DeviceType) => {
       }
       return comp;
     });
-    
+
     setPageComponents(updatedComponents);
-    
+
     // Update store
     setTimeout(() => {
       store.forceUpdatePageComponents(currentPage, updatedComponents);
@@ -687,7 +693,7 @@ const handleDeviceChange = (device: DeviceType) => {
   >
     <MobileIcon />
   </button>
-  
+
   {/* Tablet */}
   <button
     onClick={() => handleDeviceChange("tablet")}
@@ -695,7 +701,7 @@ const handleDeviceChange = (device: DeviceType) => {
   >
     <TabletIcon />
   </button>
-  
+
   {/* Desktop */}
   <button
     onClick={() => handleDeviceChange("laptop")}
@@ -718,7 +724,7 @@ Components can adapt to device type:
 // In hero1.tsx
 export default function Hero1(props) {
   const deviceType = props.deviceType || "laptop";
-  
+
   return (
     <section
       className={
@@ -727,7 +733,7 @@ export default function Hero1(props) {
         "text-lg"
       }
       style={{
-        height: 
+        height:
           deviceType === "phone" ? "90vh" :
           deviceType === "tablet" ? "90vh" :
           "90vh"
@@ -740,6 +746,7 @@ export default function Hero1(props) {
 ```
 
 **Device Type Passed**:
+
 ```typescript
 <CachedComponent
   data={{
@@ -764,25 +771,27 @@ export function CachedComponent({
   data
 }) {
   const cacheKey = `${componentName}-${JSON.stringify(data)}`;
-  
+
   return useMemo(() => {
     const Component = COMPONENTS[section]?.[componentName];
-    
+
     if (!Component) {
       return <div>Component not found: {componentName}</div>;
     }
-    
+
     return <Component {...data} />;
   }, [componentName, data, cacheKey]);
 }
 ```
 
 **How It Works**:
+
 - Create cache key from componentName + data
 - useMemo prevents re-render if key unchanged
 - Only re-renders when data actually changes
 
 **Benefits**:
+
 - Reduces iframe re-renders
 - Improves scrolling performance
 - Faster editing experience
@@ -793,10 +802,11 @@ For high-frequency updates (e.g., color picker dragging):
 
 ```typescript
 const debouncedUpdate = useMemo(
-  () => debounce((path, value) => {
-    updateValue(path, value);
-  }, 300),  // Wait 300ms after last change
-  [updateValue]
+  () =>
+    debounce((path, value) => {
+      updateValue(path, value);
+    }, 300), // Wait 300ms after last change
+  [updateValue],
 );
 ```
 
@@ -816,6 +826,7 @@ Only re-render components that changed:
 ```
 
 **Key Breakdown**:
+
 - `component.id`: Stable identifier
 - `forceUpdate`: Timestamp to force re-render
 - `selectedDevice`: Triggers re-render on device change
@@ -830,9 +841,9 @@ const copyStylesToIframe = useCallback((iframeDoc) => {
   if (stylesInitializedRef.current) {
     return;
   }
-  
+
   // ... copy styles ...
-  
+
   stylesInitializedRef.current = true;
 }, []);
 ```
@@ -883,16 +894,14 @@ UNMOUNT:
 **Symptoms**: Components render unstyled in iframe
 
 **Debug**:
+
 ```typescript
-console.log("iframe styles:", 
-  iframeDoc.querySelectorAll('style, link').length
-);
-console.log("Parent styles:", 
-  document.querySelectorAll('style, link').length
-);
+console.log("iframe styles:", iframeDoc.querySelectorAll("style, link").length);
+console.log("Parent styles:", document.querySelectorAll("style, link").length);
 ```
 
 **Solutions**:
+
 1. Increase `checkStylesLoaded` timeout
 2. Force style copy: `stylesInitializedRef.current = false`
 3. Check MutationObserver is running
@@ -903,17 +912,21 @@ console.log("Parent styles:",
 **Symptoms**: Theme changes not reflected in iframe
 
 **Debug**:
+
 ```typescript
-const iframeVars = getComputedStyle(iframeDoc.documentElement)
-  .getPropertyValue("--primary-color");
-const parentVars = getComputedStyle(document.documentElement)
-  .getPropertyValue("--primary-color");
+const iframeVars = getComputedStyle(iframeDoc.documentElement).getPropertyValue(
+  "--primary-color",
+);
+const parentVars = getComputedStyle(document.documentElement).getPropertyValue(
+  "--primary-color",
+);
 
 console.log("iframe --primary-color:", iframeVars);
 console.log("Parent --primary-color:", parentVars);
 ```
 
 **Solutions**:
+
 1. Check interval is running
 2. Verify updateCSSVariables called
 3. Force manual update: `updateCSSVariables(iframeDoc)`
@@ -923,6 +936,7 @@ console.log("Parent --primary-color:", parentVars);
 **Symptoms**: iframe empty, components not visible
 
 **Debug**:
+
 ```typescript
 console.log("loaded:", loaded);
 console.log("mountTarget:", mountTarget);
@@ -931,6 +945,7 @@ console.log("frameRef.current:", frameRef.current);
 ```
 
 **Solutions**:
+
 1. Verify all three conditions true: loaded && mountTarget && stylesLoaded
 2. Check #frame-root exists in iframe
 3. Ensure frameRef.current not null
@@ -940,6 +955,7 @@ console.log("frameRef.current:", frameRef.current);
 **Symptoms**: Clicks/inputs in iframe not responding
 
 **Debug**:
+
 ```typescript
 // Check event bubbling
 iframeDoc.getElementById("test-button")?.addEventListener("click", (e) => {
@@ -948,6 +964,7 @@ iframeDoc.getElementById("test-button")?.addEventListener("click", (e) => {
 ```
 
 **Solutions**:
+
 1. Verify portal created successfully
 2. Check React event handlers attached
 3. Ensure no pointer-events: none on elements
@@ -968,11 +985,14 @@ const injectCustomCSS = (iframeDoc, css) => {
 };
 
 // Usage
-injectCustomCSS(iframeDoc, `
+injectCustomCSS(
+  iframeDoc,
+  `
   .hero-section {
     animation: fadeIn 1s ease-in-out;
   }
-`);
+`,
+);
 ```
 
 ### Pattern 2: Script Injection
@@ -1001,10 +1021,10 @@ Ensure fonts load in iframe:
 ```typescript
 const copyFonts = (iframeDoc) => {
   const fontLinks = document.querySelectorAll(
-    'link[rel="stylesheet"][href*="fonts.googleapis.com"]'
+    'link[rel="stylesheet"][href*="fonts.googleapis.com"]',
   );
-  
-  fontLinks.forEach(link => {
+
+  fontLinks.forEach((link) => {
     const clonedLink = link.cloneNode(true);
     iframeDoc.head.appendChild(clonedLink);
   });
@@ -1026,6 +1046,7 @@ const copyFonts = (iframeDoc) => {
 ### When Modifying iframe System
 
 1. **Always check all three conditions** before portal:
+
    ```typescript
    {loaded && mountTarget && stylesLoaded && createPortal(...)}
    ```
@@ -1033,6 +1054,7 @@ const copyFonts = (iframeDoc) => {
 2. **Never mutate iframe directly**: Use React Portal
 
 3. **Clean up observers and intervals**: Prevent memory leaks
+
    ```typescript
    return () => {
      observer.disconnect();
@@ -1049,6 +1071,7 @@ const copyFonts = (iframeDoc) => {
 ### Common Mistakes
 
 ❌ **Mistake 1**: Forgetting to copy CSS variables
+
 ```typescript
 // WRONG - Only copies style elements
 copyStylesToIframe(iframeDoc);
@@ -1059,6 +1082,7 @@ updateCSSVariables(iframeDoc);
 ```
 
 ❌ **Mistake 2**: Not observing style changes
+
 ```typescript
 // WRONG - Styles copied once, new styles missed
 copyStylesToIframe(iframeDoc);
@@ -1069,6 +1093,7 @@ const observer = observeStyleChanges(iframeDoc);
 ```
 
 ❌ **Mistake 3**: Rendering before styles ready
+
 ```typescript
 // WRONG - Components render unstyled
 {loaded && mountTarget && createPortal(...)}
@@ -1090,6 +1115,7 @@ The iframe system provides:
 5. **React Portal Integration**: Components render naturally
 
 **Key Components**:
+
 - AutoFrame: iframe wrapper with sync logic
 - copyStylesToIframe: Initial style copy
 - observeStyleChanges: Ongoing sync
@@ -1097,8 +1123,8 @@ The iframe system provides:
 - createPortal: React component rendering
 
 Understanding this system is essential for:
+
 - Debugging rendering issues
 - Adding new preview features
 - Optimizing performance
 - Handling style conflicts
-

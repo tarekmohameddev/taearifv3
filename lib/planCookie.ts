@@ -43,7 +43,7 @@ export function setPlanCookie(planData: PlanData): void {
     expires.setTime(expires.getTime() + PLAN_COOKIE_MAX_AGE * 1000);
 
     document.cookie = `${PLAN_COOKIE_NAME}=${encodeURIComponent(
-      cookieValue
+      cookieValue,
     )}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
   } catch (error) {
     console.error("Error setting plan cookie:", error);
@@ -59,13 +59,13 @@ export function getPlanCookie(): PlanData | null {
   try {
     const cookies = document.cookie.split("; ");
     const planCookie = cookies.find((cookie) =>
-      cookie.startsWith(`${PLAN_COOKIE_NAME}=`)
+      cookie.startsWith(`${PLAN_COOKIE_NAME}=`),
     );
 
     if (!planCookie) return null;
 
     const cookieValue = decodeURIComponent(
-      planCookie.split("=").slice(1).join("=")
+      planCookie.split("=").slice(1).join("="),
     );
     const data = JSON.parse(cookieValue);
 
@@ -131,4 +131,3 @@ export function clearPlanFetchFlag(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem("plan_fetched");
 }
-

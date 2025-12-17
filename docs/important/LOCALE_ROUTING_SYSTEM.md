@@ -3,6 +3,7 @@
 ## Overview
 
 The application implements a **custom i18n (internationalization) routing system** using Next.js middleware that:
+
 - Supports two locales: **Arabic (`ar`)** and **English (`en`)**
 - Handles automatic locale prefix injection
 - Manages RTL/LTR direction switching
@@ -14,6 +15,7 @@ The application implements a **custom i18n (internationalization) routing system
 ## Core Concepts
 
 ### Supported Locales
+
 ```typescript
 const locales = ["ar", "en"];
 const defaultLocale = "en";
@@ -21,15 +23,18 @@ const liveEditorDefaultLocale = "ar";
 ```
 
 ### URL Structure
+
 All pages (except special cases) must have a locale prefix:
 
 **Valid URLs:**
+
 - `/ar/dashboard` ✓
 - `/en/dashboard` ✓
 - `/ar/` ✓ (homepage in Arabic)
 - `/en/about-us` ✓
 
 **Invalid URLs (will redirect):**
+
 - `/dashboard` → redirects to `/ar/dashboard`
 - `/` → redirects to `/ar/`
 - `/about-us` → redirects to `/ar/about-us`
@@ -39,11 +44,13 @@ All pages (except special cases) must have a locale prefix:
 **As of October 26, 2025**, the middleware has been updated to **preserve query parameters** during locale redirects.
 
 **Before Fix (Bug):**
+
 ```
 /for-rent?purpose=rent&search=الرياض → /ar/for-rent  ❌ (params lost!)
 ```
 
 **After Fix:**
+
 ```
 /for-rent?purpose=rent&search=الرياض → /ar/for-rent?purpose=rent&search=الرياض  ✅
 ```
@@ -69,11 +76,12 @@ function getLocale(pathname: string) {
 }
 
 const pathnameHasLocale = locales.some(
-  (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
 );
 ```
 
 **Examples:**
+
 - `/ar/dashboard` → `pathnameHasLocale = true`, `locale = "ar"`
 - `/en/about-us` → `pathnameHasLocale = true`, `locale = "en"`
 - `/dashboard` → `pathnameHasLocale = false`, `locale = "en"` (default)
@@ -85,10 +93,10 @@ const pathnameHasLocale = locales.some(
 if (!pathnameHasLocale) {
   // Use Arabic as default for all pages
   const locale = "ar";
-  
+
   // Redirect for all pages that don't have locale
   const shouldRedirect = true;
-  
+
   if (shouldRedirect) {
     // IMPORTANT: Preserve query parameters during redirect
     const searchParams = request.nextUrl.search; // Get ?key=value
@@ -101,12 +109,14 @@ if (!pathnameHasLocale) {
 **⚠️ Critical Update (October 26, 2025):**
 
 The middleware now **preserves query parameters** during locale redirects. This is essential for:
+
 - URL-based filtering (e.g., `/for-rent?city_id=5&max_price=5000`)
 - Shareable search URLs
 - Deep linking with parameters
 - Property listing filters
 
 **Flow:**
+
 ```
 User visits: /for-rent?purpose=rent&search=الرياض
   ↓
@@ -146,6 +156,7 @@ const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
 ```
 
 **Examples:**
+
 - `/ar/dashboard` → `pathnameWithoutLocale = "/dashboard"`
 - `/en/about-us` → `pathnameWithoutLocale = "/about-us"`
 - `/ar/property/123` → `pathnameWithoutLocale = "/property/123"`
@@ -161,12 +172,14 @@ const response = NextResponse.rewrite(url);
 ```
 
 **What is Rewrite?**
+
 - **URL in browser stays the same** (e.g., `/ar/dashboard`)
 - **Next.js internally routes to** `/dashboard` (page file)
 - User doesn't see URL change
 - Server-side only transformation
 
 **Flow:**
+
 ```
 Browser shows: /ar/dashboard
   ↓
@@ -188,6 +201,7 @@ response.headers.set("x-pathname", pathnameWithoutLocale);
 ```
 
 **Headers sent to page component:**
+
 - `x-locale`: `"ar"` or `"en"`
 - `x-html-lang`: Same as x-locale (for HTML lang attribute)
 - `x-pathname`: Pathname without locale (e.g., `"/dashboard"`)
@@ -197,14 +211,17 @@ response.headers.set("x-pathname", pathnameWithoutLocale);
 ## Redirect vs Rewrite: Critical Difference
 
 ### Redirect (Step 2)
+
 **When:** URL has NO locale prefix
 **Action:** `NextResponse.redirect()`
-**Result:** 
+**Result:**
+
 - Browser URL changes
 - New HTTP request
 - Status code: 307 (Temporary Redirect) or 308 (Permanent)
 
 **Example:**
+
 ```
 User types: localhost:3000/dashboard
   ↓
@@ -218,14 +235,17 @@ New request sent with: /ar/dashboard
 ```
 
 ### Rewrite (Step 4)
+
 **When:** URL HAS locale prefix
 **Action:** `NextResponse.rewrite()`
 **Result:**
+
 - Browser URL stays the same
 - No new HTTP request
 - Internal routing only
 
 **Example:**
+
 ```
 User visits: localhost:3000/ar/dashboard
   ↓
@@ -274,6 +294,7 @@ if (pathname === `/${locale}`) {
 ```
 
 **Flow:**
+
 ```
 User visits: /ar
   ↓
@@ -299,7 +320,7 @@ export default async function Page() {
   const headersList = await headers();
   const locale = headersList.get("x-locale") || "ar";
   const pathname = headersList.get("x-pathname") || "";
-  
+
   return (
     <div>
       <p>Current locale: {locale}</p>
@@ -319,7 +340,7 @@ import { useClientI18n } from "@/context-liveeditor/clientI18nStore";
 
 export default function ClientComponent() {
   const { locale, t } = useClientI18n();
-  
+
   return (
     <div>
       <p>{t('welcome_message')}</p>
@@ -341,14 +362,14 @@ export default async function RootLayout({ children }) {
   const tenantId = headersList.get("x-tenant-id");
   const pathname = headersList.get("x-pathname") || "";
   const locale = headersList.get("x-locale") || "";
-  
+
   // Pages that support dynamic dir based on locale
   const landingPages = [
     "/", "/solutions", "/updates", "/landing", "/about-us"
   ];
-  
+
   const isLandingPage = landingPages.includes(pathname);
-  
+
   // Set dir based on locale for specific pages
   const dir = isLandingPage ? (locale === "ar" ? "rtl" : "ltr") : "rtl";
 
@@ -364,6 +385,7 @@ export default async function RootLayout({ children }) {
 ```
 
 **Key Points:**
+
 1. **Landing pages** use dynamic `dir` based on locale:
    - `locale = "ar"` → `dir = "rtl"`
    - `locale = "en"` → `dir = "ltr"`
@@ -380,7 +402,8 @@ export default async function RootLayout({ children }) {
 
 ```typescript
 // app/layout.tsx
-const isLiveEditorPage = pathname === "/live-editor" || pathname.startsWith("/live-editor/");
+const isLiveEditorPage =
+  pathname === "/live-editor" || pathname.startsWith("/live-editor/");
 
 if (locale === "en" && !isLiveEditorPage && !isLandingPage) {
   const redirectUrl = `/ar${pathname}`;
@@ -389,12 +412,14 @@ if (locale === "en" && !isLiveEditorPage && !isLandingPage) {
 ```
 
 **Logic:**
+
 - If user accesses English version (`/en/*`)
 - AND it's NOT live-editor page
 - AND it's NOT a landing page
 - THEN redirect to Arabic version (`/ar/*`)
 
 **Examples:**
+
 ```
 /en/dashboard → redirect → /ar/dashboard
 /en/properties → redirect → /ar/properties
@@ -404,6 +429,7 @@ if (locale === "en" && !isLiveEditorPage && !isLandingPage) {
 ```
 
 **Why?**
+
 - Most pages are designed for Arabic (RTL)
 - Only specific pages support English properly
 - Forces users to use Arabic for dashboard/admin pages
@@ -589,6 +615,7 @@ export const config = {
 ```
 
 **What this means:**
+
 - Middleware runs on **ALL routes** except:
   - `/api/*` - API routes
   - `/_next/static/*` - Static files
@@ -596,6 +623,7 @@ export const config = {
   - `/favicon.ico` - Favicon
 
 **Why exclude these?**
+
 - API routes don't need locale prefixes
 - Static files are locale-agnostic
 - Performance optimization (no unnecessary processing)
@@ -619,6 +647,7 @@ if (
 ```
 
 **Paths that bypass locale processing:**
+
 - `/api/*` - API routes
 - `/_next/*` - Next.js internal files
 - Any path with `.` (files like `/logo.png`)
@@ -648,11 +677,13 @@ if (isEnglishPage && !isLiveEditor) {
 ```
 
 **Why disabled?**
+
 - Too restrictive - users couldn't access English versions
 - Moved logic to Layout component for more granular control
 - Now only specific pages (non-landing, non-live-editor) redirect to Arabic
 
 **Current behavior:**
+
 - English pages ARE accessible
 - Only dashboard/admin pages redirect to Arabic
 - Landing pages can be in English or Arabic
@@ -702,17 +733,17 @@ import { useClientI18nStore } from "@/context-liveeditor/clientI18nStore";
 
 export function I18nProvider({ children }) {
   const setLocale = useClientI18nStore((state) => state.setLocale);
-  
+
   useEffect(() => {
     // Extract locale from URL on client side
     const pathSegments = window.location.pathname.split("/");
     const localeFromPath = pathSegments[1];
-    
+
     if (["ar", "en"].includes(localeFromPath)) {
       setLocale(localeFromPath);
     }
   }, [setLocale]);
-  
+
   return <>{children}</>;
 }
 ```
@@ -751,22 +782,22 @@ export function LanguageDropdown() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split("/")[1] || "ar";
-  
+
   const switchLanguage = (newLocale: string) => {
     // Extract pathname without locale
     const pathSegments = pathname.split("/");
     const pathWithoutLocale = pathSegments.slice(2).join("/");
-    
+
     // Build new path with new locale
     const newPath = `/${newLocale}/${pathWithoutLocale}`;
-    
+
     // Navigate to new locale
     router.push(newPath);
   };
-  
+
   return (
-    <select 
-      value={currentLocale} 
+    <select
+      value={currentLocale}
       onChange={(e) => switchLanguage(e.target.value)}
     >
       <option value="ar">العربية</option>
@@ -777,6 +808,7 @@ export function LanguageDropdown() {
 ```
 
 **Flow:**
+
 ```
 Current URL: /ar/about-us
   ↓
@@ -812,6 +844,7 @@ return (
 ```
 
 **Logic:**
+
 1. **Landing pages** (/, /solutions, etc.):
    - Arabic → RTL
    - English → LTR
@@ -832,12 +865,14 @@ ml-4 → margin-right: 1rem (flipped automatically)
 ```
 
 **RTL-safe classes:**
+
 - `ml-*` / `mr-*` → Auto-flip
 - `pl-*` / `pr-*` → Auto-flip
 - `left-*` / `right-*` → Auto-flip
 - `rounded-l-*` / `rounded-r-*` → Auto-flip
 
 **Use logical properties when possible:**
+
 - `ms-*` (margin-start) - Always correct in RTL/LTR
 - `me-*` (margin-end) - Always correct in RTL/LTR
 
@@ -853,17 +888,19 @@ export async function generateMetadata() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
-  
+
   const meta = await getMetaForSlugServer("/", tenantId);
-  
-  const title = locale === "ar" 
-    ? meta.titleAr || meta.titleEn 
-    : meta.titleEn || meta.titleAr;
-    
-  const description = locale === "ar"
-    ? meta.descriptionAr || meta.descriptionEn
-    : meta.descriptionEn || meta.descriptionAr;
-  
+
+  const title =
+    locale === "ar"
+      ? meta.titleAr || meta.titleEn
+      : meta.titleEn || meta.titleAr;
+
+  const description =
+    locale === "ar"
+      ? meta.descriptionAr || meta.descriptionEn
+      : meta.descriptionEn || meta.descriptionAr;
+
   return {
     title,
     description,
@@ -877,6 +914,7 @@ export async function generateMetadata() {
 ```
 
 **Logic:**
+
 - If locale is "ar", prefer Arabic content, fallback to English
 - If locale is "en", prefer English content, fallback to Arabic
 - Always provide OpenGraph metadata with correct locale
@@ -893,7 +931,7 @@ import { headers } from "next/headers";
 export default async function MyPage() {
   const headersList = await headers();
   const locale = headersList.get("x-locale") || "ar";
-  
+
   return (
     <div>
       {locale === "ar" ? "مرحباً" : "Welcome"}
@@ -910,7 +948,7 @@ import { useClientI18n } from "@/context-liveeditor/clientI18nStore";
 
 export default function MyClientComponent() {
   const { locale, t } = useClientI18n();
-  
+
   return (
     <div>
       {t('welcome_message')}
@@ -929,9 +967,9 @@ import { usePathname } from "next/navigation";
 export default function LocalizedLink({ href, children }) {
   const pathname = usePathname();
   const currentLocale = pathname.split("/")[1] || "ar";
-  
+
   const localizedHref = `/${currentLocale}${href}`;
-  
+
   return <Link href={localizedHref}>{children}</Link>;
 }
 
@@ -946,7 +984,7 @@ export default function LocalizedLink({ href, children }) {
 ```typescript
 export default function ConditionalContent() {
   const locale = useClientI18nStore(state => state.locale);
-  
+
   return (
     <div>
       {locale === "ar" ? (
@@ -979,31 +1017,40 @@ console.log("x-locale header:", headersList.get("x-locale"));
 ### Common Issues
 
 #### Issue 1: "Page redirects infinitely"
+
 **Cause:** Middleware redirects to add locale, but locale is immediately removed
 **Solution:** Check if pathname correctly includes locale after redirect
 
 #### Issue 2: "Wrong direction (RTL/LTR)"
+
 **Cause:** `dir` attribute not set correctly in Layout
 **Solution:** Verify `isLandingPage` logic and locale detection
 
 #### Issue 3: "Translations don't work"
+
 **Cause:** I18nProvider not wrapping component, or locale not extracted from URL
-**Solution:** 
+**Solution:**
+
 - Ensure I18nProvider wraps components
 
 #### Issue 4: "Query parameters lost after redirect" (FIXED October 26, 2025)
+
 **Cause:** Middleware was not preserving `request.nextUrl.search` during locale redirect
-**Solution Applied:** 
+**Solution Applied:**
+
 ```typescript
 // In middleware.ts line 329-331
 const searchParams = request.nextUrl.search; // Preserve params
 const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
 return NextResponse.redirect(newUrl);
 ```
+
 **Impact:** URL filtering, shareable links, and deep linking now work correctly
+
 - Check `useClientI18n()` hook returns correct locale
 
 #### Issue 4: "Links lose locale prefix"
+
 **Cause:** Hard-coded links without locale
 **Solution:** Use LocalizedLink component or manually add locale prefix
 
@@ -1064,4 +1111,3 @@ Page renders with correct locale
 ```
 
 This system ensures all pages have proper locale handling while maintaining clean URLs and proper i18n support.
-

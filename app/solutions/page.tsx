@@ -8,7 +8,10 @@ export const dynamic = "force-dynamic";
 export default async function Solutions() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
-  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const domainType = headersList.get("x-domain-type") as
+    | "subdomain"
+    | "custom"
+    | null;
 
   // إذا كان هناك tenantId، فهذه صفحة tenant خاصة - لا نعرض صفحة الحلول العامة
   if (tenantId) {

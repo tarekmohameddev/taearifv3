@@ -259,7 +259,6 @@ export function RentalApplicationsService({
     units: [],
   });
 
-
   // Get filters from store
   const {
     contractSearchTerm,
@@ -287,7 +286,9 @@ export function RentalApplicationsService({
   } = rentalApplications;
 
   // State محلي للبحث مع debounce
-  const [localSearchTerm, setLocalSearchTerm] = useState<string>(contractSearchTerm || "");
+  const [localSearchTerm, setLocalSearchTerm] = useState<string>(
+    contractSearchTerm || "",
+  );
 
   // Debounce للبحث - تحديث contractSearchTerm بعد ثانيتين من توقف الكتابة
   useEffect(() => {
@@ -577,34 +578,44 @@ export function RentalApplicationsService({
       }
 
       try {
-        const response = await axiosInstance.get("/v1/rms/rentals/filter-options");
-        
+        const response = await axiosInstance.get(
+          "/v1/rms/rentals/filter-options",
+        );
+
         console.log("Filter options response:", response.data);
-        
+
         if (response.data.status && response.data.data) {
           // Translate contract_statuses
-          const contractStatuses = (response.data.data.contract_statuses || []).map((status: any) => ({
+          const contractStatuses = (
+            response.data.data.contract_statuses || []
+          ).map((status: any) => ({
             id: status.id,
             name: translateContractStatus(status.id),
           }));
 
           // Translate rental_statuses
-          const rentalStatuses = (response.data.data.rental_statuses || []).map((status: any) => ({
-            id: status.id,
-            name: translateRentalStatus(status.id),
-          }));
+          const rentalStatuses = (response.data.data.rental_statuses || []).map(
+            (status: any) => ({
+              id: status.id,
+              name: translateRentalStatus(status.id),
+            }),
+          );
 
           // Translate payment_statuses
-          const paymentStatuses = (response.data.data.payment_statuses || []).map((status: any) => ({
+          const paymentStatuses = (
+            response.data.data.payment_statuses || []
+          ).map((status: any) => ({
             id: status.id,
             name: translatePaymentStatus(status.id),
           }));
 
           // Translate paying_plans
-          const payingPlans = (response.data.data.paying_plans || []).map((plan: any) => ({
-            id: plan.id,
-            name: translatePayingPlan(plan.id),
-          }));
+          const payingPlans = (response.data.data.paying_plans || []).map(
+            (plan: any) => ({
+              id: plan.id,
+              name: translatePayingPlan(plan.id),
+            }),
+          );
 
           const filterData = {
             contract_statuses: contractStatuses,
@@ -615,7 +626,7 @@ export function RentalApplicationsService({
             projects: response.data.data.projects || [],
             units: response.data.data.units || [],
           };
-          
+
           console.log("Setting filter options:", filterData);
           setFilterOptions(filterData);
         } else {
@@ -866,19 +877,25 @@ export function RentalApplicationsService({
     }
 
     // التحقق من الحقول المطلوبة عند اختيار "مخصص"
-    if (collectionsPeriod === "custom" && (!collectionsFromDate || !collectionsToDate)) {
+    if (
+      collectionsPeriod === "custom" &&
+      (!collectionsFromDate || !collectionsToDate)
+    ) {
       console.log("Collections custom period requires both from and to dates");
       return;
     }
 
-    if (paymentsDuePeriod === "custom" && (!paymentsDueFromDate || !paymentsDueToDate)) {
+    if (
+      paymentsDuePeriod === "custom" &&
+      (!paymentsDueFromDate || !paymentsDueToDate)
+    ) {
       console.log("Payments due custom period requires both from and to dates");
       return;
     }
 
     try {
       setRentalApplications({ loading: true, error: null });
-      
+
       // بناء query parameters من الـ filters
       const params: any = {
         page,
@@ -966,10 +983,9 @@ export function RentalApplicationsService({
         }
       }
 
-      const response = await axiosInstance.get<ApiResponse>(
-        `/v1/rms/rentals`,
-        { params }
-      );
+      const response = await axiosInstance.get<ApiResponse>(`/v1/rms/rentals`, {
+        params,
+      });
 
       if (response.data.status) {
         setRentalApplications({
@@ -998,7 +1014,7 @@ export function RentalApplicationsService({
 
   // التأكد من أن rentals هو array
   const rentalsArray = Array.isArray(rentals) ? rentals : [];
-  
+
   const filteredRentals = rentalsArray.filter((rental: RentalData) => {
     const matchesSearch =
       getTenantName(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1225,15 +1241,17 @@ export function RentalApplicationsService({
             إضافة إيجار جديد
           </Button>
           <Button
-            onClick={() => router.push("/dashboard/rental-management/daily-followup")}
+            onClick={() =>
+              router.push("/dashboard/rental-management/daily-followup")
+            }
             variant="outline"
             className="flex items-center gap-2"
           >
             <Calendar className="h-4 w-4" />
             المتابعة اليومية
           </Button>
-            {/* مؤقتاً مخفي */}
-            {/* <Button
+          {/* مؤقتاً مخفي */}
+          {/* <Button
               onClick={() => router.push("/dashboard/rental-management/contracts")}
               variant="outline"
               className="flex items-center gap-2"
@@ -1242,7 +1260,7 @@ export function RentalApplicationsService({
               العقود
             </Button> */}
         </div>
-        
+
         {/* مؤقتاً مخفي */}
         {/* <div>
           <Button
@@ -1254,7 +1272,6 @@ export function RentalApplicationsService({
           </Button>
         </div> */}
       </div>
-
 
       {/* Statistics Cards */}
       {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -1336,7 +1353,12 @@ export function RentalApplicationsService({
         </div>
         <div className="space-y-2">
           <Label htmlFor="contract-status">حالة الإيجار</Label>
-          <Select value={contractStatusFilter} onValueChange={(value) => setRentalApplications({ contractStatusFilter: value })}>
+          <Select
+            value={contractStatusFilter}
+            onValueChange={(value) =>
+              setRentalApplications({ contractStatusFilter: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر حالة الإيجار" />
             </SelectTrigger>
@@ -1352,7 +1374,12 @@ export function RentalApplicationsService({
         </div>
         <div className="space-y-2">
           <Label htmlFor="payment-status">حالة الدفع</Label>
-          <Select value={paymentStatusFilter} onValueChange={(value) => setRentalApplications({ paymentStatusFilter: value })}>
+          <Select
+            value={paymentStatusFilter}
+            onValueChange={(value) =>
+              setRentalApplications({ paymentStatusFilter: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر حالة الدفع" />
             </SelectTrigger>
@@ -1368,7 +1395,12 @@ export function RentalApplicationsService({
         </div>
         <div className="space-y-2">
           <Label htmlFor="rental-method">طريقة الإيجار</Label>
-          <Select value={rentalMethodFilter} onValueChange={(value) => setRentalApplications({ rentalMethodFilter: value })}>
+          <Select
+            value={rentalMethodFilter}
+            onValueChange={(value) =>
+              setRentalApplications({ rentalMethodFilter: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر طريقة الإيجار" />
             </SelectTrigger>
@@ -1384,7 +1416,12 @@ export function RentalApplicationsService({
         </div>
         <div className="space-y-2">
           <Label htmlFor="building">العمارة</Label>
-          <Select value={buildingFilter} onValueChange={(value) => setRentalApplications({ buildingFilter: value })}>
+          <Select
+            value={buildingFilter}
+            onValueChange={(value) =>
+              setRentalApplications({ buildingFilter: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر العمارة" />
             </SelectTrigger>
@@ -1400,7 +1437,12 @@ export function RentalApplicationsService({
         </div>
         <div className="space-y-2">
           <Label htmlFor="date">التاريخ</Label>
-          <Select value={dateFilter} onValueChange={(value) => setRentalApplications({ dateFilter: value })}>
+          <Select
+            value={dateFilter}
+            onValueChange={(value) =>
+              setRentalApplications({ dateFilter: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر التاريخ" />
             </SelectTrigger>
@@ -1421,7 +1463,9 @@ export function RentalApplicationsService({
                 id="from-date"
                 type="date"
                 value={fromDate}
-                onChange={(e) => setRentalApplications({ fromDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({ fromDate: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -1430,7 +1474,9 @@ export function RentalApplicationsService({
                 id="to-date"
                 type="date"
                 value={toDate}
-                onChange={(e) => setRentalApplications({ toDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({ toDate: e.target.value })
+                }
               />
             </div>
           </>
@@ -1438,9 +1484,11 @@ export function RentalApplicationsService({
         {/* Contract Start Date Filter */}
         <div className="space-y-2">
           <Label htmlFor="contract-start-date-filter">تاريخ بداية العقد</Label>
-          <Select 
-            value={contractStartDateFilter || "all"} 
-            onValueChange={(value) => setRentalApplications({ contractStartDateFilter: value })}
+          <Select
+            value={contractStartDateFilter || "all"}
+            onValueChange={(value) =>
+              setRentalApplications({ contractStartDateFilter: value })
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="اختر التاريخ" />
@@ -1463,7 +1511,11 @@ export function RentalApplicationsService({
                 id="contract-start-from-date"
                 type="date"
                 value={contractStartFromDate || ""}
-                onChange={(e) => setRentalApplications({ contractStartFromDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({
+                    contractStartFromDate: e.target.value,
+                  })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -1472,7 +1524,9 @@ export function RentalApplicationsService({
                 id="contract-start-to-date"
                 type="date"
                 value={contractStartToDate || ""}
-                onChange={(e) => setRentalApplications({ contractStartToDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({ contractStartToDate: e.target.value })
+                }
               />
             </div>
           </>
@@ -1480,9 +1534,11 @@ export function RentalApplicationsService({
         {/* Contract End Date Filter */}
         <div className="space-y-2">
           <Label htmlFor="contract-end-date-filter">تاريخ نهاية العقد</Label>
-          <Select 
-            value={contractEndDateFilter || "all"} 
-            onValueChange={(value) => setRentalApplications({ contractEndDateFilter: value })}
+          <Select
+            value={contractEndDateFilter || "all"}
+            onValueChange={(value) =>
+              setRentalApplications({ contractEndDateFilter: value })
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="اختر التاريخ" />
@@ -1505,7 +1561,9 @@ export function RentalApplicationsService({
                 id="contract-end-from-date"
                 type="date"
                 value={contractEndFromDate || ""}
-                onChange={(e) => setRentalApplications({ contractEndFromDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({ contractEndFromDate: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -1514,7 +1572,9 @@ export function RentalApplicationsService({
                 id="contract-end-to-date"
                 type="date"
                 value={contractEndToDate || ""}
-                onChange={(e) => setRentalApplications({ contractEndToDate: e.target.value })}
+                onChange={(e) =>
+                  setRentalApplications({ contractEndToDate: e.target.value })
+                }
               />
             </div>
           </>
@@ -1528,43 +1588,43 @@ export function RentalApplicationsService({
         style={tableMaxWidth ? { maxWidth: `${tableMaxWidth}px` } : {}}
       >
         <table className="w-full min-w-[1000px]">
-            <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
-              <tr>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  رقم العقد
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  المستأجر
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  الوحدة
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  مبلغ الإيجار
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  مدة الإيجار
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  تاريخ الانتقال
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  التاريخ
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  الحالة
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  السداد
-                </th>
-                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  الإجراءات
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                // Skeleton loader أثناء التحميل
+          <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
+            <tr>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                رقم العقد
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                المستأجر
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                الوحدة
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                مبلغ الإيجار
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                مدة الإيجار
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                تاريخ الانتقال
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                التاريخ
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                الحالة
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                السداد
+              </th>
+              <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                الإجراءات
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {loading
+              ? // Skeleton loader أثناء التحميل
                 [...Array(5)].map((_, index) => (
                   <tr
                     key={`skeleton-${index}`}
@@ -1613,321 +1673,349 @@ export function RentalApplicationsService({
                     </td>
                   </tr>
                 ))
-              ) : (
-                filteredRentals.map((rental: RentalData, index: number) => (
-                <tr
-                  key={rental.id}
-                  onClick={(e) => {
-                    // منع فتح dialog إذا تم الضغط على dropdown menu أو أزرار
-                    if (
-                      (e.target as any).closest?.("button") ||
-                      (e.target as any).closest?.('[role="menuitem"]') ||
-                      (e.target as any).closest?.(".cursor-pointer")
-                    ) {
-                      return;
-                    }
-                    router.push(`/dashboard/rental-management/${rental.id}`);
-                  }}
-                  className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-25"
-                  }`}
-                >
-                  {/* رقم العقد */}
-                  <td className="px-6 py-5">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {rental.contract_number || "غير محدد"}
-                    </div>
-                  </td>
+              : filteredRentals.map((rental: RentalData, index: number) => (
+                  <tr
+                    key={rental.id}
+                    onClick={(e) => {
+                      // منع فتح dialog إذا تم الضغط على dropdown menu أو أزرار
+                      if (
+                        (e.target as any).closest?.("button") ||
+                        (e.target as any).closest?.('[role="menuitem"]') ||
+                        (e.target as any).closest?.(".cursor-pointer")
+                      ) {
+                        return;
+                      }
+                      router.push(`/dashboard/rental-management/${rental.id}`);
+                    }}
+                    className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-25"
+                    }`}
+                  >
+                    {/* رقم العقد */}
+                    <td className="px-6 py-5">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {rental.contract_number || "غير محدد"}
+                      </div>
+                    </td>
 
-                  {/* المستأجر */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center space-x-4 space-x-reverse">
-                      <div className="flex-shrink-0">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
-                          <span className="text-white font-bold text-lg">
-                            {getTenantName(rental)
-                              .split(" ")
-                              .map((n: string) => n[0])
-                              .join("")
-                              .slice(0, 2) || "??"}
+                    {/* المستأجر */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center space-x-4 space-x-reverse">
+                        <div className="flex-shrink-0">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
+                              {getTenantName(rental)
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")
+                                .slice(0, 2) || "??"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-bold text-gray-900 truncate">
+                            {getTenantName(rental)}
+                          </div>
+                          <div className="text-sm text-gray-500 truncate">
+                            {getJobTitle(rental)}
+                          </div>
+                          <div className="flex items-center mt-1 text-xs text-gray-400">
+                            <Phone className="h-3 w-3 ml-1" />
+                            {getPhoneNumber(rental)}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* الوحدة */}
+                    <td
+                      className="px-6 py-5"
+                      style={getCellWidthStyle(getUnitLabel(rental))}
+                    >
+                      <div
+                        className={`${getFontSizeClass(getUnitLabel(rental))} font-semibold text-gray-900`}
+                      >
+                        {truncateText(getUnitLabel(rental), 40)}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        رقم العقار: {getPropertyNumber(rental)}
+                      </div>
+                      {rental.property && (
+                        <div className="text-xs text-gray-400 mt-1">
+                          {getPropertyDetails(rental).beds} غرف •{" "}
+                          {getPropertyDetails(rental).bath} حمام
+                        </div>
+                      )}
+                    </td>
+
+                    {/* مبلغ الإيجار */}
+                    <td className="px-6 py-5">
+                      <div className="text-lg font-bold text-gray-900">
+                        {formatCurrency(
+                          rental.base_rent_amount,
+                          rental.currency,
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        الضمان:{" "}
+                        {formatCurrency(rental.deposit_amount, rental.currency)}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {getSafeValue(rental.paying_plan) === "monthly"
+                          ? "شهري"
+                          : getSafeValue(rental.paying_plan) === "quarterly"
+                            ? "ربع سنوي"
+                            : getSafeValue(rental.paying_plan) === "semi_annual"
+                              ? "نصف سنوي"
+                              : getSafeValue(rental.paying_plan) === "annual"
+                                ? "سنوي"
+                                : getSafeValue(rental.paying_plan)}
+                      </div>
+                    </td>
+
+                    {/* مدة الإيجار */}
+                    <td className="px-6 py-5">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {(() => {
+                          // استخدام duration_days من lease_term إذا كان متوفراً
+                          if (
+                            rental.lease_term?.duration_days &&
+                            rental.lease_term.duration_days > 0
+                          ) {
+                            // تحويل الأيام إلى شهور (متوسط 30.44 يوم في الشهر)
+                            const months = Math.round(
+                              rental.lease_term.duration_days / 30.44,
+                            );
+                            return Math.max(1, months); // على الأقل شهر واحد
+                          }
+
+                          // حساب من start_date و end_date إذا كانت متوفرة
+                          if (
+                            rental.lease_term?.start_date &&
+                            rental.lease_term?.end_date
+                          ) {
+                            const startDate = new Date(
+                              rental.lease_term.start_date,
+                            );
+                            const endDate = new Date(
+                              rental.lease_term.end_date,
+                            );
+
+                            // حساب الفرق بالشهور بدقة
+                            const yearDiff =
+                              endDate.getFullYear() - startDate.getFullYear();
+                            const monthDiff =
+                              endDate.getMonth() - startDate.getMonth();
+                            const totalMonths = yearDiff * 12 + monthDiff;
+
+                            return Math.max(1, totalMonths); // على الأقل شهر واحد
+                          }
+
+                          // استخدام rental_period_months إذا كان متوفراً
+                          if (
+                            rental.rental_period_months &&
+                            rental.rental_period_months > 0
+                          ) {
+                            return rental.rental_period_months;
+                          }
+
+                          // قيمة افتراضية بناءً على rental_method_code
+                          if (rental.rental_method_code) {
+                            switch (rental.rental_method_code) {
+                              case "monthly":
+                                return 12;
+                              case "quarterly":
+                                return 12;
+                              case "semi_annual":
+                                return 12;
+                              case "annual":
+                                return 12;
+                              default:
+                                return 12;
+                            }
+                          }
+
+                          // قيمة افتراضية بناءً على paying_plan
+                          if (rental.paying_plan) {
+                            switch (rental.paying_plan) {
+                              case "monthly":
+                                return 12;
+                              case "quarterly":
+                                return 12;
+                              case "semi_annual":
+                                return 12;
+                              case "annual":
+                                return 12;
+                              default:
+                                return 12;
+                            }
+                          }
+
+                          // قيمة افتراضية ثابتة
+                          return 12;
+                        })()}{" "}
+                        شهر
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        من {formatDate(rental.move_in_date)}
+                      </div>
+                    </td>
+
+                    {/* تاريخ الانتقال */}
+                    <td className="px-6 py-5">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {formatDate(rental.move_in_date)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {new Date(rental.created_at).toLocaleDateString(
+                          "ar-US",
+                        )}
+                      </div>
+                    </td>
+
+                    {/* التاريخ */}
+                    <td className="px-6 py-5">
+                      {rental.active_contract?.start_date ||
+                      rental.active_contract?.end_date ? (
+                        <>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {rental.active_contract?.start_date
+                              ? `من ${formatDate(rental.active_contract.start_date)}`
+                              : "غير محدد"}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {rental.active_contract?.end_date
+                              ? `إلى ${formatDate(rental.active_contract.end_date)}`
+                              : "غير محدد"}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-sm text-gray-500">غير محدد</div>
+                      )}
+                    </td>
+
+                    {/* الحالة */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center">
+                        <div
+                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(rental.status)}`}
+                        >
+                          {getStatusIcon(rental.status)}
+                          <span className="mr-1">
+                            {getStatusText(rental.status)}
                           </span>
                         </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-bold text-gray-900 truncate">
-                          {getTenantName(rental)}
-                        </div>
-                        <div className="text-sm text-gray-500 truncate">
-                          {getJobTitle(rental)}
-                        </div>
-                        <div className="flex items-center mt-1 text-xs text-gray-400">
-                          <Phone className="h-3 w-3 ml-1" />
-                          {getPhoneNumber(rental)}
-                        </div>
+                    </td>
+
+                    {/* السداد */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openPaymentCollectionDialog(rental.id);
+                          }}
+                          size="sm"
+                          variant="outline"
+                          className="h-9 px-4 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
+                        >
+                          <CreditCard className="h-4 w-4 ml-2" />
+                          السداد
+                        </Button>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* الوحدة */}
-                  <td className="px-6 py-5" style={getCellWidthStyle(getUnitLabel(rental))}>
-                    <div className={`${getFontSizeClass(getUnitLabel(rental))} font-semibold text-gray-900`}>
-                      {truncateText(getUnitLabel(rental), 40)}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      رقم العقار: {getPropertyNumber(rental)}
-                    </div>
-                    {rental.property && (
-                      <div className="text-xs text-gray-400 mt-1">
-                        {getPropertyDetails(rental).beds} غرف •{" "}
-                        {getPropertyDetails(rental).bath} حمام
-                      </div>
-                    )}
-                  </td>
-
-                  {/* مبلغ الإيجار */}
-                  <td className="px-6 py-5">
-                    <div className="text-lg font-bold text-gray-900">
-                      {formatCurrency(rental.base_rent_amount, rental.currency)}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      الضمان:{" "}
-                      {formatCurrency(rental.deposit_amount, rental.currency)}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {getSafeValue(rental.paying_plan) === "monthly"
-                        ? "شهري"
-                        : getSafeValue(rental.paying_plan) === "quarterly"
-                          ? "ربع سنوي"
-                          : getSafeValue(rental.paying_plan) === "semi_annual"
-                            ? "نصف سنوي"
-                            : getSafeValue(rental.paying_plan) === "annual"
-                              ? "سنوي"
-                              : getSafeValue(rental.paying_plan)}
-                    </div>
-                  </td>
-
-                  {/* مدة الإيجار */}
-                  <td className="px-6 py-5">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {(() => {
-                        // استخدام duration_days من lease_term إذا كان متوفراً
-                        if (rental.lease_term?.duration_days && rental.lease_term.duration_days > 0) {
-                          // تحويل الأيام إلى شهور (متوسط 30.44 يوم في الشهر)
-                          const months = Math.round(rental.lease_term.duration_days / 30.44);
-                          return Math.max(1, months); // على الأقل شهر واحد
-                        }
-                        
-                        // حساب من start_date و end_date إذا كانت متوفرة
-                        if (rental.lease_term?.start_date && rental.lease_term?.end_date) {
-                          const startDate = new Date(rental.lease_term.start_date);
-                          const endDate = new Date(rental.lease_term.end_date);
-                          
-                          // حساب الفرق بالشهور بدقة
-                          const yearDiff = endDate.getFullYear() - startDate.getFullYear();
-                          const monthDiff = endDate.getMonth() - startDate.getMonth();
-                          const totalMonths = yearDiff * 12 + monthDiff;
-                          
-                          return Math.max(1, totalMonths); // على الأقل شهر واحد
-                        }
-                        
-                        // استخدام rental_period_months إذا كان متوفراً
-                        if (rental.rental_period_months && rental.rental_period_months > 0) {
-                          return rental.rental_period_months;
-                        }
-                        
-                        // قيمة افتراضية بناءً على rental_method_code
-                        if (rental.rental_method_code) {
-                          switch (rental.rental_method_code) {
-                            case 'monthly':
-                              return 12;
-                            case 'quarterly':
-                              return 12;
-                            case 'semi_annual':
-                              return 12;
-                            case 'annual':
-                              return 12;
-                            default:
-                              return 12;
-                          }
-                        }
-                        
-                        // قيمة افتراضية بناءً على paying_plan
-                        if (rental.paying_plan) {
-                          switch (rental.paying_plan) {
-                            case 'monthly':
-                              return 12;
-                            case 'quarterly':
-                              return 12;
-                            case 'semi_annual':
-                              return 12;
-                            case 'annual':
-                              return 12;
-                            default:
-                              return 12;
-                          }
-                        }
-                        
-                        // قيمة افتراضية ثابتة
-                        return 12;
-                      })()}{" "}
-                      شهر
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      من {formatDate(rental.move_in_date)}
-                    </div>
-                  </td>
-
-                  {/* تاريخ الانتقال */}
-                  <td className="px-6 py-5">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {formatDate(rental.move_in_date)}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(rental.created_at).toLocaleDateString("ar-US")}
-                    </div>
-                  </td>
-
-                  {/* التاريخ */}
-                  <td className="px-6 py-5">
-                    {rental.active_contract?.start_date || rental.active_contract?.end_date ? (
-                      <>
-                        <div className="text-sm font-semibold text-gray-900">
-                          {rental.active_contract?.start_date
-                            ? `من ${formatDate(rental.active_contract.start_date)}`
-                            : "غير محدد"}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {rental.active_contract?.end_date
-                            ? `إلى ${formatDate(rental.active_contract.end_date)}`
-                            : "غير محدد"}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-sm text-gray-500">غير محدد</div>
-                    )}
-                  </td>
-
-                  {/* الحالة */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center">
-                      <div
-                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(rental.status)}`}
-                      >
-                        {getStatusIcon(rental.status)}
-                        <span className="mr-1">
-                          {getStatusText(rental.status)}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* السداد */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openPaymentCollectionDialog(rental.id);
-                        }}
-                        size="sm"
-                        variant="outline"
-                        className="h-9 px-4 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
-                      >
-                        <CreditCard className="h-4 w-4 ml-2" />
-                        السداد
-                      </Button>
-                    </div>
-                  </td>
-
-                  {/* الإجراءات */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              router.push(`/dashboard/rental-management/${rental.id}`);
-                            }}
-                            className="cursor-pointer hover:bg-gray-100"
-                          >
-                            <Eye className="h-4 w-4 ml-2 text-gray-600" />
-                            عرض التفاصيل
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              openRenewalDialog(rental);
-                            }}
-                            className="cursor-pointer hover:bg-gray-100"
-                          >
-                            <RotateCcw className="h-4 w-4 ml-2 text-gray-600" />
-                            تجديد العقد
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              openStatusChangeDialog(rental);
-                            }}
-                            className="cursor-pointer hover:bg-gray-100"
-                          >
-                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
-                            تغيير حالة العقد
-                          </DropdownMenuItem>
-                          {hasValidCRMWhatsAppChannel() && (
+                    {/* الإجراءات */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
                               onClick={() => {
-                                console.log(
-                                  "Setting rental for WhatsApp:",
-                                  rental,
+                                router.push(
+                                  `/dashboard/rental-management/${rental.id}`,
                                 );
-                                openRentalWhatsAppDialog(rental);
                               }}
                               className="cursor-pointer hover:bg-gray-100"
                             >
-                              <Activity className="h-4 w-4 ml-2 text-gray-600" />
-                              ارسال رسالة واتساب
+                              <Eye className="h-4 w-4 ml-2 text-gray-600" />
+                              عرض التفاصيل
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setRentalApplications({
-                                editingRental: rental,
-                                isEditRentalDialogOpen: true,
-                              });
-                            }}
-                            className="cursor-pointer hover:bg-gray-100"
-                          >
-                            <Edit className="h-4 w-4 ml-2 text-gray-600" />
-                            تعديل الإيجار
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setRentalApplications({
-                                deletingRental: rental,
-                                isDeleteDialogOpen: true,
-                              });
-                            }}
-                            className="cursor-pointer hover:bg-gray-100 text-gray-600"
-                          >
-                            <Trash2 className="h-4 w-4 ml-2 text-gray-600" />
-                            حذف الإيجار
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </td>
-                </tr>
-              ))
-              )}
-            </tbody>
-          </table>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                openRenewalDialog(rental);
+                              }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
+                              <RotateCcw className="h-4 w-4 ml-2 text-gray-600" />
+                              تجديد العقد
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                openStatusChangeDialog(rental);
+                              }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
+                              <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
+                              تغيير حالة العقد
+                            </DropdownMenuItem>
+                            {hasValidCRMWhatsAppChannel() && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  console.log(
+                                    "Setting rental for WhatsApp:",
+                                    rental,
+                                  );
+                                  openRentalWhatsAppDialog(rental);
+                                }}
+                                className="cursor-pointer hover:bg-gray-100"
+                              >
+                                <Activity className="h-4 w-4 ml-2 text-gray-600" />
+                                ارسال رسالة واتساب
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setRentalApplications({
+                                  editingRental: rental,
+                                  isEditRentalDialogOpen: true,
+                                });
+                              }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
+                              <Edit className="h-4 w-4 ml-2 text-gray-600" />
+                              تعديل الإيجار
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setRentalApplications({
+                                  deletingRental: rental,
+                                  isDeleteDialogOpen: true,
+                                });
+                              }}
+                              className="cursor-pointer hover:bg-gray-100 text-gray-600"
+                            >
+                              <Trash2 className="h-4 w-4 ml-2 text-gray-600" />
+                              حذف الإيجار
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+          </tbody>
+        </table>
 
         {!loading && filteredRentals.length === 0 && (
           <div className="text-center py-16">
@@ -2641,7 +2729,6 @@ function AddRentalForm({
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
-
     // التحقق من صحة مدة الإيجار
     if (
       formData.rental_period &&
@@ -3322,7 +3409,6 @@ function EditRentalForm({
     ) {
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
-
 
     // التحقق من صحة مدة الإيجار
     if (

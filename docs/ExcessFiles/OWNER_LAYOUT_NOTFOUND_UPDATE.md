@@ -33,12 +33,14 @@ if (!tenantId) {
 ## كيفية العمل
 
 ### 1. مع Tenant ID:
+
 ```
 URL: lira.localhost:3000/owner/dashboard
 Result: ✅ يتم عرض الصفحة
 ```
 
 ### 2. بدون Tenant ID:
+
 ```
 URL: localhost:3000/owner/dashboard
 Result: ❌ يتم عرض صفحة 404 Not Found
@@ -47,14 +49,17 @@ Result: ❌ يتم عرض صفحة 404 Not Found
 ## المزايا
 
 ### ✅ Better UX
+
 - عرض صفحة 404 بدلاً من إعادة توجيه
 - رسالة واضحة للمستخدم أن الصفحة غير موجودة
 
 ### ✅ SEO Friendly
+
 - إرجاع HTTP 404 status code
 - أفضل لمحركات البحث
 
 ### ✅ Consistent Behavior
+
 - يتوافق مع سلوك Next.js الافتراضي
 - لا يسبب إعادة توجيه غير متوقع
 

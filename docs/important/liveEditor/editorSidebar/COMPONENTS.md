@@ -1,6 +1,7 @@
 # EditorSidebar Components - Detailed Reference
 
 ## Table of Contents
+
 1. [Component Hierarchy](#component-hierarchy)
 2. [AdvancedSimpleSwitcher](#advancedsimpleswitcher)
 3. [DynamicFieldsRenderer](#dynamicfieldsrenderer)
@@ -87,11 +88,11 @@ EditorSidebar (Container)
 
 ```typescript
 interface AdvancedSimpleSwitcherProps {
-  type: string;              // Component type: "hero"
-  componentName: string;     // Variant: "hero1"
-  componentId?: string;      // UUID
-  onUpdateByPath?: (path, value) => void;  // Update callback
-  currentData?: any;         // Current component data
+  type: string; // Component type: "hero"
+  componentName: string; // Variant: "hero1"
+  componentId?: string; // UUID
+  onUpdateByPath?: (path, value) => void; // Update callback
+  currentData?: any; // Current component data
 }
 ```
 
@@ -111,36 +112,35 @@ const loadStructure = async (componentType: string) => {
   try {
     setLoading(true);
     setError(null);
-    
+
     // STEP 1: Verify component exists in ComponentsList
     const component = COMPONENTS[componentType];
     if (!component) {
       throw new Error(`Component "${componentType}" not found`);
     }
-    
+
     let loadedStructure = null;
-    
+
     // STEP 2: Dynamic import of structure file
     try {
       const structureModule = await import(
         `@/componentsStructure/${componentType}`
       );
-      
+
       const structureName = `${componentType}Structure`;
       loadedStructure = structureModule[structureName];
-      
+
       if (!loadedStructure) {
         throw new Error(`Structure "${structureName}" not found`);
       }
-      
     } catch (importErr) {
       console.warn(`Failed to load ${componentType}, trying fallback`);
-      
+
       // STEP 3: Fallback to header structure
       const fallbackModule = await import(`@/componentsStructure/header`);
       loadedStructure = fallbackModule.headerStructure;
     }
-    
+
     // STEP 4: Validate structure format
     if (
       !loadedStructure ||
@@ -149,28 +149,24 @@ const loadStructure = async (componentType: string) => {
     ) {
       throw new Error(`Invalid structure format`);
     }
-    
+
     // STEP 5: Translate structure labels
-    const translatedStructure = translateComponentStructure(
-      loadedStructure,
-      t
-    );
-    
+    const translatedStructure = translateComponentStructure(loadedStructure, t);
+
     // STEP 6: Find matching variant
-    const targetVariant = 
-      translatedStructure.variants.find(v => v.id === componentName) ||
-      translatedStructure.variants[0];  // Fallback to first variant
-    
+    const targetVariant =
+      translatedStructure.variants.find((v) => v.id === componentName) ||
+      translatedStructure.variants[0]; // Fallback to first variant
+
     if (!targetVariant) {
       throw new Error(`No variant found for ${componentName}`);
     }
-    
+
     // STEP 7: Set structure with current variant
     setStructure({
       ...translatedStructure,
-      currentVariant: targetVariant
+      currentVariant: targetVariant,
     });
-    
   } catch (err) {
     console.error(`Error loading structure:`, err);
     setError(err.message);
@@ -200,12 +196,12 @@ if (error || !structure) {
     <div className="error-state">
       <h4>Structure Loading Error</h4>
       <p>{error || "Failed to load structure"}</p>
-      
+
       {/* Retry button */}
       <button onClick={() => loadStructure(type)}>
         Retry Loading Structure
       </button>
-      
+
       {/* Fallback button */}
       <button onClick={useFallbackStructure}>
         Use Fallback Structure
@@ -222,7 +218,7 @@ if (error || !structure) {
 // Advanced mode: Show all fields
 
 const variant = structure.currentVariant;
-const fields = 
+const fields =
   mode === "simple" && variant.simpleFields?.length
     ? variant.simpleFields
     : variant.fields;
@@ -244,7 +240,7 @@ return (
         Advanced
       </button>
     </div>
-    
+
     {/* Render selected fields */}
     <DynamicFieldsRenderer
       fields={fields}
@@ -278,6 +274,7 @@ const handleUpdateByPath = (path, value) => {
 ```
 
 **Routing Logic**:
+
 1. Try onUpdateByPath callback (preferred)
 2. Check if global component
 3. Fallback to store updateByPath
@@ -294,11 +291,11 @@ const handleUpdateByPath = (path, value) => {
 
 ```typescript
 interface DynamicFieldsRendererProps {
-  fields: FieldDefinition[];          // Fields to render
-  componentType?: string;             // "hero"
-  variantId?: string;                 // Component UUID or "global-header"
+  fields: FieldDefinition[]; // Fields to render
+  componentType?: string; // "hero"
+  variantId?: string; // Component UUID or "global-header"
   onUpdateByPath?: (path, value) => void;
-  currentData?: any;                  // Initial/override data
+  currentData?: any; // Initial/override data
 }
 ```
 
@@ -315,48 +312,48 @@ const getValueByPath = useCallback((path: string) => {
     console.warn("Invalid path:", path);
     return undefined;
   }
-  
+
   // STEP 2: Parse path into segments
   const segments = normalizePath(path).split(".").filter(Boolean);
-  
+
   if (segments.length === 0) {
     console.warn("Empty path segments:", path);
     return undefined;
   }
-  
+
   // STEP 3: Determine data source
   let cursor;
-  
+
   if (currentData && Object.keys(currentData).length > 0) {
     // Priority 1: Explicit currentData
     cursor = currentData;
-    
+
   } else if (variantId === "global-header") {
     // Priority 2: Global header
     cursor = globalComponentsData?.header || tempData || {};
-    
+
     // Validation for global header
     const requiredFields = ["visible", "menu", "logo", "colors"];
     const missingFields = requiredFields.filter(f => !(f in cursor));
     if (missingFields.length > 0) {
       console.warn("Missing header fields:", missingFields);
     }
-    
+
   } else if (variantId === "global-footer") {
     // Priority 3: Global footer
     cursor = globalComponentsData?.footer || tempData || {};
-    
+
     // Validation for global footer
     const requiredFields = ["visible", "content", "styling"];
     const missingFields = requiredFields.filter(f => !(f in cursor));
     if (missingFields.length > 0) {
       console.warn("Missing footer fields:", missingFields);
     }
-    
+
   } else if (componentType && variantId && COMPONENTS[componentType]) {
     // Priority 4: Regular component
     const componentData = getComponentData(componentType, variantId);
-    
+
     // Prefer tempData for live editing
     if (tempData && Object.keys(tempData).length > 0) {
       cursor = tempData;
@@ -365,27 +362,27 @@ const getValueByPath = useCallback((path: string) => {
     } else {
       cursor = componentData || {};
     }
-    
+
   } else {
     // Fallback: tempData
     cursor = tempData || {};
   }
-  
+
   // STEP 4: Special handling for known paths
   if (path === "content.imagePosition" && cursor?.imagePosition) {
     return cursor.imagePosition;
   }
-  
+
   if (path === "layout.direction" && cursor?.layout?.direction) {
     return cursor.layout.direction;
   }
-  
+
   // STEP 5: Navigate path
   for (const seg of segments) {
     if (cursor == null) return undefined;
     cursor = cursor[seg];
   }
-  
+
   return cursor;
 }, [currentData, tempData, componentType, variantId, ...]);
 ```
@@ -411,7 +408,7 @@ const updateValue = useCallback((path: string, value: any) => {
     }
     return;
   }
-  
+
   // SPECIAL CASE 2: halfTextHalfImage layout.direction
   if (
     path === "layout.direction" &&
@@ -424,7 +421,7 @@ const updateValue = useCallback((path: string, value: any) => {
     }
     return;
   }
-  
+
   // REGULAR FLOW
   if (onUpdateByPath) {
     // Callback provided
@@ -460,7 +457,7 @@ const updateValue = useCallback((path: string, value: any) => {
 ```typescript
 const renderField = (def: FieldDefinition, basePath?: string) => {
   if (!def) return null;
-  
+
   // STEP 1: Build path
   let path: string;
   if (basePath) {
@@ -473,12 +470,12 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
   } else {
     path = def.key;
   }
-  
+
   const normalizedPath = normalizePath(path);
-  
+
   // STEP 2: Get current value
   const value = getValueByPath(normalizedPath);
-  
+
   // STEP 3: Check condition (if exists)
   if (def.condition) {
     const conditionValue = getValueByPath(def.condition.field);
@@ -486,7 +483,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
       return null;  // Don't render
     }
   }
-  
+
   // STEP 4: Render based on type
   switch (def.type) {
     case "array":
@@ -500,7 +497,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           renderField={renderField}  // Recursive!
         />
       );
-    
+
     case "object":
       return (
         <ObjectFieldRenderer
@@ -512,7 +509,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           renderField={renderField}  // Recursive!
         />
       );
-    
+
     case "text":
     case "image":
       if (def.type === "image") {
@@ -536,7 +533,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           />
         </div>
       );
-    
+
     case "textarea":
       return (
         <div className="textarea-field">
@@ -548,7 +545,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           />
         </div>
       );
-    
+
     case "number":
       return (
         <NumberFieldRenderer
@@ -558,7 +555,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           updateValue={updateValue}
         />
       );
-    
+
     case "boolean":
       return (
         <BooleanFieldRenderer
@@ -568,7 +565,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           updateValue={updateValue}
         />
       );
-    
+
     case "color":
       return (
         <ColorFieldRenderer
@@ -578,7 +575,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
           updateValue={updateValue}
         />
       );
-    
+
     case "select":
       return (
         <div className="select-field">
@@ -596,7 +593,7 @@ const renderField = (def: FieldDefinition, basePath?: string) => {
         </div>
       );
   }
-  
+
   return null;
 };
 ```
@@ -618,7 +615,7 @@ return (
         renderField={renderField}
       />
     )}
-    
+
     {/* Render simple background (if no nested background) */}
     {!backgroundField && (
       <SimpleBackgroundFieldRenderer
@@ -628,10 +625,10 @@ return (
         renderField={renderField}
       />
     )}
-    
+
     {/* Render all other fields */}
     {fields
-      .filter(f => 
+      .filter(f =>
         f.key !== "background" &&
         f.key !== "background.type" &&
         f.key !== "background.colors.from" &&
@@ -660,17 +657,20 @@ return (
 ```typescript
 const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 const [allCollapsed, setAllCollapsed] = useState(false);
-const [nestedExpanded, setNestedExpanded] = useState<Record<string, boolean>>({});
+const [nestedExpanded, setNestedExpanded] = useState<Record<string, boolean>>(
+  {},
+);
 const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
 ```
 
 #### Key Functions
 
 **generateDefaultItem**:
+
 ```typescript
 const generateDefaultItem = () => {
   const newItem = {};
-  
+
   if (arrDef.of && Array.isArray(arrDef.of)) {
     for (const f of arrDef.of) {
       switch (f.type) {
@@ -700,12 +700,13 @@ const generateDefaultItem = () => {
       }
     }
   }
-  
+
   return newItem;
 };
 ```
 
 **getItemTitle**:
+
 ```typescript
 const getItemTitle = (item: any, idx: number) => {
   // Try multiple patterns for title
@@ -722,60 +723,57 @@ const getItemTitle = (item: any, idx: number) => {
     item?.heading,
     item?.id,
     item?.key,
-    item?.value
+    item?.value,
   ];
-  
+
   const candidate = patterns.find(
-    p => p && typeof p === "string" && p.trim().length > 0
+    (p) => p && typeof p === "string" && p.trim().length > 0,
   );
-  
+
   const base = candidate
     ? String(candidate).trim()
     : `${arrDef.itemLabel || "Item"} ${idx + 1}`;
-  
+
   // Truncate long titles
   return base.length > 50 ? base.substring(0, 47) + "..." : base;
 };
 ```
 
 **getItemSubtitle**:
+
 ```typescript
 const getItemSubtitle = (item: any) => {
   const parts = [];
-  
+
   if (item?.type) {
     parts.push(`Type: ${item.type}`);
   }
-  
+
   if (item?.submenu && Array.isArray(item.submenu)) {
     const totalSubItems = item.submenu.reduce((total, sub) => {
       return total + (Array.isArray(sub.items) ? sub.items.length : 0);
     }, 0);
-    
-    parts.push(
-      `${item.submenu.length} submenu(s) (${totalSubItems} items)`
-    );
+
+    parts.push(`${item.submenu.length} submenu(s) (${totalSubItems} items)`);
   }
-  
+
   if (item?.url) {
     parts.push(`URL: ${item.url}`);
   }
-  
+
   return parts.join(" • ");
 };
 ```
 
 **validateItem**:
+
 ```typescript
 const validateItem = (item: any, index: number) => {
   const errors = [];
-  
+
   if (arrDef.of && Array.isArray(arrDef.of)) {
     for (const f of arrDef.of) {
-      if (
-        f.type === "text" &&
-        (!item[f.key] || item[f.key].trim() === "")
-      ) {
+      if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
         // Only error for critical fields
         if (
           f.key.includes("title") ||
@@ -787,10 +785,10 @@ const validateItem = (item: any, index: number) => {
       }
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 ```
@@ -807,12 +805,12 @@ const addItem = () => {
 const move = (idx, direction) => {
   const newIdx = idx + direction;
   if (newIdx < 0 || newIdx >= items.length) return;
-  
+
   const next = items.slice();
   const tmp = next[idx];
   next[idx] = next[newIdx];
   next[newIdx] = tmp;
-  
+
   updateValue(normalizedPath, next);
 };
 
@@ -847,22 +845,22 @@ For arrays within array items (e.g., menu with submenus):
 ```typescript
 const renderNestedArray = (field, itemPath, item) => {
   if (field.type !== "array") return null;
-  
-  const nestedItems = Array.isArray(item[field.key]) 
-    ? item[field.key] 
+
+  const nestedItems = Array.isArray(item[field.key])
+    ? item[field.key]
     : [];
-  
+
   const addNestedItem = () => {
     const newItem = field.of.reduce((acc, f) => {
       acc[f.key] = f.defaultValue || "";
       return acc;
     }, {});
-    
+
     const updatedItem = { ...item };
     updatedItem[field.key] = [...nestedItems, newItem];
     updateValue(itemPath, updatedItem);
   };
-  
+
   return (
     <div className="nested-array">
       <div className="header">
@@ -872,7 +870,7 @@ const renderNestedArray = (field, itemPath, item) => {
           Add {field.itemLabel}
         </button>
       </div>
-      
+
       {nestedItems.map((nestedItem, nestedIdx) => (
         <div key={nestedIdx} className="nested-item">
           <button onClick={() => toggleNestedItem(...)}>
@@ -880,7 +878,7 @@ const renderNestedArray = (field, itemPath, item) => {
           </button>
           <span>{field.itemLabel} {nestedIdx + 1}</span>
           <button onClick={() => removeNestedItem(...)}>Remove</button>
-          
+
           {nestedExpanded[...] && field.of.map(nestedField => (
             <div key={nestedField.key}>
               {/* Conditional rendering */}
@@ -933,14 +931,14 @@ export function ThemeSelector({
 }) {
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
   const [themeOptions, setThemeOptions] = useState({});
-  
+
   // Load available themes from ComponentsList
   useEffect(() => {
     const options = {};
-    
+
     for (const type in COMPONENTS) {
       const component = COMPONENTS[type];
-      
+
       if (component && component.variants) {
         options[type] = component.variants.map(variant => ({
           id: variant.id || variant,
@@ -951,28 +949,28 @@ export function ThemeSelector({
         }));
       }
     }
-    
+
     setThemeOptions(options);
   }, []);
-  
+
   const currentThemes = themeOptions[componentType] || [];
-  
+
   const handleConfirm = () => {
     onThemeChange(selectedTheme);
     setIsOpen(false);
   };
-  
+
   return (
     <Dialog>
       <DialogTrigger>
         <Button>Change Theme</Button>
       </DialogTrigger>
-      
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Choose Theme</DialogTitle>
         </DialogHeader>
-        
+
         {/* Theme grid */}
         <div className="theme-grid">
           {currentThemes.map(theme => (
@@ -987,7 +985,7 @@ export function ThemeSelector({
             </div>
           ))}
         </div>
-        
+
         <DialogFooter>
           <Button onClick={handleCancel}>Cancel</Button>
           <Button onClick={handleConfirm}>Apply Theme</Button>
@@ -999,6 +997,7 @@ export function ThemeSelector({
 ```
 
 **Theme Change Flow**:
+
 ```
 User selects hero2
   ↓
@@ -1033,6 +1032,7 @@ Component re-renders with hero2 variant ✓
 **Location**: `components/tenant/live-editor/PageThemeSelector.tsx`
 
 **Theme Definition**:
+
 ```typescript
 const PAGE_THEME_OPTIONS = [
   {
@@ -1043,8 +1043,8 @@ const PAGE_THEME_OPTIONS = [
       hero: "hero1",
       halfTextHalfImage: "halfTextHalfImage1",
       propertySlider: "propertySlider1",
-      ctaValuation: "ctaValuation1"
-    }
+      ctaValuation: "ctaValuation1",
+    },
   },
   {
     id: "theme2",
@@ -1054,13 +1054,14 @@ const PAGE_THEME_OPTIONS = [
       hero: "hero2",
       halfTextHalfImage: "halfTextHalfImage1",
       propertySlider: "propertySlider1",
-      ctaValuation: "ctaValuation1"
-    }
-  }
+      ctaValuation: "ctaValuation1",
+    },
+  },
 ];
 ```
 
 **Application Flow**:
+
 ```
 User selects "Modern Theme"
   ↓
@@ -1076,7 +1077,7 @@ For each component on page:
   if (components[c.type]) {
     const newTheme = components[c.type];
     const newData = createDefaultData(c.type, newTheme);
-    
+
     return {
       ...c,
       componentName: newTheme,
@@ -1096,6 +1097,7 @@ All components re-render with coordinated themes ✓
 **Location**: `components/tenant/live-editor/CardThemeSelector.tsx`
 
 **Theme Options**:
+
 ```typescript
 const CARD_THEME_OPTIONS = [
   {
@@ -1105,8 +1107,8 @@ const CARD_THEME_OPTIONS = [
       backgroundColor: "#ffffff",
       borderRadius: "8px",
       shadow: "0 1px 3px rgba(0,0,0,0.1)",
-      textColor: "#374151"
-    }
+      textColor: "#374151",
+    },
   },
   {
     id: "card-modern",
@@ -1115,14 +1117,15 @@ const CARD_THEME_OPTIONS = [
       backgroundColor: "#ffffff",
       borderRadius: "16px",
       shadow: "0 4px 6px rgba(0,0,0,0.07)",
-      textColor: "#1f2937"
-    }
+      textColor: "#1f2937",
+    },
   },
   // ... more themes
 ];
 ```
 
 **Usage**:
+
 ```typescript
 // In ObjectFieldRenderer
 {def.key === "card" && (
@@ -1150,26 +1153,26 @@ export function ResetConfirmDialog({
   onConfirmReset
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const handleConfirm = () => {
     onConfirmReset();
     setIsOpen(false);
   };
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <Button variant="outline">Reset</Button>
       </DialogTrigger>
-      
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reset Component Warning</DialogTitle>
         </DialogHeader>
-        
+
         <div className="warning-content">
           <p>⚠️ This action cannot be undone!</p>
-          
+
           <div className="will-remove">
             <strong>This will remove:</strong>
             <ul>
@@ -1180,13 +1183,13 @@ export function ResetConfirmDialog({
               <li>All other customizations</li>
             </ul>
           </div>
-          
+
           <div className="will-restore">
             <strong>This will restore:</strong>
             <p>Default configuration for this component</p>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
@@ -1222,7 +1225,7 @@ export function TranslationFields({
       [locale]: newValue
     });
   };
-  
+
   return (
     <Card>
       <CardHeader>
@@ -1237,11 +1240,11 @@ export function TranslationFields({
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           {locales.map(locale => (
             <TabsContent key={locale} value={locale}>
               <Label>{localeNames[locale]} {label}</Label>
-              
+
               {type === "textarea" ? (
                 <Textarea
                   value={value[locale] || ""}
@@ -1309,6 +1312,7 @@ menu[0]                    ← Array item
 ### Pattern 2: Conditional Field Visibility
 
 **In Field Definition**:
+
 ```typescript
 {
   key: "options",
@@ -1322,32 +1326,33 @@ menu[0]                    ← Array item
 ```
 
 **In renderField**:
+
 ```typescript
 if (def.condition) {
   const conditionValue = getValueByPath(def.condition.field);
   if (conditionValue !== def.condition.value) {
-    return null;  // Hide field
+    return null; // Hide field
   }
 }
 ```
 
 **In ArrayFieldRenderer**:
+
 ```typescript
-{arrDef.of.map(f => {
-  // Special conditional rendering
-  if (
-    f.key === "options" &&
-    f.label === "Field Options (for Select/Radio)"
-  ) {
-    const fieldType = getValueByPath(`${itemPath}.type`);
-    
-    if (fieldType !== "radio" && fieldType !== "select") {
-      return null;  // Hide options field
+{
+  arrDef.of.map((f) => {
+    // Special conditional rendering
+    if (f.key === "options" && f.label === "Field Options (for Select/Radio)") {
+      const fieldType = getValueByPath(`${itemPath}.type`);
+
+      if (fieldType !== "radio" && fieldType !== "select") {
+        return null; // Hide options field
+      }
     }
-  }
-  
-  return renderField(f, itemPath);
-})}
+
+    return renderField(f, itemPath);
+  });
+}
 ```
 
 ### Pattern 3: Item Type Tracking
@@ -1360,19 +1365,19 @@ const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
 useEffect(() => {
   if (Array.isArray(value)) {
     const newFieldTypes = {};
-    
+
     value.forEach((item, idx) => {
       if (item && typeof item === "object" && item.type) {
         newFieldTypes[`${normalizedPath}.${idx}`] = item.type;
       }
     });
-    
+
     setFieldTypes(newFieldTypes);
   }
 }, [value, normalizedPath]);
 
 // Use in rendering
-const currentFieldType = 
+const currentFieldType =
   fieldTypes[`${normalizedPath}.${idx}`] ||
   value[idx]?.type ||
   getValueByPath(`${normalizedPath}.${idx}.type`);
@@ -1385,7 +1390,7 @@ Generate intelligent defaults based on field definitions:
 ```typescript
 const generateDefaultItem = () => {
   const newItem = {};
-  
+
   if (arrDef.of && Array.isArray(arrDef.of)) {
     for (const f of arrDef.of) {
       // Use defaultValue if provided, otherwise type-appropriate default
@@ -1397,9 +1402,8 @@ const generateDefaultItem = () => {
           newItem[f.key] = f.defaultValue || 0;
           break;
         case "boolean":
-          newItem[f.key] = f.defaultValue !== undefined 
-            ? f.defaultValue 
-            : false;
+          newItem[f.key] =
+            f.defaultValue !== undefined ? f.defaultValue : false;
           break;
         case "color":
           newItem[f.key] = f.defaultValue || "#000000";
@@ -1416,7 +1420,7 @@ const generateDefaultItem = () => {
       }
     }
   }
-  
+
   return newItem;
 };
 ```
@@ -1428,6 +1432,7 @@ const generateDefaultItem = () => {
 ### When Adding New Field Renderer
 
 1. **Follow prop signature**:
+
    ```typescript
    {
      label: string;
@@ -1438,6 +1443,7 @@ const generateDefaultItem = () => {
    ```
 
 2. **Handle null/undefined**:
+
    ```typescript
    value={value || ""}           // Strings
    value={value ?? 0}            // Numbers
@@ -1465,6 +1471,7 @@ const generateDefaultItem = () => {
    - componentData (from store)
 
 2. **Check for global components**:
+
    ```typescript
    if (variantId === "global-header" || variantId === "global-footer") {
      // Special handling
@@ -1472,6 +1479,7 @@ const generateDefaultItem = () => {
    ```
 
 3. **Use deep merge for saves**:
+
    ```typescript
    const merged = deepMerge(existing, store, temp);
    ```
@@ -1485,6 +1493,7 @@ const generateDefaultItem = () => {
 ### Common Pitfalls
 
 ❌ **Pitfall 1**: Forgetting to normalize path
+
 ```typescript
 // WRONG
 getValueByPath("menu.[0].text");
@@ -1494,6 +1503,7 @@ getValueByPath(normalizePath("menu.[0].text"));
 ```
 
 ❌ **Pitfall 2**: Using shallow merge
+
 ```typescript
 // WRONG
 const merged = { ...a, ...b, ...c };
@@ -1503,9 +1513,10 @@ const merged = deepMerge(deepMerge(a, b), c);
 ```
 
 ❌ **Pitfall 3**: Not handling arrays in path navigation
+
 ```typescript
 // WRONG
-cursor = cursor[segment];  // Fails for "menu[0]"
+cursor = cursor[segment]; // Fails for "menu[0]"
 
 // CORRECT
 const segments = path.replace(/\[(\d+)\]/g, ".$1").split(".");
@@ -1513,6 +1524,7 @@ const segments = path.replace(/\[(\d+)\]/g, ".$1").split(".");
 ```
 
 ❌ **Pitfall 4**: Direct tempData mutation
+
 ```typescript
 // WRONG
 tempData.content.title = "New";
@@ -1535,6 +1547,7 @@ EditorSidebar components work together to provide dynamic editing:
 5. **Helper Components**: Reset, translations, validation
 
 **Key Principles**:
+
 - Structure-driven rendering (fields from structure definitions)
 - Path-based updates (dot notation with arrays)
 - Recursive rendering (nested objects and arrays)
@@ -1543,9 +1556,9 @@ EditorSidebar components work together to provide dynamic editing:
 - Save-based persistence (merge tempData on save)
 
 Understanding these components enables:
+
 - Adding new field types
 - Customizing field renderers
 - Implementing new component types
 - Debugging editing issues
 - Optimizing render performance
-

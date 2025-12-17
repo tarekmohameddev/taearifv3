@@ -468,12 +468,17 @@ export function PropertiesManagementPage() {
         "application/vnd.ms-excel", // .xls
         "text/csv", // .csv
       ];
-      
-      if (!validTypes.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls') && !file.name.endsWith('.csv')) {
+
+      if (
+        !validTypes.includes(file.type) &&
+        !file.name.endsWith(".xlsx") &&
+        !file.name.endsWith(".xls") &&
+        !file.name.endsWith(".csv")
+      ) {
         toast.error("يرجى رفع ملف Excel صحيح (.xlsx, .xls, .csv)");
         return;
       }
-      
+
       setImportFile(file);
     }
   };
@@ -499,7 +504,7 @@ export function PropertiesManagementPage() {
       toast.success("تم استيراد العقارات بنجاح");
       setImportDialogOpen(false);
       setImportFile(null);
-      
+
       // إعادة تحميل قائمة العقارات
       fetchProperties(currentPage, appliedFilters);
     } catch (error: any) {
@@ -519,12 +524,16 @@ export function PropertiesManagementPage() {
   const handleDownloadTemplate = async () => {
     setIsDownloadingTemplate(true);
     try {
-      const response = await axiosInstance.get("/properties/bulk-import/template", {
-        responseType: "blob",
-        headers: {
-          Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv",
+      const response = await axiosInstance.get(
+        "/properties/bulk-import/template",
+        {
+          responseType: "blob",
+          headers: {
+            Accept:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv",
+          },
         },
-      });
+      );
 
       // التحقق من أن الاستجابة هي blob
       if (response.data instanceof Blob) {
@@ -533,7 +542,9 @@ export function PropertiesManagementPage() {
         let filename = `properties-template-${new Date().toISOString().split("T")[0]}.xlsx`;
 
         if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          const filenameMatch = contentDisposition.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+          );
           if (filenameMatch && filenameMatch[1]) {
             filename = filenameMatch[1].replace(/['"]/g, "");
             // معالجة UTF-8 encoding إذا كان موجوداً
@@ -1105,9 +1116,11 @@ export function PropertiesManagementPage() {
                       disabled={isDownloadingTemplate}
                     >
                       <Download className="h-4 w-4" />
-                      {isDownloadingTemplate ? "جاري التحميل..." : "تحميل القالب"}
+                      {isDownloadingTemplate
+                        ? "جاري التحميل..."
+                        : "تحميل القالب"}
                     </Button>
-                    
+
                     <div className="grid gap-2">
                       <Label htmlFor="import-file">رفع ملف Excel</Label>
                       <Input
@@ -1399,7 +1412,9 @@ function PropertyCard({
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents[0].title).length > 20 ? 'text-sm ' : ''}`}>
+            <CardTitle
+              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents[0].title).length > 20 ? "text-sm " : ""}`}
+            >
               {property.title || property.contents[0].title}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">

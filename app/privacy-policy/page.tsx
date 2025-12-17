@@ -58,8 +58,12 @@ export async function generateMetadata() {
       : meta.titleEn || meta.titleAr || "Privacy Policy";
   const description =
     locale === "ar"
-      ? meta.descriptionAr || meta.descriptionEn || "سياسة الخصوصية وسرية المعلومات لمنصة تعاريف"
-      : meta.descriptionEn || meta.descriptionAr || "Privacy Policy and Information Confidentiality for Taearif Platform";
+      ? meta.descriptionAr ||
+        meta.descriptionEn ||
+        "سياسة الخصوصية وسرية المعلومات لمنصة تعاريف"
+      : meta.descriptionEn ||
+        meta.descriptionAr ||
+        "Privacy Policy and Information Confidentiality for Taearif Platform";
 
   return {
     title,
@@ -96,12 +100,20 @@ export async function generateMetadata() {
 export default async function PrivacyPage() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
-  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const domainType = headersList.get("x-domain-type") as
+    | "subdomain"
+    | "custom"
+    | null;
   const host = headersList.get("host") || "";
 
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
-  
+  const isCustomDomain =
+    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+      host,
+    );
+
   // اعرض PrivacyPageWrapper دائماً، سواء كان هناك tenantId أم لا
-  return <PrivacyPageWrapper tenantId={tenantId || null} domainType={domainType} />;
+  return (
+    <PrivacyPageWrapper tenantId={tenantId || null} domainType={domainType} />
+  );
 }

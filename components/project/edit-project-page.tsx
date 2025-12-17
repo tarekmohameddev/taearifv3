@@ -188,8 +188,10 @@ export default function EditProjectPage(): JSX.Element {
             featured: projectData.featured,
             latitude: projectData.latitude,
             longitude: projectData.longitude,
-            minprice: projectData.min_price?.toString?.() ?? `${projectData.min_price}`,
-            maxprice: projectData.max_price?.toString?.() ?? `${projectData.max_price}`,
+            minprice:
+              projectData.min_price?.toString?.() ?? `${projectData.min_price}`,
+            maxprice:
+              projectData.max_price?.toString?.() ?? `${projectData.max_price}`,
           });
 
           // معالجة المرافق
@@ -508,8 +510,10 @@ export default function EditProjectPage(): JSX.Element {
 
     try {
       // استخدام حقول الحد الأدنى والأعلى للسعر بدلاً من تحليل price
-      const minPrice = parseFloat(newProject.minprice as unknown as string) || 0;
-      const maxPrice = parseFloat(newProject.maxprice as unknown as string) || minPrice;
+      const minPrice =
+        parseFloat(newProject.minprice as unknown as string) || 0;
+      const maxPrice =
+        parseFloat(newProject.maxprice as unknown as string) || minPrice;
 
       const formattedDate = newProject.completion_date
         ? new Date(newProject.completion_date).toISOString().split("T")[0]
@@ -517,7 +521,11 @@ export default function EditProjectPage(): JSX.Element {
 
       let featuredImagePath = "";
       if (thumbnailImage) {
-        if (!thumbnailImage.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi)) {
+        if (
+          !thumbnailImage.url.startsWith(
+            process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
+          )
+        ) {
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
             "project",
@@ -530,11 +538,14 @@ export default function EditProjectPage(): JSX.Element {
 
       // رفع صور المخططات الجديدة فقط
       let floorplanPaths = planImages
-        .filter((img) => img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi))
+        .filter((img) =>
+          img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
+        )
         .map((img) => img.url);
 
       const newPlanImages = planImages.filter(
-        (img) => !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
+        (img) =>
+          !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newPlanImages.length > 0) {
         const files = newPlanImages.map((image) => image.file);
@@ -550,11 +561,14 @@ export default function EditProjectPage(): JSX.Element {
 
       // رفع صور المعرض الجديدة فقط
       let galleryPaths = galleryImages
-        .filter((img) => img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi))
+        .filter((img) =>
+          img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
+        )
         .map((img) => img.url);
 
       const newGalleryImages = galleryImages.filter(
-        (img) => !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
+        (img) =>
+          !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newGalleryImages.length > 0) {
         const files = newGalleryImages.map((image) => image.file);

@@ -10,9 +10,9 @@ This is the **master index** for all Live Editor documentation.
 
 ## 🚀 Quick Start (Start Here!)
 
-| # | Document | Purpose | Time |
-|---|----------|---------|------|
-| 0.1 | [QUICK_START.md](./QUICK_START.md) | 5-minute overview | 5 min |
+| #   | Document                               | Purpose            | Time   |
+| --- | -------------------------------------- | ------------------ | ------ |
+| 0.1 | [QUICK_START.md](./QUICK_START.md)     | 5-minute overview  | 5 min  |
 | 0.2 | [CORE_CONCEPTS.md](./CORE_CONCEPTS.md) | Essential concepts | 15 min |
 
 **Why start here**: Get working knowledge in 20 minutes
@@ -21,18 +21,18 @@ This is the **master index** for all Live Editor documentation.
 
 ## 📚 Core System (Fundamental Understanding)
 
-| # | Document | Purpose | Time |
-|---|----------|---------|------|
-| 1 | [OVERVIEW.md](./OVERVIEW.md) | System introduction | 1 hr |
-| 2 | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md) | Store architecture | 2 hrs |
-| 3 | [DATA_FLOW.md](./DATA_FLOW.md) | Data movement | 2 hrs |
-| 4 | [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md) | Preview rendering | 1 hr |
-| 5 | [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md) | Drag & drop | 1.5 hrs |
-| 6 | [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md) | Component system | 2 hrs |
-| 7 | [TENANT_STORE_AND_API.md](./TENANT_STORE_AND_API.md) | API integration | 1 hr |
-| 8 | [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md) | Translations | 45 min |
-| 9 | [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md) | Debug tools | 1 hr |
-| 10 | [CONTEXT_PROVIDERS.md](./CONTEXT_PROVIDERS.md) | Context integration | 1 hr |
+| #   | Document                                                   | Purpose             | Time    |
+| --- | ---------------------------------------------------------- | ------------------- | ------- |
+| 1   | [OVERVIEW.md](./OVERVIEW.md)                               | System introduction | 1 hr    |
+| 2   | [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)               | Store architecture  | 2 hrs   |
+| 3   | [DATA_FLOW.md](./DATA_FLOW.md)                             | Data movement       | 2 hrs   |
+| 4   | [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md)                     | Preview rendering   | 1 hr    |
+| 5   | [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md)               | Drag & drop         | 1.5 hrs |
+| 6   | [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)   | Component system    | 2 hrs   |
+| 7   | [TENANT_STORE_AND_API.md](./TENANT_STORE_AND_API.md)       | API integration     | 1 hr    |
+| 8   | [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md) | Translations        | 45 min  |
+| 9   | [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md)             | Debug tools         | 1 hr    |
+| 10  | [CONTEXT_PROVIDERS.md](./CONTEXT_PROVIDERS.md)             | Context integration | 1 hr    |
 
 **Total**: ~13 hours for complete core understanding
 
@@ -40,12 +40,12 @@ This is the **master index** for all Live Editor documentation.
 
 ## 🎨 EditorSidebar (Editing Interface)
 
-| # | Document | Purpose | Time |
-|---|----------|---------|------|
-| 11 | [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md) | Sidebar intro | 1 hr |
-| 12 | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) | Field types | 1.5 hrs |
-| 13 | [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md) | Sidebar data flow | 1.5 hrs |
-| 14 | [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md) | Sidebar components | 1 hr |
+| #   | Document                                                               | Purpose            | Time    |
+| --- | ---------------------------------------------------------------------- | ------------------ | ------- |
+| 11  | [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)               | Sidebar intro      | 1 hr    |
+| 12  | [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md) | Field types        | 1.5 hrs |
+| 13  | [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md)             | Sidebar data flow  | 1.5 hrs |
+| 14  | [editorSidebar/COMPONENTS.md](./editorSidebar/COMPONENTS.md)           | Sidebar components | 1 hr    |
 
 **Total**: ~5 hours for complete EditorSidebar understanding
 
@@ -53,11 +53,11 @@ This is the **master index** for all Live Editor documentation.
 
 ## 🛠️ Practical Guides (Implementation Help)
 
-| # | Document | Purpose | Time |
-|---|----------|---------|------|
-| 15 | [COMMON_PATTERNS.md](./COMMON_PATTERNS.md) | Code patterns | 1.5 hrs |
-| 16 | [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md) | Real examples | 2 hrs |
-| 17 | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Problem solving | 1 hr |
+| #   | Document                                         | Purpose         | Time    |
+| --- | ------------------------------------------------ | --------------- | ------- |
+| 15  | [COMMON_PATTERNS.md](./COMMON_PATTERNS.md)       | Code patterns   | 1.5 hrs |
+| 16  | [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md) | Real examples   | 2 hrs   |
+| 17  | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)       | Problem solving | 1 hr    |
 
 **Total**: ~4.5 hours (reference, not sequential reading)
 
@@ -65,11 +65,11 @@ This is the **master index** for all Live Editor documentation.
 
 ## 📖 Reference (Look Up As Needed)
 
-| # | Document | Purpose | Use |
-|---|----------|---------|-----|
-| 18 | [API_REFERENCE.md](./API_REFERENCE.md) | Function docs | Reference |
-| - | [README.md](./README.md) | Main index | Navigation |
-| - | [INDEX.md](./INDEX.md) | This file | Master index |
+| #   | Document                               | Purpose       | Use          |
+| --- | -------------------------------------- | ------------- | ------------ |
+| 18  | [API_REFERENCE.md](./API_REFERENCE.md) | Function docs | Reference    |
+| -   | [README.md](./README.md)               | Main index    | Navigation   |
+| -   | [INDEX.md](./INDEX.md)                 | This file     | Master index |
 
 **Total**: Reference materials (use as needed)
 
@@ -171,30 +171,35 @@ Live Editor Documentation
 ## 🔍 Find Information By Topic
 
 ### Architecture
+
 - System architecture → [OVERVIEW.md](./OVERVIEW.md)
 - Store architecture → [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)
 - Component architecture → [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)
 - EditorSidebar architecture → [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)
 
 ### Data Management
+
 - State management → [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)
 - Data flow → [DATA_FLOW.md](./DATA_FLOW.md)
 - Data merging → [CORE_CONCEPTS.md](./CORE_CONCEPTS.md) → "Three-Way Merge"
 - API integration → [TENANT_STORE_AND_API.md](./TENANT_STORE_AND_API.md)
 
 ### Components
+
 - Component system → [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)
 - Adding components → [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md)
 - Component lifecycle → [CORE_CONCEPTS.md](./CORE_CONCEPTS.md)
 - Component registry → [API_REFERENCE.md](./API_REFERENCE.md) → "ComponentsList API"
 
 ### Editing
+
 - EditorSidebar overview → [editorSidebar/OVERVIEW.md](./editorSidebar/OVERVIEW.md)
 - Field rendering → [editorSidebar/FIELD_RENDERERS.md](./editorSidebar/FIELD_RENDERERS.md)
 - Editing flow → [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md)
 - Save operation → [editorSidebar/DATA_FLOW.md](./editorSidebar/DATA_FLOW.md) → "Saving Changes Flow"
 
 ### Features
+
 - iframe system → [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md)
 - Drag & drop → [DRAG_DROP_SYSTEM.md](./DRAG_DROP_SYSTEM.md)
 - Translations → [I18N_TRANSLATION_SYSTEM.md](./I18N_TRANSLATION_SYSTEM.md)
@@ -202,12 +207,14 @@ Live Editor Documentation
 - Context providers → [CONTEXT_PROVIDERS.md](./CONTEXT_PROVIDERS.md)
 
 ### Implementation
+
 - Code patterns → [COMMON_PATTERNS.md](./COMMON_PATTERNS.md)
 - Practical examples → [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md)
 - API reference → [API_REFERENCE.md](./API_REFERENCE.md)
 - Best practices → [COMMON_PATTERNS.md](./COMMON_PATTERNS.md) → "Best Practices"
 
 ### Debugging
+
 - Troubleshooting → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 - Debug tools → [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md)
 - Common issues → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) → "Common Issues"
@@ -243,7 +250,9 @@ Live Editor Documentation
 ## 🎓 For Different Roles
 
 ### For AI Assistant
+
 **Read in this order**:
+
 1. [QUICK_START.md](./QUICK_START.md)
 2. [CORE_CONCEPTS.md](./CORE_CONCEPTS.md)
 3. [STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)
@@ -253,7 +262,9 @@ Live Editor Documentation
 **Result**: Can assist with Live Editor tasks effectively
 
 ### For New Developer
+
 **Read in this order**:
+
 1. [QUICK_START.md](./QUICK_START.md)
 2. [OVERVIEW.md](./OVERVIEW.md)
 3. [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)
@@ -263,7 +274,9 @@ Live Editor Documentation
 **Result**: Can contribute to codebase
 
 ### For Debugging
+
 **Read when needed**:
+
 1. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Find your issue
 2. [DEBUG_AND_LOGGING.md](./DEBUG_AND_LOGGING.md) - Use debug tools
 3. [DATA_FLOW.md](./DATA_FLOW.md) - Trace data movement
@@ -272,7 +285,9 @@ Live Editor Documentation
 **Result**: Can diagnose and fix issues
 
 ### For System Extension
+
 **Read in this order**:
+
 1. [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md)
 2. [PRACTICAL_EXAMPLES.md](./PRACTICAL_EXAMPLES.md)
 3. [COMMON_PATTERNS.md](./COMMON_PATTERNS.md)
@@ -286,11 +301,13 @@ Live Editor Documentation
 ## 🔗 External Links
 
 ### Related Systems
+
 - Locale Routing: `../LOCALE_ROUTING_SYSTEM.md`
 - Component Caching: `../componentsCachingSystem.md`
 - Dashboard Auth: `../dashboard/AUTHENTICATION.md`
 
 ### Technology Docs
+
 - Zustand: https://github.com/pmndrs/zustand
 - @dnd-kit: https://dndkit.com/
 - Next.js: https://nextjs.org/docs
@@ -323,6 +340,7 @@ For AI assistants working with Live Editor:
 This documentation set represents a **complete, AI-optimized reference** for the Live Editor system, covering every aspect from quick start to advanced implementation.
 
 **Key Strengths**:
+
 - 🎯 Quick start guides for rapid onboarding
 - 📖 Comprehensive core documentation
 - 🛠️ Practical guides with real examples
@@ -331,6 +349,7 @@ This documentation set represents a **complete, AI-optimized reference** for the
 - 🔄 Consistent formatting optimized for AI
 
 **Use Cases**:
+
 - Learn the system (any level)
 - Implement new features
 - Debug issues
@@ -346,4 +365,3 @@ This documentation set represents a **complete, AI-optimized reference** for the
 **Status**: ✅ Complete (20 files including indexes)  
 **Quality**: ⭐⭐⭐⭐⭐ Production-ready, AI-optimized  
 **Coverage**: 100% including Context Providers integration
-

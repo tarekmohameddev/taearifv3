@@ -79,7 +79,9 @@ const loadHeaderComponent = (componentName: string) => {
 
   if (headerComponentMap[componentName]) {
     // Wrap in lazy for Suspense compatibility
-    const component = lazy(() => Promise.resolve({ default: headerComponentMap[componentName] }));
+    const component = lazy(() =>
+      Promise.resolve({ default: headerComponentMap[componentName] }),
+    );
     headerComponentsCache.set(componentName, component);
     return component;
   }
@@ -91,30 +93,36 @@ const loadHeaderComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(`[Header Component] No subPath found for baseName: ${baseName}`);
+    console.warn(
+      `[Header Component] No subPath found for baseName: ${baseName}`,
+    );
     return null;
   }
 
   const fullPath = `${subPath}/${componentName}`;
-  
+
   // Debug log (can be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[Header Import Debug]', {
+  if (process.env.NODE_ENV === "development") {
+    console.log("[Header Import Debug]", {
       baseName,
       subPath,
       fullPath,
-      'Import path': `@/components/tenant/${fullPath}`
+      "Import path": `@/components/tenant/${fullPath}`,
     });
   }
-  
+
   const component = dynamic(
-    () => import(`@/components/tenant/${fullPath}`).catch((error) => {
-      console.error(`[Header Import Error] Failed to load ${fullPath}:`, error);
-      return { default: StaticHeader1 };
-    }),
-    { ssr: false }
+    () =>
+      import(`@/components/tenant/${fullPath}`).catch((error) => {
+        console.error(
+          `[Header Import Error] Failed to load ${fullPath}:`,
+          error,
+        );
+        return { default: StaticHeader1 };
+      }),
+    { ssr: false },
   );
-  
+
   // ⭐ Cache the component
   headerComponentsCache.set(componentName, component);
   return component;
@@ -147,7 +155,9 @@ const loadFooterComponent = (componentName: string) => {
   };
 
   if (footerComponentMap[componentName]) {
-    const component = lazy(() => Promise.resolve({ default: footerComponentMap[componentName] }));
+    const component = lazy(() =>
+      Promise.resolve({ default: footerComponentMap[componentName] }),
+    );
     footerComponentsCache.set(componentName, component);
     return component;
   }
@@ -159,20 +169,26 @@ const loadFooterComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(`[Footer Component] No subPath found for baseName: ${baseName}`);
+    console.warn(
+      `[Footer Component] No subPath found for baseName: ${baseName}`,
+    );
     return null;
   }
 
   const fullPath = `${subPath}/${componentName}`;
-  
+
   const component = dynamic(
-    () => import(`@/components/tenant/${fullPath}`).catch((error) => {
-      console.error(`[Footer Import Error] Failed to load ${fullPath}:`, error);
-      return { default: StaticFooter1 };
-    }),
-    { ssr: false }
+    () =>
+      import(`@/components/tenant/${fullPath}`).catch((error) => {
+        console.error(
+          `[Footer Import Error] Failed to load ${fullPath}:`,
+          error,
+        );
+        return { default: StaticFooter1 };
+      }),
+    { ssr: false },
   );
-  
+
   footerComponentsCache.set(componentName, component);
   return component;
 };
@@ -242,7 +258,10 @@ interface HomePageWrapperProps {
   domainType?: "subdomain" | "custom" | null;
 }
 
-export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: HomePageWrapperProps) {
+export default function HomePageWrapper({
+  tenantId,
+  domainType = "subdomain",
+}: HomePageWrapperProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -269,7 +288,9 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
       setTenantId(tenantId);
       isInitializedRef.current = true;
       lastTenantIdRef.current = tenantId;
-      console.log(`🏠 HomePageWrapper: Setting tenant ID: ${tenantId} (${domainType} domain)`);
+      console.log(
+        `🏠 HomePageWrapper: Setting tenant ID: ${tenantId} (${domainType} domain)`,
+      );
     }
   }, [tenantId, domainType]);
 
@@ -394,47 +415,57 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
   const globalHeaderData = tenantData?.globalComponentsData?.header;
   const globalHeaderVariant = useMemo(() => {
     // Priority: header.variant > globalHeaderVariant > default
-    const variant = 
+    const variant =
       globalHeaderData?.variant ||
       tenantData?.globalComponentsData?.globalHeaderVariant ||
       "StaticHeader1";
-    
+
     // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[HomePageWrapper] Header Variant Debug:', {
-        'globalHeaderData?.variant': globalHeaderData?.variant,
-        'tenantData?.globalComponentsData?.globalHeaderVariant': tenantData?.globalComponentsData?.globalHeaderVariant,
-        'resolved variant': variant,
-        'tenantData exists': !!tenantData,
-        'globalComponentsData exists': !!tenantData?.globalComponentsData,
+    if (process.env.NODE_ENV === "development") {
+      console.log("[HomePageWrapper] Header Variant Debug:", {
+        "globalHeaderData?.variant": globalHeaderData?.variant,
+        "tenantData?.globalComponentsData?.globalHeaderVariant":
+          tenantData?.globalComponentsData?.globalHeaderVariant,
+        "resolved variant": variant,
+        "tenantData exists": !!tenantData,
+        "globalComponentsData exists": !!tenantData?.globalComponentsData,
       });
     }
-    
+
     return variant;
-  }, [globalHeaderData?.variant, tenantData?.globalComponentsData?.globalHeaderVariant, tenantData]);
+  }, [
+    globalHeaderData?.variant,
+    tenantData?.globalComponentsData?.globalHeaderVariant,
+    tenantData,
+  ]);
 
   // Get global footer data and variant
   const globalFooterData = tenantData?.globalComponentsData?.footer;
   const globalFooterVariant = useMemo(() => {
     // Priority: footer.variant > globalFooterVariant > default (same as header)
-    const variant = 
+    const variant =
       globalFooterData?.variant ||
       tenantData?.globalComponentsData?.globalFooterVariant ||
       "StaticFooter1";
-    
+
     // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[HomePageWrapper] Footer Variant Debug:', {
-        'globalFooterData?.variant': globalFooterData?.variant,
-        'tenantData?.globalComponentsData?.globalFooterVariant': tenantData?.globalComponentsData?.globalFooterVariant,
-        'resolved variant': variant,
-        'tenantData exists': !!tenantData,
-        'globalComponentsData exists': !!tenantData?.globalComponentsData,
+    if (process.env.NODE_ENV === "development") {
+      console.log("[HomePageWrapper] Footer Variant Debug:", {
+        "globalFooterData?.variant": globalFooterData?.variant,
+        "tenantData?.globalComponentsData?.globalFooterVariant":
+          tenantData?.globalComponentsData?.globalFooterVariant,
+        "resolved variant": variant,
+        "tenantData exists": !!tenantData,
+        "globalComponentsData exists": !!tenantData?.globalComponentsData,
       });
     }
-    
+
     return variant;
-  }, [globalFooterData?.variant, tenantData?.globalComponentsData?.globalFooterVariant, tenantData]);
+  }, [
+    globalFooterData?.variant,
+    tenantData?.globalComponentsData?.globalFooterVariant,
+    tenantData,
+  ]);
 
   // Load footer component dynamically
   const FooterComponent = useMemo(() => {
@@ -529,9 +560,7 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header from globalComponentsData */}
             <div className="relative">
-              <Suspense
-                fallback={<SkeletonLoader componentName="header" />}
-              >
+              <Suspense fallback={<SkeletonLoader componentName="header" />}>
                 {(() => {
                   // Map variant names to component names
                   const componentMap: Record<string, string> = {
@@ -544,29 +573,37 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
                     header6: "header6",
                   };
 
-                  const componentName = componentMap[globalHeaderVariant] || "StaticHeader1";
-                  
+                  const componentName =
+                    componentMap[globalHeaderVariant] || "StaticHeader1";
+
                   // Debug log (can be removed in production)
-                  if (process.env.NODE_ENV === 'development') {
-                    console.log('[HomePageWrapper] Header Component Debug:', {
-                      'globalHeaderVariant': globalHeaderVariant,
-                      'componentName': componentName,
-                      'componentMap[globalHeaderVariant]': componentMap[globalHeaderVariant],
+                  if (process.env.NODE_ENV === "development") {
+                    console.log("[HomePageWrapper] Header Component Debug:", {
+                      globalHeaderVariant: globalHeaderVariant,
+                      componentName: componentName,
+                      "componentMap[globalHeaderVariant]":
+                        componentMap[globalHeaderVariant],
                     });
                   }
-                  
+
                   const HeaderComponent = loadHeaderComponent(componentName);
 
                   if (!HeaderComponent) {
-                    console.warn('[HomePageWrapper] HeaderComponent is null, falling back to StaticHeader1');
-                    return <StaticHeader1 overrideData={globalHeaderData || {}} />;
+                    console.warn(
+                      "[HomePageWrapper] HeaderComponent is null, falling back to StaticHeader1",
+                    );
+                    return (
+                      <StaticHeader1 overrideData={globalHeaderData || {}} />
+                    );
                   }
 
                   // Remove variant from data before passing to component
-                  const headerDataWithoutVariant = globalHeaderData ? (() => {
-                    const { variant: _variant, ...data } = globalHeaderData;
-                    return data;
-                  })() : {};
+                  const headerDataWithoutVariant = globalHeaderData
+                    ? (() => {
+                        const { variant: _variant, ...data } = globalHeaderData;
+                        return data;
+                      })()
+                    : {};
 
                   return (
                     <HeaderComponent
@@ -633,13 +670,17 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
             {/* Footer from globalComponentsData */}
             <Suspense fallback={<SkeletonLoader componentName="footer" />}>
               {(() => {
-                const footerDataWithoutVariant = globalFooterData ? (() => {
-                  const { variant: _variant, ...data } = globalFooterData;
-                  return data;
-                })() : {};
+                const footerDataWithoutVariant = globalFooterData
+                  ? (() => {
+                      const { variant: _variant, ...data } = globalFooterData;
+                      return data;
+                    })()
+                  : {};
 
                 if (!FooterComponent) {
-                  return <StaticFooter1 overrideData={footerDataWithoutVariant} />;
+                  return (
+                    <StaticFooter1 overrideData={footerDataWithoutVariant} />
+                  );
                 }
 
                 return (

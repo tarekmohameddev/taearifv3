@@ -181,7 +181,7 @@ export default function HalfTextHalfImage4(props: HalfTextHalfImage4Props) {
     if (props.useStore) {
       // Get tenant component data inside useEffect to avoid infinite loops
       const tenantComponentData = getTenantComponentData();
-      
+
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -244,30 +244,21 @@ export default function HalfTextHalfImage4(props: HalfTextHalfImage4Props) {
     mergedData.styling?.button?.backgroundColor || "#8b5f46";
   const buttonHoverBgColor =
     mergedData.styling?.button?.hoverBackgroundColor || "#6b4630";
-  const buttonTextColor =
-    mergedData.styling?.button?.textColor || "#ffffff";
-  const buttonBorderRadius =
-    mergedData.styling?.button?.borderRadius || "8px";
-  const titleColor =
-    mergedData.styling?.textColors?.title || "#1f2937";
-  const paragraphColor =
-    mergedData.styling?.textColors?.paragraph || "#374151";
+  const buttonTextColor = mergedData.styling?.button?.textColor || "#ffffff";
+  const buttonBorderRadius = mergedData.styling?.button?.borderRadius || "8px";
+  const titleColor = mergedData.styling?.textColors?.title || "#1f2937";
+  const paragraphColor = mergedData.styling?.textColors?.paragraph || "#374151";
 
-  const mobileTextOrder =
-    mergedData.responsive?.mobile?.textOrder || 2;
-  const mobileImageOrder =
-    mergedData.responsive?.mobile?.imageOrder || 1;
-  const mobileTextWidth =
-    mergedData.responsive?.mobile?.textWidth || "w-full";
+  const mobileTextOrder = mergedData.responsive?.mobile?.textOrder || 2;
+  const mobileImageOrder = mergedData.responsive?.mobile?.imageOrder || 1;
+  const mobileTextWidth = mergedData.responsive?.mobile?.textWidth || "w-full";
   const mobileImageWidth =
     mergedData.responsive?.mobile?.imageWidth || "w-full";
   const mobileImageHeight =
     mergedData.responsive?.mobile?.imageHeight || "h-[200px]";
 
-  const desktopTextOrder =
-    mergedData.responsive?.desktop?.textOrder || 1;
-  const desktopImageOrder =
-    mergedData.responsive?.desktop?.imageOrder || 2;
+  const desktopTextOrder = mergedData.responsive?.desktop?.textOrder || 1;
+  const desktopImageOrder = mergedData.responsive?.desktop?.imageOrder || 2;
   const desktopTextWidth =
     mergedData.responsive?.desktop?.textWidth || "md:w-[60%]";
   const desktopImageWidth =
@@ -295,8 +286,7 @@ export default function HalfTextHalfImage4(props: HalfTextHalfImage4Props) {
             className="text-xl md:text-2xl lg:text-3xl font-bold mb-3"
             style={{ color: titleColor }}
           >
-            {mergedData.content?.title ||
-              "ابنِ طريقك... ولا تنتظر أن تُمنح"}
+            {mergedData.content?.title || "ابنِ طريقك... ولا تنتظر أن تُمنح"}
           </h3>
 
           {/* Divider */}
@@ -379,4 +369,3 @@ export default function HalfTextHalfImage4(props: HalfTextHalfImage4Props) {
     </section>
   );
 }
-

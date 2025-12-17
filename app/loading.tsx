@@ -7,7 +7,7 @@
  * 2. Subdomain (tenant1.taearif.com): Shows loading skeletons (tenant site).
  * 3. Custom Domain (example.com): Shows loading skeletons (tenant site with custom domain).
  * 4. Reserved subdomains (www, api, dashboard, etc.): Treated as non-tenant, shows blank page.
- * 
+ *
  * منطق مكون التحميل:
  * يتحقق هذا المكون من اسم النطاق (hostname) لتحديد ما إذا كان موقع عميل أم منصة تعاريف الرئيسية.
  * ١. النطاق الأساسي (www.taearif.com أو taearif.com): يعرض صفحة بيضاء فارغة (ليس عميل).
@@ -86,26 +86,39 @@ export default function Loading() {
   useEffect(() => {
     const checkTenantId = () => {
       const hostname = window.location.hostname;
-      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+      const productionDomain =
+        process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
       const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
       const isDevelopment = process.env.NODE_ENV === "development";
-      
+
       // قائمة الكلمات المحجوزة (نفس middleware)
       const reservedWords = [
-        "www", "api", "admin", "app", "mail", "ftp", "blog", 
-        "shop", "store", "dashboard", "live-editor", "auth", 
-        "login", "register"
+        "www",
+        "api",
+        "admin",
+        "app",
+        "mail",
+        "ftp",
+        "blog",
+        "shop",
+        "store",
+        "dashboard",
+        "live-editor",
+        "auth",
+        "login",
+        "register",
       ];
-      
+
       if (process.env.NODE_ENV === "development") {
         console.log("🔍 Loading.tsx - Checking hostname:", hostname);
       }
-      
+
       // 1️⃣ التحقق من أنه الدومين الأساسي
-      const isOnBaseDomain = isDevelopment 
+      const isOnBaseDomain = isDevelopment
         ? hostname === localDomain || hostname === `${localDomain}:3000`
-        : hostname === productionDomain || hostname === `www.${productionDomain}`;
-      
+        : hostname === productionDomain ||
+          hostname === `www.${productionDomain}`;
+
       if (isOnBaseDomain) {
         if (process.env.NODE_ENV === "development") {
           console.log("❌ Loading.tsx - Base domain, no tenant");
@@ -113,36 +126,45 @@ export default function Loading() {
         setHasTenantId(false);
         return;
       }
-      
+
       // 2️⃣ التحقق من Subdomain (tenant1.taearif.com)
-      if (hostname.includes(productionDomain) || hostname.includes(localDomain)) {
+      if (
+        hostname.includes(productionDomain) ||
+        hostname.includes(localDomain)
+      ) {
         const parts = hostname.split(".");
-        
+
         // للتطوير: tenant1.localhost
         if (isDevelopment && hostname.includes(localDomain)) {
           if (parts.length > 1 && parts[0] !== localDomain) {
             const potentialTenantId = parts[0];
             if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
               if (process.env.NODE_ENV === "development") {
-                console.log("✅ Loading.tsx - Valid subdomain (local):", potentialTenantId);
+                console.log(
+                  "✅ Loading.tsx - Valid subdomain (local):",
+                  potentialTenantId,
+                );
               }
               setHasTenantId(true);
               return;
             }
           }
         }
-        
+
         // للإنتاج: tenant1.taearif.com
         if (!isDevelopment && hostname.includes(productionDomain)) {
           if (parts.length > 2) {
             const potentialTenantId = parts[0];
             const domainPart = parts.slice(1).join(".");
-            
+
             // التأكد من أن domain part هو بالضبط productionDomain
             if (domainPart === productionDomain) {
               if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
                 if (process.env.NODE_ENV === "development") {
-                  console.log("✅ Loading.tsx - Valid subdomain (prod):", potentialTenantId);
+                  console.log(
+                    "✅ Loading.tsx - Valid subdomain (prod):",
+                    potentialTenantId,
+                  );
                 }
                 setHasTenantId(true);
                 return;
@@ -151,10 +173,13 @@ export default function Loading() {
           }
         }
       }
-      
+
       // 3️⃣ التحقق من Custom Domain (أي domain مختلف تماماً)
-      const hasCustomDomainExtension = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
-      
+      const hasCustomDomainExtension =
+        /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+          hostname,
+        );
+
       if (hasCustomDomainExtension) {
         // إذا وصلنا هنا، يعني الـ hostname:
         // - ليس base domain (www.taearif.com أو taearif.com)
@@ -167,7 +192,7 @@ export default function Loading() {
         setHasTenantId(true);
         return;
       }
-      
+
       // ❌ لا يوجد tenant
       if (process.env.NODE_ENV === "development") {
         console.log("❌ Loading.tsx - No tenant found");

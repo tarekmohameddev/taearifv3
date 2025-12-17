@@ -7,33 +7,40 @@
 تم إضافة اللوجو بجانب "لوحة تحكم المالك" من بيانات tenant:
 
 ```javascript
-{/* Logo from tenant data */}
-{tenantData?.globalComponentsData?.header?.logo?.image && (
-  <img 
-    src={tenantData.globalComponentsData.header.logo.image} 
-    alt="Logo"
-    className="h-8 w-auto object-contain"
-  />
-)}
+{
+  /* Logo from tenant data */
+}
+{
+  tenantData?.globalComponentsData?.header?.logo?.image && (
+    <img
+      src={tenantData.globalComponentsData.header.logo.image}
+      alt="Logo"
+      className="h-8 w-auto object-contain"
+    />
+  );
+}
 ```
 
 ## كيفية العمل
 
 ### 1. التحقق من وجود اللوجو
+
 ```javascript
-tenantData?.globalComponentsData?.header?.logo?.image
+tenantData?.globalComponentsData?.header?.logo?.image;
 ```
 
 ### 2. عرض اللوجو
+
 ```javascript
-<img 
-  src={tenantData.globalComponentsData.header.logo.image} 
+<img
+  src={tenantData.globalComponentsData.header.logo.image}
   alt="Logo"
   className="h-8 w-auto object-contain"
 />
 ```
 
 ### 3. التصميم
+
 - **الارتفاع**: `h-8` (32px)
 - **العرض**: `w-auto` (نسبي للحفاظ على النسبة)
 - **Object Fit**: `object-contain` (لضمان عدم تشويه الصورة)
@@ -41,34 +48,39 @@ tenantData?.globalComponentsData?.header?.logo?.image
 ## الميزات
 
 ### ✅ Nullable Logo
+
 - يتم التحقق من وجود اللوجو قبل عرضه
 - إذا لم يكن هناك لوجو، لن يتم عرض أي شيء
 - لا يسبب أخطاء إذا كانت البيانات غير موجودة
 
 ### ✅ Responsive Design
+
 - اللوجو يتكيف مع حجم الشاشة
 - يحافظ على النسبة الأصلية للصورة
 
 ### ✅ Accessibility
+
 - يحتوي على `alt="Logo"` للوصولية
 - يتم عرضه فقط عند وجوده
 
 ## أمثلة على البيانات
 
 ### ✅ مع لوجو:
+
 ```javascript
 tenantData = {
   globalComponentsData: {
     header: {
       logo: {
-        image: "https://example.com/logo.png"
-      }
-    }
-  }
-}
+        image: "https://example.com/logo.png",
+      },
+    },
+  },
+};
 ```
 
 ### ❌ بدون لوجو:
+
 ```javascript
 tenantData = {
   globalComponentsData: {
@@ -92,6 +104,7 @@ tenantData = {
 ```
 
 ### بدون لوجو:
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ لوحة تحكم المالك        مرحباً، أحمد علي [👤] │

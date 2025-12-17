@@ -51,7 +51,8 @@ export function useTenantId() {
 
 function extractTenantFromHostname(hostname: string): string | null {
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // قائمة بالكلمات المحجوزة
@@ -68,8 +69,11 @@ function extractTenantFromHostname(hostname: string): string | null {
   ];
 
   // التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
-  
+  const isCustomDomain =
+    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+      hostname,
+    );
+
   if (isCustomDomain) {
     // إذا كان Custom Domain، إرجاع الـ hostname نفسه
     return hostname;

@@ -1,45 +1,43 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export default function DashboardSection() {
-
   return (
     <section id="dashboard" className="sm:py-20  relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="relative">
           {/* Background Images with Animations */}
           <div className="relative h-[400px] lg:h-[700px]">
-             {/* Main Dashboard Image */}
-             <motion.div 
-               className="absolute inset-0 flex items-center justify-center"
-               initial={{ opacity: 0, scale: 0.9 }}
-               whileInView={{ opacity: 1, scale: 1 }}
-               transition={{ duration: 1, ease: "easeOut" }}
-               viewport={{ once: true, margin: "-100px" }}
-             >
-               <img
-                 src="https://test.kingbellsa.com/wp-content/uploads/2025/10/ssss.webp"
-                 alt="Dashboard"
-                 className="w-full max-w-7xl h-auto rounded-lg"
-               />
-             </motion.div>
-
-
+            {/* Main Dashboard Image */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              viewport={{ once: true, margin: "-100px" }}
+            >
+              <img
+                src="https://test.kingbellsa.com/wp-content/uploads/2025/10/ssss.webp"
+                alt="Dashboard"
+                className="w-full max-w-7xl h-auto rounded-lg"
+              />
+            </motion.div>
           </div>
 
           {/* Content Overlay */}
           <div className="relative z-10 mt-16">
             <div className="max-w-4xl mx-auto text-center">
-               {/* Main Heading */}
-               <h1 className="text-4xl lg:text-6xl font-bold text-black mb-8 leading-tight">
-                 كل أعمالك العقارية في{' '}
-                 <span className="text-[#17BD37]">لوحة تحكم واحدة</span>
-               </h1>
+              {/* Main Heading */}
+              <h1 className="text-4xl lg:text-6xl font-bold text-black mb-8 leading-tight">
+                كل أعمالك العقارية في{" "}
+                <span className="text-[#17BD37]">لوحة تحكم واحدة</span>
+              </h1>
 
               {/* Description */}
               <p className="text-xl text-[#6E6E75] mb-8 leading-relaxed max-w-3xl mx-auto">
-                من إدارة العقارات والعملاء إلى الصفقات والرسائل — نظام ذكي يشتغل عنك، مو عليك.
+                من إدارة العقارات والعملاء إلى الصفقات والرسائل — نظام ذكي يشتغل
+                عنك، مو عليك.
               </p>
 
               {/* Rating */}

@@ -312,31 +312,17 @@ interface EditorStore {
 
   // Card4 states
   card4States: Record<string, ComponentData>;
-  ensureCard4Variant: (
-    variantId: string,
-    initial?: ComponentData,
-  ) => void;
+  ensureCard4Variant: (variantId: string, initial?: ComponentData) => void;
   getCard4Data: (variantId: string) => ComponentData;
   setCard4Data: (variantId: string, data: ComponentData) => void;
-  updateCard4ByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updateCard4ByPath: (variantId: string, path: string, value: any) => void;
 
   // Card5 states
   card5States: Record<string, ComponentData>;
-  ensureCard5Variant: (
-    variantId: string,
-    initial?: ComponentData,
-  ) => void;
+  ensureCard5Variant: (variantId: string, initial?: ComponentData) => void;
   getCard5Data: (variantId: string) => ComponentData;
   setCard5Data: (variantId: string, data: ComponentData) => void;
-  updateCard5ByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updateCard5ByPath: (variantId: string, path: string, value: any) => void;
 
   // Logos Ticker states
   logosTickerStates: Record<string, ComponentData>;
@@ -354,17 +340,10 @@ interface EditorStore {
 
   // Partners states
   partnersStates: Record<string, ComponentData>;
-  ensurePartnersVariant: (
-    variantId: string,
-    initial?: ComponentData,
-  ) => void;
+  ensurePartnersVariant: (variantId: string, initial?: ComponentData) => void;
   getPartnersData: (variantId: string) => ComponentData;
   setPartnersData: (variantId: string, data: ComponentData) => void;
-  updatePartnersByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updatePartnersByPath: (variantId: string, path: string, value: any) => void;
 
   // Why Choose Us states
   whyChooseUsStates: Record<string, ComponentData>;
@@ -487,17 +466,10 @@ interface EditorStore {
 
   // Image Text states
   imageTextStates: Record<string, ComponentData>;
-  ensureImageTextVariant: (
-    variantId: string,
-    initial?: ComponentData,
-  ) => void;
+  ensureImageTextVariant: (variantId: string, initial?: ComponentData) => void;
   getImageTextData: (variantId: string) => ComponentData;
   setImageTextData: (variantId: string, data: ComponentData) => void;
-  updateImageTextByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updateImageTextByPath: (variantId: string, path: string, value: any) => void;
 
   contactUsHomePageStates: Record<string, ComponentData>;
   ensureContactUsHomePageVariant: (
@@ -927,9 +899,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
         // Special handling: If we're navigating to a property of a color field (e.g., bgColor.useDefaultColor),
         // and the existing value is a string (color hex), preserve it in a value property
-        const isColorFieldProperty = (nextKey === "useDefaultColor" || nextKey === "globalColorType") && 
-                                     typeof existing === "string" && 
-                                     existing.startsWith("#");
+        const isColorFieldProperty =
+          (nextKey === "useDefaultColor" || nextKey === "globalColorType") &&
+          typeof existing === "string" &&
+          existing.startsWith("#");
 
         // إذا كان existing string أو primitive value، استبدله بـ object أو array
         if (
@@ -942,7 +915,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             // Preserve the color value when converting to object
             cursor[key] = { value: existing };
             if (path.includes("styling") && path.includes("bgColor")) {
-              console.log(`🔧 Preserving color value: ${existing} in ${key}.value`);
+              console.log(
+                `🔧 Preserving color value: ${existing} in ${key}.value`,
+              );
             }
           } else {
             cursor[key] = nextIsIndex ? [] : {};
@@ -959,28 +934,36 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         cursor = cursor[key];
       }
       const lastKey = segments[segments.length - 1]!;
-      
+
       // Special handling: If we're setting useDefaultColor or globalColorType on a color field,
       // and the parent object has a value property (from a previous string-to-object conversion),
       // preserve it
-      if ((lastKey === "useDefaultColor" || lastKey === "globalColorType") && 
-          cursor && 
-          typeof cursor === "object" && 
-          !Array.isArray(cursor) &&
-          cursor.value && 
-          typeof cursor.value === "string" && 
-          cursor.value.startsWith("#")) {
+      if (
+        (lastKey === "useDefaultColor" || lastKey === "globalColorType") &&
+        cursor &&
+        typeof cursor === "object" &&
+        !Array.isArray(cursor) &&
+        cursor.value &&
+        typeof cursor.value === "string" &&
+        cursor.value.startsWith("#")
+      ) {
         // The value property already exists, just update useDefaultColor or globalColorType
         cursor[lastKey] = value;
         if (path.includes("styling") && path.includes("bgColor")) {
-          console.log(`🔧 Preserving existing color value: ${cursor.value} while setting ${lastKey} to ${value}`);
+          console.log(
+            `🔧 Preserving existing color value: ${cursor.value} while setting ${lastKey} to ${value}`,
+          );
         }
       } else {
         cursor[lastKey] = value;
       }
 
       // Debug: Log the update for styling paths
-      if (path.includes("styling") || path.includes("searchButton") || path.includes("bgColor")) {
+      if (
+        path.includes("styling") ||
+        path.includes("searchButton") ||
+        path.includes("bgColor")
+      ) {
         console.group("🔧 updateByPath Debug");
         console.log("Path:", path);
         console.log("Value:", value);
@@ -1112,9 +1095,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "imageText":
           return imageTextFunctions.ensureVariant(state, variantId, initial);
         case "contactUsHomePage":
-          return contactUsHomePageFunctions.ensureVariant(state, variantId, initial);
+          return contactUsHomePageFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "blogsSections":
-          return blogsSectionsFunctions.ensureVariant(state, variantId, initial);
+          return blogsSectionsFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1198,13 +1189,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       case "filterButtons":
         return filterButtonsFunctions.getData(state, variantId);
       case "propertyFilter":
-        const propertyFilterData = propertyFilterFunctions.getData(state, variantId);
+        const propertyFilterData = propertyFilterFunctions.getData(
+          state,
+          variantId,
+        );
         // Debug: Log propertyFilter data retrieval
         if (variantId === "1") {
           console.group("🔍 getComponentData Debug for propertyFilter");
           console.log("VariantId:", variantId);
-          console.log("PropertyFilterStates keys:", Object.keys(state.propertyFilterStates));
-          console.log("PropertyFilterStates['1']:", state.propertyFilterStates["1"]);
+          console.log(
+            "PropertyFilterStates keys:",
+            Object.keys(state.propertyFilterStates),
+          );
+          console.log(
+            "PropertyFilterStates['1']:",
+            state.propertyFilterStates["1"],
+          );
           console.log("Returned Data:", propertyFilterData);
           console.groupEnd();
         }
@@ -1269,7 +1269,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState = testimonialsFunctions.setData(state, variantId, data);
           break;
         case "propertiesShowcase":
-          newState = propertiesShowcaseFunctions.setData(state, variantId, data);
+          newState = propertiesShowcaseFunctions.setData(
+            state,
+            variantId,
+            data,
+          );
           break;
         case "card":
           // Determine which card variant based on variantId
@@ -1305,7 +1309,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             console.log("VariantId:", variantId);
             console.log("Data to save:", data);
             console.log("NewState:", newState);
-            console.log("PropertyFilterStates after save:", newState.propertyFilterStates);
+            console.log(
+              "PropertyFilterStates after save:",
+              newState.propertyFilterStates,
+            );
             console.groupEnd();
           }
           break;
@@ -1461,9 +1468,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "card":
           // Determine which card variant based on variantId
           if (variantId.includes("card5") || variantId === "card5") {
-            newState = card5Functions.updateByPath(state, variantId, path, value);
+            newState = card5Functions.updateByPath(
+              state,
+              variantId,
+              path,
+              value,
+            );
           } else {
-            newState = card4Functions.updateByPath(state, variantId, path, value);
+            newState = card4Functions.updateByPath(
+              state,
+              variantId,
+              path,
+              value,
+            );
           }
           break;
         case "logosTicker":
@@ -1796,9 +1813,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   // Partners functions using modular approach
   ensurePartnersVariant: (variantId, initial) =>
-    set((state) =>
-      partnersFunctions.ensureVariant(state, variantId, initial),
-    ),
+    set((state) => partnersFunctions.ensureVariant(state, variantId, initial)),
   getPartnersData: (variantId) => {
     const state = get();
     return partnersFunctions.getData(state, variantId);
@@ -2036,7 +2051,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   // ContactUsHomePage functions using modular approach
   ensureContactUsHomePageVariant: (variantId, initial) =>
-    set((state) => contactUsHomePageFunctions.ensureVariant(state, variantId, initial)),
+    set((state) =>
+      contactUsHomePageFunctions.ensureVariant(state, variantId, initial),
+    ),
   getContactUsHomePageData: (variantId) => {
     const state = get();
     return contactUsHomePageFunctions.getData(state, variantId);
@@ -2050,7 +2067,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   // Blogs Sections functions using modular approach
   ensureBlogsSectionsVariant: (variantId, initial) =>
-    set((state) => blogsSectionsFunctions.ensureVariant(state, variantId, initial)),
+    set((state) =>
+      blogsSectionsFunctions.ensureVariant(state, variantId, initial),
+    ),
   getBlogsSectionsData: (variantId) => {
     const state = get();
     return blogsSectionsFunctions.getData(state, variantId);
@@ -2129,19 +2148,23 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         Object.keys(tenantData.globalComponentsData).length > 0
       ) {
         newState.globalComponentsData = tenantData.globalComponentsData;
-        
+
         // ⭐ Load globalHeaderVariant from globalComponentsData
         if (tenantData.globalComponentsData.globalHeaderVariant) {
-          newState.globalHeaderVariant = tenantData.globalComponentsData.globalHeaderVariant;
+          newState.globalHeaderVariant =
+            tenantData.globalComponentsData.globalHeaderVariant;
         } else if (tenantData.globalComponentsData.header?.variant) {
-          newState.globalHeaderVariant = tenantData.globalComponentsData.header.variant;
+          newState.globalHeaderVariant =
+            tenantData.globalComponentsData.header.variant;
         }
-        
+
         // ⭐ Load globalFooterVariant from globalComponentsData
         if (tenantData.globalComponentsData.globalFooterVariant) {
-          newState.globalFooterVariant = tenantData.globalComponentsData.globalFooterVariant;
+          newState.globalFooterVariant =
+            tenantData.globalComponentsData.globalFooterVariant;
         } else if (tenantData.globalComponentsData.footer?.variant) {
-          newState.globalFooterVariant = tenantData.globalComponentsData.footer.variant;
+          newState.globalFooterVariant =
+            tenantData.globalComponentsData.footer.variant;
         }
       } else {
         // Only initialize with default data if not already set in editorStore
@@ -2249,7 +2272,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       break;
                     case "card":
                       // Determine which card variant based on componentName
-                      if (comp.componentName === "card5" || comp.id?.includes("card5")) {
+                      if (
+                        comp.componentName === "card5" ||
+                        comp.id?.includes("card5")
+                      ) {
                         newState.card5States = card5Functions.setData(
                           newState,
                           comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
@@ -2375,18 +2401,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       ).imageTextStates;
                       break;
                     case "contactUsHomePage":
-                      newState.contactUsHomePageStates = contactUsHomePageFunctions.setData(
-                        newState,
-                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                        comp.data,
-                      ).contactUsHomePageStates;
+                      newState.contactUsHomePageStates =
+                        contactUsHomePageFunctions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).contactUsHomePageStates;
                       break;
                     case "blogsSections":
-                      newState.blogsSectionsStates = blogsSectionsFunctions.setData(
-                        newState,
-                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                        comp.data,
-                      ).blogsSectionsStates;
+                      newState.blogsSectionsStates =
+                        blogsSectionsFunctions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).blogsSectionsStates;
                       break;
                   }
                 }
@@ -2571,11 +2599,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
               ).imageTextStates;
               break;
             case "contactUsHomePage":
-              newState.contactUsHomePageStates = contactUsHomePageFunctions.setData(
-                newState,
-                comp.componentName,
-                comp.data,
-              ).contactUsHomePageStates;
+              newState.contactUsHomePageStates =
+                contactUsHomePageFunctions.setData(
+                  newState,
+                  comp.componentName,
+                  comp.data,
+                ).contactUsHomePageStates;
               break;
             case "blogsSections":
               newState.blogsSectionsStates = blogsSectionsFunctions.setData(

@@ -1,17 +1,20 @@
 # Vercel Domain Integration
 
 ## نظرة عامة
+
 تم دمج نظام إدارة النطاقات المخصصة مع Vercel API لتمكين إضافة النطاقات تلقائياً إلى مشروع Vercel.
 
 ## الملفات المضافة/المعدلة
 
 ### 1. API Route الجديد
+
 - **الملف:** `app/api/vercel/add-domain/route.js` (Next.js 15 App Router)
 - **الوظيفة:** يتعامل مع إضافة النطاقات إلى Vercel API
 - **الأمان:** جميع بيانات Vercel محمية على السيرفر فقط
 - **التحديث:** يستخدم axios العادي بدلاً من axiosInstance لتجنب PHP backend
 
 ### 2. إعدادات Vercel
+
 - **الملف:** `app/api/vercel/add-domain/route.js` (مدمج في API route)
 - **الوظيفة:** يحتوي على إعدادات Vercel API مدمجة
 - **المتغيرات:**
@@ -19,6 +22,7 @@
   - `VERCEL_PROJECT_ID`: معرف المشروع (من متغيرات البيئة أو افتراضي)
 
 ### 3. تحديث Frontend
+
 - **الملف:** `components/settings-page.tsx`
 - **التحديث:** دالة `handleAddDomain2` تستخدم axios العادي مع API الجديد
 - **السبب:** تجنب إرسال الطلبات إلى PHP backend
@@ -26,6 +30,7 @@
 ## كيفية الاستخدام
 
 ### 1. إعداد متغيرات البيئة
+
 ```bash
 # إنشاء ملف .env.local
 VERCEL_TOKEN=s9Ltgz5461j51k6531v6M3OSOuDUDrvN
@@ -33,6 +38,7 @@ VERCEL_PROJECT_ID=prj_38KFpi23Xf79S6111W1515165665Cc5IkeTo40cc3NDrK
 ```
 
 ### 2. اختبار API
+
 ```bash
 # اختبار API محلياً
 curl -X POST http://localhost:3000/api/vercel/add-domain \
@@ -41,6 +47,7 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ```
 
 ### 3. استخدام الواجهة
+
 1. اذهب إلى صفحة الإعدادات
 2. اضغط على "إضافة نطاق2"
 3. أدخل اسم النطاق
@@ -49,6 +56,7 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ## استجابة API
 
 ### نجاح العملية
+
 ```json
 {
   "success": true,
@@ -84,6 +92,7 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ```
 
 ### فشل العملية
+
 ```json
 {
   "success": false,
@@ -99,11 +108,13 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ## معالجة الأخطاء
 
 ### أنواع الأخطاء المدعومة
+
 1. **domain_already_exists**: النطاق موجود بالفعل
 2. **invalid_domain**: تنسيق النطاق غير صالح
 3. **domain_not_verified**: النطاق يحتاج للتحقق
 
 ### رسائل الخطأ
+
 - جميع رسائل الخطأ باللغة العربية
 - تسجيل مفصل في console
 - إشعارات للمستخدم عبر toast
@@ -111,23 +122,28 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ## الأمان
 
 ### حماية البيانات
+
 - ✅ Vercel credentials محمية على السيرفر
 - ✅ لا يتم إرسال البيانات الحساسة للعميل
 - ✅ التحقق من صحة النطاق قبل الإرسال
 
 ### CORS
+
 - ✅ دعم CORS للطلبات المتقاطعة
 - ✅ رؤوس HTTP آمنة
 
 ## التطوير المستقبلي
 
 ### PHP Backend Integration
+
 هذا النظام يعمل كنموذج أولي للفريق PHP المستقبلي:
+
 1. **API Structure**: نفس هيكل الاستجابة
 2. **Error Handling**: نفس معالجة الأخطاء
 3. **Security**: نفس مستوى الأمان
 
 ### تحسينات مقترحة
+
 1. **Domain Verification**: إضافة التحقق من ملكية النطاق
 2. **SSL Management**: إدارة شهادات SSL
 3. **DNS Configuration**: إعداد DNS تلقائي
@@ -135,11 +151,13 @@ curl -X POST http://localhost:3000/api/vercel/add-domain \
 ## استكشاف الأخطاء
 
 ### مشاكل شائعة
+
 1. **Token غير صالح**: تحقق من VERCEL_TOKEN
 2. **Project ID خاطئ**: تحقق من VERCEL_PROJECT_ID
 3. **Network Error**: تحقق من الاتصال بالإنترنت
 
 ### سجلات التطوير
+
 ```bash
 # مراقبة السجلات
 npm run dev
@@ -149,6 +167,7 @@ npm run dev
 ## الدعم الفني
 
 للحصول على المساعدة:
+
 1. تحقق من سجلات console
 2. راجع ملف `vercel-config.js`
 3. تأكد من صحة متغيرات البيئة

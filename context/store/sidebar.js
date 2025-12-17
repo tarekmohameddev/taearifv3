@@ -26,10 +26,10 @@ const getIconComponent = (iconName) => {
       return LayoutDashboard;
     case "content-settings":
       return FileText;
-      case "web-settings":
-        return Settings;
-        case "sparkles":
-          return Sparkles;
+    case "web-settings":
+      return Settings;
+    case "sparkles":
+      return Sparkles;
     case "building":
       return Building2;
     case "home":

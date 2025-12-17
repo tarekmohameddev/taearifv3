@@ -12,7 +12,7 @@ import useAuthStore from "@/context/AuthContext";
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
 
 // استيراد TenantPageWrapper ديناميكياً (للاستخدام عند الحاجة)
-const TenantPageWrapper = dynamic(() => import('@/app/TenantPageWrapper'), {
+const TenantPageWrapper = dynamic(() => import("@/app/TenantPageWrapper"), {
   ssr: false,
 });
 
@@ -55,14 +55,16 @@ export default function DashboardLayout({
   const fetchUserFromAPI = useAuthStore((state) => state.fetchUserFromAPI);
   const userData = useAuthStore((state) => state.userData);
   const hasFetchedUserRef = useRef(false);
-  
+
   // قراءة حالة التحقق من sessionStorage مباشرة في initial state
-  const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem(SESSION_VALIDATION_KEY) === "true";
-    }
-    return false;
-  });
+  const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(
+    () => {
+      if (typeof window !== "undefined") {
+        return sessionStorage.getItem(SESSION_VALIDATION_KEY) === "true";
+      }
+      return false;
+    },
+  );
 
   // جلب بيانات المستخدم من API عند فتح أي صفحة في الداشبورد
   useEffect(() => {
@@ -92,17 +94,30 @@ export default function DashboardLayout({
     if (tokenValidation.isValid && !tokenValidation.loading) {
       fetchUser();
     }
-  }, [tokenValidation.isValid, tokenValidation.loading, userData?.token, fetchUserFromAPI]);
+  }, [
+    tokenValidation.isValid,
+    tokenValidation.loading,
+    userData?.token,
+    fetchUserFromAPI,
+  ]);
 
   // حفظ حالة التحقق في sessionStorage عند اكتمال التحقق بنجاح
   // هذا يضمن عدم عرض رسالة التحميل عند التنقل بين الصفحات في نفس الجلسة
   useEffect(() => {
-    if (typeof window !== "undefined" && tokenValidation.isValid === true && !tokenValidation.loading) {
+    if (
+      typeof window !== "undefined" &&
+      tokenValidation.isValid === true &&
+      !tokenValidation.loading
+    ) {
       sessionStorage.setItem(SESSION_VALIDATION_KEY, "true");
       setHasValidatedSession(true);
     }
     // في حالة فشل التحقق، احذف المفتاح من sessionStorage لإجبار التحقق مرة أخرى
-    if (typeof window !== "undefined" && tokenValidation.isValid === false && !tokenValidation.loading) {
+    if (
+      typeof window !== "undefined" &&
+      tokenValidation.isValid === false &&
+      !tokenValidation.loading
+    ) {
       sessionStorage.removeItem(SESSION_VALIDATION_KEY);
       setHasValidatedSession(false);
     }
@@ -112,34 +127,44 @@ export default function DashboardLayout({
   useEffect(() => {
     const checkDomain = () => {
       if (typeof window === "undefined") return;
-      
+
       const hostname = window.location.hostname;
-      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+      const productionDomain =
+        process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
       const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
       const isDevelopment = process.env.NODE_ENV === "development";
-      
+
       // التحقق من أن المستخدم على الدومين الأساسي
-      const isOnBaseDomain = isDevelopment 
+      const isOnBaseDomain = isDevelopment
         ? hostname === localDomain || hostname === `${localDomain}:3000`
-        : hostname === productionDomain || hostname === `www.${productionDomain}`;
-      
+        : hostname === productionDomain ||
+          hostname === `www.${productionDomain}`;
+
       // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-      const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
-      
+      const isCustomDomain =
+        /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
+          hostname,
+        );
+
       if (isCustomDomain && !isOnBaseDomain) {
         // إذا كان custom domain، اعتبره tenant domain
-        console.log("🏢 Dashboard Layout: Custom domain detected, treating as tenant domain:", hostname);
+        console.log(
+          "🏢 Dashboard Layout: Custom domain detected, treating as tenant domain:",
+          hostname,
+        );
         setIsValidDomain(false); // false يعني أنه tenant domain
         return;
       }
-      
+
       // إذا كان الدومين الأساسي، اعرض Dashboard العادي
       if (isOnBaseDomain) {
-        console.log("🏠 Dashboard Layout: Base domain detected, showing main dashboard");
+        console.log(
+          "🏠 Dashboard Layout: Base domain detected, showing main dashboard",
+        );
         setIsValidDomain(true); // true يعني أنه الدومين الأساسي
         return;
       }
-      
+
       // إذا لم يكن أي منهما، اعتبره غير صالح
       console.log("❌ Dashboard Layout: Unknown domain type:", hostname);
       setIsValidDomain(false);
@@ -179,8 +204,9 @@ export default function DashboardLayout({
   // 1. عند التحقق من الدومين لأول مرة (isValidDomain === null)
   // 2. عند التحقق من الجلسة لأول مرة في هذه الجلسة (tokenValidation.loading && !hasValidatedSession)
   // ملاحظة: إذا تم التحقق من الجلسة من قبل في هذه الجلسة، لن تظهر رسالة التحميل عند التنقل
-  const shouldShowLoading = isValidDomain === null || (tokenValidation.loading && !hasValidatedSession);
-  
+  const shouldShowLoading =
+    isValidDomain === null || (tokenValidation.loading && !hasValidatedSession);
+
   if (shouldShowLoading) {
     return (
       <div
@@ -190,7 +216,9 @@ export default function DashboardLayout({
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {isValidDomain === null ? "جاري التحقق من الدومين..." : "جاري التحقق من صحة الجلسة..."}
+            {isValidDomain === null
+              ? "جاري التحقق من الدومين..."
+              : "جاري التحقق من صحة الجلسة..."}
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 # Drag & Drop System - Complete Reference
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Architecture](#architecture)
 3. [Core Components](#core-components)
@@ -14,6 +15,7 @@
 ## Overview
 
 The Live Editor implements an advanced drag & drop system using **@dnd-kit** library. The system supports:
+
 - **Component reordering**: Move existing components within page
 - **New component addition**: Drag from sidebar to page
 - **Position tracking**: Precise index calculation
@@ -90,19 +92,22 @@ services-liveeditor/live-editor/dragDrop/
 **Purpose**: Main provider for drag & drop functionality
 
 **Props**:
+
 ```typescript
 interface EnhancedLiveEditorDragDropContextProps {
   children: React.ReactNode;
-  components: any[];                    // Current page components
-  onComponentMove?: (                   // Move callback
+  components: any[]; // Current page components
+  onComponentMove?: (
+    // Move callback
     sourceIndex: number,
     sourceZone: string,
     finalIndex: number,
     destinationZone: string,
     updatedComponents?: any[],
-    debugInfo?: PositionDebugInfo
+    debugInfo?: PositionDebugInfo,
   ) => void;
-  onComponentAdd?: (data: {            // Add callback
+  onComponentAdd?: (data: {
+    // Add callback
     type: string;
     index: number;
     zone: string;
@@ -126,7 +131,7 @@ export function EnhancedLiveEditorDragDropContext({
 }) {
   const sensors = useLiveEditorSensors();
   const zoneStore = useMemo(() => createZoneStore(), []);
-  
+
   const handleEnhancedMove = useCallback((
     sourceIndex,
     sourceZone,
@@ -141,7 +146,7 @@ export function EnhancedLiveEditorDragDropContext({
       destinationIndex,
       destinationZone
     );
-    
+
     if (result.success) {
       onComponentMove?.(
         sourceIndex,
@@ -155,7 +160,7 @@ export function EnhancedLiveEditorDragDropContext({
       onPositionDebug?.(result.debugInfo);
     }
   }, [components, onComponentMove, onPositionDebug]);
-  
+
   return (
     <DragDropProvider
       sensors={sensors}
@@ -183,6 +188,7 @@ export function EnhancedLiveEditorDragDropContext({
 **Purpose**: Wrapper for draggable page components
 
 **Usage**:
+
 ```typescript
 <LiveEditorDraggableComponent
   id={component.id}
@@ -206,6 +212,7 @@ export function EnhancedLiveEditorDragDropContext({
 ```
 
 **Features**:
+
 - Drag handle overlay (appears on hover)
 - Edit and Delete buttons
 - Visual selection indicator
@@ -219,6 +226,7 @@ export function EnhancedLiveEditorDragDropContext({
 **Purpose**: Drop target area for components
 
 **Usage**:
+
 ```typescript
 <LiveEditorDropZone
   zone="root"
@@ -232,6 +240,7 @@ export function EnhancedLiveEditorDragDropContext({
 ```
 
 **Features**:
+
 - Accept drops from draggable components
 - Show drop indicators
 - Calculate drop position
@@ -244,6 +253,7 @@ export function EnhancedLiveEditorDragDropContext({
 **Purpose**: Draggable component cards in ComponentsSidebar
 
 **Usage**:
+
 ```typescript
 <DraggableDrawerItem
   componentType="hero"
@@ -265,6 +275,7 @@ export function EnhancedLiveEditorDragDropContext({
 ```
 
 **Features**:
+
 - Drag from sidebar to page
 - Visual drag preview
 - Component metadata
@@ -280,11 +291,12 @@ export function EnhancedLiveEditorDragDropContext({
 **Purpose**: Track and validate component positions
 
 **API**:
+
 ```typescript
 export const positionTracker = {
   // Record state for history
   recordState: (components, operation) => void;
-  
+
   // Track component move with validation
   trackComponentMove: (
     components,
@@ -297,13 +309,13 @@ export const positionTracker = {
     updatedComponents: any[];
     debugInfo: PositionDebugInfo;
   };
-  
+
   // Validate positions
   validatePositions: (components) => ValidationResult;
-  
+
   // Generate debug report
   generateReport: () => Report;
-  
+
   // Enable debug mode
   setDebugMode: (enabled: boolean) => void;
 };
@@ -326,7 +338,7 @@ export function trackComponentMove(
     destinationZone,
     componentsCount: components.length
   });
-  
+
   // STEP 1: Validate inputs
   if (!Array.isArray(components)) {
     return {
@@ -346,7 +358,7 @@ export function trackComponentMove(
       }
     };
   }
-  
+
   if (sourceIndex < 0 || sourceIndex >= components.length) {
     return {
       success: false,
@@ -357,10 +369,10 @@ export function trackComponentMove(
       }
     };
   }
-  
+
   // STEP 2: Extract component being moved
   const movingComponent = components[sourceIndex];
-  
+
   if (!movingComponent) {
     return {
       success: false,
@@ -371,32 +383,32 @@ export function trackComponentMove(
       }
     };
   }
-  
+
   // STEP 3: Calculate actual target index
   let adjustedFinalIndex = finalIndex;
   let adjustmentReason = "";
-  
+
   // If moving down (finalIndex > sourceIndex), adjust for removal
   if (finalIndex > sourceIndex) {
     adjustedFinalIndex = finalIndex - 1;
     adjustmentReason = "Adjusted for source removal (moving down)";
   }
-  
+
   // Clamp to valid range
   adjustedFinalIndex = Math.max(0, Math.min(
     adjustedFinalIndex,
     components.length - 1
   ));
-  
+
   // STEP 4: Perform move
   const newComponents = [...components];
-  
+
   // Remove from source
   newComponents.splice(sourceIndex, 1);
-  
+
   // Insert at destination
   newComponents.splice(adjustedFinalIndex, 0, movingComponent);
-  
+
   // STEP 5: Update positions
   const updatedComponents = newComponents.map((comp, index) => ({
     ...comp,
@@ -406,7 +418,7 @@ export function trackComponentMove(
       row: index
     }
   }));
-  
+
   // STEP 6: Create debug info
   const debugInfo: PositionDebugInfo = {
     operation: {
@@ -432,12 +444,12 @@ export function trackComponentMove(
       name: c.componentName
     }))
   };
-  
+
   console.log("✅ Position Tracker: Move Complete", debugInfo);
-  
+
   // STEP 7: Record operation
   recordState(updatedComponents, "enhanced-move");
-  
+
   return {
     success: true,
     updatedComponents,
@@ -452,30 +464,30 @@ export function trackComponentMove(
 export function validateComponentPositions(components: any[]) {
   const issues: string[] = [];
   const suggestions: string[] = [];
-  
+
   // Check 1: Sequential positions
-  const positions = components.map(c => c.position);
+  const positions = components.map((c) => c.position);
   const expected = Array.from({ length: components.length }, (_, i) => i);
-  
+
   const hasSequential = positions.every((pos, idx) => pos === idx);
-  
+
   if (!hasSequential) {
     issues.push("Positions are not sequential");
     suggestions.push("Run handleResetPositions() to fix");
   }
-  
+
   // Check 2: No duplicates
   const uniquePositions = new Set(positions);
-  
+
   if (uniquePositions.size !== positions.length) {
     issues.push("Duplicate positions detected");
-    
+
     const duplicates = positions.filter(
-      (pos, idx) => positions.indexOf(pos) !== idx
+      (pos, idx) => positions.indexOf(pos) !== idx,
     );
     suggestions.push(`Duplicates at: ${duplicates.join(", ")}`);
   }
-  
+
   // Check 3: No gaps
   for (let i = 0; i < components.length; i++) {
     if (!positions.includes(i)) {
@@ -484,26 +496,26 @@ export function validateComponentPositions(components: any[]) {
       break;
     }
   }
-  
+
   // Check 4: Layout matches position
   components.forEach((comp, idx) => {
     if (comp.layout?.row !== comp.position) {
       issues.push(
         `Component ${comp.id} layout.row (${comp.layout?.row}) ` +
-        `doesn't match position (${comp.position})`
+          `doesn't match position (${comp.position})`,
       );
     }
   });
-  
+
   return {
     isValid: issues.length === 0,
     issues,
     suggestions,
-    components: components.map(c => ({
+    components: components.map((c) => ({
       id: c.id,
       position: c.position,
-      layoutRow: c.layout?.row
-    }))
+      layoutRow: c.layout?.row,
+    })),
   };
 }
 ```
@@ -538,24 +550,24 @@ STEP 3: onDragStart Handler
 ────────────────────────────────────────────────
 EnhancedLiveEditorDragDropContext.onDragStart(event, manager):
   const { source } = event.operation;
-  
+
   console.log("🖐️ Drag started:", {
     sourceId: source.id,
     sourceType: source.type,
     sourceData: source.data
   });
-  
+
   // Execute registered listener (if exists)
   const listener = dragListeners[source.id];
   if (listener) {
     listener(event);
   }
-  
+
   // Check if new component from sidebar
-  const isNewComponent = 
+  const isNewComponent =
     source.id.startsWith("new-component") ||
     source.id.startsWith("drawer-item-");
-  
+
   console.log("🆕 Is new component:", isNewComponent);
 
 
@@ -611,7 +623,7 @@ STEP 1: onDragEnd Event Fires
 ────────────────────────────────────────────────
 EnhancedLiveEditorDragDropContext.onDragEnd(event, manager):
   const { source, target } = event.operation;
-  
+
   if (!source || event.canceled) {
     return;  // Drag was canceled
   }
@@ -620,7 +632,7 @@ EnhancedLiveEditorDragDropContext.onDragEnd(event, manager):
 STEP 2: Get iframe Document
 ────────────────────────────────────────────────
   const iframeDoc = iframeRef?.current?.contentDocument;
-  
+
   if (!iframeDoc) {
     console.error("iframe document not available");
     return;
@@ -629,10 +641,10 @@ STEP 2: Get iframe Document
 
 STEP 3: Determine if New Component
 ────────────────────────────────────────────────
-  const isNewComponent = 
+  const isNewComponent =
     source.id.toString().startsWith("new-component") ||
     source.id.toString().startsWith("drawer-item-");
-  
+
   const sourceComponentId = source.id.toString();
 
 
@@ -648,11 +660,11 @@ STEP 4: Get Target Information
 STEP 5A: Handle Droppable/Dropzone Target
 ────────────────────────────────────────────────
     if (target.type === "droppable" || target.type === "dropzone") {
-      
+
       // Special: Root dropzone
       if (target.type === "dropzone" && targetComponentId === "root") {
         const dragY = event.operation.shape?.current?.y || 0;
-        
+
         // Get all component elements in iframe
         const allElements = Array.from(
           iframeDoc.querySelectorAll("[data-component-id]")
@@ -663,7 +675,7 @@ STEP 5A: Handle Droppable/Dropzone Target
           bottom: el.getBoundingClientRect().bottom,
           element: el
         })).sort((a, b) => a.top - b.top);
-        
+
         // Find insertion point based on mouse Y
         let calculatedIndex = 0;
         for (const item of allElements) {
@@ -673,20 +685,20 @@ STEP 5A: Handle Droppable/Dropzone Target
           }
           calculatedIndex = item.index + 1;
         }
-        
+
         targetIndex = calculatedIndex;
         realTargetIndex = calculatedIndex;
         targetZone = "main";
-        
+
       } else {
         // Regular droppable target
         const targetElement = iframeDoc.getElementById(targetComponentId);
-        
+
         if (targetElement) {
           const rect = targetElement.getBoundingClientRect();
           const dragY = event.operation.shape?.current?.y || 0;
           const midpoint = rect.top + rect.height / 2;
-          
+
           // Get sorted elements
           const allElements = Array.from(
             iframeDoc.querySelectorAll("[data-component-id]")
@@ -695,18 +707,18 @@ STEP 5A: Handle Droppable/Dropzone Target
             index: parseInt(el.getAttribute("data-index") || "0"),
             top: el.getBoundingClientRect().top
           })).sort((a, b) => a.top - b.top);
-          
+
           // Find target in sorted list
           const targetElementIndex = allElements.findIndex(
             item => item.id === targetComponentId
           );
-          
+
           if (targetElementIndex >= 0) {
             // Insert before or after based on cursor position
             targetIndex = dragY > midpoint
               ? targetElementIndex + 1
               : targetElementIndex;
-            
+
             realTargetIndex = targetIndex;
           }
         }
@@ -719,12 +731,12 @@ STEP 5B: Handle Component Target
     else if (target.type === "component") {
       // Similar logic to droppable...
       const targetElement = iframeDoc.getElementById(targetComponentId);
-      
+
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
         const dragY = event.operation.shape?.current?.y || 0;
         const midpoint = rect.top + rect.height / 2;
-        
+
         // Calculate index based on position relative to midpoint
         // ... (similar to above)
       }
@@ -740,25 +752,25 @@ STEP 6: Execute Operation
         index: targetIndex,
         zone: targetZone
       });
-      
+
       onComponentAdd?.({
         type: source.data.componentType || source.data.type,
         index: targetIndex,
         zone: targetZone
       });
-      
+
     } else {
       // MOVE EXISTING COMPONENT
       const actualSourceIndex = components.findIndex(
         c => c.id === sourceComponentId
       );
-      
+
       if (actualSourceIndex !== -1) {
         console.log("🔄 Moving component:", {
           from: actualSourceIndex,
           to: targetIndex
         });
-        
+
         handleEnhancedMove(
           actualSourceIndex,
           "main",
@@ -897,6 +909,7 @@ function DropIndicator({ position, zone }) {
 ```
 
 **Positioning**:
+
 ```
 Components in iframe:
 ┌─────────────┐
@@ -938,7 +951,7 @@ useEffect(() => {
   if (pageComponents.length > 0) {
     const validation = validateComponentPositions(pageComponents);
     setPositionValidation(validation);
-    
+
     if (!validation.isValid) {
       console.warn("⚠️ Position validation failed:", validation.issues);
     }
@@ -958,9 +971,9 @@ if (!validation.isValid) {
       row: index
     }
   }));
-  
+
   setPageComponents(fixedComponents);
-  
+
   // Option 2: Show warning to user
   // (Current implementation shows in debug panel)
 }
@@ -979,27 +992,28 @@ const handleResetPositions = useCallback(() => {
     position: index,
     layout: {
       ...comp.layout,
-      row: index
-    }
+      row: index,
+    },
   }));
-  
+
   setPageComponents(resetComponents);
   positionTracker.recordState(resetComponents, "manual-reset");
-  
+
   // Update store
   setTimeout(() => {
     const store = useEditorStore.getState();
     store.forceUpdatePageComponents(currentPage, resetComponents);
   }, 0);
-  
+
   const validation = validateComponentPositions(resetComponents);
   setPositionValidation(validation);
-  
+
   console.log("🔄 Positions reset:", validation);
 }, [pageComponents]);
 ```
 
 **When to Use**:
+
 - Positions corrupted after complex operations
 - Duplicate positions detected
 - Gaps in position sequence
@@ -1017,7 +1031,7 @@ const handleResetPositions = useCallback(() => {
     {/* Position Validation */}
     <div className="validation-status">
       Position Validation: {positionValidation.isValid ? "✅ Valid" : "❌ Invalid"}
-      
+
       {!positionValidation.isValid && (
         <div>
           {positionValidation.issues.map(issue => (
@@ -1029,7 +1043,7 @@ const handleResetPositions = useCallback(() => {
         </div>
       )}
     </div>
-    
+
     {/* Current Components */}
     <div className="components-list">
       <h4>Current Components ({pageComponents.length})</h4>
@@ -1041,7 +1055,7 @@ const handleResetPositions = useCallback(() => {
         </div>
       ))}
     </div>
-    
+
     {/* Last Move Operation */}
     {debugInfo && (
       <div className="last-move">
@@ -1055,7 +1069,7 @@ const handleResetPositions = useCallback(() => {
         )}
       </div>
     )}
-    
+
     {/* Quick Actions */}
     <div className="actions">
       <button onClick={handleResetPositions}>
@@ -1085,7 +1099,7 @@ console.log("🔍 [DRAG DEBUG] Calculated index:", targetIndex);
 console.log("📍 Position Tracker: Move Request", {
   sourceIndex,
   finalIndex,
-  componentsCount: components.length
+  componentsCount: components.length,
 });
 console.log("✅ Position Tracker: Move Complete", debugInfo);
 ```
@@ -1107,15 +1121,15 @@ export const recordState = (components, operation) => {
   const snapshot = {
     timestamp: Date.now(),
     operation,
-    components: components.map(c => ({
+    components: components.map((c) => ({
       id: c.id,
       position: c.position,
-      name: c.componentName
-    }))
+      name: c.componentName,
+    })),
   };
-  
+
   history.push(snapshot);
-  
+
   // Keep last 50 operations
   if (history.length > 50) {
     history.shift();
@@ -1130,21 +1144,21 @@ export function generatePositionReport() {
   const report = {
     timestamp: new Date().toISOString(),
     totalOperations: history.length,
-    operations: history.map(h => ({
+    operations: history.map((h) => ({
       operation: h.operation,
       timestamp: new Date(h.timestamp).toLocaleTimeString(),
       componentCount: h.components.length,
-      positions: h.components.map(c => ({
+      positions: h.components.map((c) => ({
         id: c.id,
         position: c.position,
-        name: c.name
-      }))
+        name: c.name,
+      })),
     })),
     currentState: {
       // Current component positions
-    }
+    },
   };
-  
+
   console.log("📊 Position Report:", report);
   return report;
 }
@@ -1161,13 +1175,14 @@ export function generatePositionReport() {
 const plugins = [
   ...defaultPreset.plugins,
   new AutoScroller({
-    threshold: 0.2,      // Scroll when within 20% of edge
-    acceleration: 0.5    // Scroll speed
-  })
+    threshold: 0.2, // Scroll when within 20% of edge
+    acceleration: 0.5, // Scroll speed
+  }),
 ];
 ```
 
 **Behavior**:
+
 - Drag near top edge → Auto-scroll up
 - Drag near bottom edge → Auto-scroll down
 - Smooth acceleration
@@ -1180,7 +1195,7 @@ const plugins = [
   <div className="drag-handle">
     <GripVerticalIcon />  {/* Drag icon */}
   </div>
-  
+
   <div className="component-actions">
     <button onClick={onEditClick}>
       <EditIcon />
@@ -1193,6 +1208,7 @@ const plugins = [
 ```
 
 **Visibility**:
+
 - Hidden by default
 - Shows on component hover
 - Positioned absolutely over component
@@ -1240,14 +1256,17 @@ handleEnhancedMove(
 ### Common Issues
 
 **Issue 1**: Component moves to wrong position
+
 - **Cause**: Not sorting elements by visual position
 - **Fix**: Sort by `top` coordinate before calculating index
 
 **Issue 2**: Position validation fails after move
+
 - **Cause**: Not updating position properties
 - **Fix**: Map over components and set `position: index`
 
 **Issue 3**: Drag handle not clickable
+
 - **Cause**: z-index too low or pointer-events disabled
 - **Fix**: Ensure high z-index and pointer-events: auto
 
@@ -1264,6 +1283,7 @@ The drag & drop system provides:
 5. **Multi-zone support**: Ready for complex layouts
 
 **Key Components**:
+
 - EnhancedLiveEditorDragDropContext: Main provider
 - LiveEditorDraggableComponent: Draggable wrapper
 - LiveEditorDropZone: Drop target
@@ -1271,8 +1291,8 @@ The drag & drop system provides:
 - validateComponentPositions: Position validation
 
 Understanding this system enables:
+
 - Debugging drag issues
 - Adding new drag sources
 - Implementing complex layouts
 - Optimizing drag performance
-

@@ -1,6 +1,7 @@
 # Live Editor Data Flow - Complete Analysis
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Component Lifecycle Data Flow](#component-lifecycle-data-flow)
 3. [Editing Session Data Flow](#editing-session-data-flow)
@@ -98,7 +99,7 @@ LiveEditorEffects.tsx:
   useEffect(() => {
     if (!initialized && !authLoading && !tenantLoading && tenantData) {
       editorStore.loadFromDatabase(tenantData);
-      
+
       // Load page components
       if (tenantData.componentSettings?.[slug]) {
         const dbComponents = Object.entries(
@@ -110,13 +111,13 @@ LiveEditorEffects.tsx:
           data: comp.data,
           position: comp.position || 0
         }));
-        
+
         setPageComponents(dbComponents);
       } else {
         // No saved data - use defaults
         setPageComponents(createInitialComponents(slug));
       }
-      
+
       setInitialized(true);
     }
   }, [initialized, authLoading, tenantLoading, tenantData, slug]);
@@ -146,9 +147,9 @@ LiveEditorUI.tsx:
     // Get data from store
     const storeData = useEditorStore.getState()
       .getComponentData(component.type, component.id);
-    
+
     const mergedData = storeData || component.data;
-    
+
     return (
       <CachedComponent
         key={component.id}
@@ -172,7 +173,7 @@ hero1.tsx (example):
         ...getDefaultHeroData(),
         ...props
       };
-      
+
       ensureComponentVariant("hero", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore]);
@@ -184,13 +185,13 @@ hero1.tsx:
   const storeData = props.useStore
     ? getComponentData("hero", uniqueId) || {}
     : {};
-  
+
   const currentStoreData = props.useStore
     ? heroStates[uniqueId] || {}
     : {};
-  
+
   const defaultData = getDefaultHeroData();
-  
+
   const mergedData = {
     ...defaultData,
     ...props,
@@ -270,16 +271,16 @@ LiveEditorUI.tsx:
 STEP 4: EditorSidebar Initialization
 ────────────────────────────────────────────────
 EditorSidebar/index.tsx useEffect triggers:
-  
+
   selectedComponent = {
     id: "uuid-1234",
     type: "hero",
     componentName: "hero1",
     data: {...}
   }
-  
+
   view = "edit-component"
-  
+
   // Check component type
   if (selectedComponent.id === "global-header") {
     // Global header flow...
@@ -287,30 +288,30 @@ EditorSidebar/index.tsx useEffect triggers:
     // Global footer flow...
   } else {
     // REGULAR COMPONENT FLOW
-    
+
     const store = useEditorStore.getState();
-    
+
     // Get default data
     const defaultData = createDefaultData(
       "hero",      // type
       "hero1"      // componentName
     );
-    
+
     // Use component.id as unique identifier
     const uniqueVariantId = "uuid-1234";
-    
+
     // Determine data to use
-    const dataToUse = 
+    const dataToUse =
       selectedComponent.data && Object.keys(selectedComponent.data).length > 0
         ? selectedComponent.data
         : defaultData;
-    
+
     // Ensure component exists in store
     store.ensureComponentVariant("hero", uniqueVariantId, dataToUse);
-    
+
     // Get current data from store
     const currentComponentData = store.getComponentData("hero", uniqueVariantId);
-    
+
     // Initialize tempData for editing
     setTempData(currentComponentData || {});
   }
@@ -322,7 +323,7 @@ AdvancedSimpleSwitcher receives:
   type = "hero"
   componentName = "hero1"
   componentId = "uuid-1234"
-  
+
 useEffect(() => {
   loadStructure("hero");
 }, ["hero"]);
@@ -339,7 +340,7 @@ STEP 6: Field Rendering
 ────────────────────────────────────────────────
 DynamicFieldsRenderer:
   fields = hero1Variant.fields  // or simpleFields if mode=simple
-  
+
   For each field:
     renderField(field, basePath)
       ↓
@@ -368,7 +369,7 @@ updateValue("content.title", "Find Your Dream Home")
 DynamicFieldsRenderer.updateValue():
   // Check special cases (imagePosition, etc.)
   // None match, continue...
-  
+
   if (onUpdateByPath) {
     // Regular component, not global
     updateByPath("content.title", "Find Your Dream Home");
@@ -378,10 +379,10 @@ editorStore.updateByPath("content.title", "Find Your Dream Home"):
   set((state) => {
     const segments = ["content", "title"];
     let newData = { ...state.tempData };
-    
+
     // Navigate
     newData.content.title = "Find Your Dream Home";
-    
+
     return { tempData: newData };
   })
   ↓
@@ -404,7 +405,7 @@ Why? Component reads from heroStates[id], not from tempData:
 hero1.tsx:
   const storeData = getComponentData("hero", uniqueId);
   const mergedData = { ...defaultData, ...storeData };
-  
+
   // storeData DOES NOT include tempData!
   // tempData only merged on SAVE
 
@@ -447,18 +448,18 @@ STEP 1: handleSave() Triggered
 EditorSidebar/index.tsx:
   const handleSave = () => {
     if (!selectedComponent) return;
-    
+
     console.log("🚀 Save initiated");
 
 
 STEP 2: Mark Changes Made
 ────────────────────────────────────────────────
     setHasChangesMade(true);
-    
+
     // This triggers:
     // 1. Unsaved changes warning dialog
     // 2. UI indicator that changes need publishing
-    
+
     console.log("✅ hasChangesMade set to true");
 
 
@@ -466,18 +467,18 @@ STEP 3: Get Store State
 ────────────────────────────────────────────────
     const store = useEditorStore.getState();
     const currentPage = store.currentPage || "homepage";
-    
+
     console.log("📍 Current page:", currentPage);
 
 
 STEP 4: Determine Latest tempData
 ────────────────────────────────────────────────
-    const latestTempData = 
+    const latestTempData =
       selectedComponent.id === "global-header" ||
       selectedComponent.id === "global-footer"
         ? store.tempData || tempData  // Global: Check store first
         : tempData;                     // Regular: Use local tempData
-    
+
     console.log("📦 Latest tempData:", latestTempData);
 
 
@@ -491,21 +492,21 @@ STEP 5A: Save Global Header (if applicable)
         latestTempData,
         "GLOBAL_HEADER"
       );
-      
+
       // Update individual global header
       setGlobalHeaderData(latestTempData);
-      
+
       // Update unified global components
       setGlobalComponentsData({
         ...globalComponentsData,
         header: latestTempData
       });
-      
+
       // Notify parent (trigger re-render)
       onComponentUpdate(selectedComponent.id, latestTempData);
-      
+
       console.log("✅ Global header saved");
-      
+
       onClose();
       return;
     }
@@ -521,16 +522,16 @@ STEP 5B: Save Global Footer (if applicable)
         latestTempData,
         "GLOBAL_FOOTER"
       );
-      
+
       setGlobalFooterData(latestTempData);
       setGlobalComponentsData({
         ...globalComponentsData,
         footer: latestTempData
       });
       onComponentUpdate(selectedComponent.id, latestTempData);
-      
+
       console.log("✅ Global footer saved");
-      
+
       onClose();
       return;
     }
@@ -540,7 +541,7 @@ STEP 5C: Save Regular Component
 ────────────────────────────────────────────────
     // Use component.id as unique identifier
     const uniqueVariantId = selectedComponent.id;  // "uuid-1234"
-    
+
     console.log("🔑 Unique variant ID:", uniqueVariantId);
 
 
@@ -551,16 +552,16 @@ STEP 6: Gather Data Sources
       selectedComponent.type,    // "hero"
       uniqueVariantId            // "uuid-1234"
     );
-    
+
     // Get current page components
-    const currentPageComponents = 
+    const currentPageComponents =
       store.pageComponentsByPage[currentPage] || [];
-    
+
     // Find existing component in page
     const existingComponent = currentPageComponents.find(
       comp => comp.id === selectedComponent.id
     );
-    
+
     console.log("📊 Data sources:", {
       existingData: existingComponent?.data,
       storeData,
@@ -576,9 +577,9 @@ STEP 7: CRITICAL - Deep Merge Data
           latestTempData
         )
       : deepMerge(storeData, latestTempData);
-    
+
     console.log("🔧 Merged data:", mergedData);
-    
+
     // Example merge:
     // existingData = { visible: true, content: { title: "Old", subtitle: "Sub" } }
     // storeData = { content: { title: "Old", font: "Tajawal" } }
@@ -602,7 +603,7 @@ STEP 8: Update Component State
       uniqueVariantId,           // "uuid-1234"
       mergedData
     );
-    
+
     // This executes heroFunctions.setData():
     // return {
     //   heroStates: {
@@ -614,7 +615,7 @@ STEP 8: Update Component State
     //     [currentPage]: updatedComponents  ← Also updated!
     //   }
     // };
-    
+
     console.log("✅ Component state updated");
 
 
@@ -626,43 +627,43 @@ STEP 9: Update Page Components Array
       }
       return comp;
     });
-    
+
     store.forceUpdatePageComponents(currentPage, updatedPageComponents);
-    
+
     console.log("✅ pageComponentsByPage updated");
 
 
 STEP 10: Notify Parent Component
 ────────────────────────────────────────────────
     onComponentUpdate(selectedComponent.id, mergedData);
-    
+
     // This triggers in LiveEditorUI:
     const handleComponentUpdate = (id, newData) => {
       setPageComponents(current =>
         current.map(c => c.id === id ? { ...c, data: newData } : c)
       );
     };
-    
+
     console.log("✅ Parent notified, local state updated");
 
 
 STEP 11: Sync tempData
 ────────────────────────────────────────────────
     setTempData(mergedData);
-    
+
     // Keep tempData in sync with saved data
     // Allows continued editing without reloading
-    
+
     console.log("✅ tempData synced");
 
 
 STEP 12: Close Sidebar
 ────────────────────────────────────────────────
     onClose();
-    
+
     // Sidebar slides out with animation
     // User sees updated component in iframe
-    
+
     console.log("✅ Save complete, sidebar closed");
   };
 
@@ -751,7 +752,7 @@ All stores now contain merged data:
   - heroStates["uuid-1234"] = mergedData
   - pageComponentsByPage["homepage"][0].data = mergedData
   - pageComponents[0].data = mergedData (local state)
-  
+
 Component renders with new title ✓
 All other fields preserved ✓
 ```
@@ -794,12 +795,12 @@ Extract data:
   sourceId = dragged component ID
   targetId = drop target ID
   dragY = mouse Y position
-  
+
   ↓
 Calculate positions:
   const allElements = iframe.querySelectorAll("[data-component-id]")
     .sort((a, b) => a.top - b.top);
-  
+
   // Find where to insert based on dragY
   for (const el of allElements) {
     if (dragY < el.top) {
@@ -808,7 +809,7 @@ Calculate positions:
     }
     targetIndex = el.index + 1;
   }
-  
+
   ↓
 Find source index:
   sourceIndex = components.findIndex(c => c.id === sourceId);
@@ -847,7 +848,7 @@ STEP 5: Update State
     ↓
   handleMoveComponent():
     setPageComponents(result.updatedComponents);
-    
+
     // Update store (deferred)
     setTimeout(() => {
       store.forceUpdatePageComponents(slug, result.updatedComponents);
@@ -897,7 +898,7 @@ STEP 3: Create Component Instance
 handleAddComponent({ type, index, zone }):
   const componentName = `${type}1`;  // hero → hero1
   const componentId = uuidv4();      // Generate UUID
-  
+
   const newComponent = {
     id: componentId,
     type: "hero",
@@ -916,7 +917,7 @@ STEP 4: Insert at Index
 ────────────────────────────────────────────────
   const updatedComponents = [...pageComponents];
   updatedComponents.splice(index, 0, newComponent);
-  
+
   setPageComponents(updatedComponents);
 
 
@@ -924,10 +925,10 @@ STEP 5: Initialize in Store
 ────────────────────────────────────────────────
   setTimeout(() => {
     const store = useEditorStore.getState();
-    
+
     // Ensure component in store
     store.ensureComponentVariant("hero", componentId, newComponent.data);
-    
+
     // Update page components
     const updated = [...store.pageComponentsByPage[currentPage], newComponent];
     store.forceUpdatePageComponents(currentPage, updated);
@@ -959,7 +960,7 @@ STEP 1: Trigger Save Dialog
 ────────────────────────────────────────────────
 App header button onClick:
   editorStore.openSaveDialogFn();
-  
+
   // This calls the registered save function:
   const saveFn = () => {
     store.forceUpdatePageComponents(slug, pageComponents);
@@ -988,7 +989,7 @@ const state = useEditorStore.getState();
 
 const payload = {
   tenantId: tenantId || "",
-  
+
   // All page components
   pages: state.pageComponentsByPage,
   // {
@@ -996,7 +997,7 @@ const payload = {
   //   "about-us": [...],
   //   "contact": [...]
   // }
-  
+
   // Global components
   globalComponentsData: state.globalComponentsData
   // {
@@ -1016,10 +1017,10 @@ await axiosInstance.post(
 )
   .then(response => {
     console.log("✅ Save successful:", response);
-    
+
     closeDialog();
     toast.success("Changes saved successfully!");
-    
+
     // Reset change tracking
     state.setHasChangesMade(false);
   })
@@ -1201,7 +1202,7 @@ Both stores synchronized ✓
 handleComponentThemeChange(id, "hero2")
   ↓
 Local state update:
-  setPageComponents(current => 
+  setPageComponents(current =>
     current.map(c => c.id === id ? { ...c, componentName: "hero2", data: newData } : c)
   )
   ↓
@@ -1264,6 +1265,7 @@ Header component re-renders with new menu ✓
 ### Synchronization Points
 
 Every data mutation must update:
+
 1. **Component type state** (heroStates[id])
 2. **Page aggregation** (pageComponentsByPage[page])
 3. **Local state** (pageComponents) - via onComponentUpdate callback
@@ -1290,7 +1292,7 @@ console.log("Value at path:", getValueByPath("content.title"));
 console.log("Data source:", {
   currentData,
   tempData,
-  componentData: getComponentData(type, id)
+  componentData: getComponentData(type, id),
 });
 ```
 
@@ -1332,12 +1334,14 @@ console.log("Component key:", `${component.id}-${forceUpdate}`);
 Live Editor data flow involves multiple stores and complex synchronization:
 
 **Key Flows**:
+
 1. **Load**: Database → tenantStore → editorStore → Components
 2. **Edit**: User Input → tempData → (on save) → Component States
 3. **Save**: Component States → pageComponentsByPage → API → Database
 4. **Preview**: Component States → Component Rendering → iframe
 
 **Critical Rules**:
+
 - Use component.id as identifier (UUID)
 - Deep merge when saving
 - Update all relevant stores
@@ -1345,4 +1349,3 @@ Live Editor data flow involves multiple stores and complex synchronization:
 - Use setTimeout for store updates from handlers
 
 Understanding these flows is essential for working effectively with the Live Editor system.
-

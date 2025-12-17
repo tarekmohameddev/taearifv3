@@ -11,6 +11,7 @@ This document explains how components should properly load and initialize data f
 **Symptom**: Component shows default data in Live Editor instead of database data, even though the data exists in the database.
 
 **Root Causes**:
+
 1. Missing case in `loadFromDatabase` switch statement
 2. Component's `useEffect` initializes before database data is loaded
 3. `ensureComponentVariant` doesn't use database data when initializing
@@ -30,7 +31,7 @@ This document explains how components should properly load and initialize data f
 loadFromDatabase: (tenantData) =>
   set((state) => {
     // ... existing code ...
-    
+
     // Load component data into respective stores
     Object.entries(tenantData.componentSettings).forEach(
       ([page, pageSettings]: [string, any]) => {
@@ -40,7 +41,7 @@ loadFromDatabase: (tenantData) =>
               if (comp.data && comp.componentName) {
                 switch (comp.type) {
                   // ... existing cases ...
-                  
+
                   case "partners":  // ✅ ADD THIS
                     newState.partnersStates = partnersFunctions.setData(
                       newState,
@@ -48,7 +49,7 @@ loadFromDatabase: (tenantData) =>
                       comp.data,
                     ).partnersStates;
                     break;
-                  
+
                   // ... rest of cases ...
                 }
               }
@@ -57,12 +58,13 @@ loadFromDatabase: (tenantData) =>
         }
       },
     );
-    
+
     return newState;
   }),
 ```
 
 **Critical Points**:
+
 - ✅ Must use `comp.id` (the UUID), NOT `comp.componentName`
 - ✅ Must call `{componentType}Functions.setData()` to properly initialize
 - ✅ Must extract the state property (e.g., `.partnersStates`) from the returned object
@@ -150,25 +152,27 @@ export default function Partners1(props: PartnersProps = {}) {
   useEffect(() => {
     if (props.useStore) {
       // If we have tenant data, use it; otherwise use props or defaults
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultPartnersData(),
-            ...tenantComponentData,  // ✅ Database data takes priority
-            ...props,
-          }
-        : {
-            ...getDefaultPartnersData(),
-            ...props,
-          };
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPartnersData(),
+              ...tenantComponentData, // ✅ Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultPartnersData(),
+              ...props,
+            };
       ensureComponentVariant("partners", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);  // ✅ Add tenantComponentData as dependency
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]); // ✅ Add tenantComponentData as dependency
 
   // ... rest of component ...
 }
 ```
 
 **Key Changes**:
+
 1. ✅ Move `getTenantComponentData()` function **before** the `useEffect`
 2. ✅ Call `getTenantComponentData()` to extract database data
 3. ✅ Use `tenantComponentData` in `initialData` when available
@@ -253,6 +257,7 @@ After implementing both steps, verify:
 ### Mistake 1: Missing `loadFromDatabase` Case
 
 ❌ **Wrong**: Component type not in switch statement
+
 ```typescript
 switch (comp.type) {
   case "hero": ...
@@ -262,6 +267,7 @@ switch (comp.type) {
 ```
 
 ✅ **Correct**: Component type included
+
 ```typescript
 switch (comp.type) {
   case "hero": ...
@@ -277,6 +283,7 @@ switch (comp.type) {
 ### Mistake 2: Using `componentName` Instead of `id`
 
 ❌ **Wrong**: Using componentName (variant name)
+
 ```typescript
 case "partners":
   newState.partnersStates = partnersFunctions.setData(
@@ -287,6 +294,7 @@ case "partners":
 ```
 
 ✅ **Correct**: Using id (UUID)
+
 ```typescript
 case "partners":
   newState.partnersStates = partnersFunctions.setData(
@@ -301,12 +309,13 @@ case "partners":
 ### Mistake 3: Not Using Database Data in `useEffect`
 
 ❌ **Wrong**: Only using defaults and props
+
 ```typescript
 useEffect(() => {
   if (props.useStore) {
     const initialData = {
       ...getDefaultPartnersData(),
-      ...props,  // ❌ Missing database data!
+      ...props, // ❌ Missing database data!
     };
     ensureComponentVariant("partners", uniqueId, initialData);
   }
@@ -314,24 +323,26 @@ useEffect(() => {
 ```
 
 ✅ **Correct**: Including database data
+
 ```typescript
 const tenantComponentData = getTenantComponentData();
 
 useEffect(() => {
   if (props.useStore) {
-    const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-      ? {
-          ...getDefaultPartnersData(),
-          ...tenantComponentData,  // ✅ Database data included
-          ...props,
-        }
-      : {
-          ...getDefaultPartnersData(),
-          ...props,
-        };
+    const initialData =
+      tenantComponentData && Object.keys(tenantComponentData).length > 0
+        ? {
+            ...getDefaultPartnersData(),
+            ...tenantComponentData, // ✅ Database data included
+            ...props,
+          }
+        : {
+            ...getDefaultPartnersData(),
+            ...props,
+          };
     ensureComponentVariant("partners", uniqueId, initialData);
   }
-}, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);  // ✅ Dependency added
+}, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]); // ✅ Dependency added
 ```
 
 ---
@@ -339,6 +350,7 @@ useEffect(() => {
 ### Mistake 4: Calling `getTenantComponentData` After `useEffect`
 
 ❌ **Wrong**: Function defined after useEffect
+
 ```typescript
 useEffect(() => {
   // ...
@@ -349,6 +361,7 @@ const getTenantComponentData = () => { ... };
 ```
 
 ✅ **Correct**: Function defined before useEffect
+
 ```typescript
 // ✅ Function defined first
 const getTenantComponentData = () => { ... };
@@ -394,17 +407,17 @@ useEffect(() => {
 // Extract component data from tenantData (BEFORE useEffect)
 const getTenantComponentData = () => {
   if (!tenantData) return {};
-  
+
   // Check new structure
   if (tenantData.components && Array.isArray(tenantData.components)) {
     for (const component of tenantData.components) {
-      if (component.type === "{componentType}" && 
+      if (component.type === "{componentType}" &&
           component.componentName === variantId) {
         return component.data;
       }
     }
   }
-  
+
   // Check old structure
   if (tenantData?.componentSettings) {
     for (const [pageSlug, pageComponents] of Object.entries(
@@ -424,7 +437,7 @@ const getTenantComponentData = () => {
       }
     }
   }
-  
+
   return {};
 };
 
@@ -475,4 +488,3 @@ See `components/tenant/whyChooseUs/whyChooseUs1.tsx` for another complete workin
 **Version**: 1.0  
 **Last Updated**: 2025-01-26  
 **Maintenance**: Update when adding new component types or changing data loading patterns
-

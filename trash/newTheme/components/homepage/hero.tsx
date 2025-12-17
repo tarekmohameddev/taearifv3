@@ -138,7 +138,15 @@ interface HeroProps {
 }
 
 // Search Form Component
-function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; primaryColor?: string; primaryColorHover?: string }) {
+function SearchForm({
+  config,
+  primaryColor,
+  primaryColorHover,
+}: {
+  config: any;
+  primaryColor?: string;
+  primaryColorHover?: string;
+}) {
   const [status, setStatus] = useState("");
   const [city, setCity] = useState("");
   const [type, setType] = useState("");
@@ -155,9 +163,29 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
   if (!config?.enabled) return null;
 
   // Default options based on the HTML code provided
-  const typeOptions = config.fields?.type?.options || ["الكل", "شقق", "فلل", "اراضي", "ادوار", "عمائر", "تاون هاوس", "أبراج"];
-  const cityOptions = config.fields?.city?.options || ["اختر المدينة", "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام"];
-  const statusOptions = config.fields?.status?.options || ["بيع / ايجار", "للبيع", "للإيجار"];
+  const typeOptions = config.fields?.type?.options || [
+    "الكل",
+    "شقق",
+    "فلل",
+    "اراضي",
+    "ادوار",
+    "عمائر",
+    "تاون هاوس",
+    "أبراج",
+  ];
+  const cityOptions = config.fields?.city?.options || [
+    "اختر المدينة",
+    "الرياض",
+    "جدة",
+    "مكة المكرمة",
+    "المدينة المنورة",
+    "الدمام",
+  ];
+  const statusOptions = config.fields?.status?.options || [
+    "بيع / ايجار",
+    "للبيع",
+    "للإيجار",
+  ];
 
   return (
     <form
@@ -345,7 +373,6 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
   );
 }
 
-
 /**
  * Hero1 Component - Static Hero Section
  */
@@ -376,7 +403,8 @@ const Hero1 = (props: HeroProps = {}) => {
     },
     content: {
       title: "مع باهية... اجعل حلمك السكني استثمارا يدوم",
-      subtitle: "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
+      subtitle:
+        "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
       font: {
         title: {
           family: "Tajawal",
@@ -412,13 +440,29 @@ const Hero1 = (props: HeroProps = {}) => {
           enabled: true,
           placeholder: "نوع العقار",
           icon: "Home",
-          options: ["الكل", "شقق", "فلل", "اراضي", "ادوار", "عمائر", "تاون هاوس", "أبراج"],
+          options: [
+            "الكل",
+            "شقق",
+            "فلل",
+            "اراضي",
+            "ادوار",
+            "عمائر",
+            "تاون هاوس",
+            "أبراج",
+          ],
         },
         city: {
           enabled: true,
           placeholder: "موقع العقار",
           icon: "MapPin",
-          options: ["اختر المدينة", "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام"],
+          options: [
+            "اختر المدينة",
+            "الرياض",
+            "جدة",
+            "مكة المكرمة",
+            "المدينة المنورة",
+            "الدمام",
+          ],
         },
         status: {
           enabled: true,
@@ -472,11 +516,13 @@ const Hero1 = (props: HeroProps = {}) => {
 
   // Extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
-    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    const match = url.match(
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
+    );
     return match ? match[1] : null;
   };
 
-  const videoId = mergedData.background?.video 
+  const videoId = mergedData.background?.video
     ? getYouTubeVideoId(mergedData.background.video)
     : null;
   const videoStart = mergedData.background?.videoStart || 0;
@@ -491,7 +537,7 @@ const Hero1 = (props: HeroProps = {}) => {
   // Build YouTube embed URL
   const getYouTubeEmbedUrl = () => {
     if (!videoId) return "";
-    const baseUrl = privacyMode 
+    const baseUrl = privacyMode
       ? "https://www.youtube-nocookie.com/embed"
       : "https://www.youtube.com/embed";
     const params = new URLSearchParams({
@@ -566,7 +612,8 @@ const Hero1 = (props: HeroProps = {}) => {
               )}
               style={titleStyles}
             >
-              {mergedData.content?.title || "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
+              {mergedData.content?.title ||
+                "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
             </h2>
             <p
               className={cn(
@@ -582,7 +629,11 @@ const Hero1 = (props: HeroProps = {}) => {
             {/* Hero Search Form for Desktop/Tablet */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full pointer-events-auto flex items-center justify-center">
-                <SearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+                <SearchForm
+                  config={mergedData.searchForm}
+                  primaryColor={primaryColor}
+                  primaryColorHover={primaryColorHover}
+                />
               </div>
             )}
           </div>
@@ -614,7 +665,11 @@ const Hero1 = (props: HeroProps = {}) => {
             {/* Hero Search Form for Mobile */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full px-4 pointer-events-auto">
-                <SearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+                <SearchForm
+                  config={mergedData.searchForm}
+                  primaryColor={primaryColor}
+                  primaryColorHover={primaryColorHover}
+                />
               </div>
             )}
           </div>

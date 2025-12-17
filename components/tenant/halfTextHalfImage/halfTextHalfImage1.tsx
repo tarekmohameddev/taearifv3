@@ -350,9 +350,11 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // ⭐ IMPORTANT: Only use default data from halfTextHalfImage1 if variantId is "halfTextHalfImage1"
   // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
   // So we only use getDefaultHalfTextHalfImageData() as fallback if no store data exists
-  const defaultData = (variantId === "halfTextHalfImage1" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
-    ? getDefaultHalfTextHalfImageData() 
-    : {};
+  const defaultData =
+    variantId === "halfTextHalfImage1" &&
+    (!currentStoreData || Object.keys(currentStoreData).length === 0)
+      ? getDefaultHalfTextHalfImageData()
+      : {};
 
   // Merge data with priority: currentStoreData > tenantComponentData > props > default
   const mergedData = {
@@ -365,18 +367,18 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -385,53 +387,64 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
-    
+
     // Navigate to the field using the path (e.g., "button.backgroundColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData = styling;
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // Also check for useDefaultColor and globalColorType at the same path level
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    const useDefaultColorPathParts = useDefaultColorPath.split(".");
     let useDefaultColorValue = styling;
     for (const part of useDefaultColorPathParts) {
-      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+      if (
+        useDefaultColorValue &&
+        typeof useDefaultColorValue === "object" &&
+        !Array.isArray(useDefaultColorValue)
+      ) {
         useDefaultColorValue = useDefaultColorValue[part];
       } else {
         useDefaultColorValue = undefined;
         break;
       }
     }
-    
-    const globalColorTypePathParts = globalColorTypePath.split('.');
+
+    const globalColorTypePathParts = globalColorTypePath.split(".");
     let globalColorTypeValue = styling;
     for (const part of globalColorTypePathParts) {
-      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+      if (
+        globalColorTypeValue &&
+        typeof globalColorTypeValue === "object" &&
+        !Array.isArray(globalColorTypeValue)
+      ) {
         globalColorTypeValue = globalColorTypeValue[part];
       } else {
         globalColorTypeValue = undefined;
         break;
       }
     }
-    
+
     // Check useDefaultColor value (default is true if not specified)
-    const useDefaultColor = useDefaultColorValue !== undefined 
-      ? useDefaultColorValue 
-      : true;
-    
+    const useDefaultColor =
+      useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+
     // If useDefaultColor is true, use branding color from WebsiteLayout
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
@@ -439,33 +452,54 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
       // Image background should use primary color
       if (fieldPath.includes("imageBackground")) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      } else if (
+        fieldPath.includes("textColor") ||
+        fieldPath.includes("Text")
+      ) {
         defaultGlobalColorType = "secondary";
-      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor") || fieldPath.includes("backgroundColor")) {
+      } else if (
+        fieldPath.includes("Button") ||
+        fieldPath.includes("button") ||
+        fieldPath.includes("hoverBgColor") ||
+        fieldPath.includes("backgroundColor")
+      ) {
         defaultGlobalColorType = "primary";
-      } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+      } else if (
+        fieldPath.includes("color") &&
+        !fieldPath.includes("imageBackground")
+      ) {
         // For other color fields (not imageBackground), default to secondary
         defaultGlobalColorType = "secondary";
       }
-      
+
       const globalColorType = globalColorTypeValue || defaultGlobalColorType;
-      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        defaultColor;
       return brandingColor;
     }
-    
+
     // If useDefaultColor is false, try to get custom color
     // The color might be stored directly as string or in a value property of an object
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       return fieldData;
     }
-    
+
     // If fieldData is an object, check for value property
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
     }
-    
+
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
     // Image background should use primary color
@@ -473,25 +507,39 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
       defaultGlobalColorType = "primary";
     } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
-    } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+    } else if (
+      fieldPath.includes("color") &&
+      !fieldPath.includes("imageBackground")
+    ) {
       defaultGlobalColorType = "secondary";
     }
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // REACTIVE SPACING: Subscribe directly to store for instant updates
@@ -502,7 +550,7 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
       padding: { top: 12, bottom: 6, left: 4, right: 4 },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
     }),
-    []
+    [],
   );
 
   // Cache the selector function to avoid infinite loop
@@ -522,15 +570,13 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
       // Fallback to default spacing if no store data
       return defaultSpacing;
     },
-    [props.useStore, uniqueId, defaultSpacing]
+    [props.useStore, uniqueId, defaultSpacing],
   );
 
   const spacing = useEditorStore(spacingSelector);
 
   // Merge spacing with mergedData.spacing if available (for non-store usage)
-  const finalSpacing = props.useStore
-    ? spacing
-    : mergedData.spacing || spacing;
+  const finalSpacing = props.useStore ? spacing : mergedData.spacing || spacing;
 
   // Generate reactive styles that update instantly when spacing changes
   const sectionStyles = {
@@ -579,7 +625,10 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Get colors for button
   const buttonBgColor = getColor("button.backgroundColor", "#059669");
   const buttonTextColor = "#ffffff"; // Always white for button text
-  const buttonHoverBgColor = getColor("button.hoverBackgroundColor", getDarkerColor(buttonBgColor, 20));
+  const buttonHoverBgColor = getColor(
+    "button.hoverBackgroundColor",
+    getDarkerColor(buttonBgColor, 20),
+  );
   const buttonHoverTextColor = "#ffffff"; // Always white for button hover text
 
   const buttonStyles = {
@@ -591,12 +640,24 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   };
 
   // Get color for image background (always uses primary color)
-  const imageBackgroundColor = getColor("imageBackground.color", brandingColors.primary);
+  const imageBackgroundColor = getColor(
+    "imageBackground.color",
+    brandingColors.primary,
+  );
 
   // Get colors for typography
-  const eyebrowColor = getColor("typography.eyebrow.color", brandingColors.secondary);
-  const titleColor = getColor("typography.title.color", brandingColors.secondary);
-  const descriptionColor = getColor("typography.description.color", brandingColors.secondary);
+  const eyebrowColor = getColor(
+    "typography.eyebrow.color",
+    brandingColors.secondary,
+  );
+  const titleColor = getColor(
+    "typography.title.color",
+    brandingColors.secondary,
+  );
+  const descriptionColor = getColor(
+    "typography.description.color",
+    brandingColors.secondary,
+  );
 
   const backgroundStyles = {
     backgroundColor: imageBackgroundColor,

@@ -13,6 +13,7 @@ This document provides a **COMPLETE DIAGNOSTIC AND REPAIR SYSTEM** for fixing ex
 ### WHEN TO USE THIS SYSTEM
 
 Execute this protocol when:
+
 - ✅ User reports component not working correctly
 - ✅ Component not appearing in editor
 - ✅ Component renders but data doesn't update
@@ -57,7 +58,7 @@ INTEGRATION_FILES = [
    IF ANY MISSING:
       ERROR: "Critical file missing: {filename}"
       ACTION: Create file using template from ADD_NEW_COMPONENT.md
-      
+
 2. Check INTEGRATION_FILES contain references to {componentType}
    IF MISSING:
       ERROR: "Integration missing in {filename}"
@@ -103,7 +104,11 @@ if (!editorStoreContent.includes(`import { ${componentType}Functions }`)) {
   FIX_ACTION = "Add import to editorStore.ts";
 }
 
-if (!editorStoreContent.includes(`${componentType}States: Record<string, ComponentData>`)) {
+if (
+  !editorStoreContent.includes(
+    `${componentType}States: Record<string, ComponentData>`,
+  )
+) {
   ISSUE_DETECTED = "MISSING_EDITORSTORE_STATE";
   SEVERITY = "HIGH";
   FIX_ACTION = "Add state property to EditorStore interface";
@@ -137,7 +142,7 @@ REQUIRED_EXPORTS = [
 
 REQUIRED_FUNCTIONS_IN_OBJECT = [
   "ensureVariant",
-  "getData", 
+  "getData",
   "setData",
   "updateByPath"
 ]
@@ -149,49 +154,51 @@ REQUIRED_FUNCTIONS_IN_OBJECT = [
      "import { ComponentData } from '@/lib/types'",
      "import { ComponentState, createDefaultData, updateDataByPath } from './types'"
    ]
-   
+
 2. Check default data function exists and returns ComponentData
    EXPECTED_SIGNATURE = "export const getDefault{ComponentType}Data = (): ComponentData => ({...})"
    VALIDATION:
      - Returns object with "visible: true" at minimum
      - Has proper TypeScript return type
      - Exports as named export
-     
+
 3. Check functions object has all 4 required functions
    EXPECTED_STRUCTURE:
-   ```
-   export const {componentType}Functions = {
-     ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {...},
-     getData: (state: any, variantId: string) => {...},
-     setData: (state: any, variantId: string, data: ComponentData) => {...},
-     updateByPath: (state: any, variantId: string, path: string, value: any) => {...}
-   };
-   ```
+```
+
+export const {componentType}Functions = {
+ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {...},
+getData: (state: any, variantId: string) => {...},
+setData: (state: any, variantId: string, data: ComponentData) => {...},
+updateByPath: (state: any, variantId: string, path: string, value: any) => {...}
+};
+
+```
 
 4. Validate ensureVariant function logic
-   CRITICAL_CHECKS:
-     ✓ Checks if state.{componentType}States[variantId] already exists
-     ✓ Returns empty object {} if exists
-     ✓ Uses getDefault{ComponentType}Data() for defaults
-     ✓ Prioritizes: initial || state.tempData || defaultData
-     ✓ Returns { {componentType}States: { [variantId]: data } }
-     
+CRITICAL_CHECKS:
+  ✓ Checks if state.{componentType}States[variantId] already exists
+  ✓ Returns empty object {} if exists
+  ✓ Uses getDefault{ComponentType}Data() for defaults
+  ✓ Prioritizes: initial || state.tempData || defaultData
+  ✓ Returns { {componentType}States: { [variantId]: data } }
+
 5. Validate getData function logic
-   CRITICAL_CHECKS:
-     ✓ Returns state.{componentType}States[variantId]
-     ✓ Fallbacks to getDefault{ComponentType}Data() or {}
-     
-6. Validate setData function logic  
-   CRITICAL_CHECKS:
-     ✓ Returns { {componentType}States: { ...state.{componentType}States, [variantId]: data } }
-     ✓ Properly spreads existing states
-     
+CRITICAL_CHECKS:
+  ✓ Returns state.{componentType}States[variantId]
+  ✓ Fallbacks to getDefault{ComponentType}Data() or {}
+
+6. Validate setData function logic
+CRITICAL_CHECKS:
+  ✓ Returns { {componentType}States: { ...state.{componentType}States, [variantId]: data } }
+  ✓ Properly spreads existing states
+
 7. Validate updateByPath function logic
-   CRITICAL_CHECKS:
-     ✓ Gets source from state.{componentType}States[variantId]
-     ✓ Uses updateDataByPath(source, path, value) from types.ts
-     ✓ Returns updated {componentType}States
-     ✓ May also update pageComponentsByPage (optional but recommended)
+CRITICAL_CHECKS:
+  ✓ Gets source from state.{componentType}States[variantId]
+  ✓ Uses updateDataByPath(source, path, value) from types.ts
+  ✓ Returns updated {componentType}States
+  ✓ May also update pageComponentsByPage (optional but recommended)
 ```
 
 ### EXECUTION CODE:
@@ -199,7 +206,9 @@ REQUIRED_FUNCTIONS_IN_OBJECT = [
 ```typescript
 // AI: Execute this validation
 
-const functionsFile = readFile(`context-liveeditor/editorStoreFunctions/${componentType}Functions.ts`);
+const functionsFile = readFile(
+  `context-liveeditor/editorStoreFunctions/${componentType}Functions.ts`,
+);
 
 // Check 2.1: Imports
 if (!functionsFile.includes("import { ComponentData } from")) {
@@ -210,7 +219,7 @@ if (!functionsFile.includes("import { ComponentData } from")) {
 
 if (!functionsFile.includes("updateDataByPath")) {
   ISSUE_DETECTED = "MISSING_IMPORT_UPDATEDATABYPATH";
-  SEVERITY = "HIGH";  
+  SEVERITY = "HIGH";
   FIX_ACTION = "Add: import { updateDataByPath } from './types'";
 }
 
@@ -231,7 +240,12 @@ if (!functionsFile.includes(`export const ${functionsObjectName}`)) {
 }
 
 // Check 2.4: All 4 functions exist
-const requiredFunctions = ["ensureVariant", "getData", "setData", "updateByPath"];
+const requiredFunctions = [
+  "ensureVariant",
+  "getData",
+  "setData",
+  "updateByPath",
+];
 for (const funcName of requiredFunctions) {
   if (!functionsFile.includes(`${funcName}:`)) {
     ISSUE_DETECTED = `MISSING_FUNCTION_${funcName.toUpperCase()}`;
@@ -255,7 +269,10 @@ if (!ensureVariantCode.includes(`${defaultDataFunctionName}()`)) {
 }
 
 // Check 2.6: Return type validation
-if (!ensureVariantCode.includes(`return {`) || !ensureVariantCode.includes(`${componentType}States:`)) {
+if (
+  !ensureVariantCode.includes(`return {`) ||
+  !ensureVariantCode.includes(`${componentType}States:`)
+) {
   ISSUE_DETECTED = "INCORRECT_ENSUREVARIANT_RETURN";
   SEVERITY = "CRITICAL";
   FIX_ACTION = `Fix return: { ${componentType}States: { ...state.${componentType}States, [variantId]: data } }`;
@@ -287,7 +304,7 @@ VARIANT_DEFINITION = {
 }
 
 FIELD_TYPES = [
-  "text", "textarea", "number", "boolean", 
+  "text", "textarea", "number", "boolean",
   "color", "image", "select", "array", "object"
 ]
 
@@ -295,20 +312,20 @@ FIELD_TYPES = [
 
 1. Check file imports ComponentStructure type
    EXPECTED: "import { ComponentStructure } from './types'"
-   
+
 2. Check export statement
    EXPECTED: "export const {componentType}Structure: ComponentStructure = {...}"
-   
+
 3. Validate componentType property
    CRITICAL: Must match the component type name exactly
    EXAMPLE: For "pricing", componentType MUST be "pricing"
-   
+
 4. Validate variants array
    CHECKS:
      ✓ Contains at least one variant
      ✓ Each variant has unique id
      ✓ Variant id follows pattern: {componentType}1, {componentType}2, etc.
-     
+
 5. Validate fields array
    CHECKS:
      ✓ Contains "visible" boolean field at minimum
@@ -316,7 +333,7 @@ FIELD_TYPES = [
      ✓ Nested objects use type: "object" with fields: []
      ✓ Arrays use type: "array" with of: []
      ✓ All required fields have proper types
-     
+
 6. Validate field structure matches default data
    CRITICAL_CHECK:
      - Extract all keys from getDefault{ComponentType}Data()
@@ -376,7 +393,7 @@ for (const variant of structure.variants) {
     SEVERITY = "HIGH";
     FIX_ACTION = `Variant id should start with "${componentType}"`;
   }
-  
+
   // Check fields array
   if (!variant.fields || variant.fields.length === 0) {
     ISSUE_DETECTED = "NO_FIELDS_DEFINED";
@@ -384,9 +401,9 @@ for (const variant of structure.variants) {
     SEVERITY = "CRITICAL";
     FIX_ACTION = "Add fields array with at least 'visible' field";
   }
-  
+
   // Check visible field exists
-  const hasVisibleField = variant.fields.some(f => f.key === "visible");
+  const hasVisibleField = variant.fields.some((f) => f.key === "visible");
   if (!hasVisibleField) {
     ISSUE_DETECTED = "MISSING_VISIBLE_FIELD";
     VARIANT = variant.id;
@@ -400,7 +417,9 @@ const defaultData = getDefaultDataFromFunctionsFile(componentType);
 const fieldsKeys = extractFieldKeys(structure.variants[0].fields);
 const defaultDataKeys = extractAllKeys(defaultData);
 
-const missingInStructure = defaultDataKeys.filter(k => !fieldsKeys.includes(k));
+const missingInStructure = defaultDataKeys.filter(
+  (k) => !fieldsKeys.includes(k),
+);
 if (missingInStructure.length > 0) {
   ISSUE_DETECTED = "FIELDS_MISSING_IN_STRUCTURE";
   SEVERITY = "MEDIUM";
@@ -408,7 +427,7 @@ if (missingInStructure.length > 0) {
   FIX_ACTION = `Add fields for keys: ${missingInStructure.join(", ")}`;
 }
 
-const extraInStructure = fieldsKeys.filter(k => !defaultDataKeys.includes(k));
+const extraInStructure = fieldsKeys.filter((k) => !defaultDataKeys.includes(k));
 if (extraInStructure.length > 0) {
   ISSUE_DETECTED = "EXTRA_FIELDS_IN_STRUCTURE";
   SEVERITY = "LOW";
@@ -446,87 +465,102 @@ REQUIRED_IN_EDITORSTORE = [
 1. Check import statement
    LOCATION: Top of file (~line 46-68)
    EXPECTED: "import { {componentType}Functions } from './editorStoreFunctions/{componentType}Functions'"
-   
+
 2. Check interface state property
    LOCATION: EditorStore interface (~line 82-447)
-   EXPECTED: 
-   ```
-   {componentType}States: Record<string, ComponentData>;
-   ensure{ComponentTypeCamel}Variant: (variantId: string, initial?: ComponentData) => void;
-   get{ComponentTypeCamel}Data: (variantId: string) => ComponentData;
-   set{ComponentTypeCamel}Data: (variantId: string, data: ComponentData) => void;
-   update{ComponentTypeCamel}ByPath: (variantId: string, path: string, value: any) => void;
-   ```
-   
+   EXPECTED:
+```
+
+{componentType}States: Record<string, ComponentData>;
+ensure{ComponentTypeCamel}Variant: (variantId: string, initial?: ComponentData) => void;
+get{ComponentTypeCamel}Data: (variantId: string) => ComponentData;
+set{ComponentTypeCamel}Data: (variantId: string, data: ComponentData) => void;
+update{ComponentTypeCamel}ByPath: (variantId: string, path: string, value: any) => void;
+
+```
+
 3. Check state initialization
-   LOCATION: Inside create() function (~line 449-498)
-   EXPECTED: "{componentType}States: {},"
-   
+LOCATION: Inside create() function (~line 449-498)
+EXPECTED: "{componentType}States: {},"
+
 4. Check switch case in ensureComponentVariant
-   LOCATION: ensureComponentVariant function (~line 843-940)
-   EXPECTED:
-   ```
-   case "{componentType}":
-     return {componentType}Functions.ensureVariant(state, variantId, initial);
-   ```
-   
+LOCATION: ensureComponentVariant function (~line 843-940)
+EXPECTED:
+```
+
+case "{componentType}":
+return {componentType}Functions.ensureVariant(state, variantId, initial);
+
+```
+
 5. Check switch case in getComponentData
-   LOCATION: getComponentData function (~line 942-994)
-   EXPECTED:
-   ```
-   case "{componentType}":
-     return {componentType}Functions.getData(state, variantId);
-   ```
-   
+LOCATION: getComponentData function (~line 942-994)
+EXPECTED:
+```
+
+case "{componentType}":
+return {componentType}Functions.getData(state, variantId);
+
+```
+
 6. Check switch case in setComponentData
-   LOCATION: setComponentData function (~line 996-1106)
-   EXPECTED:
-   ```
-   case "{componentType}":
-     newState = {componentType}Functions.setData(state, variantId, data);
-     break;
-   ```
-   
+LOCATION: setComponentData function (~line 996-1106)
+EXPECTED:
+```
+
+case "{componentType}":
+newState = {componentType}Functions.setData(state, variantId, data);
+break;
+
+```
+
 7. Check switch case in updateComponentByPath
-   LOCATION: updateComponentByPath function (~line 1108-1339)
-   EXPECTED:
-   ```
-   case "{componentType}":
-     newState = {componentType}Functions.updateByPath(state, variantId, path, value);
-     break;
-   ```
-   
+LOCATION: updateComponentByPath function (~line 1108-1339)
+EXPECTED:
+```
+
+case "{componentType}":
+newState = {componentType}Functions.updateByPath(state, variantId, path, value);
+break;
+
+```
+
 8. Check specific component functions
-   LOCATION: After generic functions (~line 1341+)
-   EXPECTED:
-   ```
-   ensure{ComponentTypeCamel}Variant: (variantId, initial) =>
-     set((state) => {componentType}Functions.ensureVariant(state, variantId, initial)),
-     
-   get{ComponentTypeCamel}Data: (variantId) => {
-     const state = get();
-     return {componentType}Functions.getData(state, variantId);
-   },
-   
-   set{ComponentTypeCamel}Data: (variantId, data) =>
-     set((state) => {componentType}Functions.setData(state, variantId, data)),
-     
-   update{ComponentTypeCamel}ByPath: (variantId, path, value) =>
-     set((state) => {componentType}Functions.updateByPath(state, variantId, path, value)),
-   ```
+LOCATION: After generic functions (~line 1341+)
+EXPECTED:
+```
+
+ensure{ComponentTypeCamel}Variant: (variantId, initial) =>
+set((state) => {componentType}Functions.ensureVariant(state, variantId, initial)),
+
+get{ComponentTypeCamel}Data: (variantId) => {
+const state = get();
+return {componentType}Functions.getData(state, variantId);
+},
+
+set{ComponentTypeCamel}Data: (variantId, data) =>
+set((state) => {componentType}Functions.setData(state, variantId, data)),
+
+update{ComponentTypeCamel}ByPath: (variantId, path, value) =>
+set((state) => {componentType}Functions.updateByPath(state, variantId, path, value)),
+
+```
 
 9. Check loadFromDatabase function integration
-   LOCATION: loadFromDatabase function (~line 1629-1895)
-   EXPECTED: Case for {componentType} in switch statement
-   ```
-   case "{componentType}":
-     newState.{componentType}States = {componentType}Functions.setData(
-       newState,
-       comp.id,
-       comp.data
-     ).{componentType}States;
-     break;
-   ```
+LOCATION: loadFromDatabase function (~line 1629-1895)
+EXPECTED: Case for {componentType} in switch statement
+```
+
+case "{componentType}":
+newState.{componentType}States = {componentType}Functions.setData(
+newState,
+comp.id,
+comp.data
+).{componentType}States;
+break;
+
+```
+
 ```
 
 ### EXECUTION CODE:
@@ -565,7 +599,10 @@ if (!editorStoreFile.includes(stateInit)) {
 
 // Check 4.4: Switch case in ensureComponentVariant
 const ensureCase = `case "${componentType}":`;
-const ensureFunctionSection = extractFunctionCode(editorStoreFile, "ensureComponentVariant");
+const ensureFunctionSection = extractFunctionCode(
+  editorStoreFile,
+  "ensureComponentVariant",
+);
 if (!ensureFunctionSection.includes(ensureCase)) {
   ISSUE_DETECTED = "MISSING_ENSURE_SWITCH_CASE";
   SEVERITY = "CRITICAL";
@@ -574,7 +611,10 @@ if (!ensureFunctionSection.includes(ensureCase)) {
 }
 
 // Check 4.5: Switch case in getComponentData
-const getFunctionSection = extractFunctionCode(editorStoreFile, "getComponentData");
+const getFunctionSection = extractFunctionCode(
+  editorStoreFile,
+  "getComponentData",
+);
 if (!getFunctionSection.includes(ensureCase)) {
   ISSUE_DETECTED = "MISSING_GET_SWITCH_CASE";
   SEVERITY = "CRITICAL";
@@ -583,7 +623,10 @@ if (!getFunctionSection.includes(ensureCase)) {
 }
 
 // Check 4.6: Switch case in setComponentData
-const setFunctionSection = extractFunctionCode(editorStoreFile, "setComponentData");
+const setFunctionSection = extractFunctionCode(
+  editorStoreFile,
+  "setComponentData",
+);
 if (!setFunctionSection.includes(ensureCase)) {
   ISSUE_DETECTED = "MISSING_SET_SWITCH_CASE";
   SEVERITY = "CRITICAL";
@@ -592,7 +635,10 @@ if (!setFunctionSection.includes(ensureCase)) {
 }
 
 // Check 4.7: Switch case in updateComponentByPath
-const updateFunctionSection = extractFunctionCode(editorStoreFile, "updateComponentByPath");
+const updateFunctionSection = extractFunctionCode(
+  editorStoreFile,
+  "updateComponentByPath",
+);
 if (!updateFunctionSection.includes(ensureCase)) {
   ISSUE_DETECTED = "MISSING_UPDATE_SWITCH_CASE";
   SEVERITY = "CRITICAL";
@@ -606,7 +652,7 @@ const specificFunctions = [
   `ensure${ComponentTypeCamel}Variant`,
   `get${ComponentTypeCamel}Data`,
   `set${ComponentTypeCamel}Data`,
-  `update${ComponentTypeCamel}ByPath`
+  `update${ComponentTypeCamel}ByPath`,
 ];
 
 for (const funcName of specificFunctions) {
@@ -619,7 +665,10 @@ for (const funcName of specificFunctions) {
 }
 
 // Check 4.9: loadFromDatabase integration
-const loadFromDbSection = extractFunctionCode(editorStoreFile, "loadFromDatabase");
+const loadFromDbSection = extractFunctionCode(
+  editorStoreFile,
+  "loadFromDatabase",
+);
 if (!loadFromDbSection.includes(`case "${componentType}":`)) {
   ISSUE_DETECTED = "MISSING_LOADFROMDATABASE_CASE";
   SEVERITY = "HIGH";
@@ -632,7 +681,8 @@ if (!loadFromDbSection.includes(`case "${componentType}":`)) {
       ).${componentType}States;
       break;`;
   INSERT_AT = "In loadFromDatabase switch (~line 1797-2042)";
-  REFERENCE = "See @docs/important/liveEditor/DATABASE_DATA_LOADING.md for details";
+  REFERENCE =
+    "See @docs/important/liveEditor/DATABASE_DATA_LOADING.md for details";
 }
 
 // AI: Report all detected issues from Layer 4
@@ -660,38 +710,40 @@ REQUIRED_IN_COMPONENTSLIST = [
 1. Check import statement
    LOCATION: Top of file (~line 24-43)
    EXPECTED: "import { {componentType}Structure } from '@/componentsStructure/{componentType}'"
-   
+
 2. Check entry in getComponents function
    LOCATION: getComponents function (~line 70-352)
    EXPECTED:
-   ```
-   {componentType}: {
-     id: "{componentType}",
-     name: "{componentType}",
-     displayName: t("components.{componentType}.display_name"),
-     description: t("components.{componentType}.description"),
-     category: "{category}",
-     section: "{section}",
-     subPath: "{componentType}",
-     variants: {componentType}Structure.variants.map((variant) => ({
-       ...variant,
-       componentPath: `components/tenant/{componentType}/${variant.id}.tsx`,
-     })),
-     icon: "{icon}",
-     hasStore: true,
-     hasStructure: true,
-     defaultTheme: "{componentType}1",
-     ...{componentType}Structure,
-   },
-   ```
-   
+```
+
+{componentType}: {
+id: "{componentType}",
+name: "{componentType}",
+displayName: t("components.{componentType}.display_name"),
+description: t("components.{componentType}.description"),
+category: "{category}",
+section: "{section}",
+subPath: "{componentType}",
+variants: {componentType}Structure.variants.map((variant) => ({
+...variant,
+componentPath: `components/tenant/{componentType}/${variant.id}.tsx`,
+})),
+icon: "{icon}",
+hasStore: true,
+hasStructure: true,
+defaultTheme: "{componentType}1",
+...{componentType}Structure,
+},
+
+```
+
 3. Check entry in COMPONENTS constant
-   LOCATION: COMPONENTS constant (~line 355-578)
-   EXPECTED: Similar structure as getComponents but without translations
-   
+LOCATION: COMPONENTS constant (~line 355-578)
+EXPECTED: Similar structure as getComponents but without translations
+
 4. Check section components array
-   LOCATION: getSections or SECTIONS constant (~line 74-103)
-   EXPECTED: "{componentType}" in components array of appropriate section
+LOCATION: getSections or SECTIONS constant (~line 74-103)
+EXPECTED: "{componentType}" in components array of appropriate section
 ```
 
 ### EXECUTION CODE:
@@ -711,7 +763,10 @@ if (!componentsListFile.includes(`${componentType}Structure`)) {
 }
 
 // Check 5.2: Entry in getComponents
-const getComponentsSection = extractFunctionCode(componentsListFile, "getComponents");
+const getComponentsSection = extractFunctionCode(
+  componentsListFile,
+  "getComponents",
+);
 if (!getComponentsSection.includes(`${componentType}: {`)) {
   ISSUE_DETECTED = "MISSING_GETCOMPONENTS_ENTRY";
   SEVERITY = "CRITICAL";
@@ -722,26 +777,29 @@ if (!getComponentsSection.includes(`${componentType}: {`)) {
 // Validate entry structure
 if (getComponentsSection.includes(`${componentType}: {`)) {
   const entry = extractComponentEntry(getComponentsSection, componentType);
-  
+
   if (!entry.includes(`id: "${componentType}"`)) {
     ISSUE_DETECTED = "INCORRECT_COMPONENT_ID";
     SEVERITY = "HIGH";
     FIX_ACTION = `Set id to "${componentType}"`;
   }
-  
+
   if (!entry.includes(`...${componentType}Structure`)) {
     ISSUE_DETECTED = "NOT_SPREADING_STRUCTURE";
     SEVERITY = "HIGH";
     FIX_ACTION = `Add: ...${componentType}Structure at the end of object`;
   }
-  
+
   if (!entry.includes(`hasStore: true`)) {
     WARNING = "hasStore not set to true - component may not integrate properly";
   }
 }
 
 // Check 5.3: Entry in COMPONENTS constant
-const componentsConstant = extractConstantCode(componentsListFile, "COMPONENTS");
+const componentsConstant = extractConstantCode(
+  componentsListFile,
+  "COMPONENTS",
+);
 if (!componentsConstant.includes(`${componentType}: {`)) {
   ISSUE_DETECTED = "MISSING_COMPONENTS_CONSTANT_ENTRY";
   SEVERITY = "HIGH";
@@ -786,7 +844,7 @@ THE_7_STEP_PATTERN = [
 
 1. Check file is "use client"
    EXPECTED: First line is '"use client";'
-   
+
 2. Check imports
    REQUIRED_IMPORTS = [
      "useEffect from 'react'",
@@ -794,7 +852,7 @@ THE_7_STEP_PATTERN = [
      "useTenantStore from '@/context-liveeditor/tenantStore'",
      "getDefault{ComponentType}Data from functions file"
    ]
-   
+
 3. Check props interface
    CRITICAL_PROPS = [
      "variant?: string",
@@ -802,69 +860,81 @@ THE_7_STEP_PATTERN = [
      "id?: string"
    ]
    SHOULD_HAVE: All component-specific props matching default data structure
-   
+
 4. Validate Step 1: Extract unique ID
    EXPECTED_CODE:
-   ```
-   const variantId = props.variant || "{componentType}1";
-   const uniqueId = props.id || variantId;
-   ```
-   
+```
+
+const variantId = props.variant || "{componentType}1";
+const uniqueId = props.id || variantId;
+
+```
+
 5. Validate Step 2: Connect to stores
-   EXPECTED_SUBSCRIPTIONS:
-   ```
-   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-   const getComponentData = useEditorStore(s => s.getComponentData);
-   const {componentType}States = useEditorStore(s => s.{componentType}States);
-   const tenantData = useTenantStore(s => s.tenantData);
-   ```
-   
+EXPECTED_SUBSCRIPTIONS:
+```
+
+const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
+const getComponentData = useEditorStore(s => s.getComponentData);
+const {componentType}States = useEditorStore(s => s.{componentType}States);
+const tenantData = useTenantStore(s => s.tenantData);
+
+```
+
 6. Validate Step 3: Initialize in store
-   EXPECTED_USEEFFECT:
-   ```
-   useEffect(() => {
-     if (props.useStore) {
-       const initialData = {
-         ...getDefault{ComponentType}Data(),
-         ...props
-       };
-       ensureComponentVariant("{componentType}", uniqueId, initialData);
-     }
-   }, [uniqueId, props.useStore]);
-   ```
-   
+EXPECTED_USEEFFECT:
+```
+
+useEffect(() => {
+if (props.useStore) {
+const initialData = {
+...getDefault{ComponentType}Data(),
+...props
+};
+ensureComponentVariant("{componentType}", uniqueId, initialData);
+}
+}, [uniqueId, props.useStore]);
+
+```
+
 7. Validate Step 4: Retrieve data
-   EXPECTED:
-   ```
-   const storeData = {componentType}States[uniqueId];
-   const currentStoreData = getComponentData("{componentType}", uniqueId);
-   ```
-   
+EXPECTED:
+```
+
+const storeData = {componentType}States[uniqueId];
+const currentStoreData = getComponentData("{componentType}", uniqueId);
+
+```
+
 8. Validate Step 5: Merge data
-   EXPECTED_MERGE_ORDER:
-   ```
-   const mergedData = {
-     ...getDefault{ComponentType}Data(),    // Lowest priority
-     ...storeData,
-     ...currentStoreData,
-     ...props                                // Highest priority
-   };
-   ```
-   CRITICAL: Must use mergedData for all rendering, NOT props directly
-   
+EXPECTED_MERGE_ORDER:
+```
+
+const mergedData = {
+...getDefault{ComponentType}Data(), // Lowest priority
+...storeData,
+...currentStoreData,
+...props // Highest priority
+};
+
+```
+CRITICAL: Must use mergedData for all rendering, NOT props directly
+
 9. Validate Step 6: Early return
-   EXPECTED:
-   ```
-   if (!mergedData.visible) {
-     return null;
-   }
-   ```
-   
+EXPECTED:
+```
+
+if (!mergedData.visible) {
+return null;
+}
+
+```
+
 10. Validate Step 7: Render
-    CRITICAL_CHECK: All rendered values use mergedData, not props
-    EXAMPLE:
-      ✅ {mergedData.content?.title}
-      ❌ {props.content?.title}
+ CRITICAL_CHECK: All rendered values use mergedData, not props
+ EXAMPLE:
+   ✅ {mergedData.content?.title}
+   ❌ {props.content?.title}
 ```
 
 ### EXECUTION CODE:
@@ -872,7 +942,9 @@ THE_7_STEP_PATTERN = [
 ```typescript
 // AI: Execute React component validation
 
-const componentFile = readFile(`components/tenant/${componentType}/${componentType}1.tsx`);
+const componentFile = readFile(
+  `components/tenant/${componentType}/${componentType}1.tsx`,
+);
 
 // Check 6.1: "use client"
 if (!componentFile.startsWith('"use client"')) {
@@ -886,7 +958,7 @@ const requiredImports = [
   "useEffect",
   "useEditorStore",
   "useTenantStore",
-  `getDefault${capitalize(componentType)}Data`
+  `getDefault${capitalize(componentType)}Data`,
 ];
 
 for (const imp of requiredImports) {
@@ -933,7 +1005,8 @@ if (!componentFile.includes("const uniqueId = props.id || variantId")) {
 if (!componentFile.includes("useEditorStore(s => s.ensureComponentVariant)")) {
   ISSUE_DETECTED = "MISSING_ENSURE_SUBSCRIPTION";
   SEVERITY = "CRITICAL";
-  FIX_ACTION = "Add: const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);";
+  FIX_ACTION =
+    "Add: const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);";
 }
 
 if (!componentFile.includes(`${componentType}States`)) {
@@ -944,7 +1017,9 @@ if (!componentFile.includes(`${componentType}States`)) {
 
 // Check 6.6: Step 3 - Initialize useEffect
 const hasUseEffect = componentFile.includes("useEffect(");
-const hasEnsureCall = componentFile.includes(`ensureComponentVariant("${componentType}"`);
+const hasEnsureCall = componentFile.includes(
+  `ensureComponentVariant("${componentType}"`,
+);
 
 if (!hasUseEffect || !hasEnsureCall) {
   ISSUE_DETECTED = "MISSING_INITIALIZATION_USEEFFECT";
@@ -954,11 +1029,13 @@ if (!hasUseEffect || !hasEnsureCall) {
 
 // Check 6.6.1: Database data loading in useEffect
 const useEffectCode = extractFunctionCode(componentFile, "useEffect", true);
-const hasTenantDataCheck = componentFile.includes("getTenantComponentData") || 
-                           componentFile.includes("tenantComponentData");
-const hasTenantDataInDeps = useEffectCode && 
-                            (useEffectCode.includes("tenantComponentData") || 
-                             useEffectCode.includes("tenantData"));
+const hasTenantDataCheck =
+  componentFile.includes("getTenantComponentData") ||
+  componentFile.includes("tenantComponentData");
+const hasTenantDataInDeps =
+  useEffectCode &&
+  (useEffectCode.includes("tenantComponentData") ||
+    useEffectCode.includes("tenantData"));
 
 if (!hasTenantDataCheck && hasUseEffect) {
   ISSUE_DETECTED = "MISSING_DATABASE_DATA_LOADING";
@@ -994,13 +1071,15 @@ if (!componentFile.includes("const mergedData = {")) {
 const hasMergedData = componentFile.includes("const mergedData");
 if (hasMergedData) {
   const mergedDataCode = extractVariableCode(componentFile, "mergedData");
-  
-  if (!mergedDataCode.includes(`getDefault${capitalize(componentType)}Data()`)) {
+
+  if (
+    !mergedDataCode.includes(`getDefault${capitalize(componentType)}Data()`)
+  ) {
     ISSUE_DETECTED = "MERGEDDATA_NOT_USING_DEFAULTS";
     SEVERITY = "HIGH";
     FIX_ACTION = `Start mergedData with ...getDefault${capitalize(componentType)}Data()`;
   }
-  
+
   if (!mergedDataCode.includes("...props")) {
     ISSUE_DETECTED = "MERGEDDATA_NOT_SPREADING_PROPS";
     SEVERITY = "MEDIUM";
@@ -1009,8 +1088,10 @@ if (hasMergedData) {
 }
 
 // Check 6.9: Step 6 - Early return
-if (!componentFile.includes("if (!mergedData.visible)") && 
-    !componentFile.includes("if (mergedData.visible === false)")) {
+if (
+  !componentFile.includes("if (!mergedData.visible)") &&
+  !componentFile.includes("if (mergedData.visible === false)")
+) {
   ISSUE_DETECTED = "MISSING_VISIBILITY_CHECK";
   SEVERITY = "MEDIUM";
   FIX_ACTION = "Add: if (!mergedData.visible) return null;";
@@ -1032,12 +1113,15 @@ if (propsUsage > mergedDataUsage) {
 }
 
 // Specific check for common mistakes
-if (renderSection.includes("props.content") || 
-    renderSection.includes("props.styling") ||
-    renderSection.includes("props.layout")) {
+if (
+  renderSection.includes("props.content") ||
+  renderSection.includes("props.styling") ||
+  renderSection.includes("props.layout")
+) {
   ISSUE_DETECTED = "DIRECT_PROPS_USAGE_IN_RENDER";
   SEVERITY = "CRITICAL";
-  FIX_ACTION = "MUST use mergedData.content, mergedData.styling, etc. NOT props.*";
+  FIX_ACTION =
+    "MUST use mergedData.content, mergedData.styling, etc. NOT props.*";
 }
 
 // AI: Report all detected issues from Layer 6
@@ -1063,14 +1147,14 @@ EXPORT_FILES_TO_CHECK = [
 1. Check componentsStructure/index.ts
    EXPECTED: "export { {componentType}Structure } from './{componentType}'"
    LOCATION: Add alphabetically with other exports
-   
+
 2. Check editorStoreFunctions/index.ts
    EXPECTED: "export * from './{componentType}Functions'"
    LOCATION: Add alphabetically with other exports
 
 3. Verify no duplicate exports
    CHECK: No export appears twice
-   
+
 4. Verify export order (alphabetical recommended)
    RECOMMENDATION: Keep alphabetical for maintainability
 ```
@@ -1092,7 +1176,9 @@ if (!structureIndexFile.includes(`${componentType}Structure`)) {
 }
 
 // Check 7.2: editorStoreFunctions/index.ts
-const functionsIndexFile = readFile("context-liveeditor/editorStoreFunctions/index.ts");
+const functionsIndexFile = readFile(
+  "context-liveeditor/editorStoreFunctions/index.ts",
+);
 
 const expectedFunctionsExport = `export * from "./${componentType}Functions"`;
 if (!functionsIndexFile.includes(`${componentType}Functions"`)) {
@@ -1120,7 +1206,7 @@ REPORT_LAYER_7_RESULTS();
 
 ### SYSTEMATIC REPAIR PROCESS
 
-```typescript
+````typescript
 // AI: Execute repairs in this exact order
 
 REPAIR_PRIORITY_ORDER = [
@@ -1136,15 +1222,15 @@ REPAIR_PRIORITY_ORDER = [
 // EXECUTION PATTERN:
 
 FOR EACH DETECTED ISSUE IN PRIORITY ORDER:
-  
+
   1. LOG ISSUE
      console.log(`[FIX] ${ISSUE_DETECTED}`);
      console.log(`[SEVERITY] ${SEVERITY}`);
      console.log(`[ACTION] ${FIX_ACTION}`);
-  
+
   2. EXECUTE FIX
      APPLY FIX ACCORDING TO FIX_ACTION
-     
+
   3. VERIFY FIX
      RE-RUN SPECIFIC DIAGNOSTIC CHECK
      IF STILL FAILING:
@@ -1152,7 +1238,7 @@ FOR EACH DETECTED ISSUE IN PRIORITY ORDER:
        CONTINUE TO NEXT ISSUE
      ELSE:
        LOG: "✓ Fix successful"
-  
+
   4. TRACK FIXES
      FIXES_APPLIED.push({
        issue: ISSUE_DETECTED,
@@ -1162,40 +1248,40 @@ FOR EACH DETECTED ISSUE IN PRIORITY ORDER:
      });
 
 AFTER ALL FIXES APPLIED:
-  
+
   1. RE-RUN ALL 7 DIAGNOSTIC LAYERS
-  
+
   2. GENERATE REPORT:
      ```
      COMPONENT REPAIR REPORT: {componentType}
      ================================
-     
+
      TOTAL ISSUES FOUND: {totalIssues}
      CRITICAL: {criticalCount}
      HIGH: {highCount}
      MEDIUM: {mediumCount}
      LOW: {lowCount}
-     
+
      FIXES APPLIED: {fixesApplied}
      SUCCESSFUL: {successCount}
      FAILED: {failedCount}
-     
+
      REMAINING ISSUES: {remainingIssues}
-     
+
      DETAILED FIXES:
      {list each fix with before/after}
-     
+
      RECOMMENDATIONS:
      {any additional recommendations}
      ```
-  
+
   3. IF ALL CRITICAL/HIGH ISSUES FIXED:
      STATUS = "COMPONENT REPAIRED AND FUNCTIONAL"
-     
+
   4. IF CRITICAL ISSUES REMAIN:
      STATUS = "COMPONENT REQUIRES MANUAL REVIEW"
      LIST REMAINING CRITICAL ISSUES
-```
+````
 
 ---
 
@@ -1280,7 +1366,7 @@ PATTERN_1: Component renders but doesn't update
   DIAGNOSTIC:
     - Check Layer 4: updateComponentByPath switch
     - Check Layer 6: Store subscriptions and mergedData usage
-    
+
 PATTERN_2: Component doesn't appear in editor
   SYMPTOMS:
     - Component files exist
@@ -1290,7 +1376,7 @@ PATTERN_2: Component doesn't appear in editor
     - Missing in section components array
   DIAGNOSTIC:
     - Check Layer 5: ComponentsList integration
-    
+
 PATTERN_3: Component breaks on page load
   SYMPTOMS:
     - TypeError or crash when loading page
@@ -1302,7 +1388,7 @@ PATTERN_3: Component breaks on page load
   DIAGNOSTIC:
     - Check Layer 2: Functions file validation
     - Verify default data structure matches component expectations
-    
+
 PATTERN_4: Multiple instances interfere with each other
   SYMPTOMS:
     - Editing one instance affects another
@@ -1313,7 +1399,7 @@ PATTERN_4: Multiple instances interfere with each other
   DIAGNOSTIC:
     - Check Layer 6: Verify uniqueId usage
     - Ensure all store operations use uniqueId not variantId
-    
+
 PATTERN_5: Component doesn't save to database
   SYMPTOMS:
     - Changes work in editor
@@ -1342,7 +1428,7 @@ COMMAND: FIX_MISSING_INTEGRATION
     - Add all missing exports
   USE_WHEN: Component files exist but not integrated
 
-COMMAND: FIX_COMPONENT_PATTERN  
+COMMAND: FIX_COMPONENT_PATTERN
   EXECUTES:
     - Rewrite React component to follow 7-step pattern
     - Fix all props → mergedData issues
@@ -1391,7 +1477,7 @@ AI: Execute this checklist after repairs
   □ getData function logic correct
   □ setData function logic correct
   □ updateByPath function logic correct
-  
+
 □ Layer 3: Structure file valid
   □ ComponentStructure imported
   □ {componentType}Structure exported
@@ -1400,7 +1486,7 @@ AI: Execute this checklist after repairs
   □ Fields array exists
   □ visible field present
   □ Fields match default data structure
-  
+
 □ Layer 4: editorStore integration complete
   □ Functions imported
   □ State property in interface
@@ -1412,13 +1498,13 @@ AI: Execute this checklist after repairs
   □ updateComponentByPath switch case
   □ Specific component functions exist
   □ loadFromDatabase case exists
-  
+
 □ Layer 5: ComponentsList integration complete
   □ Structure imported
   □ Entry in getComponents
   □ Entry in COMPONENTS
   □ In section components array
-  
+
 □ Layer 6: React component follows pattern
   □ "use client" directive
   □ All required imports
@@ -1430,11 +1516,11 @@ AI: Execute this checklist after repairs
   □ Step 5: mergedData creation
   □ Step 6: Visibility check
   □ Step 7: Render uses mergedData
-  
+
 □ Layer 7: Exports complete
   □ Structure exported from index
   □ Functions exported from index
-  
+
 □ Component appears in editor
 □ Component can be added to page
 □ Component renders correctly
@@ -1452,11 +1538,11 @@ FINAL_STATUS = ALL_CHECKS_PASSED ? "✅ COMPONENT FULLY FUNCTIONAL" : "⚠️ IS
 
 ### When Repairs Fail
 
-```typescript
+````typescript
 // AI: Follow this protocol when a fix doesn't work
 
 IF FIX_FAILS:
-  
+
   1. LOG DETAILED ERROR:
      ```
      ERROR: Failed to fix {ISSUE_DETECTED}
@@ -1465,39 +1551,39 @@ IF FIX_FAILS:
      FILE: {affected file}
      LINE: {if applicable}
      ```
-  
+
   2. TRY ALTERNATIVE FIX:
      - Check for variations of the issue
      - Try related fixes
      - Look for dependencies
-  
+
   3. IF STILL FAILING:
      ESCALATE:
      ```
      MANUAL INTERVENTION REQUIRED
-     
+
      Component: {componentType}
      Issue: {ISSUE_DETECTED}
      Severity: {SEVERITY}
-     
+
      Attempted Fixes:
      1. {first attempt}
      2. {second attempt}
-     
+
      Current State:
      {describe what works and what doesn't}
-     
+
      Recommendations:
      {specific recommendations for manual fix}
-     
+
      Related Files:
      {list all files that may need manual review}
      ```
-  
+
   4. MARK ISSUE AS REQUIRES_MANUAL_REVIEW
-  
+
   5. CONTINUE WITH OTHER FIXES
-```
+````
 
 ---
 
@@ -1636,63 +1722,58 @@ END OF REPORT
 // AI: Learn from these patterns to improve diagnosis
 
 PATTERN_DATABASE = {
-  
-  "component_not_updating": {
+  component_not_updating: {
     symptoms: [
       "renders but doesn't update",
       "editorsidebar changes don't reflect",
-      "store updates but component doesn't rerender"
+      "store updates but component doesn't rerender",
     ],
     common_causes: [
       "missing store subscription",
       "using props instead of mergedData",
-      "missing updateByPath switch case"
+      "missing updateByPath switch case",
     ],
     fix_sequence: [
       "check store subscriptions in component",
       "verify mergedData usage in render",
-      "check updateComponentByPath switch case"
-    ]
-  },
-  
-  "typescript_errors": {
-    symptoms: [
-      "type errors in component",
-      "interface errors",
-      "import errors"
+      "check updateComponentByPath switch case",
     ],
+  },
+
+  typescript_errors: {
+    symptoms: ["type errors in component", "interface errors", "import errors"],
     common_causes: [
       "missing imports",
       "incorrect types in props interface",
-      "wrong function signatures"
+      "wrong function signatures",
     ],
     fix_sequence: [
       "check all imports present",
       "verify props interface matches default data",
-      "check function signatures match editorStore interface"
-    ]
+      "check function signatures match editorStore interface",
+    ],
   },
-  
-  "data_persistence_issues": {
+
+  data_persistence_issues: {
     symptoms: [
       "changes don't save",
       "data lost after refresh",
-      "component resets to defaults"
+      "component resets to defaults",
     ],
     common_causes: [
       "missing loadFromDatabase case",
       "pageComponentsByPage not updating",
-      "wrong component ID usage"
+      "wrong component ID usage",
     ],
     fix_sequence: [
       "add loadFromDatabase case",
       "ensure setData updates pageComponentsByPage",
-      "verify using uniqueId (props.id) not variantId"
-    ]
-  }
-  
+      "verify using uniqueId (props.id) not variantId",
+    ],
+  },
+
   // More patterns...
-}
+};
 
 // AI: When encountering issue, match against patterns first for faster diagnosis
 ```
@@ -1727,8 +1808,8 @@ RESPONSE TO USER SHOULD INCLUDE:
 
 EXAMPLE RESPONSE:
 
-"I've completed a comprehensive diagnostic and repair of the '{componentType}' component. 
-Found and fixed {criticalCount} critical issues and {highCount} high-priority issues. 
+"I've completed a comprehensive diagnostic and repair of the '{componentType}' component.
+Found and fixed {criticalCount} critical issues and {highCount} high-priority issues.
 The component is now {FUNCTIONAL/PARTIALLY_FUNCTIONAL/REQUIRES_MANUAL_REVIEW}.
 
 Summary:
@@ -1751,4 +1832,3 @@ Would you like to see the detailed repair report?"
 **END OF COMPONENT REPAIR PROTOCOL**
 
 **AI NOTE**: This is a comprehensive diagnostic and repair system. Execute all checks systematically and apply fixes in priority order. Always verify fixes work before marking as complete. Generate detailed reports for user review.
-

@@ -19,7 +19,7 @@ interface ImageTextProps {
   paragraph?: string;
   blockquote?: string;
   overlayOpacity?: number;
-  
+
   // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
@@ -35,21 +35,23 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "imageText1";
   const uniqueId = props.id || variantId;
-  
+
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-  const getComponentData = useEditorStore(s => s.getComponentData);
-  const imageTextStates = useEditorStore(s => s.imageTextStates);
-  
-  const tenantData = useTenantStore(s => s.tenantData);
-  const fetchTenantData = useTenantStore(s => s.fetchTenantData);
-  const tenantId = useTenantStore(s => s.tenantId);
-  
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const imageTextStates = useEditorStore((s) => s.imageTextStates);
+
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
   // Translation hook
   const t = useClientT();
-  
+
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -62,22 +64,28 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "imageText" && component.componentName === variantId) {
+        if (
+          component.type === "imageText" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -91,7 +99,7 @@ export default function ImageText1(props: ImageTextProps = {}) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -100,50 +108,49 @@ export default function ImageText1(props: ImageTextProps = {}) {
   useEffect(() => {
     if (props.useStore) {
       // ✅ Use database data if available
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultImageTextData(),
-            ...tenantComponentData,  // Database data takes priority
-            ...props
-          }
-        : {
-            ...getDefaultImageTextData(),
-            ...props
-          };
-      
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultImageTextData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultImageTextData(),
+              ...props,
+            };
+
       // Initialize in store
       ensureComponentVariant("imageText", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
-  
+
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
-  const storeData = props.useStore
-    ? imageTextStates[uniqueId] || {}
-    : {};
+  const storeData = props.useStore ? imageTextStates[uniqueId] || {} : {};
   const currentStoreData = props.useStore
     ? getComponentData("imageText", uniqueId) || {}
     : {};
-  
+
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultImageTextData(),    // 1. Defaults (lowest priority)
-    ...props,                        // 2. Props
-    ...tenantComponentData,          // 3. Database data
-    ...storeData,                    // 4. Store state
-    ...currentStoreData,             // 5. Current store data (highest priority)
+    ...getDefaultImageTextData(), // 1. Defaults (lowest priority)
+    ...props, // 2. Props
+    ...tenantComponentData, // 3. Database data
+    ...storeData, // 4. Store state
+    ...currentStoreData, // 5. Current store data (highest priority)
   };
-  
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
-  
+
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
@@ -152,7 +159,10 @@ export default function ImageText1(props: ImageTextProps = {}) {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={mergedData.backgroundImage || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80"}
+          src={
+            mergedData.backgroundImage ||
+            "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80"
+          }
           alt={t("components.imageText.alt_text")}
           fill
           className="object-cover brightness-50"
@@ -190,4 +200,3 @@ export default function ImageText1(props: ImageTextProps = {}) {
     </section>
   );
 }
-

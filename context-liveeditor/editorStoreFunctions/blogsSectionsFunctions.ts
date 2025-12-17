@@ -7,39 +7,47 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 export const getDefaultBlogsSectionsData = (): ComponentData => ({
   visible: true,
-  
+
   // Content - Two paragraphs
-  paragraph1: "نصمم رحلتك العقارية بخطى واثقة نجمع بين السلاسة في التعامل والاحترافية في الأداء، لنقدّم لك تجربة سلسة من أول استفسار حتى استلام المفتاح. نُراعي احتياجاتك، ونُرشدك نحو أفضل الخيارات بخبرة ودراية تامة.",
-  paragraph2: "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
-  
+  paragraph1:
+    "نصمم رحلتك العقارية بخطى واثقة نجمع بين السلاسة في التعامل والاحترافية في الأداء، لنقدّم لك تجربة سلسة من أول استفسار حتى استلام المفتاح. نُراعي احتياجاتك، ونُرشدك نحو أفضل الخيارات بخبرة ودراية تامة.",
+  paragraph2:
+    "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
+
   // Cards array
   cards: [
     {
       id: "1",
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "حلول عقارية سريعة وموثوقة",
-      description: "نقدّم لك خدمات عقارية متكاملة بمرونة وسرعة، مع فريق يتمتع بالكفاءة والخبرة لتلبية جميع احتياجاتك بسهولة واحترافية",
+      description:
+        "نقدّم لك خدمات عقارية متكاملة بمرونة وسرعة، مع فريق يتمتع بالكفاءة والخبرة لتلبية جميع احتياجاتك بسهولة واحترافية",
       readMoreUrl: "#",
       date: "مايو 29, 2023",
     },
     {
       id: "2",
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "استثمر بثقة… وابدأ حياة جديدة",
-      description: "في باهية للعقارات، نضع بين يديك مجموعة مختارة من العقارات بعناية فائقة، لنمنحك تجربة فريدة ومضمونة من البداية حتى التملّك.",
+      description:
+        "في باهية للعقارات، نضع بين يديك مجموعة مختارة من العقارات بعناية فائقة، لنمنحك تجربة فريدة ومضمونة من البداية حتى التملّك.",
       readMoreUrl: "#",
       date: "يوليو 9, 2025",
     },
     {
       id: "3",
-      image: "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
+      image:
+        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
       title: "اختيارك الأول للسكن والاستثمار",
-      description: "سواء كنت تبحث عن منزل الأحلام أو فرصة استثمارية رابحة، فريقنا المختص يساعدك في اتخاذ القرار الصحيح بكل شفافية ومصداقية",
+      description:
+        "سواء كنت تبحث عن منزل الأحلام أو فرصة استثمارية رابحة، فريقنا المختص يساعدك في اتخاذ القرار الصحيح بكل شفافية ومصداقية",
       readMoreUrl: "#",
       date: "يوليو 9, 2025",
     },
   ],
-  
+
   // Styling
   styling: {
     backgroundColor: "#8b5f46",
@@ -53,7 +61,7 @@ export const getDefaultBlogsSectionsData = (): ComponentData => ({
     readMoreHoverColor: "#6b4630",
     dateColor: "#6b7280",
   },
-  
+
   // Layout
   layout: {
     maxWidth: "1280px",
@@ -80,7 +88,7 @@ export const getDefaultBlogsSectionsData = (): ComponentData => ({
 export const blogsSectionsFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -92,46 +100,46 @@ export const blogsSectionsFunctions = {
       state.blogsSectionsStates[variantId] &&
       Object.keys(state.blogsSectionsStates[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data
     const defaultData = getDefaultBlogsSectionsData();
-    
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data }
+      blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
     state.blogsSectionsStates[variantId] || getDefaultBlogsSectionsData(),
-  
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data }
+    blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "content.title")
@@ -139,12 +147,15 @@ export const blogsSectionsFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.blogsSectionsStates[variantId] || getDefaultBlogsSectionsData();
+    const source =
+      state.blogsSectionsStates[variantId] || getDefaultBlogsSectionsData();
     const newData = updateDataByPath(source, path, value);
-    
-    return {
-      blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: newData }
-    } as any;
-  }
-};
 
+    return {
+      blogsSectionsStates: {
+        ...state.blogsSectionsStates,
+        [variantId]: newData,
+      },
+    } as any;
+  },
+};

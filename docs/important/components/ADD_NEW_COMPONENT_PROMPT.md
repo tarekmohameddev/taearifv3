@@ -52,6 +52,7 @@ Reference these files for examples:
 ```
 
 **Replace**:
+
 - `{COMPONENT_NAME}`: pricing, testimonials, gallery, etc.
 - `{ComponentName}`: Pricing, Testimonials, Gallery, etc.
 - `{BRIEF_DESCRIPTION}`: Short description of component
@@ -406,23 +407,31 @@ Reference multi-variant examples:
 ## 💡 Tips for Using These Prompts
 
 ### 1. **Be Specific**
+
 Replace all `{PLACEHOLDERS}` with actual values before sending to Cursor
 
 ### 2. **Attach Reference Files**
+
 Use `@filename` to attach example files for Cursor to reference
 
 ### 3. **One Step at a Time (Optional)**
+
 For complex components, you can break it down:
+
 ```
 First, create only Step 1: pricingFunctions.ts following @docs/important/components/ADD_NEW_COMPONENT.md
 ```
+
 Then after reviewing:
+
 ```
 Now create Step 2: pricing.ts structure following @docs/important/components/ADD_NEW_COMPONENT.md
 ```
 
 ### 4. **Verify After Each Major Step**
+
 After Steps 1-7, run:
+
 ```
 Verify the integration by checking:
 1. No TypeScript errors
@@ -431,6 +440,7 @@ Verify the integration by checking:
 ```
 
 ### 5. **Use Composer for Multi-File Changes**
+
 For Steps 3-7 (updating existing files), use Cursor Composer (Ctrl+I / Cmd+I) to make changes across multiple files at once.
 
 ---
@@ -467,26 +477,34 @@ For Steps 3-7 (updating existing files), use Cursor Composer (Ctrl+I / Cmd+I) to
 ## 🚨 Common AI Mistakes to Watch For
 
 ### 1. **Forgetting Switch Cases**
+
 AI might add import and state but forget one of the 4 switch cases. Verify all 4:
+
 - ensureComponentVariant
 - getComponentData
 - setComponentData
 - updateComponentByPath
 
 ### 2. **Wrong Naming Convention**
+
 Ensure consistent naming:
+
 - `pricingFunctions` (not `pricingFunction` or `PricingFunctions`)
 - `pricingStates` (not `pricingState`)
 - `pricingStructure` (not `PricingStructure`)
 
 ### 3. **Missing simpleFields in Structure**
+
 AI might create only `fields` but forget `simpleFields`. Remind it:
+
 ```
 Don't forget to add simpleFields array for simple editing mode
 ```
 
 ### 4. **Not Following 7-Step Pattern in Component**
+
 The React component MUST follow the exact 7-step pattern. If AI deviates, ask:
+
 ```
 Rewrite the component following the exact 7-step pattern from Step 6 in the guide
 ```

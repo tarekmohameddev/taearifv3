@@ -109,13 +109,19 @@ export default function DataHandler({
               email: "",
               whatsapp: "",
               customerType: null,
-              city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+              city: propertyBasic.address
+                ? propertyBasic.address.split(",")[1]?.trim() || ""
+                : "",
               district: "",
               assignedAgent: "",
               lastContact: "",
-              urgency: customer.priority_id ? getPriorityLabel(customer.priority_id) : "",
+              urgency: customer.priority_id
+                ? getPriorityLabel(customer.priority_id)
+                : "",
               pipelineStage: String(request.stage_id || stage.id),
-              dealValue: propertyBasic.price ? parseFloat(propertyBasic.price) : basicInfo.price || 0,
+              dealValue: propertyBasic.price
+                ? parseFloat(propertyBasic.price)
+                : basicInfo.price || 0,
               probability: 0,
               avatar: propertyBasic.featured_image || "",
               reminders: [],

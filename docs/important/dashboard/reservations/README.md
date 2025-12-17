@@ -11,12 +11,14 @@
 ### أنواع الـ APIs
 
 #### 1. **Public APIs** (APIs عامة)
+
 - **Base URL**: `/api/v1/tenant-website/{tenantId}`
 - **Authentication**: غير مطلوبة (Public)
 - **Rate Limiting**: 5 طلبات/دقيقة
 - **الغرض**: إنشاء حجوزات فقط
 
 #### 2. **Dashboard APIs** (APIs للإدارة)
+
 - **Base URL**: `/api/v1`
 - **Authentication**: مطلوبة (`Bearer Token`)
 - **الغرض**: إدارة كاملة للحجوزات (قراءة، تحديث، إحصائيات، تصدير)
@@ -45,15 +47,18 @@ reservations:
 ```
 
 ### أنواع الحجوزات (Type)
+
 - `rent`: إيجار (يُشتق تلقائياً من `property.purpose = 'rent'` أو `'rented'`)
 - `buy`: شراء (يُشتق تلقائياً من `property.purpose = 'sale'` أو `'sold'`)
 
 ### حالات الحجوزات (Status)
+
 - `pending`: قيد الانتظار (افتراضي عند الإنشاء)
 - `accepted`: مقبولة
 - `rejected`: مرفوضة
 
 ### Metadata Structure
+
 ```json
 {
   "ip": "192.168.1.1",
@@ -75,11 +80,13 @@ reservations:
 ## 🔐 المصادقة والأمان
 
 ### Public Endpoints
+
 - **لا تحتاج مصادقة**
 - محمية بـ **Rate Limiting**: 5 طلبات/دقيقة لكل عميل (IP)
 - **Tenant Isolation**: كل tenant يمكنه الوصول لحجوزاته فقط
 
 ### Dashboard Endpoints
+
 - **مطلوبة**: `Authorization: Bearer {access_token}`
 - استخدام **Laravel Sanctum** للمصادقة
 - **Tenant Isolation**: عبر Policy - كل tenant يرى حجوزاته فقط
@@ -93,14 +100,17 @@ reservations:
 **Endpoint:** `POST /api/v1/tenant-website/{tenantId}/reservations`
 
 #### الوصف
+
 إنشاء طلب حجز جديد لعقار محدد باستخدام `slug` العقار.
 
 #### Request Headers
+
 ```
 Content-Type: application/json
 ```
 
 #### Request Body
+
 ```json
 {
   "propertySlug": "astdyo-mothth-hy-alaaard-rkm-19-1",
@@ -112,15 +122,17 @@ Content-Type: application/json
 ```
 
 #### Validation Rules
-| الحقل | مطلوب | النوع | القيود |
-|------|------|------|--------|
-| `propertySlug` | ✅ | string | max: 200 |
-| `customerName` | ✅ | string | max: 100 |
-| `customerPhone` | ✅ | string | max: 40, regex: `/^\+?\d{7,15}$/` |
-| `desiredDate` | ❌ | date | ISO format, `>= today` |
-| `message` | ❌ | string | max: 1000 |
+
+| الحقل           | مطلوب | النوع  | القيود                            |
+| --------------- | ----- | ------ | --------------------------------- |
+| `propertySlug`  | ✅    | string | max: 200                          |
+| `customerName`  | ✅    | string | max: 100                          |
+| `customerPhone` | ✅    | string | max: 40, regex: `/^\+?\d{7,15}$/` |
+| `desiredDate`   | ❌    | date   | ISO format, `>= today`            |
+| `message`       | ❌    | string | max: 1000                         |
 
 #### Behavior (السلوك)
+
 1. يتم حل `{tenantId}` من الـ URL
 2. البحث عن العقار باستخدام `slug` ضمن عقارات المستأجر النشطة فقط (`status = 1`)
 3. تحديد نوع الحجز (`type`) تلقائياً من `property.purpose`:
@@ -130,6 +142,7 @@ Content-Type: application/json
 5. حفظ `ip` و `user_agent` في `metadata`
 
 #### Response (201 Created)
+
 ```json
 {
   "success": true,
@@ -143,6 +156,7 @@ Content-Type: application/json
 #### Error Responses
 
 **404 Not Found** - العقار غير موجود
+
 ```json
 {
   "success": false,
@@ -151,16 +165,20 @@ Content-Type: application/json
 ```
 
 **422 Validation Error** - خطأ في التحقق
+
 ```json
 {
   "message": "The given data was invalid.",
   "errors": {
-    "customerPhone": ["Invalid phone format. Use international format like +9665XXXXXXX"]
+    "customerPhone": [
+      "Invalid phone format. Use international format like +9665XXXXXXX"
+    ]
   }
 }
 ```
 
 **429 Too Many Requests** - تجاوز معدل الطلبات
+
 ```json
 {
   "message": "Too Many Attempts."
@@ -168,6 +186,7 @@ Content-Type: application/json
 ```
 
 #### مثال الاستخدام (curl)
+
 ```bash
 curl -X POST "https://your-app.test/api/v1/tenant-website/mytenant/reservations" \
   -H "Content-Type: application/json" \
@@ -181,13 +200,14 @@ curl -X POST "https://your-app.test/api/v1/tenant-website/mytenant/reservations"
 ```
 
 #### مثال الاستخدام (JavaScript/React)
+
 ```typescript
 import axiosInstance from "@/lib/axiosInstance"
 import { useTenantId } from "@/hooks/useTenantId"
 
 const CreateReservation = () => {
   const { tenantId } = useTenantId()
-  
+
   const handleCreate = async (formData: {
     propertySlug: string
     customerName: string
@@ -200,7 +220,7 @@ const CreateReservation = () => {
         `/api/v1/tenant-website/${tenantId}/reservations`,
         formData
       )
-      
+
       if (response.data.success) {
         console.log("تم إنشاء الحجز:", response.data.data)
       }
@@ -214,7 +234,7 @@ const CreateReservation = () => {
       }
     }
   }
-  
+
   return (
     // UI Component
   )
@@ -230,32 +250,36 @@ const CreateReservation = () => {
 **Endpoint:** `GET /api/v1/reservations`
 
 #### الوصف
+
 جلب قائمة جميع الحجوزات مع إمكانية الفلترة، البحث، الترتيب، والتقسيم الصفحي. يُرجع أيضاً ملخص إحصائيات.
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Query Parameters
 
-| المعامل | النوع | الوصف | القيم المتاحة |
-|--------|------|------|---------------|
-| `status` | string | فلترة حسب الحالة | `pending`, `accepted`, `rejected`, `all` (default: `all`) |
-| `type` | string | فلترة حسب النوع | `rent`, `buy`, `all` (default: `all`) |
-| `search` | string | البحث | يبحث في: اسم العميل، عنوان العقار، اسم المشروع، اسم المبنى |
-| `sort_by` | string | ترتيب حسب | `date`, `price`, `name` (default: `date`) |
-| `sort_order` | string | اتجاه الترتيب | `asc`, `desc` (default: `desc`) |
-| `page` | integer | رقم الصفحة | default: `1` |
-| `per_page` | integer | عدد العناصر/صفحة | default: `20`, max: `100` |
+| المعامل      | النوع   | الوصف            | القيم المتاحة                                              |
+| ------------ | ------- | ---------------- | ---------------------------------------------------------- |
+| `status`     | string  | فلترة حسب الحالة | `pending`, `accepted`, `rejected`, `all` (default: `all`)  |
+| `type`       | string  | فلترة حسب النوع  | `rent`, `buy`, `all` (default: `all`)                      |
+| `search`     | string  | البحث            | يبحث في: اسم العميل، عنوان العقار، اسم المشروع، اسم المبنى |
+| `sort_by`    | string  | ترتيب حسب        | `date`, `price`, `name` (default: `date`)                  |
+| `sort_order` | string  | اتجاه الترتيب    | `asc`, `desc` (default: `desc`)                            |
+| `page`       | integer | رقم الصفحة       | default: `1`                                               |
+| `per_page`   | integer | عدد العناصر/صفحة | default: `20`, max: `100`                                  |
 
 #### Request Example
+
 ```
 GET /api/v1/reservations?status=pending&type=rent&search=نرجس&sort_by=date&sort_order=desc&page=1&per_page=10
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -311,40 +335,41 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
 const fetchReservations = async () => {
-  setLoading(true)
-  setError(null)
+  setLoading(true);
+  setError(null);
 
   try {
-    const params = new URLSearchParams()
-    if (filterType !== "all") params.append("type", filterType)
-    if (searchQuery) params.append("search", searchQuery)
-    params.append("sort_by", sortBy)
-    params.append("sort_order", sortOrder)
-    params.append("page", "1")
-    params.append("per_page", "100")
+    const params = new URLSearchParams();
+    if (filterType !== "all") params.append("type", filterType);
+    if (searchQuery) params.append("search", searchQuery);
+    params.append("sort_by", sortBy);
+    params.append("sort_order", sortOrder);
+    params.append("page", "1");
+    params.append("per_page", "100");
 
     const response = await axiosInstance.get(
-      `/api/v1/reservations?${params.toString()}`
-    )
+      `/api/v1/reservations?${params.toString()}`,
+    );
 
     if (response.data.success && response.data.data) {
-      const reservationsData = response.data.data.reservations || []
-      setReservations(reservationsData)
+      const reservationsData = response.data.data.reservations || [];
+      setReservations(reservationsData);
 
       // Update stats if available
       if (response.data.data.stats) {
-        setStats(response.data.data.stats)
+        setStats(response.data.data.stats);
       }
     }
   } catch (err: any) {
-    console.error("Error fetching reservations:", err)
-    setError(err.response?.data?.message || "حدث خطأ أثناء جلب الحجوزات")
+    console.error("Error fetching reservations:", err);
+    setError(err.response?.data?.message || "حدث خطأ أثناء جلب الحجوزات");
   } finally {
-    setLoading(false)
+    setLoading(false);
   }
-}
+};
 ```
 
 ---
@@ -354,23 +379,28 @@ const fetchReservations = async () => {
 **Endpoint:** `GET /api/v1/reservations/{id}`
 
 #### الوصف
+
 جلب معلومات تفصيلية عن حجز واحد، تتضمن الوثائق والرسائل والسجل الزمني (Timeline).
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Path Parameters
+
 - `{id}`: معرف الحجز (string)
 
 #### Request Example
+
 ```
 GET /api/v1/reservations/res-001
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -435,6 +465,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 #### Error Responses
 
 **404 Not Found** - الحجز غير موجود
+
 ```json
 {
   "success": false,
@@ -443,6 +474,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 **403 Forbidden** - لا تملك صلاحية الوصول
+
 ```json
 {
   "message": "This action is unauthorized."
@@ -450,20 +482,21 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
 const fetchReservationDetails = async (id: string) => {
   try {
-    const response = await axiosInstance.get(`/api/v1/reservations/${id}`)
+    const response = await axiosInstance.get(`/api/v1/reservations/${id}`);
 
     if (response.data.success && response.data.data) {
-      setSelectedReservation(response.data.data)
-      setShowDetailDialog(true)
+      setSelectedReservation(response.data.data);
+      setShowDetailDialog(true);
     }
   } catch (err: any) {
-    console.error("Error fetching reservation details:", err)
-    setError(err.response?.data?.message || "حدث خطأ أثناء جلب تفاصيل الحجز")
+    console.error("Error fetching reservation details:", err);
+    setError(err.response?.data?.message || "حدث خطأ أثناء جلب تفاصيل الحجز");
   }
-}
+};
 ```
 
 ---
@@ -473,17 +506,21 @@ const fetchReservationDetails = async (id: string) => {
 **Endpoint:** `POST /api/v1/reservations/{id}/accept`
 
 #### الوصف
+
 قبول حجز مع إمكانية تأكيد استلام الدفعة وإضافة ملاحظات.
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Path Parameters
+
 - `{id}`: معرف الحجز (string)
 
 #### Request Body
+
 ```json
 {
   "confirmPayment": true,
@@ -493,12 +530,13 @@ Authorization: Bearer {access_token}
 
 #### Request Fields
 
-| الحقل | مطلوب | النوع | الوصف |
-|------|------|------|------|
-| `confirmPayment` | ❌ | boolean | تأكيد استلام الدفعة |
-| `notes` | ❌ | string | ملاحظات القبول |
+| الحقل            | مطلوب | النوع   | الوصف               |
+| ---------------- | ----- | ------- | ------------------- |
+| `confirmPayment` | ❌    | boolean | تأكيد استلام الدفعة |
+| `notes`          | ❌    | string  | ملاحظات القبول      |
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -519,30 +557,35 @@ Authorization: Bearer {access_token}
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
-const handleAcceptReservation = async (reservationId: string, confirmPayment: boolean, notes?: string) => {
+const handleAcceptReservation = async (
+  reservationId: string,
+  confirmPayment: boolean,
+  notes?: string,
+) => {
   try {
     const response = await axiosInstance.post(
       `/api/v1/reservations/${reservationId}/accept`,
       {
         confirmPayment,
         notes: notes || undefined,
-      }
-    )
+      },
+    );
 
     if (response.data.success) {
       // Refresh reservations list
-      await fetchReservations()
-      await fetchReservationsStats()
-      
+      await fetchReservations();
+      await fetchReservationsStats();
+
       // Show success message
-      console.log("تم قبول الحجز بنجاح")
+      console.log("تم قبول الحجز بنجاح");
     }
   } catch (err: any) {
-    console.error("Error accepting reservation:", err)
-    setError(err.response?.data?.message || "حدث خطأ أثناء قبول الحجز")
+    console.error("Error accepting reservation:", err);
+    setError(err.response?.data?.message || "حدث خطأ أثناء قبول الحجز");
   }
-}
+};
 ```
 
 ---
@@ -552,17 +595,21 @@ const handleAcceptReservation = async (reservationId: string, confirmPayment: bo
 **Endpoint:** `POST /api/v1/reservations/{id}/reject`
 
 #### الوصف
+
 رفض حجز مع إمكانية إضافة سبب الرفض.
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Path Parameters
+
 - `{id}`: معرف الحجز (string)
 
 #### Request Body
+
 ```json
 {
   "reason": "السعر أعلى من ميزانية العميل"
@@ -571,11 +618,12 @@ Authorization: Bearer {access_token}
 
 #### Request Fields
 
-| الحقل | مطلوب | النوع | الوصف |
-|------|------|------|------|
-| `reason` | ❌ | string | سبب الرفض |
+| الحقل    | مطلوب | النوع  | الوصف     |
+| -------- | ----- | ------ | --------- |
+| `reason` | ❌    | string | سبب الرفض |
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -596,29 +644,33 @@ Authorization: Bearer {access_token}
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
-const handleRejectReservation = async (reservationId: string, reason?: string) => {
+const handleRejectReservation = async (
+  reservationId: string,
+  reason?: string,
+) => {
   try {
     const response = await axiosInstance.post(
       `/api/v1/reservations/${reservationId}/reject`,
       {
         reason: reason || undefined,
-      }
-    )
+      },
+    );
 
     if (response.data.success) {
       // Refresh reservations list
-      await fetchReservations()
-      await fetchReservationsStats()
-      
+      await fetchReservations();
+      await fetchReservationsStats();
+
       // Show success message
-      console.log("تم رفض الحجز")
+      console.log("تم رفض الحجز");
     }
   } catch (err: any) {
-    console.error("Error rejecting reservation:", err)
-    setError(err.response?.data?.message || "حدث خطأ أثناء رفض الحجز")
+    console.error("Error rejecting reservation:", err);
+    setError(err.response?.data?.message || "حدث خطأ أثناء رفض الحجز");
   }
-}
+};
 ```
 
 ---
@@ -628,14 +680,17 @@ const handleRejectReservation = async (reservationId: string, reason?: string) =
 **Endpoint:** `POST /api/v1/reservations/bulk-action`
 
 #### الوصف
+
 تنفيذ إجراءات جماعية (قبول/رفض) على عدة حجوزات في نفس الوقت.
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Request Body
+
 ```json
 {
   "action": "accept",
@@ -646,13 +701,14 @@ Authorization: Bearer {access_token}
 
 #### Request Fields
 
-| الحقل | مطلوب | النوع | الوصف | القيم |
-|------|------|------|------|------|
-| `action` | ✅ | string | نوع الإجراء | `accept`, `reject` |
-| `reservationIds` | ✅ | array | قائمة معرفات الحجوزات | array of strings |
-| `notes` | ❌ | string | ملاحظات |
+| الحقل            | مطلوب | النوع  | الوصف                 | القيم              |
+| ---------------- | ----- | ------ | --------------------- | ------------------ |
+| `action`         | ✅    | string | نوع الإجراء           | `accept`, `reject` |
+| `reservationIds` | ✅    | array  | قائمة معرفات الحجوزات | array of strings   |
+| `notes`          | ❌    | string | ملاحظات               |
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -667,6 +723,7 @@ Authorization: Bearer {access_token}
 ```
 
 #### Error Response (400 Bad Request)
+
 ```json
 {
   "success": false,
@@ -679,37 +736,45 @@ Authorization: Bearer {access_token}
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
-const handleBulkAction = async (actionType: "accept" | "reject", reservationIds: string[], notes?: string) => {
+const handleBulkAction = async (
+  actionType: "accept" | "reject",
+  reservationIds: string[],
+  notes?: string,
+) => {
   try {
-    const response = await axiosInstance.post("/api/v1/reservations/bulk-action", {
-      action: actionType,
-      reservationIds,
-      notes: notes || undefined,
-    })
+    const response = await axiosInstance.post(
+      "/api/v1/reservations/bulk-action",
+      {
+        action: actionType,
+        reservationIds,
+        notes: notes || undefined,
+      },
+    );
 
     if (response.data.success) {
-      const { successful, failed } = response.data.data
-      
+      const { successful, failed } = response.data.data;
+
       if (failed.length > 0) {
-        console.warn(`فشل في ${failed.length} حجز:`, failed)
+        console.warn(`فشل في ${failed.length} حجز:`, failed);
       }
-      
+
       // Refresh reservations list
-      await fetchReservations()
-      await fetchReservationsStats()
-      
+      await fetchReservations();
+      await fetchReservationsStats();
+
       // Clear selection
-      setSelectedReservations(new Set())
-      
+      setSelectedReservations(new Set());
+
       // Show success message
-      console.log(`تم تنفيذ الإجراء على ${successful.length} حجز بنجاح`)
+      console.log(`تم تنفيذ الإجراء على ${successful.length} حجز بنجاح`);
     }
   } catch (err: any) {
-    console.error("Error performing bulk action:", err)
-    setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء")
+    console.error("Error performing bulk action:", err);
+    setError(err.response?.data?.message || "حدث خطأ أثناء تنفيذ الإجراء");
   }
-}
+};
 ```
 
 ---
@@ -719,20 +784,24 @@ const handleBulkAction = async (actionType: "accept" | "reject", reservationIds:
 **Endpoint:** `GET /api/v1/reservations/stats`
 
 #### الوصف
+
 جلب إحصائيات شاملة عن الحجوزات (إجمالي، حسب الحالة، حسب النوع، حسب الشهر).
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Request Example
+
 ```
 GET /api/v1/reservations/stats
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
 #### Response Structure (200 OK)
+
 ```json
 {
   "success": true,
@@ -758,23 +827,24 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 
 #### Response Fields
 
-| الحقل | النوع | الوصف |
-|------|------|------|
-| `total` | integer | إجمالي الحجوزات |
-| `pending` | integer | الحجوزات قيد الانتظار |
-| `accepted` | integer | الحجوزات المقبولة |
-| `rejected` | integer | الحجوزات المرفوضة |
-| `acceptanceRate` | integer | نسبة القبول (%) |
-| `totalRevenue` | number | إجمالي الإيرادات (من الدفعات) |
-| `byType.rent` | integer | عدد حجوزات الإيجار |
-| `byType.buy` | integer | عدد حجوزات الشراء |
-| `byMonth` | array | عدد الحجوزات حسب الشهر |
+| الحقل            | النوع   | الوصف                         |
+| ---------------- | ------- | ----------------------------- |
+| `total`          | integer | إجمالي الحجوزات               |
+| `pending`        | integer | الحجوزات قيد الانتظار         |
+| `accepted`       | integer | الحجوزات المقبولة             |
+| `rejected`       | integer | الحجوزات المرفوضة             |
+| `acceptanceRate` | integer | نسبة القبول (%)               |
+| `totalRevenue`   | number  | إجمالي الإيرادات (من الدفعات) |
+| `byType.rent`    | integer | عدد حجوزات الإيجار            |
+| `byType.buy`     | integer | عدد حجوزات الشراء             |
+| `byMonth`        | array   | عدد الحجوزات حسب الشهر        |
 
 #### مثال الاستخدام (React)
+
 ```typescript
 const fetchReservationsStats = async () => {
   try {
-    const response = await axiosInstance.get("/api/v1/reservations/stats")
+    const response = await axiosInstance.get("/api/v1/reservations/stats");
 
     if (response.data.success && response.data.data) {
       setStats({
@@ -786,12 +856,12 @@ const fetchReservationsStats = async () => {
         totalRevenue: response.data.data.totalRevenue || 0,
         byType: response.data.data.byType || { rent: 0, buy: 0 },
         byMonth: response.data.data.byMonth || [],
-      })
+      });
     }
   } catch (err: any) {
-    console.error("Error fetching stats:", err)
+    console.error("Error fetching stats:", err);
   }
-}
+};
 
 // استخدام الإحصائيات في الواجهة
 const stats = {
@@ -801,12 +871,14 @@ const stats = {
   rejected: 5,
   acceptanceRate: 85,
   totalRevenue: 420000,
-}
+};
 
 // حساب نسبة القبول
-const acceptanceRate = stats.accepted > 0 
-  ? Math.round((stats.accepted / (stats.accepted + stats.rejected)) * 100) || 0 
-  : 0
+const acceptanceRate =
+  stats.accepted > 0
+    ? Math.round((stats.accepted / (stats.accepted + stats.rejected)) * 100) ||
+      0
+    : 0;
 ```
 
 ---
@@ -816,15 +888,19 @@ const acceptanceRate = stats.accepted > 0
 **Endpoint:** `GET /api/v1/reservations/export/csv`
 
 #### الوصف
+
 تصدير الحجوزات كملف CSV مع تطبيق نفس فلاتر البحث والترتيب المستخدمة في قائمة الحجوزات.
 
 #### Authentication
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 #### Query Parameters
+
 نفس معاملات `GET /api/v1/reservations`:
+
 - `status`: `pending`, `accepted`, `rejected`, `all`
 - `type`: `rent`, `buy`, `all`
 - `search`: نص البحث
@@ -832,6 +908,7 @@ Authorization: Bearer {access_token}
 - `sort_order`: `asc`, `desc`
 
 #### Request Example
+
 ```
 GET /api/v1/reservations/export/csv?status=pending&type=all
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
@@ -839,12 +916,14 @@ Accept: text/csv
 ```
 
 #### Response Headers
+
 ```
 Content-Type: text/csv
 Content-Disposition: attachment; filename="reservations-2025-01-13_153045.csv"
 ```
 
 #### Response Body (CSV Format)
+
 ```csv
 ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 1,pending,rent,أحمد محمد,+966501234567,فيلا فاخرة بحي النرجس,حي النرجس، الرياض,5000,2025-01-08 10:30:00
@@ -852,19 +931,20 @@ ID,Status,Type,Customer,Phone,Property,Address,Price,Requested At
 ```
 
 #### مثال الاستخدام (React)
+
 ```typescript
 const handleExport = async (format: "csv" | "pdf") => {
   if (format === "csv") {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // بناء معاملات البحث والفلترة
-      const params = new URLSearchParams()
-      if (filterType !== "all") params.append("type", filterType)
-      if (searchQuery) params.append("search", searchQuery)
-      if (sortBy) params.append("sort_by", sortBy)
-      if (sortOrder) params.append("sort_order", sortOrder)
+      const params = new URLSearchParams();
+      if (filterType !== "all") params.append("type", filterType);
+      if (searchQuery) params.append("search", searchQuery);
+      if (sortBy) params.append("sort_by", sortBy);
+      if (sortOrder) params.append("sort_order", sortOrder);
 
       // جلب ملف CSV
       const response = await axiosInstance.get(
@@ -874,66 +954,70 @@ const handleExport = async (format: "csv" | "pdf") => {
           headers: {
             Accept: "text/csv",
           },
-        }
-      )
+        },
+      );
 
       // التحقق من أن الاستجابة هي blob
       if (response.data instanceof Blob) {
         // الحصول على اسم الملف من headers أو استخدام اسم افتراضي
-        const contentDisposition = response.headers["content-disposition"]
-        let filename = `reservations-${new Date().toISOString().split("T")[0]}.csv`
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = `reservations-${new Date().toISOString().split("T")[0]}.csv`;
 
         if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+          const filenameMatch = contentDisposition.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+          );
           if (filenameMatch && filenameMatch[1]) {
-            filename = filenameMatch[1].replace(/['"]/g, "")
+            filename = filenameMatch[1].replace(/['"]/g, "");
           }
         }
 
         // إنشاء رابط للتحميل
-        const url = window.URL.createObjectURL(response.data)
-        const link = document.createElement("a")
-        link.href = url
-        link.download = filename
-        document.body.appendChild(link)
-        link.click()
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
 
         // تنظيف
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
       } else {
-        throw new Error("استجابة غير صحيحة من الخادم")
+        throw new Error("استجابة غير صحيحة من الخادم");
       }
     } catch (err: any) {
-      console.error("Error exporting reservations:", err)
-      
+      console.error("Error exporting reservations:", err);
+
       // معالجة الأخطاء
       if (err.response) {
         if (err.response.data instanceof Blob) {
-          const reader = new FileReader()
+          const reader = new FileReader();
           reader.onload = async () => {
             try {
-              const text = reader.result as string
-              const errorData = JSON.parse(text)
-              setError(errorData.message || "حدث خطأ أثناء تصدير الحجوزات")
+              const text = reader.result as string;
+              const errorData = JSON.parse(text);
+              setError(errorData.message || "حدث خطأ أثناء تصدير الحجوزات");
             } catch {
-              setError("حدث خطأ أثناء تصدير الحجوزات")
+              setError("حدث خطأ أثناء تصدير الحجوزات");
             }
-          }
-          reader.readAsText(err.response.data)
+          };
+          reader.readAsText(err.response.data);
         } else {
-          setError(err.response?.data?.message || "حدث خطأ أثناء تصدير الحجوزات")
+          setError(
+            err.response?.data?.message || "حدث خطأ أثناء تصدير الحجوزات",
+          );
         }
       } else if (err.request) {
-        setError("تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت")
+        setError("تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت");
       } else {
-        setError(err.message || "حدث خطأ أثناء تصدير الحجوزات")
+        setError(err.message || "حدث خطأ أثناء تصدير الحجوزات");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-}
+};
 ```
 
 ---
@@ -941,15 +1025,17 @@ const handleExport = async (format: "csv" | "pdf") => {
 ## 🎨 Frontend Integration (التكامل مع الواجهة الأمامية)
 
 ### ملف المكون الرئيسي
+
 `components/property-reservations-page.tsx`
 
 ### المكونات الرئيسية
 
 #### 1. State Management
+
 ```typescript
-const [reservations, setReservations] = useState<Reservation[]>([])
-const [loading, setLoading] = useState(false)
-const [error, setError] = useState<string | null>(null)
+const [reservations, setReservations] = useState<Reservation[]>([]);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
 const [stats, setStats] = useState({
   total: 0,
   pending: 0,
@@ -959,45 +1045,49 @@ const [stats, setStats] = useState({
   totalRevenue: 0,
   byType: { rent: 0, buy: 0 },
   byMonth: [] as Array<{ month: string; reservations: number }>,
-})
+});
 ```
 
 #### 2. Filters & Search
+
 ```typescript
-const [searchQuery, setSearchQuery] = useState("")
-const [filterType, setFilterType] = useState<"all" | "rent" | "buy">("all")
-const [sortBy, setSortBy] = useState<"date" | "price" | "name">("date")
-const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+const [searchQuery, setSearchQuery] = useState("");
+const [filterType, setFilterType] = useState<"all" | "rent" | "buy">("all");
+const [sortBy, setSortBy] = useState<"date" | "price" | "name">("date");
+const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 ```
 
 #### 3. Create Reservation Form
+
 ```typescript
-const [showCreatePopup, setShowCreatePopup] = useState(false)
+const [showCreatePopup, setShowCreatePopup] = useState(false);
 const [createFormData, setCreateFormData] = useState({
   propertySlug: "",
   customerName: "",
   customerPhone: "",
   desiredDate: "",
   message: "",
-})
+});
 ```
 
 ### استخدام Tenant ID
-```typescript
-import { useTenantId } from "@/hooks/useTenantId"
 
-const { tenantId } = useTenantId()
+```typescript
+import { useTenantId } from "@/hooks/useTenantId";
+
+const { tenantId } = useTenantId();
 
 // استخدام tenantId في API calls
 const response = await axiosInstance.post(
   `/api/v1/tenant-website/${tenantId}/reservations`,
-  formData
-)
+  formData,
+);
 ```
 
 ### استخدام axiosInstance
+
 ```typescript
-import axiosInstance from "@/lib/axiosInstance"
+import axiosInstance from "@/lib/axiosInstance";
 
 // axiosInstance يضيف تلقائياً:
 // - Authorization header (Bearer token)
@@ -1012,6 +1102,7 @@ import axiosInstance from "@/lib/axiosInstance"
 ### أنواع الأخطاء الشائعة
 
 #### 1. 400 Bad Request
+
 ```json
 {
   "success": false,
@@ -1023,56 +1114,70 @@ import axiosInstance from "@/lib/axiosInstance"
 ```
 
 #### 2. 401 Unauthorized
+
 ```json
 {
   "message": "Unauthenticated."
 }
 ```
+
 **الحل**: إعادة تسجيل الدخول
 
 #### 3. 403 Forbidden
+
 ```json
 {
   "message": "This action is unauthorized."
 }
 ```
+
 **الحل**: التحقق من الصلاحيات
 
 #### 4. 404 Not Found
+
 ```json
 {
   "success": false,
   "message": "الحجز غير موجود"
 }
 ```
+
 **الحل**: التحقق من معرف الحجز
 
 #### 5. 422 Validation Error
+
 ```json
 {
   "message": "The given data was invalid.",
   "errors": {
-    "customerPhone": ["Invalid phone format. Use international format like +9665XXXXXXX"]
+    "customerPhone": [
+      "Invalid phone format. Use international format like +9665XXXXXXX"
+    ]
   }
 }
 ```
+
 **الحل**: التحقق من البيانات المدخلة
 
 #### 6. 429 Too Many Requests
+
 ```json
 {
   "message": "Too Many Attempts."
 }
 ```
+
 **الحل**: الانتظار قبل إعادة المحاولة (Rate Limit: 5 req/min للـ Public API)
 
 #### 7. 500 Internal Server Error
+
 ```json
 {
   "success": false,
   "message": "حدث خطأ في الخادم"
 }
 ```
+
 **الحل**: التواصل مع الدعم الفني
 
 ---
@@ -1080,14 +1185,16 @@ import axiosInstance from "@/lib/axiosInstance"
 ## 🔄 Data Flow (تدفق البيانات)
 
 ### 1. إنشاء حجز (Create Reservation)
+
 ```
-Client (Public) 
+Client (Public)
   → POST /api/v1/tenant-website/{tenantId}/reservations
   → Backend validates & creates reservation
   → Response: { success: true, data: { id, status } }
 ```
 
 ### 2. عرض قائمة الحجوزات (List Reservations)
+
 ```
 Dashboard Client
   → GET /api/v1/reservations?status=pending&type=rent
@@ -1096,6 +1203,7 @@ Dashboard Client
 ```
 
 ### 3. قبول/رفض حجز (Accept/Reject)
+
 ```
 Dashboard Client
   → POST /api/v1/reservations/{id}/accept
@@ -1109,12 +1217,15 @@ Dashboard Client
 ## 📁 ملفات الـ Frontend
 
 ### الملف الرئيسي
+
 - `components/property-reservations-page.tsx` - الصفحة الرئيسية لإدارة الحجوزات
 
 ### الـ Hooks
+
 - `hooks/useTenantId.ts` - للحصول على معرف المستأجر
 
 ### الـ API Instance
+
 - `lib/axiosInstance.js` - axios instance مع المصادقة التلقائية
 
 ---
@@ -1139,5 +1250,5 @@ Dashboard Client
 ---
 
 ## 📅 آخر تحديث
-2025-01-13
 
+2025-01-13

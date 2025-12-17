@@ -11,13 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ChevronDown,
-  Home,
-  MapPin,
-  Search,
-  Tag,
-} from "lucide-react";
+import { ChevronDown, Home, MapPin, Search, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -137,7 +131,15 @@ interface HeroProps {
 }
 
 // Search Form Component
-function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; primaryColor?: string; primaryColorHover?: string }) {
+function SearchForm({
+  config,
+  primaryColor,
+  primaryColorHover,
+}: {
+  config: any;
+  primaryColor?: string;
+  primaryColorHover?: string;
+}) {
   const [status, setStatus] = useState("");
   const [city, setCity] = useState("");
   const [type, setType] = useState("");
@@ -154,9 +156,29 @@ function SearchForm({ config, primaryColor, primaryColorHover }: { config: any; 
   if (!config?.enabled) return null;
 
   // Default options based on the HTML code provided
-  const typeOptions = config.fields?.type?.options || ["الكل", "شقق", "فلل", "اراضي", "ادوار", "عمائر", "تاون هاوس", "أبراج"];
-  const cityOptions = config.fields?.city?.options || ["اختر المدينة", "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام"];
-  const statusOptions = config.fields?.status?.options || ["بيع / ايجار", "للبيع", "للإيجار"];
+  const typeOptions = config.fields?.type?.options || [
+    "الكل",
+    "شقق",
+    "فلل",
+    "اراضي",
+    "ادوار",
+    "عمائر",
+    "تاون هاوس",
+    "أبراج",
+  ];
+  const cityOptions = config.fields?.city?.options || [
+    "اختر المدينة",
+    "الرياض",
+    "جدة",
+    "مكة المكرمة",
+    "المدينة المنورة",
+    "الدمام",
+  ];
+  const statusOptions = config.fields?.status?.options || [
+    "بيع / ايجار",
+    "للبيع",
+    "للإيجار",
+  ];
 
   return (
     <form
@@ -357,13 +379,15 @@ export default function Hero3(props: HeroProps) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
-  const getComponentData = useEditorStore(s => s.getComponentData);
-  const heroStates = useEditorStore(s => s.heroStates);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const heroStates = useEditorStore((s) => s.heroStates);
 
-  const tenantData = useTenantStore(s => s.tenantData);
-  const fetchTenantData = useTenantStore(s => s.fetchTenantData);
-  const tenantId = useTenantStore(s => s.tenantId);
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
@@ -377,22 +401,28 @@ export default function Hero3(props: HeroProps) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
-    
+
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "hero" && component.componentName === variantId) {
+        if (
+          component.type === "hero" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
-    
+
     // Check old structure (tenantData.componentSettings)
     if (tenantData?.componentSettings) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -406,7 +436,7 @@ export default function Hero3(props: HeroProps) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -415,17 +445,18 @@ export default function Hero3(props: HeroProps) {
   useEffect(() => {
     if (props.useStore) {
       // ✅ Use database data if available
-      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
-        ? {
-            ...getDefaultHero3Data(),
-            ...tenantComponentData,  // Database data takes priority
-            ...props
-          }
-        : {
-            ...getDefaultHero3Data(),
-            ...props
-          };
-      
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultHero3Data(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultHero3Data(),
+              ...props,
+            };
+
       // Initialize in store
       ensureComponentVariant("hero", uniqueId, initialData);
     }
@@ -441,10 +472,10 @@ export default function Hero3(props: HeroProps) {
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultHero3Data(),    // 1. Defaults (lowest priority)
-    ...storeData,                 // 2. Store state
-    ...currentStoreData,          // 3. Current store data
-    ...props                       // 4. Props (highest priority)
+    ...getDefaultHero3Data(), // 1. Defaults (lowest priority)
+    ...storeData, // 2. Store state
+    ...currentStoreData, // 3. Current store data
+    ...props, // 4. Props (highest priority)
   };
 
   // ─────────────────────────────────────────────────────────
@@ -457,7 +488,7 @@ export default function Hero3(props: HeroProps) {
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
-  
+
   // Generate dynamic styles
   const sectionStyles = {
     height: mergedData.height?.desktop || "90vh",
@@ -485,13 +516,15 @@ export default function Hero3(props: HeroProps) {
 
   // Extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
-    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    const match = url.match(
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
+    );
     return match ? match[1] : null;
   };
 
   // Default video URL
   const defaultVideoUrl = "https://youtu.be/ULzl51V38lw?si=iwlRp_cUXmTe50Gc";
-  
+
   // Use video from data, or fallback to default video
   const videoUrl = mergedData.background?.video || defaultVideoUrl;
   const videoId = getYouTubeVideoId(videoUrl);
@@ -502,7 +535,7 @@ export default function Hero3(props: HeroProps) {
   // Build YouTube embed URL
   const getYouTubeEmbedUrl = () => {
     if (!videoId) return "";
-    const baseUrl = privacyMode 
+    const baseUrl = privacyMode
       ? "https://www.youtube-nocookie.com/embed"
       : "https://www.youtube.com/embed";
     const params = new URLSearchParams({
@@ -551,31 +584,32 @@ export default function Hero3(props: HeroProps) {
             }}
             title="Background Video"
           />
-          
-        {/* Overlay */}
-      {mergedData.background?.overlay?.enabled && (
-        <div className="absolute inset-0 z-[1]" style={overlayStyles} />
-      )}
+
+          {/* Overlay */}
+          {mergedData.background?.overlay?.enabled && (
+            <div className="absolute inset-0 z-[1]" style={overlayStyles} />
+          )}
         </div>
       ) : (
         <>
-        <Image
-          src={mergedData.background?.image || "https://dalel-lovat.vercel.app/images/hero.webp"}
-          alt={mergedData.background?.alt || "صورة خلفية"}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+          <Image
+            src={
+              mergedData.background?.image ||
+              "https://dalel-lovat.vercel.app/images/hero.webp"
+            }
+            alt={mergedData.background?.alt || "صورة خلفية"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
 
-        {/* Overlay */}
-      {mergedData.background?.overlay?.enabled && (
-        <div className="absolute inset-0 z-[1]" style={overlayStyles} />
-      )}
+          {/* Overlay */}
+          {mergedData.background?.overlay?.enabled && (
+            <div className="absolute inset-0 z-[1]" style={overlayStyles} />
+          )}
         </>
       )}
-
-      
 
       {/* Content - Centered in middle */}
       <div className="absolute inset-0 z-[2] flex items-center justify-center">
@@ -590,7 +624,8 @@ export default function Hero3(props: HeroProps) {
               )}
               style={titleStyles}
             >
-              {mergedData.content?.title || "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
+              {mergedData.content?.title ||
+                "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
             </h2>
             <p
               className={cn(
@@ -606,7 +641,11 @@ export default function Hero3(props: HeroProps) {
             {/* Hero Search Form for Desktop/Tablet */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full pointer-events-auto flex items-center justify-center">
-                <SearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+                <SearchForm
+                  config={mergedData.searchForm}
+                  primaryColor={primaryColor}
+                  primaryColorHover={primaryColorHover}
+                />
               </div>
             )}
           </div>
@@ -638,7 +677,11 @@ export default function Hero3(props: HeroProps) {
             {/* Hero Search Form for Mobile */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full px-4 pointer-events-auto">
-                <SearchForm config={mergedData.searchForm} primaryColor={primaryColor} primaryColorHover={primaryColorHover} />
+                <SearchForm
+                  config={mergedData.searchForm}
+                  primaryColor={primaryColor}
+                  primaryColorHover={primaryColorHover}
+                />
               </div>
             )}
           </div>
@@ -647,4 +690,3 @@ export default function Hero3(props: HeroProps) {
     </section>
   );
 }
-

@@ -10,12 +10,12 @@ export const blogsSectionsStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        { 
-          key: "visible", 
-          label: "Visible", 
-          type: "boolean" 
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CONTENT - PARAGRAPHS
         // ═══════════════════════════════════════════════════════════
@@ -23,15 +23,15 @@ export const blogsSectionsStructure: ComponentStructure = {
           key: "paragraph1",
           label: "First Paragraph",
           type: "textarea",
-          placeholder: "Enter first paragraph text"
+          placeholder: "Enter first paragraph text",
         },
         {
           key: "paragraph2",
           label: "Second Paragraph",
           type: "textarea",
-          placeholder: "Enter second paragraph text"
+          placeholder: "Enter second paragraph text",
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // CARDS ARRAY
         // ═══════════════════════════════════════════════════════════
@@ -46,41 +46,41 @@ export const blogsSectionsStructure: ComponentStructure = {
               key: "id",
               label: "Card ID",
               type: "text",
-              placeholder: "1"
+              placeholder: "1",
             },
             {
               key: "image",
               label: "Card Image",
               type: "image",
-              placeholder: "Image URL"
+              placeholder: "Image URL",
             },
             {
               key: "title",
               label: "Card Title",
               type: "text",
-              placeholder: "Card title"
+              placeholder: "Card title",
             },
             {
               key: "description",
               label: "Card Description",
               type: "textarea",
-              placeholder: "Card description"
+              placeholder: "Card description",
             },
             {
               key: "readMoreUrl",
               label: "Read More URL",
               type: "text",
-              placeholder: "#"
+              placeholder: "#",
             },
             {
               key: "date",
               label: "Date",
               type: "text",
-              placeholder: "Date text"
-            }
-          ]
+              placeholder: "Date text",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -92,56 +92,56 @@ export const blogsSectionsStructure: ComponentStructure = {
             {
               key: "backgroundColor",
               label: "Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "paragraphColor",
               label: "Paragraph Text Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "dividerColor",
               label: "Divider Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardBackgroundColor",
               label: "Card Background Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardTitleColor",
               label: "Card Title Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardTitleHoverColor",
               label: "Card Title Hover Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "cardDescriptionColor",
               label: "Card Description Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "readMoreColor",
               label: "Read More Link Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "readMoreHoverColor",
               label: "Read More Hover Color",
-              type: "color"
+              type: "color",
             },
             {
               key: "dateColor",
               label: "Date Color",
-              type: "color"
-            }
-          ]
+              type: "color",
+            },
+          ],
         },
-        
+
         // ═══════════════════════════════════════════════════════════
         // LAYOUT
         // ═══════════════════════════════════════════════════════════
@@ -154,7 +154,7 @@ export const blogsSectionsStructure: ComponentStructure = {
               key: "maxWidth",
               label: "Max Width",
               type: "text",
-              placeholder: "1280px"
+              placeholder: "1280px",
             },
             {
               key: "padding",
@@ -165,15 +165,15 @@ export const blogsSectionsStructure: ComponentStructure = {
                   key: "top",
                   label: "Top Padding",
                   type: "text",
-                  placeholder: "3rem"
+                  placeholder: "3rem",
                 },
                 {
                   key: "bottom",
                   label: "Bottom Padding",
                   type: "text",
-                  placeholder: "3rem"
-                }
-              ]
+                  placeholder: "3rem",
+                },
+              ],
             },
             {
               key: "gap",
@@ -184,15 +184,15 @@ export const blogsSectionsStructure: ComponentStructure = {
                   key: "paragraphs",
                   label: "Paragraphs Gap",
                   type: "text",
-                  placeholder: "2rem"
+                  placeholder: "2rem",
                 },
                 {
                   key: "cards",
                   label: "Cards Gap",
                   type: "text",
-                  placeholder: "1.5rem"
-                }
-              ]
+                  placeholder: "1.5rem",
+                },
+              ],
             },
             {
               key: "gridColumns",
@@ -203,26 +203,26 @@ export const blogsSectionsStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile Columns",
                   type: "number",
-                  placeholder: "1"
+                  placeholder: "1",
                 },
                 {
                   key: "tablet",
                   label: "Tablet Columns",
                   type: "number",
-                  placeholder: "2"
+                  placeholder: "2",
                 },
                 {
                   key: "desktop",
                   label: "Desktop Columns",
                   type: "number",
-                  placeholder: "3"
-                }
-              ]
-            }
-          ]
-        }
+                  placeholder: "3",
+                },
+              ],
+            },
+          ],
+        },
       ],
-      
+
       // ═══════════════════════════════════════════════════════════
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
@@ -230,9 +230,8 @@ export const blogsSectionsStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "paragraph1", label: "First Paragraph", type: "textarea" },
         { key: "paragraph2", label: "Second Paragraph", type: "textarea" },
-        { key: "cards", label: "Blog Cards", type: "array" }
-      ]
-    }
-  ]
+        { key: "cards", label: "Blog Cards", type: "array" },
+      ],
+    },
+  ],
 };
-

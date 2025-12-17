@@ -13,6 +13,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../AUTHENTICATION_SYSTEMS.md](../AUTHENTICATION_SYSTEMS.md)
 
 **What it covers:**
+
 - TWO separate auth systems (Dashboard vs Owner)
 - Dashboard User authentication flow
 - Owner authentication flow
@@ -22,6 +23,7 @@ Links to external system documentation and how they integrate with the Dashboard
 - Login/logout flows
 
 **Relevant to Dashboard:**
+
 - Dashboard uses **Dashboard User system**
 - AuthStore implementation
 - Cookie: `authToken` (httpOnly)
@@ -37,6 +39,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../LOCALE_ROUTING_SYSTEM.md](../LOCALE_ROUTING_SYSTEM.md)
 
 **What it covers:**
+
 - Locale prefixing (`/ar/`, `/en/`)
 - Middleware locale handling
 - Redirect vs Rewrite
@@ -45,6 +48,7 @@ Links to external system documentation and how they integrate with the Dashboard
 - Language switcher
 
 **Relevant to Dashboard:**
+
 - ALL dashboard routes require `/ar/` prefix
 - `/dashboard` → redirects to `/ar/dashboard`
 - `/en/dashboard` → redirects to `/ar/dashboard`
@@ -60,6 +64,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../MIDDLEWARE_TENANT_DETECTION.md](../MIDDLEWARE_TENANT_DETECTION.md)
 
 **What it covers:**
+
 - Subdomain detection
 - Custom domain detection
 - Base domain vs tenant domain
@@ -68,6 +73,7 @@ Links to external system documentation and how they integrate with the Dashboard
 - Tenant-only vs Non-tenant pages
 
 **Relevant to Dashboard:**
+
 - Dashboard is **Non-Tenant Only**
 - Accessible ONLY on base domain (localhost, taearif.com)
 - Blocked on tenant domains (tenant1.localhost, custom.com)
@@ -83,6 +89,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../COMPONENT_LOADING_SYSTEM.md](../COMPONENT_LOADING_SYSTEM.md)
 
 **What it covers:**
+
 - Dynamic component loading (lazy imports)
 - Component variants (hero1, hero2, etc.)
 - ComponentsList registry
@@ -90,6 +97,7 @@ Links to external system documentation and how they integrate with the Dashboard
 - Skeleton loading states
 
 **Relevant to Dashboard:**
+
 - Dashboard uses **standard imports** (not lazy loading)
 - Components imported directly from `@/components/`
 - No dynamic component loading in dashboard
@@ -104,6 +112,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../RECAPTCHA_SYSTEM.md](../RECAPTCHA_SYSTEM.md)
 
 **What it covers:**
+
 - ReCAPTCHA v3 implementation
 - Client-side integration
 - Server-side validation
@@ -111,6 +120,7 @@ Links to external system documentation and how they integrate with the Dashboard
 - reCAPTCHA providers
 
 **Relevant to Dashboard:**
+
 - ReCAPTCHA used on `/login` page
 - Protects dashboard from brute force
 - Required for `AuthStore.login()` function
@@ -127,6 +137,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../metaDataIntegration.md](../metaDataIntegration.md)
 
 **What it covers:**
+
 - Dynamic metadata generation
 - Locale-based meta tags
 - OpenGraph tags
@@ -134,12 +145,14 @@ Links to external system documentation and how they integrate with the Dashboard
 - getMetaForSlugServer()
 
 **Relevant to Dashboard:**
+
 - Dashboard pages have **simple static metadata**
 - No dynamic metadata (not public-facing)
 - No SEO needed (requires authentication)
 - Example: `export const metadata = { title: "Analytics" }`
 
 **Key Difference:**
+
 - Tenant pages: Dynamic, SEO-optimized metadata
 - Dashboard pages: Static, simple metadata
 
@@ -150,18 +163,21 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../componentsCachingSystem.md](../componentsCachingSystem.md)
 
 **What it covers:**
+
 - Component data caching
 - Default data fallbacks
 - EditorStore caching
 - Tenant data caching
 
 **Relevant to Dashboard:**
+
 - Dashboard does NOT use component caching
 - UserStore has 5-minute caching (different purpose)
 - No localStorage caching for components
 - Dashboard always fetches fresh data
 
 **Key Difference:**
+
 - Tenant pages: Component data cached
 - Dashboard pages: Fresh API data always
 
@@ -172,12 +188,14 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../editorSidebarTranslationSystem.md](../editorSidebarTranslationSystem.md)
 
 **What it covers:**
+
 - Live Editor translations
 - editorI18nStore
 - Translation files (ar.json, en.json)
 - Component label translations
 
 **Relevant to Dashboard:**
+
 - Used when dashboard user accesses `/live-editor`
 - Dashboard itself uses hardcoded Arabic text
 - No translation system for dashboard UI
@@ -191,12 +209,14 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../ifDataDoesntExistPutTheDefaultDataOnTheEditorSidebar.md](../ifDataDoesntExistPutTheDefaultDataOnTheEditorSidebar.md)
 
 **What it covers:**
+
 - Default component data
 - editorStoreFunctions
 - Fallback data loading
 - ComponentStructure
 
 **Relevant to Dashboard:**
+
 - Used when dashboard user accesses Live Editor
 - Dashboard pages don't use default data system
 - Live Editor loads defaults if no data exists
@@ -210,6 +230,7 @@ Links to external system documentation and how they integrate with the Dashboard
 **File:** [../liveeditor.md](../liveeditor.md)
 
 **What it covers:**
+
 - Live Editor architecture
 - EditorStore
 - Component editing
@@ -217,12 +238,14 @@ Links to external system documentation and how they integrate with the Dashboard
 - Save functionality
 
 **Relevant to Dashboard:**
+
 - Accessed via dashboard sidebar → "Websites" menu item
 - Route: `/ar/live-editor`
 - Different layout from dashboard
 - Content created in `/dashboard/content/*` → editable in Live Editor
 
 **Integration Points:**
+
 1. Dashboard sidebar → Live Editor navigation
 2. Dashboard content → Live Editor components
 3. Dashboard settings → Live Editor configuration
@@ -316,26 +339,26 @@ Links to external system documentation and how they integrate with the Dashboard
 
 ## External Documentation Quick Reference
 
-| System | File | Dashboard Usage |
-|--------|------|----------------|
-| **Auth** | `AUTHENTICATION_SYSTEMS.md` | Dashboard User auth flow |
-| **Locale** | `LOCALE_ROUTING_SYSTEM.md` | `/ar/` prefix requirement |
-| **Middleware** | `MIDDLEWARE_TENANT_DETECTION.md` | Domain blocking |
-| **Components** | `COMPONENT_LOADING_SYSTEM.md` | NOT used (standard imports) |
-| **ReCAPTCHA** | `RECAPTCHA_SYSTEM.md` | Login protection |
-| **Metadata** | `metaDataIntegration.md` | NOT used (static metadata) |
-| **Caching** | `componentsCachingSystem.md` | NOT used |
-| **Translations** | `editorSidebarTranslationSystem.md` | Live Editor only |
-| **Defaults** | `ifDataDoesntExist...md` | Live Editor only |
-| **Live Editor** | `liveeditor.md` | Accessed from dashboard |
+| System           | File                                | Dashboard Usage             |
+| ---------------- | ----------------------------------- | --------------------------- |
+| **Auth**         | `AUTHENTICATION_SYSTEMS.md`         | Dashboard User auth flow    |
+| **Locale**       | `LOCALE_ROUTING_SYSTEM.md`          | `/ar/` prefix requirement   |
+| **Middleware**   | `MIDDLEWARE_TENANT_DETECTION.md`    | Domain blocking             |
+| **Components**   | `COMPONENT_LOADING_SYSTEM.md`       | NOT used (standard imports) |
+| **ReCAPTCHA**    | `RECAPTCHA_SYSTEM.md`               | Login protection            |
+| **Metadata**     | `metaDataIntegration.md`            | NOT used (static metadata)  |
+| **Caching**      | `componentsCachingSystem.md`        | NOT used                    |
+| **Translations** | `editorSidebarTranslationSystem.md` | Live Editor only            |
+| **Defaults**     | `ifDataDoesntExist...md`            | Live Editor only            |
+| **Live Editor**  | `liveeditor.md`                     | Accessed from dashboard     |
 
 ---
 
 **See Also:**
+
 - [README.md](./README.md) - Documentation index
 - [CORE_INFRASTRUCTURE.md](./CORE_INFRASTRUCTURE.md) - Core systems
 - [AUTHENTICATION.md](./AUTHENTICATION.md) - Auth details
 - [MODULES.md](./MODULES.md) - All modules
 - [DATA_FLOWS.md](./DATA_FLOWS.md) - Data flows
 - [DEBUGGING.md](./DEBUGGING.md) - Troubleshooting
-

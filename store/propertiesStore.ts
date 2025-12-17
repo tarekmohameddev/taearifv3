@@ -209,7 +209,12 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       fetchProperties: async (page = 1) => {
         const state = get();
-        console.log("fetchProperties called with page:", page, "tenantId:", state.tenantId);
+        console.log(
+          "fetchProperties called with page:",
+          page,
+          "tenantId:",
+          state.tenantId,
+        );
 
         // منع الـ duplicate calls
         if (state.loading) {
@@ -258,7 +263,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
           }
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
-          
+
           // Debug: طباعة الـ parameters المرسلة
           console.log("Properties API Request Parameters:", {
             tenantId,
@@ -270,19 +275,19 @@ export const usePropertiesStore = create<PropertiesStore>()(
             search: state.search,
             propertyType: state.propertyType,
             price: state.price,
-            url: url
+            url: url,
           });
 
           const response = await axiosInstance.get(url);
 
           const result: PropertiesResponse = response.data;
-          
+
           // Debug: طباعة الـ response
           console.log("Properties API Response:", {
             hasProperties: !!result.properties,
             propertiesCount: result.properties?.length || 0,
             pagination: result.pagination,
-            fullResponse: result
+            fullResponse: result,
           });
 
           if (result.properties) {
@@ -293,13 +298,13 @@ export const usePropertiesStore = create<PropertiesStore>()(
               total: result.pagination.total,
               pagination: result.pagination,
             });
-            
+
             // Debug: طباعة الـ state بعد الحفظ
             console.log("Properties saved to store:", {
               allPropertiesCount: result.properties.length,
               filteredPropertiesCount: result.properties.length,
               total: result.pagination.total,
-              pagination: result.pagination
+              pagination: result.pagination,
             });
           } else {
             // Handle empty results - clear the store

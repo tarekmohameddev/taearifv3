@@ -7,6 +7,7 @@ This document explains ALL Zustand stores in `context-liveeditor/` directory.
 ---
 
 ## Table of Contents
+
 1. [editorStore](#editorstore)
 2. [tenantStore](#tenantstore)
 3. [editorI18nStore](#editori18nstore)
@@ -49,7 +50,7 @@ interface EditorStore {
   applicationFormStates: Record<string, ComponentData>;
   inputsStates: Record<string, ComponentData>;
   inputs2States: Record<string, ComponentData>;
-  
+
   // ═════════════════════════════════════════════════════════
   // GLOBAL COMPONENTS (header & footer shared across pages)
   // ═════════════════════════════════════════════════════════
@@ -59,25 +60,25 @@ interface EditorStore {
     header: ComponentData;
     footer: ComponentData;
   };
-  
+
   // ═════════════════════════════════════════════════════════
   // PAGE MANAGEMENT
   // ═════════════════════════════════════════════════════════
   pageComponentsByPage: Record<string, ComponentInstance[]>;
   currentPage: string;
-  
+
   // ═════════════════════════════════════════════════════════
   // TEMPORARY EDITING STATE
   // ═════════════════════════════════════════════════════════
   tempData: ComponentData;
   hasChangesMade: boolean;
-  
+
   // ═════════════════════════════════════════════════════════
   // SAVE DIALOG
   // ═════════════════════════════════════════════════════════
   showDialog: boolean;
   openSaveDialogFn: () => void;
-  
+
   // ═════════════════════════════════════════════════════════
   // WEBSITE LAYOUT (SEO meta tags)
   // ═════════════════════════════════════════════════════════
@@ -86,7 +87,7 @@ interface EditorStore {
       pages: Array<MetaTagPage>;
     };
   };
-  
+
   // ═════════════════════════════════════════════════════════
   // STRUCTURES REGISTRY
   // ═════════════════════════════════════════════════════════
@@ -108,11 +109,11 @@ ensureComponentVariant(type: string, variantId: string, initial?: ComponentData)
 getComponentData(type: string, variantId: string): ComponentData
   → Routes to heroFunctions.getData, headerFunctions.getData, etc.
   → Returns data from appropriate state
-  
+
 setComponentData(type: string, variantId: string, data: ComponentData)
   → Routes to heroFunctions.setData, headerFunctions.setData, etc.
   → Updates component state AND pageComponentsByPage
-  
+
 updateComponentByPath(type: string, variantId: string, path: string, value: any)
   → Routes to heroFunctions.updateByPath, headerFunctions.updateByPath, etc.
   → Updates specific field AND pageComponentsByPage
@@ -123,7 +124,7 @@ updateComponentByPath(type: string, variantId: string, path: string, value: any)
 ```typescript
 getComponentData: (componentType, variantId) => {
   const state = get();
-  
+
   switch (componentType) {
     case "hero":
       return heroFunctions.getData(state, variantId);
@@ -137,7 +138,7 @@ getComponentData: (componentType, variantId) => {
     default:
       return state.componentStates[componentType]?.[variantId] || {};
   }
-}
+};
 ```
 
 #### Specific Component Functions (Legacy but still used)
@@ -260,25 +261,25 @@ interface TenantStore {
   tenant: any | null;
   tenantId: string | null;
   lastFetchedWebsite: string | null;
-  
+
   // ═════════════════════════════════════════════════════════
   // LOADING STATE
   // ═════════════════════════════════════════════════════════
   loadingTenantData: boolean;
-  loading: boolean;  // Alias
+  loading: boolean; // Alias
   error: string | null;
-  
+
   // ═════════════════════════════════════════════════════════
   // FETCH FUNCTION
   // ═════════════════════════════════════════════════════════
   fetchTenantData: (websiteName: string) => Promise<void>;
-  
+
   // ═════════════════════════════════════════════════════════
   // SETTERS
   // ═════════════════════════════════════════════════════════
   setTenant: (tenant: any) => void;
   setTenantId: (tenantId: string) => void;
-  
+
   // ═════════════════════════════════════════════════════════
   // LEGACY UPDATE FUNCTIONS (mostly unused)
   // ═════════════════════════════════════════════════════════
@@ -286,7 +287,7 @@ interface TenantStore {
   updateHero: (heroData) => void;
   updateFooter: (footerData) => void;
   // ... more legacy functions
-  
+
   // ═════════════════════════════════════════════════════════
   // LEGACY SAVE FUNCTIONS (mostly unused)
   // ═════════════════════════════════════════════════════════
@@ -301,7 +302,7 @@ interface TenantStore {
 ```typescript
 fetchTenantData: async (websiteName) => {
   const state = useTenantStore.getState();
-  
+
   // STEP 1: Cache check - prevent duplicate requests
   if (
     state.loadingTenantData ||
@@ -310,54 +311,52 @@ fetchTenantData: async (websiteName) => {
     console.log("Skipping fetch - already loaded");
     return;
   }
-  
+
   // STEP 2: Set loading state
   set({ loadingTenantData: true, error: null });
-  
+
   try {
     // STEP 3: API request
-    const response = await axiosInstance.post(
-      "/v1/tenant-website/getTenant",
-      { websiteName }
-    );
-    
+    const response = await axiosInstance.post("/v1/tenant-website/getTenant", {
+      websiteName,
+    });
+
     const data = response.data || {};
-    
+
     // STEP 4: Load into editorStore
     const { useEditorStore } = await import("./editorStore");
     const editorStore = useEditorStore.getState();
-    
+
     if (data.globalComponentsData) {
       editorStore.setGlobalComponentsData(data.globalComponentsData);
     }
-    
+
     if (data.WebsiteLayout) {
       editorStore.setWebsiteLayout(data.WebsiteLayout);
     }
-    
+
     // STEP 5: Update tenantStore
     set({
       tenantData: data,
       loadingTenantData: false,
-      lastFetchedWebsite: websiteName
+      lastFetchedWebsite: websiteName,
     });
-    
   } catch (error) {
     console.error("Error fetching tenant data:", error);
     set({
       error: error.message || "Failed to fetch",
-      loadingTenantData: false
+      loadingTenantData: false,
     });
   }
-}
+};
 ```
 
 **Usage in LiveEditor**:
 
 ```typescript
 // In LiveEditorEffects.tsx
-const tenantId = useTenantStore(s => s.tenantId);
-const fetchTenantData = useTenantStore(s => s.fetchTenantData);
+const tenantId = useTenantStore((s) => s.tenantId);
+const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
 
 useEffect(() => {
   if (tenantId) {
@@ -380,7 +379,7 @@ useEffect(() => {
 
 ```typescript
 interface EditorI18nState {
-  locale: Locale;  // "ar" | "en"
+  locale: Locale; // "ar" | "en"
   translations: {
     ar: typeof arTranslations;
     en: typeof enTranslations;
@@ -411,11 +410,11 @@ persist(
 t: (key: string, params?) => {
   const { locale, translations } = get();
   const current = translations[locale];
-  
+
   // Navigate nested: "live_editor.save" → current.live_editor.save
   const keys = key.split(".");
   let value = current;
-  
+
   for (const k of keys) {
     if (value && k in value) {
       value = value[k];
@@ -426,16 +425,16 @@ t: (key: string, params?) => {
       break;
     }
   }
-  
+
   // Replace parameters: "Hello {{name}}" → "Hello John"
   if (params) {
     return value.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return params[key]?.toString() || match;
     });
   }
-  
+
   return value;
-}
+};
 ```
 
 **Hooks**:
@@ -474,12 +473,12 @@ return (
 
 ### Difference from editorI18nStore
 
-| Aspect | editorI18nStore | clientI18nStore |
-|--------|-----------------|-----------------|
-| Purpose | Editor UI translations | Client website translations |
-| Storage Key | "editor-i18n-storage" | "client-i18n-storage" |
-| Hooks | useEditorT, useEditorLocale | useClientT, useClientLocale |
-| Used In | Live Editor interface | Tenant websites |
+| Aspect      | editorI18nStore             | clientI18nStore             |
+| ----------- | --------------------------- | --------------------------- |
+| Purpose     | Editor UI translations      | Client website translations |
+| Storage Key | "editor-i18n-storage"       | "client-i18n-storage"       |
+| Hooks       | useEditorT, useEditorLocale | useClientT, useClientLocale |
+| Used In     | Live Editor interface       | Tenant websites             |
 
 ### Store Structure
 
@@ -498,9 +497,9 @@ interface ClientI18nState {
 **Hooks**:
 
 ```typescript
-const t = useClientT();                      // Translation function
-const { locale, setLocale } = useClientLocale();  // Locale management
-const translations = useClientTranslations();     // Translations object
+const t = useClientT(); // Translation function
+const { locale, setLocale } = useClientLocale(); // Locale management
+const translations = useClientTranslations(); // Translations object
 ```
 
 **Why Separate?**:
@@ -525,13 +524,13 @@ const translations = useClientTranslations();     // Translations object
 interface SidebarStateManager {
   selectedComponent: ComponentInstanceWithPosition | null;
   currentPage: string;
-  
+
   setSelectedComponent: (component) => void;
   setCurrentPage: (page) => void;
-  
+
   updateComponentData: (componentId, path, value) => void;
   getComponentData: (componentId) => ComponentData | null;
-  
+
   updateGlobalHeader: (path, value) => void;
   updateGlobalFooter: (path, value) => void;
   getGlobalHeaderData: () => ComponentData;
@@ -543,7 +542,8 @@ interface SidebarStateManager {
 
 **Original Purpose**: Manage sidebar state separately from editorStore
 
-**Current Status**: 
+**Current Status**:
+
 - editorStore now handles all state directly
 - SidebarStateManager creates circular dependencies
 - NOT used in current codebase
@@ -581,7 +581,7 @@ store.updateComponentByPath(type, id, path, value);
                   │
                   └─→ useEditorT() / useClientT()
                       └─ Translations for UI text
-                      
+
 ┌─────────────────────────────────────────────────────────────┐
 │                      EDITORSIDEBAR                           │
 │  (editing interface)                                         │
@@ -594,7 +594,7 @@ store.updateComponentByPath(type, id, path, value);
                   │
                   └─→ useEditorT()
                       └─ Editor UI translations
-                      
+
 ┌─────────────────────────────────────────────────────────────┐
 │                    EDITORPROVIDER                            │
 │  (save dialog manager)                                       │
@@ -620,7 +620,7 @@ store.updateComponentByPath(type, id, path, value);
 function MyComponent() {
   // Subscribes to tempData - component re-renders when tempData changes
   const tempData = useEditorStore(s => s.tempData);
-  
+
   return <div>{tempData.title}</div>;
 }
 ```
@@ -632,7 +632,7 @@ function handleClick() {
   // Gets current state without subscribing
   const store = useEditorStore.getState();
   const data = store.getComponentData("hero", id);
-  
+
   console.log(data);
 }
 ```
@@ -647,7 +647,7 @@ function MyComponent() {
     hasChangesMade: s.hasChangesMade,
     currentPage: s.currentPage
   }));
-  
+
   return <div>{currentPage} - {hasChangesMade ? "Modified" : "Clean"}</div>;
 }
 ```
@@ -656,10 +656,10 @@ function MyComponent() {
 
 ```typescript
 // ✅ GOOD - Only re-renders when heroStates[id] changes
-const heroData = useEditorStore(s => s.heroStates[id]);
+const heroData = useEditorStore((s) => s.heroStates[id]);
 
 // ❌ BAD - Re-renders when ANY heroStates change
-const heroStates = useEditorStore(s => s.heroStates);
+const heroStates = useEditorStore((s) => s.heroStates);
 const heroData = heroStates[id];
 ```
 
@@ -677,35 +677,35 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   tempData: {},
   currentPage: "homepage",
   hasChangesMade: false,
-  
+
   // Initialize global components with defaults
   globalHeaderData: getDefaultHeaderData(),
   globalFooterData: getDefaultFooterData(),
   globalComponentsData: {
     header: getDefaultHeaderData(),
-    footer: getDefaultFooterData()
+    footer: getDefaultFooterData(),
   },
-  
+
   // Initialize WebsiteLayout
   WebsiteLayout: {
-    metaTags: { pages: [] }
+    metaTags: { pages: [] },
   },
-  
+
   // Initialize structures registry
   structures: Object.keys(COMPONENTS).reduce((acc, type) => {
     acc[type] = COMPONENTS[type];
     return acc;
   }, {}),
-  
+
   // Initialize all component states as empty
   heroStates: {},
   headerStates: {},
   footerStates: {},
   // ... all 19 types = {}
-  
+
   // Initialize page components
   pageComponentsByPage: {},
-  
+
   // ... all functions
 }));
 ```
@@ -720,7 +720,7 @@ const useTenantStore = create((set) => ({
   tenant: null,
   tenantId: null,
   lastFetchedWebsite: null,
-  
+
   // Functions...
 }));
 ```
@@ -731,16 +731,16 @@ const useTenantStore = create((set) => ({
 export const useEditorI18nStore = create<EditorI18nState>()(
   persist(
     (set, get) => ({
-      locale: defaultLocale,  // "ar"
+      locale: defaultLocale, // "ar"
       translations: { ar: arTranslations, en: enTranslations },
-      
+
       // Functions...
     }),
     {
       name: "editor-i18n-storage",
-      partialize: (state) => ({ locale: state.locale })
-    }
-  )
+      partialize: (state) => ({ locale: state.locale }),
+    },
+  ),
 );
 ```
 
@@ -762,10 +762,10 @@ pageComponentsByPage → Source of truth for saves
 
 ```typescript
 // ✅ CORRECT - Use generic function
-store.getComponentData("hero", id)
+store.getComponentData("hero", id);
 
 // ❌ WRONG - Don't access state directly
-store.heroStates[id]
+store.heroStates[id];
 ```
 
 **Why?**: Generic functions might have additional logic (defaults, validation)
@@ -799,6 +799,7 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 ### Store Responsibilities
 
 **editorStore**:
+
 - ALL component states (19 types)
 - Global components (header/footer)
 - Page management (pageComponentsByPage)
@@ -807,35 +808,38 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 - WebsiteLayout (SEO)
 
 **tenantStore**:
+
 - Fetch from API
 - Cache tenant data
 - Loading states
 - Provides initial data to editorStore
 
 **editorI18nStore**:
+
 - Editor UI translations
 - Locale management
 - Persisted to localStorage
 
 **clientI18nStore**:
+
 - Client website translations
 - Independent locale
 - Persisted separately
 
 **SidebarStateManager**:
+
 - LEGACY - Don't use
 
 ### Key Characteristics
 
-| Store | Provider Needed? | Persistent? | Purpose |
-|-------|------------------|-------------|---------|
-| editorStore | ❌ No (Zustand) | ❌ No | State management |
-| tenantStore | ❌ No (Zustand) | ❌ No | API integration |
-| editorI18nStore | ❌ No (Zustand) | ✅ Yes (locale) | Editor i18n |
-| clientI18nStore | ❌ No (Zustand) | ✅ Yes (locale) | Client i18n |
-| SidebarStateManager | ❌ No (Zustand) | ❌ No | Legacy/unused |
+| Store               | Provider Needed? | Persistent?     | Purpose          |
+| ------------------- | ---------------- | --------------- | ---------------- |
+| editorStore         | ❌ No (Zustand)  | ❌ No           | State management |
+| tenantStore         | ❌ No (Zustand)  | ❌ No           | API integration  |
+| editorI18nStore     | ❌ No (Zustand)  | ✅ Yes (locale) | Editor i18n      |
+| clientI18nStore     | ❌ No (Zustand)  | ✅ Yes (locale) | Client i18n      |
+| SidebarStateManager | ❌ No (Zustand)  | ❌ No           | Legacy/unused    |
 
 ---
 
 **For AI**: Understand these 5 stores and their distinct responsibilities. Focus on editorStore (main) and tenantStore (API). The i18n stores are for translations only.
-

@@ -46,8 +46,8 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default
@@ -215,9 +215,12 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
         className="absolute inset-0 w-full h-full object-cover"
         priority={false}
       />
-      <div 
+      <div
         className="absolute inset-0 opacity-60"
-        style={{ backgroundColor: mergedData.background?.overlay?.color || primaryColor }}
+        style={{
+          backgroundColor:
+            mergedData.background?.overlay?.color || primaryColor,
+        }}
       ></div>
       <div className="relative z-10 text-center text-white px-4">
         <h1 className="text-[36px] md:text-[60px] text-white mb-4 md:mb-10">

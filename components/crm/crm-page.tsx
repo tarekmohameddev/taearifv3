@@ -448,7 +448,9 @@ export default function CrmPage() {
                 // Backward compatibility fields
                 nameEn: customer.name || "",
                 whatsapp: "",
-                city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+                city: propertyBasic.address
+                  ? propertyBasic.address.split(",")[1]?.trim() || ""
+                  : "",
                 district: "",
                 assignedAgent: "",
                 lastContact: "",
@@ -583,7 +585,10 @@ export default function CrmPage() {
 
         clearTimeout(timeoutId);
 
-        if (response.data.status === "success" || response.data.status === true) {
+        if (
+          response.data.status === "success" ||
+          response.data.status === true
+        ) {
           return true;
         }
         return false;
@@ -1050,7 +1055,8 @@ export default function CrmPage() {
               statistics={
                 crmData?.data?.statistics
                   ? {
-                      total_requests: crmData.data.statistics.total_requests || 0,
+                      total_requests:
+                        crmData.data.statistics.total_requests || 0,
                       with_property: crmData.data.statistics.with_property || 0,
                       without_property:
                         crmData.data.statistics.without_property || 0,

@@ -130,14 +130,18 @@ export function ArrayFieldRenderer({
             newItem[f.key] = f.defaultValue || "";
         }
       }
-      
+
       // Auto-generate ID if not in field definitions but needed for the array
       // Check if the path suggests this is a partners or logos array that needs IDs
-      if (!newItem.id && (normalizedPath.includes("partners") || normalizedPath.includes("logos"))) {
+      if (
+        !newItem.id &&
+        (normalizedPath.includes("partners") ||
+          normalizedPath.includes("logos"))
+      ) {
         // Generate unique ID using timestamp + random number
         newItem.id = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       }
-      
+
       return newItem;
     }
     return {};

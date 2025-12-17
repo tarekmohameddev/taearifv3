@@ -49,11 +49,12 @@ export function DailyFollowupPage() {
                   متابعة المستحقات اليومية
                 </h1>
                 <p className="text-muted-foreground">
-                  متابعة المستحقات المالية والمدفوعات المتأخرة في نظام إدارة الإيجارات
+                  متابعة المستحقات المالية والمدفوعات المتأخرة في نظام إدارة
+                  الإيجارات
                 </p>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.push("/dashboard/rental-management")}
                 className="flex items-center gap-2"
               >

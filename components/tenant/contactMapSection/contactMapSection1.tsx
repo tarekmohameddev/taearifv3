@@ -402,18 +402,18 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
   const brandingColors = {
-    primary: 
-      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
       tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.primary
         : "#059669", // emerald-600 default (fallback)
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
       tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.secondary
         : "#059669", // fallback to primary
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
@@ -422,15 +422,24 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Merge data with priority: storeData > tenantComponentData > props > default
@@ -444,29 +453,46 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor: string = "#059669",
   ): string => {
     // Navigate to the field using the path (e.g., "form.submitButton.backgroundColor", "form.rating.activeColor")
-    const pathParts = fieldPath.split('.');
+    const pathParts = fieldPath.split(".");
     let fieldData: any = mergedData;
-    
+
     for (const part of pathParts) {
-      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (
+        fieldData &&
+        typeof fieldData === "object" &&
+        !Array.isArray(fieldData)
+      ) {
         fieldData = fieldData[part];
       } else {
         fieldData = undefined;
         break;
       }
     }
-    
+
     // If fieldData is an object, check for useDefaultColor and value
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+    if (
+      fieldData &&
+      typeof fieldData === "object" &&
+      !Array.isArray(fieldData)
+    ) {
       // If object has useDefaultColor property set to false, use the value
-      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.useDefaultColor === false &&
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         return fieldData.value;
       }
       // If object has value but useDefaultColor is true or undefined, check if we should use branding color
-      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+      if (
+        fieldData.value &&
+        typeof fieldData.value === "string" &&
+        fieldData.value.startsWith("#")
+      ) {
         // Check if useDefaultColor is explicitly false
         if (fieldData.useDefaultColor === false) {
           return fieldData.value;
@@ -478,47 +504,87 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
         let globalColorType = fieldData.globalColorType;
         if (!globalColorType) {
           // Determine based on field path
-          if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+          if (
+            fieldPath.includes("textColor") ||
+            fieldPath.includes("Text") ||
+            fieldPath.includes("labelColor") ||
+            fieldPath.includes("ratingTextColor")
+          ) {
             globalColorType = "secondary";
-          } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
+          } else if (
+            fieldPath.includes("activeColor") ||
+            fieldPath.includes("hoverColor") ||
+            fieldPath.includes("hoverBackgroundColor") ||
+            fieldPath.includes("backgroundColor") ||
+            fieldPath.includes("submitButton")
+          ) {
             globalColorType = "primary";
           } else {
             globalColorType = "primary";
           }
         }
-        const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+        const brandingColor =
+          brandingColors[globalColorType as keyof typeof brandingColors] ||
+          defaultColor;
         return brandingColor;
       }
     }
-    
+
     // If fieldData is a string (legacy format), check if it's emerald color - if so, use branding color instead
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+    if (typeof fieldData === "string" && fieldData.startsWith("#")) {
       // Check if it's the default emerald color - if so, use branding color
       if (fieldData === "#059669" || fieldData === "#047857") {
         // Determine globalColorType based on field path
         let defaultGlobalColorType = "primary";
-        if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+        if (
+          fieldPath.includes("textColor") ||
+          fieldPath.includes("Text") ||
+          fieldPath.includes("labelColor") ||
+          fieldPath.includes("ratingTextColor")
+        ) {
           defaultGlobalColorType = "secondary";
-        } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
+        } else if (
+          fieldPath.includes("activeColor") ||
+          fieldPath.includes("hoverColor") ||
+          fieldPath.includes("hoverBackgroundColor") ||
+          fieldPath.includes("backgroundColor") ||
+          fieldPath.includes("submitButton")
+        ) {
           defaultGlobalColorType = "primary";
         }
-        const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+        const brandingColor =
+          brandingColors[
+            defaultGlobalColorType as keyof typeof brandingColors
+          ] || defaultColor;
         return brandingColor;
       }
       // If it's a custom color (not emerald), return it
       return fieldData;
     }
-    
+
     // If no custom color found, use branding color (useDefaultColor is true by default)
     // Determine globalColorType based on field path
     let defaultGlobalColorType = "primary";
-    if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+    if (
+      fieldPath.includes("textColor") ||
+      fieldPath.includes("Text") ||
+      fieldPath.includes("labelColor") ||
+      fieldPath.includes("ratingTextColor")
+    ) {
       defaultGlobalColorType = "secondary";
-    } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
+    } else if (
+      fieldPath.includes("activeColor") ||
+      fieldPath.includes("hoverColor") ||
+      fieldPath.includes("hoverBackgroundColor") ||
+      fieldPath.includes("backgroundColor") ||
+      fieldPath.includes("submitButton")
+    ) {
       defaultGlobalColorType = "primary";
     }
-    
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+
+    const brandingColor =
+      brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
+      defaultColor;
     return brandingColor;
   };
 
@@ -545,15 +611,33 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   }
 
   // Get colors for submit button
-  const submitButtonBgColor = getColor("form.submitButton.backgroundColor", brandingColors.primary);
-  const submitButtonTextColor = getColor("form.submitButton.textColor", "#ffffff");
-  const submitButtonHoverBgColor = getColor("form.submitButton.hoverBackgroundColor", getDarkerColor(submitButtonBgColor, 20));
-  
+  const submitButtonBgColor = getColor(
+    "form.submitButton.backgroundColor",
+    brandingColors.primary,
+  );
+  const submitButtonTextColor = getColor(
+    "form.submitButton.textColor",
+    "#ffffff",
+  );
+  const submitButtonHoverBgColor = getColor(
+    "form.submitButton.hoverBackgroundColor",
+    getDarkerColor(submitButtonBgColor, 20),
+  );
+
   // Get colors for rating stars
-  const ratingActiveColor = getColor("form.rating.activeColor", brandingColors.primary);
-  const ratingHoverColor = getColor("form.rating.hoverColor", brandingColors.primary);
-  const ratingTextColor = getColor("form.rating.ratingTextColor", brandingColors.secondary);
-  
+  const ratingActiveColor = getColor(
+    "form.rating.activeColor",
+    brandingColors.primary,
+  );
+  const ratingHoverColor = getColor(
+    "form.rating.hoverColor",
+    brandingColors.primary,
+  );
+  const ratingTextColor = getColor(
+    "form.rating.ratingTextColor",
+    brandingColors.secondary,
+  );
+
   // Get colors for labels
   const labelColor = getColor("labels.labelColor", brandingColors.secondary);
 
@@ -740,10 +824,22 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                           onClick={() => setRating(i + 1)}
                         >
                           <Star
-                            className={mergedData.form.rating?.starSize || "size-8"}
+                            className={
+                              mergedData.form.rating?.starSize || "size-8"
+                            }
                             style={{
-                              fill: i < (hoveredRating || rating) ? ratingActiveColor : mergedData.form.rating?.inactiveColor || "#d1d5db",
-                              color: i < (hoveredRating || rating) ? ratingActiveColor : (hoveredRating > i ? ratingHoverColor : mergedData.form.rating?.inactiveColor || "#d1d5db"),
+                              fill:
+                                i < (hoveredRating || rating)
+                                  ? ratingActiveColor
+                                  : mergedData.form.rating?.inactiveColor ||
+                                    "#d1d5db",
+                              color:
+                                i < (hoveredRating || rating)
+                                  ? ratingActiveColor
+                                  : hoveredRating > i
+                                    ? ratingHoverColor
+                                    : mergedData.form.rating?.inactiveColor ||
+                                      "#d1d5db",
                             }}
                           />
                         </button>
@@ -773,10 +869,12 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                       color: submitButtonTextColor,
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = submitButtonHoverBgColor;
+                      e.currentTarget.style.backgroundColor =
+                        submitButtonHoverBgColor;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = submitButtonBgColor;
+                      e.currentTarget.style.backgroundColor =
+                        submitButtonBgColor;
                     }}
                   >
                     {mergedData.form?.submitButton?.text || "إرسال"}

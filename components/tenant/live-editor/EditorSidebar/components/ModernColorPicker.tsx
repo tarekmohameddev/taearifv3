@@ -86,11 +86,15 @@ export function ModernColorPicker({
       // Mark initialization as complete after state updates
       setTimeout(() => {
         isInitializing.current = false;
-        console.log(`✅ ModernColorPicker: Initialization complete, ready for changes`);
+        console.log(
+          `✅ ModernColorPicker: Initialization complete, ready for changes`,
+        );
       }, 50);
     } else if (!value || !value.startsWith("#") || value === "") {
       // If value is empty, we're ready for user input immediately
-      console.log(`✅ ModernColorPicker: No value provided, ready for user input`);
+      console.log(
+        `✅ ModernColorPicker: No value provided, ready for user input`,
+      );
       isInitializing.current = false;
       // Initialize with default black color
       if (!hexInput || hexInput === "#000000") {
@@ -109,12 +113,12 @@ export function ModernColorPicker({
   // Update hex when HSL changes
   useEffect(() => {
     const hex = hslToHex(hue, saturation, lightness);
-    
+
     // Always update hexInput when HSL changes (for display)
     if (hex !== lastHexRef.current) {
       setHexInput(hex);
       lastHexRef.current = hex;
-      
+
       // Only call onChange if not initializing (to avoid loops)
       if (!isInitializing.current) {
         console.log(`🎨 ModernColorPicker: Calling onChange with hex: ${hex}`);
@@ -222,7 +226,9 @@ export function ModernColorPicker({
                   const moveX = moveEvent.clientX - moveRect.left;
                   const moveY = moveEvent.clientY - moveRect.top;
                   const moveS = Math.round((moveX / moveRect.width) * 100);
-                  const moveL = Math.round(100 - (moveY / moveRect.height) * 100);
+                  const moveL = Math.round(
+                    100 - (moveY / moveRect.height) * 100,
+                  );
                   setSaturation(Math.max(0, Math.min(100, moveS)));
                   setLightness(Math.max(0, Math.min(100, moveL)));
                 };
@@ -331,4 +337,3 @@ export function ModernColorPicker({
     </div>
   );
 }
-

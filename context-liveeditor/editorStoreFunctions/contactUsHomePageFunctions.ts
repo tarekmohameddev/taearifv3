@@ -8,11 +8,12 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 export const getDefaultContactUsHomePageData = (): ComponentData => ({
   visible: true,
   ThemeTwo: "ThemeTwo",
-  
+
   // Background configuration
   background: {
     ThemeTwo: "ThemeTwo",
-    image: "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
+    image:
+      "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     alt: "خلفية",
     overlay: {
       ThemeTwo: "ThemeTwo",
@@ -20,13 +21,13 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
       color: "rgba(139, 95, 70, 0.8)",
     },
   },
-  
+
   // Header text
   header: {
     ThemeTwo: "ThemeTwo",
     text: "سنعثر لك على مستأجر موثوق ونتولى إدارة عملية الإيجار بالكامل بكل احترافية.\nنضمن لك مستأجرًا موثوقًا ونتكفّل بجميع خطوات التأجير نيابةً عنك.",
   },
-  
+
   // Form configuration
   form: {
     ThemeTwo: "ThemeTwo",
@@ -69,7 +70,11 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
         type: "select",
         options: [
           { ThemeTwo: "ThemeTwo", value: "بنك مدعوم", label: "بنك مدعوم" },
-          { ThemeTwo: "ThemeTwo", value: "بنك غير مدعوم", label: "بنك غير مدعوم" },
+          {
+            ThemeTwo: "ThemeTwo",
+            value: "بنك غير مدعوم",
+            label: "بنك غير مدعوم",
+          },
           { ThemeTwo: "ThemeTwo", value: "كاش", label: "كاش" },
         ],
       },
@@ -83,7 +88,11 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
           { ThemeTwo: "ThemeTwo", value: "الرياض", label: "الرياض" },
           { ThemeTwo: "ThemeTwo", value: "جدة", label: "جدة" },
           { ThemeTwo: "ThemeTwo", value: "مكة المكرمة", label: "مكة المكرمة" },
-          { ThemeTwo: "ThemeTwo", value: "المدينة المنورة", label: "المدينة المنورة" },
+          {
+            ThemeTwo: "ThemeTwo",
+            value: "المدينة المنورة",
+            label: "المدينة المنورة",
+          },
           { ThemeTwo: "ThemeTwo", value: "الدمام", label: "الدمام" },
         ],
       },
@@ -118,7 +127,7 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
       },
     },
   },
-  
+
   // Styling
   styling: {
     ThemeTwo: "ThemeTwo",
@@ -130,7 +139,7 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
     labelColor: "#ffffff",
     errorColor: "#ef4444",
   },
-  
+
   // Layout
   layout: {
     ThemeTwo: "ThemeTwo",
@@ -157,7 +166,7 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 export const contactUsHomePageFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID (UUID)
    * @param initial - Optional initial data to override defaults
@@ -169,46 +178,53 @@ export const contactUsHomePageFunctions = {
       state.contactUsHomePageStates[variantId] &&
       Object.keys(state.contactUsHomePageStates[variantId]).length > 0
     ) {
-      return {} as any;  // Already exists, skip initialization
+      return {} as any; // Already exists, skip initialization
     }
-    
+
     // Determine default data
     const defaultData = getDefaultContactUsHomePageData();
-    
+
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     // Return new state
     return {
-      contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: data }
+      contactUsHomePageStates: {
+        ...state.contactUsHomePageStates,
+        [variantId]: data,
+      },
     } as any;
   },
-  
+
   /**
    * getData - Retrieve component data from store
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.contactUsHomePageStates[variantId] || getDefaultContactUsHomePageData(),
-  
+    state.contactUsHomePageStates[variantId] ||
+    getDefaultContactUsHomePageData(),
+
   /**
    * setData - Set/replace component data completely
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param data - New component data
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: data }
+    contactUsHomePageStates: {
+      ...state.contactUsHomePageStates,
+      [variantId]: data,
+    },
   }),
-  
+
   /**
    * updateByPath - Update specific field in component data
-   * 
+   *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "form.submitButton.text")
@@ -216,12 +232,16 @@ export const contactUsHomePageFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.contactUsHomePageStates[variantId] || getDefaultContactUsHomePageData();
+    const source =
+      state.contactUsHomePageStates[variantId] ||
+      getDefaultContactUsHomePageData();
     const newData = updateDataByPath(source, path, value);
-    
-    return {
-      contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: newData }
-    } as any;
-  }
-};
 
+    return {
+      contactUsHomePageStates: {
+        ...state.contactUsHomePageStates,
+        [variantId]: newData,
+      },
+    } as any;
+  },
+};

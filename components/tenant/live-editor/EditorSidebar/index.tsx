@@ -170,7 +170,7 @@ export function EditorSidebar({
         // Use globalFooterVariant to get correct default data
         const currentVariant = globalFooterVariant || "StaticFooter1";
         const defaultData = createDefaultData("footer", currentVariant);
-        
+
         const dataToUse =
           globalComponentsData?.footer &&
           Object.keys(globalComponentsData.footer).length > 0
@@ -362,7 +362,7 @@ export function EditorSidebar({
         // Use globalFooterVariant to get correct default data
         const currentVariant = store.globalFooterVariant || "StaticFooter1";
         const defaultData = createDefaultData("footer", currentVariant);
-        
+
         const dataToUse =
           store.globalFooterData &&
           Object.keys(store.globalFooterData).length > 0
@@ -375,20 +375,25 @@ export function EditorSidebar({
         // Don't rely on selectedComponent.data as it may be stale after theme change
         if (selectedComponent.type === "halfTextHalfImage") {
           // First, try to get data from store (this will have the correct default data after theme change)
-          const storeData = store.getComponentData(selectedComponent.type, uniqueVariantId);
-          
+          const storeData = store.getComponentData(
+            selectedComponent.type,
+            uniqueVariantId,
+          );
+
           // Also check halfTextHalfImageStates directly for the latest data
           const stateData = halfTextHalfImageStates?.[uniqueVariantId];
-          
+
           // Priority: stateData > storeData > selectedComponent.data
-          const dataToUse = (stateData && Object.keys(stateData).length > 0)
-            ? stateData
-            : (storeData && Object.keys(storeData).length > 0
-              ? storeData
-              : (selectedComponent.data && Object.keys(selectedComponent.data).length > 0
-                ? selectedComponent.data
-                : {}));
-          
+          const dataToUse =
+            stateData && Object.keys(stateData).length > 0
+              ? stateData
+              : storeData && Object.keys(storeData).length > 0
+                ? storeData
+                : selectedComponent.data &&
+                    Object.keys(selectedComponent.data).length > 0
+                  ? selectedComponent.data
+                  : {};
+
           setTempData(dataToUse);
         } else {
           // For other components, use existing component data if available, otherwise get from store
@@ -404,7 +409,14 @@ export function EditorSidebar({
     } else {
       setTempData({});
     }
-  }, [selectedComponent, globalHeaderData, globalFooterData, globalFooterVariant, view, halfTextHalfImageStates]);
+  }, [
+    selectedComponent,
+    globalHeaderData,
+    globalFooterData,
+    globalFooterVariant,
+    view,
+    halfTextHalfImageStates,
+  ]);
 
   // Clear tempData when view changes (but not for branding-settings)
   useEffect(() => {
@@ -427,7 +439,7 @@ export function EditorSidebar({
       const store = useEditorStore.getState();
       // Get the latest tempData (which should be updated by BrandingSettings)
       const brandingData = store.tempData || {};
-      
+
       console.log("🔍 Current tempData:", brandingData);
       console.log("🔍 Current brandingData structure:", {
         hasColors: !!brandingData.colors,
@@ -436,7 +448,7 @@ export function EditorSidebar({
         accent: brandingData.colors?.accent,
         mainBgColor: brandingData.mainBgColor,
       });
-      
+
       // Ensure brandingData has the correct structure
       const finalBrandingData = {
         colors: {
@@ -446,14 +458,14 @@ export function EditorSidebar({
         },
         mainBgColor: brandingData.mainBgColor || "",
       };
-      
+
       // Update WebsiteLayout with branding data
       const updatedWebsiteLayout = {
         ...(store.WebsiteLayout || {}),
         metaTags: store.WebsiteLayout?.metaTags || { pages: [] },
         branding: finalBrandingData,
       };
-      
+
       console.log("💾 Saving branding data:", finalBrandingData);
       setWebsiteLayout(updatedWebsiteLayout);
       setHasChangesMade(true);
@@ -478,10 +490,10 @@ export function EditorSidebar({
       console.log("Current Page:", currentPage);
       console.log("Page Components Before:", pageComponentsBefore.length);
       console.log("TempData:", tempData);
-      console.log("StoreData:", store.getComponentData(
-        selectedComponent.type,
-        selectedComponent.id,
-      ));
+      console.log(
+        "StoreData:",
+        store.getComponentData(selectedComponent.type, selectedComponent.id),
+      );
       console.groupEnd();
 
       // Get the latest tempData from store for global components
@@ -563,9 +575,10 @@ export function EditorSidebar({
 
       // IMPORTANT: Always use store.tempData directly (not tempData prop) to get the latest changes
       // This ensures that all changes made via updateByPath are included
-      const actualTempData = store.tempData && Object.keys(store.tempData).length > 0
-        ? store.tempData
-        : latestTempData;
+      const actualTempData =
+        store.tempData && Object.keys(store.tempData).length > 0
+          ? store.tempData
+          : latestTempData;
 
       console.group("🔍 Save Debug - tempData sources");
       console.log("Store TempData:", store.tempData);
@@ -596,9 +609,18 @@ export function EditorSidebar({
       console.log("Styling in StoreData:", storeData?.styling);
       console.log("Styling in MergedData:", mergedData?.styling);
       console.group("Search Button Data");
-      console.log("SearchButton in TempData:", actualTempData?.styling?.searchButton);
-      console.log("SearchButton in StoreData:", storeData?.styling?.searchButton);
-      console.log("SearchButton in MergedData:", mergedData?.styling?.searchButton);
+      console.log(
+        "SearchButton in TempData:",
+        actualTempData?.styling?.searchButton,
+      );
+      console.log(
+        "SearchButton in StoreData:",
+        storeData?.styling?.searchButton,
+      );
+      console.log(
+        "SearchButton in MergedData:",
+        mergedData?.styling?.searchButton,
+      );
       console.groupEnd();
       console.groupEnd();
       console.groupEnd();
@@ -628,7 +650,7 @@ export function EditorSidebar({
 
       // Update tempData with the merged data to keep sidebar in sync
       setTempData(mergedData);
-      
+
       // Also update store.tempData to ensure consistency
       store.setTempData(mergedData);
 
@@ -645,7 +667,10 @@ export function EditorSidebar({
       console.log("Page Components After:", pageComponentsAfter.length);
       console.group("Store After");
       console.log("Contact Cards States:", storeAfter.contactCardsStates);
-      console.log("Page Components By Page:", storeAfter.pageComponentsByPage[currentPage]);
+      console.log(
+        "Page Components By Page:",
+        storeAfter.pageComponentsByPage[currentPage],
+      );
       console.groupEnd();
       console.groupEnd();
 
@@ -867,9 +892,7 @@ export function EditorSidebar({
             </div>
           )}
 
-          {view === "branding-settings" && (
-            <BrandingSettings />
-          )}
+          {view === "branding-settings" && <BrandingSettings />}
 
           {view === "edit-component" && selectedComponent && (
             <div className="space-y-8">
@@ -918,7 +941,7 @@ export function EditorSidebar({
                               "header",
                               newTheme,
                             );
-                            
+
                             // ⭐ Add variant to newDefaultData to ensure it's included
                             const newDefaultDataWithVariant = {
                               ...newDefaultData,
@@ -958,7 +981,7 @@ export function EditorSidebar({
                               "footer",
                               newTheme,
                             );
-                            
+
                             // ⭐ Add variant to newDefaultData to ensure it's included
                             const newDefaultDataWithVariant = {
                               ...newDefaultData,
@@ -987,19 +1010,19 @@ export function EditorSidebar({
                         className="w-full"
                       />
                     ) : (
-                    <ThemeSelector
-                      componentType={selectedComponent.type}
-                      currentTheme={selectedComponent.componentName}
-                      onThemeChange={(newTheme) => {
-                        if (onComponentThemeChange && selectedComponent) {
-                          onComponentThemeChange(
-                            selectedComponent.id,
-                            newTheme,
-                          );
-                        }
-                      }}
-                      className="w-full"
-                    />
+                      <ThemeSelector
+                        componentType={selectedComponent.type}
+                        currentTheme={selectedComponent.componentName}
+                        onThemeChange={(newTheme) => {
+                          if (onComponentThemeChange && selectedComponent) {
+                            onComponentThemeChange(
+                              selectedComponent.id,
+                              newTheme,
+                            );
+                          }
+                        }}
+                        className="w-full"
+                      />
                     )}
 
                     <div className="pt-2 border-t border-purple-200/50">
@@ -1266,9 +1289,13 @@ export function EditorSidebar({
                   } else if (selectedComponent?.id === "global-footer") {
                     const store = useEditorStore.getState();
                     // Use globalFooterVariant to get correct default data
-                    const currentVariant = store.globalFooterVariant || "StaticFooter1";
-                    const defaultData = createDefaultData("footer", currentVariant);
-                    
+                    const currentVariant =
+                      store.globalFooterVariant || "StaticFooter1";
+                    const defaultData = createDefaultData(
+                      "footer",
+                      currentVariant,
+                    );
+
                     const originalData =
                       store.globalFooterData &&
                       Object.keys(store.globalFooterData).length > 0

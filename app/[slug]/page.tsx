@@ -100,8 +100,17 @@ export default async function TenantPage({
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
-  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const domainType = headersList.get("x-domain-type") as
+    | "subdomain"
+    | "custom"
+    | null;
   const { slug } = await params;
 
-  return <TenantPageWrapper tenantId={tenantId} slug={slug} domainType={domainType || undefined} />;
+  return (
+    <TenantPageWrapper
+      tenantId={tenantId}
+      slug={slug}
+      domainType={domainType || undefined}
+    />
+  );
 }

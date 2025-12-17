@@ -100,7 +100,10 @@ export function MostVisitedPagesTable() {
                 <TableHeader>
                   <TableRow>
                     {[...Array(6)].map((_, i) => (
-                      <TableHead key={i} className="px-2 sm:px-4 whitespace-nowrap">
+                      <TableHead
+                        key={i}
+                        className="px-2 sm:px-4 whitespace-nowrap"
+                      >
                         <Skeleton className="h-4 w-full max-w-[80px] sm:max-w-none" />
                       </TableHead>
                     ))}

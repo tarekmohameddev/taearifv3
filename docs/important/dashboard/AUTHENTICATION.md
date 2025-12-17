@@ -9,6 +9,7 @@ Complete guide to authentication flows and access control layers in the Dashboar
 ## Authentication Requirements
 
 Dashboard pages require:
+
 1. ✅ **Dashboard User Login** (not Owner login)
 2. ✅ **Valid session token** (stored in httpOnly cookie)
 3. ✅ **Active subscription** (for some features)
@@ -61,18 +62,18 @@ export default function DashboardLayout({ children }) {
       const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
       const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
       const isDevelopment = process.env.NODE_ENV === "development";
-      
-      const isOnBaseDomain = isDevelopment 
+
+      const isOnBaseDomain = isDevelopment
         ? hostname === localDomain || hostname === `${localDomain}:3000`
         : hostname === productionDomain || hostname === `www.${productionDomain}`;
-      
+
       const isCustomDomain = /\.(com|net|org|io|co|me)$/i.test(hostname);
-      
+
       if (isCustomDomain && !isOnBaseDomain) {
         setIsValidDomain(false); // Block tenant domains
         return;
       }
-      
+
       setIsValidDomain(isOnBaseDomain);
     };
 
@@ -119,6 +120,7 @@ export default function DashboardLayout({ children }) {
 ```
 
 **Key Features:**
+
 - **Domain Validation:** Blocks tenant domains (lines 16-41)
 - **Token Validation:** Verifies session (line 2)
 - **RTL Enforcement:** Forces Arabic layout (lines 56-69)
@@ -138,7 +140,7 @@ export default function ClientLayout({ children }) {
   const pathname = usePathname();
 
   const publicPages = ["/login", "/register", "/oauth", "/forgot-password"];
-  
+
   const isPublicPage = publicPages.some(page => pathname?.startsWith(page));
 
   useEffect(() => {
@@ -204,7 +206,7 @@ export function useTokenValidation() {
       const response = await axiosInstance.get("/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (response.status === 200) {
         // Token valid - update AuthStore
         const userData = response.data.data;
@@ -225,16 +227,16 @@ export function useTokenValidation() {
   useEffect(() => {
     const init = async () => {
       const userInfo = await fetchUserInfo();
-      
+
       if (!userInfo?.token) {
         setTokenValidation({ isValid: false, loading: false });
         router.push("/login");
         return;
       }
-      
+
       await validateToken(userInfo.token);
     };
-    
+
     init();
   }, []);
 
@@ -279,7 +281,7 @@ const clearAuthContextData = () => {
 ```typescript
 export default function PermissionWrapper({ children, fallback }) {
   const { hasPermission, loading, error } = usePermissions();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -290,7 +292,7 @@ export default function PermissionWrapper({ children, fallback }) {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <Card>
@@ -303,7 +305,7 @@ export default function PermissionWrapper({ children, fallback }) {
       </Card>
     );
   }
-  
+
   if (!hasPermission) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -333,7 +335,7 @@ export default function PermissionWrapper({ children, fallback }) {
       </div>
     );
   }
-  
+
   return <>{children}</>;
 }
 ```
@@ -343,7 +345,8 @@ export default function PermissionWrapper({ children, fallback }) {
 ```typescript
 export const usePermissions = () => {
   const pathname = usePathname();
-  const { userData, loading, error, hasAccessToPage, fetchUserData } = useUserStore();
+  const { userData, loading, error, hasAccessToPage, fetchUserData } =
+    useUserStore();
 
   // Initialize user data
   useEffect(() => {
@@ -363,23 +366,23 @@ export const usePermissions = () => {
   // Map slug to permission
   const getPermissionName = (slug: string): string => {
     const permissionMap = {
-      "customers": "customers.view",
-      "properties": "properties.view",
-      "analytics": "analytics.view",
+      customers: "customers.view",
+      properties: "properties.view",
+      analytics: "analytics.view",
       "rental-management": "rental.management",
       "purchase-management": "purchase.management",
       "access-control": "access.control",
       "activity-logs": "activity.logs.view",
-      "affiliate": "affiliate.view",
-      "marketing": "marketing.view",
+      affiliate: "affiliate.view",
+      marketing: "marketing.view",
       "whatsapp-ai": "whatsapp.ai",
-      "live_editor": "live_editor.view",
-      "projects": "projects.view",
-      "blogs": "blogs.view",
-      "messages": "messages.view",
-      "apps": "apps.view",
-      "settings": "settings.view",
-      "templates": "templates.view",
+      live_editor: "live_editor.view",
+      projects: "projects.view",
+      blogs: "blogs.view",
+      messages: "messages.view",
+      apps: "apps.view",
+      settings: "settings.view",
+      templates: "templates.view",
     };
 
     return permissionMap[slug] || `${slug}.view`;
@@ -388,7 +391,13 @@ export const usePermissions = () => {
   const pageSlug = getPageSlug(pathname);
   const hasPermission = hasAccessToPage(pageSlug);
 
-  return { hasPermission, loading, userData, error, getPageSlug: () => pageSlug };
+  return {
+    hasPermission,
+    loading,
+    userData,
+    error,
+    getPageSlug: () => pageSlug,
+  };
 };
 ```
 
@@ -414,7 +423,7 @@ hasAccessToPage: (pageSlug: string | null) => {
   // Permission-based access
   const permissionMap = { /* ... */ };
   const requiredPermission = permissionMap[pageSlug] || `${pageSlug}.view`;
-  
+
   return get().checkPermission(requiredPermission);
 },
 
@@ -435,27 +444,32 @@ checkPermission: (permissionName: string) => {
 ### Account Types
 
 **1. Tenant (account_type === "tenant"):**
+
 - ✅ Full access to ALL pages (except nothing)
 - ✅ Bypasses permission checks
 - ✅ Can access `/dashboard/access-control`
 - ✅ Owner of the dashboard instance
 
 **2. Admin:**
+
 - ✅ Full access based on permissions array
 - ✅ Typically has all permissions assigned
 - ✅ Can manage other users
 
 **3. Manager:**
+
 - ⚠️ Limited access based on assigned permissions
 - ✅ Can access only permitted modules
 - ❌ Cannot manage users (unless permission granted)
 
 **4. Editor:**
+
 - ⚠️ Content management only
 - ✅ Access to `/dashboard/content/*`
 - ❌ No access to settings, analytics, etc.
 
 **5. Viewer:**
+
 - ⚠️ Read-only access
 - ✅ View data only
 - ❌ Cannot create, edit, or delete
@@ -473,18 +487,18 @@ checkPermission: (permissionName: string) => {
 ```typescript
 const handleLogin = async (e) => {
   e.preventDefault();
-  
+
   // Execute reCAPTCHA
   const recaptchaToken = await executeRecaptcha("login");
-  
+
   if (!recaptchaToken) {
     toast.error("فشل التحقق من reCAPTCHA");
     return;
   }
-  
+
   // Login with token
   const result = await login(email, password, recaptchaToken);
-  
+
   if (result.success) {
     router.push("/dashboard");
   }
@@ -504,6 +518,7 @@ If invalid → reject login
 ```
 
 **Protection Against:**
+
 - Brute force attacks
 - Automated login attempts
 - Bot traffic
@@ -545,6 +560,7 @@ Redirect to /dashboard
 **File:** `pages/api/auth/[...nextauth].js`
 
 **Providers:**
+
 - Google (configured)
 - Credentials (email/password)
 
@@ -573,12 +589,14 @@ Dashboard blocked
 ```
 
 **Reason:**
+
 - Dashboard = platform administration
 - Tenant domains = customer websites
 - Prevents confusion and security risks
 - Keeps admin/tenant contexts separate
 
 **Valid Access:**
+
 - `localhost:3000/ar/dashboard` ✅
 - `taearif.com/ar/dashboard` ✅
 - `tenant1.localhost:3000/ar/dashboard` ❌
@@ -618,7 +636,7 @@ useEffect(() => {
       if (pathname !== "/onboarding") {
         const response = await axiosInstance.get("/user");
         const completed = response.data.data.onboarding_completed;
-        
+
         if (completed == undefined) {
           router.push("/onboarding");
         }
@@ -659,6 +677,7 @@ useEffect(() => {
 ```
 
 **Why?**
+
 - Dashboard designed for Arabic interface
 - All UI text in Arabic
 - Complements locale system (always `/ar/` prefix)
@@ -731,6 +750,7 @@ User visits /dashboard/properties
 ### Token Storage
 
 **httpOnly Cookie:**
+
 - Name: `authToken`
 - Set by: `/api/user/setAuth`
 - Expires: 30 days
@@ -739,6 +759,7 @@ User visits /dashboard/properties
 - ✅ Cannot be accessed by JavaScript (XSS protection)
 
 **localStorage:**
+
 - Key: `user`
 - Contains: User data (including token copy)
 - Purpose: Quick access, persistence
@@ -747,6 +768,7 @@ User visits /dashboard/properties
 ### Best Practices
 
 **✅ DO:**
+
 - Use AuthStore for authentication
 - Use UserStore for permissions
 - Use axiosInstance for API calls
@@ -754,6 +776,7 @@ User visits /dashboard/properties
 - Clear all auth data on logout
 
 **❌ DON'T:**
+
 - Store sensitive data in localStorage
 - Mix Dashboard and Owner auth systems
 - Bypass PermissionWrapper
@@ -762,7 +785,7 @@ User visits /dashboard/properties
 ---
 
 **See Also:**
+
 - [CORE_INFRASTRUCTURE.md](./CORE_INFRASTRUCTURE.md) - AuthStore details
 - [../AUTHENTICATION_SYSTEMS.md](../AUTHENTICATION_SYSTEMS.md) - Complete auth system
 - [../RECAPTCHA_SYSTEM.md](../RECAPTCHA_SYSTEM.md) - ReCAPTCHA implementation
-

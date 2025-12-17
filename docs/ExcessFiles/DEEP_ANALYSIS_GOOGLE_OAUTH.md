@@ -3,11 +3,13 @@
 ## 🚨 المشكلة التي تواجهها
 
 عند فتح:
+
 ```
 https://www.taearif.com/api/auth/google/callback?code=...
 ```
 
 يظهر:
+
 ```
 Error: This action with HTTP GET is not supported by NextAuth.js
 ```
@@ -19,18 +21,21 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 ### المشكلة #1: الـ URL خاطئ! ❌
 
 **أنت تفتح:**
+
 ```
 /api/auth/google/callback     ❌ خاطئ
          ^^^^^^ ^^^^^^^^
 ```
 
 **الصحيح في NextAuth:**
+
 ```
 /api/auth/callback/google     ✅ صحيح
          ^^^^^^^^ ^^^^^^
 ```
 
 **الفرق:**
+
 - ❌ الخاطئ: `google` جاء **قبل** `callback`
 - ✅ الصحيح: `callback` جاء **قبل** `google`
 
@@ -41,12 +46,13 @@ Error: This action with HTTP GET is not supported by NextAuth.js
 في مشروعك، هناك **نظامان مختلفان** لـ Google OAuth يعملان في نفس الوقت:
 
 #### **النظام 1: NextAuth.js** (المثبت حالياً)
+
 ```typescript
 // في pages/api/auth/[...nextauth].js
 GoogleProvider({
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-})
+});
 
 // NextAuth تلقائياً يصنع هذه الـ routes:
 // ✅ /api/auth/signin
@@ -55,10 +61,11 @@ GoogleProvider({
 ```
 
 #### **النظام 2: Backend API مخصص** (قديم)
+
 ```typescript
 // في context/AuthContext.js - السطر 259
 const response = await fetch(
-  `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+  `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
 );
 
 // هذا يعيد URL مختلف تماماً:
@@ -70,17 +77,20 @@ const response = await fetch(
 ### المشكلة #3: متغيرات البيئة
 
 في `env.txt` السطر 11:
+
 ```env
 NEXTAUTH_URL=http://taearif.com   ❌ خاطئ
 ```
 
 **المشاكل:**
+
 1. ❌ `http://` بدلاً من `https://`
 2. ❌ `taearif.com` بدلاً من `www.taearif.com`
 3. ❌ لا يوجد `GOOGLE_CLIENT_ID`
 4. ❌ لا يوجد `GOOGLE_CLIENT_SECRET`
 
 **الصحيح:**
+
 ```env
 NEXTAUTH_URL=https://www.taearif.com   ✅
 GOOGLE_CLIENT_ID=your_client_id_here   ✅
@@ -94,6 +104,7 @@ GOOGLE_CLIENT_SECRET=your_secret_here  ✅
 ### الحل #1: صحح متغيرات البيئة (الأهم!)
 
 #### في Vercel (أو استضافتك):
+
 1. اذهب إلى **Settings** > **Environment Variables**
 2. أضف/حدّث:
 
@@ -116,9 +127,11 @@ NEXTAUTH_SECRET=asdkbashndfkjsdgbf4z3qyiurghf347980fh432807fh4387fh342fsdaffm493
 ### الحل #2: صحح Google Cloud Console
 
 #### الخطوة 1: اذهب إلى Google Console
+
 [console.cloud.google.com](https://console.cloud.google.com/)
 
 #### الخطوة 2: اذهب إلى Credentials
+
 **APIs & Services** > **Credentials**
 
 #### الخطوة 3: اختر OAuth Client ID
@@ -165,11 +178,12 @@ useEffect(() => {
 }, []);
 
 const handleGoogleLogin = () => {
-  window.location.href = googleAuthUrl;  // ❌ خاطئ
+  window.location.href = googleAuthUrl; // ❌ خاطئ
 };
 ```
 
 **المشكلة:**
+
 - هذا يستخدم Backend API المخصص
 - يوجه إلى `/api/auth/google/callback` (خاطئ)
 - لا يستخدم NextAuth
@@ -181,13 +195,14 @@ const handleGoogleLogin = () => {
 import { signIn } from "next-auth/react";
 
 const handleGoogleLogin = () => {
-  signIn("google", { 
-    callbackUrl: "/dashboard" 
+  signIn("google", {
+    callbackUrl: "/dashboard",
   });
 };
 ```
 
 **الفوائد:**
+
 - يستخدم NextAuth بشكل صحيح
 - يوجه إلى `/api/auth/callback/google` (صحيح)
 - آمن ومختبر
@@ -196,12 +211,12 @@ const handleGoogleLogin = () => {
 
 ## 📊 مقارنة بين الـ URLs
 
-| الحالة | URL | الحالة | الاستخدام |
-|--------|-----|--------|-----------|
-| **ما تفتحه الآن** | `/api/auth/google/callback` | ❌ خاطئ | Backend API قديم |
-| **ما يجب أن يكون** | `/api/auth/callback/google` | ✅ صحيح | NextAuth.js |
-| **Backend API** | `/auth/google/redirect` | ⚠️ قديم | نظام مخصص |
-| **NextAuth Signin** | `/api/auth/signin` | ✅ صحيح | NextAuth.js |
+| الحالة              | URL                         | الحالة  | الاستخدام        |
+| ------------------- | --------------------------- | ------- | ---------------- |
+| **ما تفتحه الآن**   | `/api/auth/google/callback` | ❌ خاطئ | Backend API قديم |
+| **ما يجب أن يكون**  | `/api/auth/callback/google` | ✅ صحيح | NextAuth.js      |
+| **Backend API**     | `/auth/google/redirect`     | ⚠️ قديم | نظام مخصص        |
+| **NextAuth Signin** | `/api/auth/signin`          | ✅ صحيح | NextAuth.js      |
 
 ---
 
@@ -288,12 +303,14 @@ git push origin main
 ### خطأ: "redirect_uri_mismatch"
 
 **السبب:**
+
 ```
 Google يتوقع: https://www.taearif.com/api/auth/callback/google
 لكن NEXTAUTH_URL: http://taearif.com
 ```
 
 **الحل:**
+
 ```env
 # صحح في Vercel
 NEXTAUTH_URL=https://www.taearif.com
@@ -304,18 +321,21 @@ NEXTAUTH_URL=https://www.taearif.com
 ### خطأ: "This action with HTTP GET is not supported"
 
 **السبب #1: تفتح الـ URL مباشرة**
+
 ```
 ❌ لا تفتح /api/auth/callback/google مباشرة في المتصفح
 ✅ استخدم signIn("google")
 ```
 
 **السبب #2: الـ URL خاطئ**
+
 ```
 ❌ أنت على: /api/auth/google/callback
 ✅ يجب أن تكون: /api/auth/callback/google
 ```
 
 **الحل:**
+
 ```typescript
 // استخدم NextAuth
 import { signIn } from "next-auth/react";
@@ -327,11 +347,13 @@ signIn("google");
 ### خطأ: "Invalid client"
 
 **السبب:**
+
 ```
 GOOGLE_CLIENT_ID أو GOOGLE_CLIENT_SECRET خاطئ/غير موجود
 ```
 
 **الحل:**
+
 1. راجع Google Cloud Console
 2. انسخ القيم الصحيحة
 3. أضفها في Vercel بدقة (بدون مسافات إضافية)
@@ -384,12 +406,14 @@ NextAuth يصنع:     [NEXTAUTH_URL]/api/auth/callback/google
 ## 📝 الخلاصة النهائية
 
 ### المشكلة الحقيقية:
+
 1. ❌ تحاول فتح `/api/auth/google/callback` (خاطئ)
 2. ❌ NEXTAUTH_URL = `http://taearif.com` (خاطئ)
 3. ❌ لا يوجد GOOGLE_CLIENT_ID/SECRET
 4. ❌ تستخدم Backend API بدلاً من NextAuth
 
 ### الحل:
+
 1. ✅ أضف `NEXTAUTH_URL=https://www.taearif.com` في Vercel
 2. ✅ أضف GOOGLE_CLIENT_ID و GOOGLE_CLIENT_SECRET في Vercel
 3. ✅ صحح Redirect URI في Google Console: `/api/auth/callback/google`
@@ -399,6 +423,7 @@ NextAuth يصنع:     [NEXTAUTH_URL]/api/auth/callback/google
 ---
 
 ## ⏱️ الوقت المتوقع
+
 - **الحصول على Credentials**: 15 دقيقة
 - **إضافة في Vercel**: 5 دقائق
 - **إعادة النشر**: 2 دقيقة
@@ -421,4 +446,3 @@ NextAuth يصنع:     [NEXTAUTH_URL]/api/auth/callback/google
 **تم التحديث:** 24 أكتوبر 2025  
 **الحالة:** ✅ تحليل عميق كامل  
 **المصادر:** NextAuth.js Docs + Google OAuth 2.0 Docs + Stack Overflow
-

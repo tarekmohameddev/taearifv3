@@ -14,6 +14,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Component:** `WelcomeDashboard` from `@/components/homepage/welcome-dashboard`
 
 **Features:**
+
 - Welcome message
 - Quick statistics
 - Recent activity
@@ -21,6 +22,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Getting started guide
 
 **Layout Structure:**
+
 ```typescript
 <div className="flex min-h-screen flex-col">
   <DashboardHeader />
@@ -44,6 +46,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Business metrics and performance tracking
 
 **Features:**
+
 - Website traffic analytics
 - Visitor statistics
 - Page views
@@ -53,6 +56,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Export reports
 
 **Data Source:** Store homepage analytics sub-stores
+
 - `dashboardDevice` - Device statistics
 - `dashboardSummary` - Summary cards
 - `visitorData` - Visitor metrics
@@ -68,6 +72,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Real estate property listings management
 
 **Features:**
+
 - Property listing grid
 - Add new property
 - Edit property
@@ -79,6 +84,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Bulk actions
 
 **Sub-Routes:**
+
 - `/dashboard/properties/add` - Add new property
 - `/dashboard/properties/[id]/edit` - Edit property
 
@@ -93,6 +99,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Real estate project management (buildings, compounds)
 
 **Features:**
+
 - Project listing
 - Add new project
 - Edit project details
@@ -102,6 +109,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Location mapping
 
 **Sub-Routes:**
+
 - `/dashboard/projects/add` - Add new project
 - `/dashboard/projects/[id]/edit` - Edit project
 
@@ -118,6 +126,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Building management within projects
 
 **Features:**
+
 - Building listing
 - Floor plans
 - Unit allocation
@@ -125,6 +134,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Maintenance tracking
 
 **Sub-Routes:**
+
 - `/dashboard/buildings/add` - Add new building
 - `/dashboard/buildings/[id]/edit` - Edit building
 
@@ -140,6 +150,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Customer database management
 
 **Features:**
+
 - Customer listing
 - Customer profiles
 - Contact information
@@ -159,6 +170,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Customer Relationship Management
 
 **Features:**
+
 - Lead management
 - Sales pipeline
 - Deal tracking
@@ -179,6 +191,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Handle property inquiries from website visitors
 
 **Features:**
+
 - Request inbox
 - Request status (new, contacted, completed)
 - Customer details
@@ -198,6 +211,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Comprehensive rental operations management
 
 **Features:**
+
 - Rental contracts
 - Tenant management
 - Rent collection tracking
@@ -208,6 +222,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Rental reports
 
 **Sub-Routes:**
+
 - `/dashboard/rental-management/contracts` - Contract management
 - `/dashboard/rental-management/owners` - Owner management
 - `/dashboard/rental-management/daily-followup` - Daily tasks
@@ -226,6 +241,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Property purchase transaction management
 
 **Features:**
+
 - Purchase agreements
 - Payment schedules
 - Buyer information
@@ -234,6 +250,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Completion status
 
 **Sub-Routes:**
+
 - `/dashboard/purchase-management/[id]` - Purchase details
 
 **Store:** `purchaseManagement` in `context/store/purchaseManagement.js`
@@ -249,73 +266,87 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **14 Sub-Sections:**
 
 #### 11.1 About (`/dashboard/content/about`)
+
 - About us page content
 - Company information
 - Team members
 - Mission & vision
 
 #### 11.2 Achievements (`/dashboard/content/achievements`)
+
 - Achievement badges
 - Milestones
 - Statistics
 
 #### 11.3 Banner (`/dashboard/content/banner`)
+
 - Homepage banners
 - Promotional banners
 - Image uploads
 
 #### 11.4 Brands (`/dashboard/content/brands`)
+
 - Partner brands
 - Brand logos
 - Brand links
 
 #### 11.5 Categories (`/dashboard/content/categories`)
+
 - Property categories
 - Service categories
 - Category management
 
 #### 11.6 Footer (`/dashboard/content/footer`)
+
 - Footer content
 - Footer links
 - Social media links
 - Contact information
 
 #### 11.7 Gallery (`/dashboard/content/gallery`)
+
 - Image gallery
 - Video gallery
 - Media organization
 
 #### 11.8 General (`/dashboard/content/general`)
+
 - General site settings
 - Global content
 - Company details
 
 #### 11.9 Menu (`/dashboard/content/menu`)
+
 - Navigation menu
 - Menu structure
 - Menu items
 
 #### 11.10 Portfolio (`/dashboard/content/portfolio`)
+
 - Portfolio items
 - Case studies
 - Past projects
 
 #### 11.11 Services (`/dashboard/content/services`)
+
 - Service offerings
 - Service descriptions
 - Service pricing
 
 #### 11.12 Skills (`/dashboard/content/skills`)
+
 - Team skills
 - Expertise areas
 - Skill levels
 
 #### 11.13 Testimonials (`/dashboard/content/testimonials`)
+
 - Customer reviews
 - Testimonial management
 - Rating display
 
 #### 11.14 Why Choose Us (`/dashboard/content/why-choose-us`)
+
 - Value propositions
 - Unique selling points
 - Benefits
@@ -333,6 +364,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Blog post management
 
 **Features:**
+
 - Blog post listing
 - Add new post
 - Edit post
@@ -343,6 +375,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Publish/draft status
 
 **Sub-Routes:**
+
 - `/dashboard/blogs/add` - Create new blog post
 
 **Store:** `blogManagement` in `context/store/blogManagement.js`
@@ -365,6 +398,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Affiliate marketing program management
 
 **Features:**
+
 - Affiliate dashboard
 - Referral tracking
 - Commission management
@@ -373,6 +407,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Payout history
 
 **Sub-Routes:**
+
 - `/dashboard/affiliate/register` - Affiliate registration
 - `/dashboard/affiliate/dashboard` - Affiliate dashboard
 - `/dashboard/affiliate/links` - Affiliate links
@@ -390,6 +425,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Marketing campaign management
 
 **Features:**
+
 - Email campaigns
 - SMS marketing
 - Social media integration
@@ -409,6 +445,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Third-party app integrations
 
 **Features:**
+
 - Available apps
 - Installed apps
 - API keys management
@@ -425,6 +462,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** AI-powered WhatsApp integration
 
 **Features:**
+
 - WhatsApp bot configuration
 - Auto-responses
 - Chat management
@@ -441,6 +479,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Internal messaging system
 
 **Features:**
+
 - Inbox
 - Sent messages
 - Compose message
@@ -456,6 +495,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** System activity tracking and auditing
 
 **Features:**
+
 - User activity logs
 - System events
 - Change history
@@ -463,6 +503,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Export logs
 
 **Sub-Routes:**
+
 - `/dashboard/activity-logs/customer/[slug]` - Customer-specific logs
 - `/dashboard/activity-logs/property/[slug]` - Property-specific logs
 - `/dashboard/activity-logs/project/[slug]` - Project-specific logs
@@ -476,6 +517,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** User roles and permissions management
 
 **Features:**
+
 - User management
 - Role creation
 - Permission assignment
@@ -483,6 +525,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Team member invitations
 
 **Sub-Routes:**
+
 - `/dashboard/access-control/roles` - Role management
 
 **Permission Required:** `account_type === "tenant"` (only tenant can access)
@@ -497,6 +540,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Property-customer matching system
 
 **Features:**
+
 - Customer preferences
 - Property recommendations
 - Match algorithm
@@ -515,6 +559,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Website template management
 
 **Features:**
+
 - Available templates
 - Template preview
 - Template activation
@@ -531,6 +576,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Dashboard and account settings
 
 **Features:**
+
 - Profile settings
 - Password change
 - Notification preferences
@@ -548,6 +594,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Triggers:** Subscription button in DashboardHeader
 
 **Recent Changes (2025-10-26):**
+
 - Temporarily hidden monthly subscription option
 - Set default billing period to yearly
 - Modified `components/settings-page.tsx`:
@@ -584,6 +631,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 **Purpose:** Password reset functionality (dashboard-specific)
 
 **Features:**
+
 - Reset password form
 - Email verification
 - Token validation
@@ -596,6 +644,7 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 ### Property Management Ecosystem
 
 **Core Modules:**
+
 1. Projects → Buildings → Properties
 2. Property Requests (inquiries)
 3. Rental Management
@@ -628,6 +677,7 @@ Create Agreement (/dashboard/purchase-management)
 ### Customer Relationship Ecosystem
 
 **Core Modules:**
+
 1. Customers (database)
 2. CRM (relationship management)
 3. Messages (communication)
@@ -678,6 +728,7 @@ Changes visible on tenant.localhost:3000
 ```
 
 **Content Mapping:**
+
 - `about` → About Us page
 - `achievements` → Achievement section
 - `testimonials` → Testimonials component
@@ -725,21 +776,25 @@ export default function Page() {
 ## Module Dependencies
 
 ### Properties Module Depends On:
+
 - Projects module (parent relationship)
 - Buildings module (parent relationship)
 - Customers module (ownership)
 
 ### Rental Management Depends On:
+
 - Properties module (rental property)
 - Customers module (tenant information)
 - Owners module (property owner via `/owner` system)
 
 ### CRM Depends On:
+
 - Customers module (customer data)
 - Property Requests module (lead source)
 - Messages module (communication)
 
 ### Marketing Depends On:
+
 - Customers module (contact list)
 - Analytics module (campaign tracking)
 - Messages module (email/SMS sending)
@@ -748,36 +803,36 @@ export default function Page() {
 
 ## Module Quick Reference
 
-| Module | Route | Component File | Store | Permission |
-|--------|-------|----------------|-------|------------|
-| **Homepage** | `/dashboard` | `components/homepage/welcome-dashboard` | `homepage/*` | - |
-| **Analytics** | `/dashboard/analytics` | `components/analytics-page` | `homepage/*` | `analytics.view` |
-| **Properties** | `/dashboard/properties` | `components/property/properties-management-page` | `propertiesManagement` | `properties.view` |
-| **Projects** | `/dashboard/projects` | - | `projectsManagement` | `projects.view` |
-| **Buildings** | `/dashboard/buildings` | - | - | `projects.view` |
-| **Customers** | `/dashboard/customers` | `components/customers-page` | - | `customers.view` |
-| **CRM** | `/dashboard/crm` | `components/crm/crm-page` | - | `crm.view` |
-| **Requests** | `/dashboard/property-requests` | - | - | `properties.view` |
-| **Rental** | `/dashboard/rental-management` | `components/rental-management/rental-management-dashboard` | `rentalManagement` | `rental.management` |
-| **Purchase** | `/dashboard/purchase-management` | - | `purchaseManagement` | `purchase.management` |
-| **Content** | `/dashboard/content` | - | `contentManagement` | - |
-| **Blogs** | `/dashboard/blogs` | - | `blogManagement` | `blogs.view` |
-| **Affiliate** | `/dashboard/affiliate` | `components/affiliate/affiliate-registration-page` | `affiliate` | `affiliate.view` |
-| **Marketing** | `/dashboard/marketing` | `components/marketing-page` | `marketingDashboard` | `marketing.view` |
-| **Messages** | `/dashboard/messages` | `components/messages-page` | - | `messages.view` |
-| **Apps** | `/dashboard/apps` | `components/apps-page` | - | `apps.view` |
-| **WhatsApp** | `/dashboard/whatsapp-ai` | `components/whatsapp-ai-page` | - | `whatsapp.ai` |
-| **Templates** | `/dashboard/templates` | `components/templates-page` | - | `templates.view` |
-| **Settings** | `/dashboard/settings` | `components/settings-page` | - | `settings.view` |
-| **Access** | `/dashboard/access-control` | - | - | `tenant` only |
-| **Logs** | `/dashboard/activity-logs` | - | - | `activity.logs.view` |
-| **Matching** | `/dashboard/matching` | `components/matching-page` | `matchingPage` | - |
-| **Reset** | `/dashboard/reset` | - | - | - |
+| Module         | Route                            | Component File                                             | Store                  | Permission            |
+| -------------- | -------------------------------- | ---------------------------------------------------------- | ---------------------- | --------------------- |
+| **Homepage**   | `/dashboard`                     | `components/homepage/welcome-dashboard`                    | `homepage/*`           | -                     |
+| **Analytics**  | `/dashboard/analytics`           | `components/analytics-page`                                | `homepage/*`           | `analytics.view`      |
+| **Properties** | `/dashboard/properties`          | `components/property/properties-management-page`           | `propertiesManagement` | `properties.view`     |
+| **Projects**   | `/dashboard/projects`            | -                                                          | `projectsManagement`   | `projects.view`       |
+| **Buildings**  | `/dashboard/buildings`           | -                                                          | -                      | `projects.view`       |
+| **Customers**  | `/dashboard/customers`           | `components/customers-page`                                | -                      | `customers.view`      |
+| **CRM**        | `/dashboard/crm`                 | `components/crm/crm-page`                                  | -                      | `crm.view`            |
+| **Requests**   | `/dashboard/property-requests`   | -                                                          | -                      | `properties.view`     |
+| **Rental**     | `/dashboard/rental-management`   | `components/rental-management/rental-management-dashboard` | `rentalManagement`     | `rental.management`   |
+| **Purchase**   | `/dashboard/purchase-management` | -                                                          | `purchaseManagement`   | `purchase.management` |
+| **Content**    | `/dashboard/content`             | -                                                          | `contentManagement`    | -                     |
+| **Blogs**      | `/dashboard/blogs`               | -                                                          | `blogManagement`       | `blogs.view`          |
+| **Affiliate**  | `/dashboard/affiliate`           | `components/affiliate/affiliate-registration-page`         | `affiliate`            | `affiliate.view`      |
+| **Marketing**  | `/dashboard/marketing`           | `components/marketing-page`                                | `marketingDashboard`   | `marketing.view`      |
+| **Messages**   | `/dashboard/messages`            | `components/messages-page`                                 | -                      | `messages.view`       |
+| **Apps**       | `/dashboard/apps`                | `components/apps-page`                                     | -                      | `apps.view`           |
+| **WhatsApp**   | `/dashboard/whatsapp-ai`         | `components/whatsapp-ai-page`                              | -                      | `whatsapp.ai`         |
+| **Templates**  | `/dashboard/templates`           | `components/templates-page`                                | -                      | `templates.view`      |
+| **Settings**   | `/dashboard/settings`            | `components/settings-page`                                 | -                      | `settings.view`       |
+| **Access**     | `/dashboard/access-control`      | -                                                          | -                      | `tenant` only         |
+| **Logs**       | `/dashboard/activity-logs`       | -                                                          | -                      | `activity.logs.view`  |
+| **Matching**   | `/dashboard/matching`            | `components/matching-page`                                 | `matchingPage`         | -                     |
+| **Reset**      | `/dashboard/reset`               | -                                                          | -                      | -                     |
 
 ---
 
 **See Also:**
+
 - [CORE_INFRASTRUCTURE.md](./CORE_INFRASTRUCTURE.md) - Stores used by modules
 - [DATA_FLOWS.md](./DATA_FLOWS.md) - How modules interact
 - [AUTHENTICATION.md](./AUTHENTICATION.md) - Permission requirements
-

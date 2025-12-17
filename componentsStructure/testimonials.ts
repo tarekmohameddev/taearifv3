@@ -92,12 +92,12 @@ export const testimonialsStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "section-title",
                 },
-                { 
-                  key: "color", 
-                  label: "Color", 
+                {
+                  key: "color",
+                  label: "Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary" // Title uses secondary color
+                  globalColorType: "secondary", // Title uses secondary color
                 },
                 {
                   key: "size",
@@ -124,12 +124,12 @@ export const testimonialsStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "section-subtitle-large",
                 },
-                { 
-                  key: "color", 
-                  label: "Color", 
+                {
+                  key: "color",
+                  label: "Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary" // Description uses secondary color
+                  globalColorType: "secondary", // Description uses secondary color
                 },
                 {
                   key: "size",
@@ -261,12 +261,12 @@ export const testimonialsStructure: ComponentStructure = {
               label: "Quote Icon",
               type: "object",
               fields: [
-                { 
-                  key: "color", 
-                  label: "Icon Color", 
+                {
+                  key: "color",
+                  label: "Icon Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "primary" // Icon uses primary color
+                  globalColorType: "primary", // Icon uses primary color
                 },
                 {
                   key: "size",
@@ -287,12 +287,12 @@ export const testimonialsStructure: ComponentStructure = {
               label: "Text Styling",
               type: "object",
               fields: [
-                { 
-                  key: "color", 
-                  label: "Text Color", 
+                {
+                  key: "color",
+                  label: "Text Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary" // Text uses secondary color
+                  globalColorType: "secondary", // Text uses secondary color
                 },
                 {
                   key: "size",
@@ -336,12 +336,12 @@ export const testimonialsStructure: ComponentStructure = {
                   label: "Customer Info",
                   type: "object",
                   fields: [
-                    { 
-                      key: "nameColor", 
-                      label: "Name Color", 
+                    {
+                      key: "nameColor",
+                      label: "Name Color",
                       type: "color",
                       useDefaultColor: true,
-                      globalColorType: "secondary" // Name uses secondary color
+                      globalColorType: "secondary", // Name uses secondary color
                     },
                     {
                       key: "nameWeight",
@@ -354,7 +354,7 @@ export const testimonialsStructure: ComponentStructure = {
                       label: "Location Color",
                       type: "color",
                       useDefaultColor: true,
-                      globalColorType: "secondary" // Location uses secondary color
+                      globalColorType: "secondary", // Location uses secondary color
                     },
                   ],
                 },
@@ -447,9 +447,9 @@ export const testimonialsStructure: ComponentStructure = {
               type: "text",
               placeholder: "12px",
             },
-            { 
-              key: "bulletColor", 
-              label: "Bullet Color", 
+            {
+              key: "bulletColor",
+              label: "Bullet Color",
               type: "color",
               useDefaultColor: false, // Bullet color is usually custom (gray)
             },

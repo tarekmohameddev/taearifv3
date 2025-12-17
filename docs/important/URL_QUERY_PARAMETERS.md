@@ -12,58 +12,72 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ## Supported Query Parameters
 
 ### 1. `purpose` (string)
+
 Transaction type: "rent" or "sale". Auto-added when using the search form.
 
 **Example:**
+
 ```
 /for-rent?purpose=rent
 /for-sale?purpose=sale
 ```
 
 ### 2. `city_id` (string)
+
 Filter properties by city ID.
 
 **Example:**
+
 ```
 /for-rent?city_id=5
 ```
 
 ### 3. `state_id` (string)
+
 Filter properties by state/district ID.
 
 **Example:**
+
 ```
 /for-sale?state_id=10200005003
 ```
 
 ### 4. `max_price` (string)
+
 Filter properties by maximum price.
 
 **Example:**
+
 ```
 /for-rent?max_price=5000
 ```
 
 ### 5. `category_id` (string)
+
 Filter properties by category ID.
 
 **Example:**
+
 ```
 /for-sale?category_id=3
 ```
 
 ### 6. `type_id` (string)
+
 Filter properties by property type.
 
 **Example:**
+
 ```
 /for-rent?type_id=شقة
 ```
 
 ### 7. `search` (string)
+
 Search properties by city name or general search keyword.
 
 **Example:**
+
 ```
 /for-sale?search=الرياض
 ```
@@ -266,10 +280,12 @@ const [price, setPrice] = useState(searchParams.get("max_price") || "");
 ### Test 10: Both Pages
 
 Test same functionality on both:
+
 - `/for-rent` (rent properties)
 - `/for-sale` (sale properties)
 
 **Expected Results:**
+
 - Both pages work identically
 - TransactionType determined by route
 - Filters work consistently
@@ -285,6 +301,7 @@ GET /v1/tenant-website/{tenantId}/properties
 ```
 
 **Query Parameters:**
+
 - `page`: Page number (pagination)
 - `purpose`: Transaction type ("rent" or "sale")
 - `city_id`: City filter
@@ -295,11 +312,13 @@ GET /v1/tenant-website/{tenantId}/properties
 - `search`: Search term (optional)
 
 **Example Request:**
+
 ```
 GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=10200005003&max_price=5000&category_id=3&page=1
 ```
 
 **Expected Response:**
+
 ```json
 {
   "success": true,
@@ -333,6 +352,7 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 ### Issue: Parameters not applying
 
 **Solution:**
+
 - Check console for errors
 - Verify `useUrlFilters` hook is called in grid1
 - Ensure properties store has correct filter fields
@@ -345,6 +365,7 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 **Root Cause:** `middleware.ts` was not preserving `request.nextUrl.search` during locale redirect.
 
 **Solution Applied (Line 329-331 in middleware.ts):**
+
 ```typescript
 // FIXED: Preserve query parameters during locale redirect
 const searchParams = request.nextUrl.search; // Get ?key=value
@@ -353,18 +374,21 @@ return NextResponse.redirect(newUrl);
 ```
 
 **Before Fix:**
+
 ```
 User navigates: /for-rent?purpose=rent&search=الرياض
 Middleware redirects to: /ar/for-rent  ❌ (params lost!)
 ```
 
 **After Fix:**
+
 ```
 User navigates: /for-rent?purpose=rent&search=الرياض
 Middleware redirects to: /ar/for-rent?purpose=rent&search=الرياض  ✅ (params preserved!)
 ```
 
 **Test:**
+
 1. Clear browser cache (Ctrl+Shift+Delete)
 2. Hard refresh (Ctrl+F5)
 3. Fill search form and click search
@@ -373,6 +397,7 @@ Middleware redirects to: /ar/for-rent?purpose=rent&search=الرياض  ✅ (par
 ### Issue: Form not auto-filling
 
 **Solution:**
+
 - Verify hero1 component uses `useSearchParams`
 - Check URL parameters are valid
 - Ensure form state syncs with URL
@@ -380,6 +405,7 @@ Middleware redirects to: /ar/for-rent?purpose=rent&search=الرياض  ✅ (par
 ### Issue: Pagination breaks filters
 
 **Solution:**
+
 - Verify pagination component preserves URL params
 - Check store maintains filters during page changes
 - Ensure API includes filters in paginated requests
@@ -387,6 +413,7 @@ Middleware redirects to: /ar/for-rent?purpose=rent&search=الرياض  ✅ (par
 ### Issue: Shared URLs don't work
 
 **Solution:**
+
 - Test URL in incognito/private mode
 - Verify backend accepts parameters
 - Check tenant ID is valid
@@ -457,6 +484,7 @@ Middleware redirects to: /ar/for-rent?purpose=rent&search=الرياض  ✅ (par
 ## Support
 
 For issues or questions:
+
 - Check this documentation first
 - Review code references above
 - Test with provided test cases
@@ -467,4 +495,3 @@ For issues or questions:
 
 **Last Updated:** October 26, 2025
 **Version:** 1.0.0
-

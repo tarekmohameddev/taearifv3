@@ -134,7 +134,7 @@ export default function ProjectCard2({
 
   // Generate WhatsApp link
   const whatsappMessage = encodeURIComponent(
-    `مرحبًا، أود الاستفسار عن هذا الفرد: ${title}${url ? `, رابط الأفراد: ${url}` : ""}`
+    `مرحبًا، أود الاستفسار عن هذا الفرد: ${title}${url ? `, رابط الأفراد: ${url}` : ""}`,
   );
   const whatsappUrl = `https://wa.me/966542120011?text=${whatsappMessage}`;
 
@@ -196,7 +196,9 @@ export default function ProjectCard2({
             <div className="flex items-center justify-end gap-1 mb-1">
               <StairsIcon />
               <span className="text-[#896042] text-sm font-medium">
-                {floors.min === floors.max ? floors.min : `${floors.min} - ${floors.max}`}
+                {floors.min === floors.max
+                  ? floors.min
+                  : `${floors.min} - ${floors.max}`}
               </span>
             </div>
             <span className="text-xs text-gray-600">عدد الطوابق</span>
@@ -207,7 +209,9 @@ export default function ProjectCard2({
             <div className="flex items-center justify-end gap-1 mb-1">
               <BedIcon />
               <span className="text-[#896042] text-sm font-medium">
-                {rooms.min === rooms.max ? rooms.min : `${rooms.min} - ${rooms.max}`}
+                {rooms.min === rooms.max
+                  ? rooms.min
+                  : `${rooms.min} - ${rooms.max}`}
               </span>
             </div>
             <span className="text-xs text-gray-600">غرف النوم</span>

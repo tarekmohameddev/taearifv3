@@ -1,6 +1,7 @@
 # Context Providers and Integration
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Provider Hierarchy](#provider-hierarchy)
 3. [Context Providers](#context-providers)
@@ -14,6 +15,7 @@
 ## Overview
 
 The Live Editor uses a **hybrid approach** combining:
+
 - **Zustand stores**: For state management (editorStore, tenantStore, i18nStore)
 - **React Context**: For component tree integration and dependency injection
 - **Custom providers**: For specific functionality (DragDrop, Editor, Auth)
@@ -21,12 +23,14 @@ The Live Editor uses a **hybrid approach** combining:
 ### Why Hybrid Approach?
 
 **Zustand Advantages**:
+
 - ✅ No provider wrapper needed
 - ✅ Less boilerplate
 - ✅ Better performance (selective subscriptions)
 - ✅ DevTools support
 
 **React Context Advantages**:
+
 - ✅ Tree-scoped data
 - ✅ Dependency injection
 - ✅ Integration with third-party libraries
@@ -115,6 +119,7 @@ app/live-editor/layout.tsx (Root)
 **Purpose**: Provide internationalization context
 
 **Implementation** (Simplified):
+
 ```typescript
 import { createContext, useContext } from "react";
 import { useEditorI18nStore } from "@/context-liveeditor/editorI18nStore";
@@ -123,7 +128,7 @@ const I18nContext = createContext(undefined);
 
 export function I18nProvider({ children }) {
   const { locale, setLocale, t } = useEditorI18nStore();
-  
+
   return (
     <I18nContext.Provider value={{ locale, setLocale, t }}>
       {children}
@@ -141,11 +146,13 @@ export const useI18n = () => {
 ```
 
 **What it provides**:
+
 - `locale`: Current language ("ar" or "en")
 - `setLocale`: Change language function
 - `t`: Translation function
 
 **Used in**:
+
 - Language switchers
 - Translated component labels
 - UI text throughout editor
@@ -159,6 +166,7 @@ export const useI18n = () => {
 **Purpose**: Provide authentication context
 
 **Implementation**:
+
 ```typescript
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
@@ -169,7 +177,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Initialize from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -178,7 +186,7 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
-  
+
   const login = async (email, password) => {
     setLoading(true);
     try {
@@ -186,11 +194,11 @@ export const AuthProvider = ({ children }) => {
         email,
         password
       });
-      
+
       const userData = response.data;
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
-      
+
       toast.success("تم تسجيل الدخول بنجاح!");
     } catch (err) {
       const errorMessage = err.response?.data?.message || "فشل تسجيل الدخول";
@@ -200,7 +208,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  
+
   const logout = async () => {
     try {
       await axios.post("/api/users/logout");
@@ -210,14 +218,14 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  
+
   const fetchUser = async (username) => {
     setLoading(true);
     try {
       const response = await axios.post("/api/users/fetchUsername", {
         username
       });
-      
+
       const userData = response.data;
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -229,7 +237,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -255,6 +263,7 @@ export const useAuth = () => {
 ```
 
 **What it provides**:
+
 - `user`: Current user data
 - `loading`: Authentication loading state
 - `error`: Authentication errors
@@ -264,6 +273,7 @@ export const useAuth = () => {
 - `fetchUser`: Fetch user data function
 
 **Used in**:
+
 - LiveEditorEffects (authentication check)
 - EditorProvider (get tenantId)
 - Navigation bar (user menu)
@@ -277,6 +287,7 @@ export const useAuth = () => {
 **Purpose**: Manage save dialog and save operations
 
 **Implementation**:
+
 ```typescript
 "use client";
 import { ReactNode } from "react";
@@ -292,19 +303,19 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   // ═══════════════════════════════════════════════════════════
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
   const { userData } = useAuthStore();
-  
+
   const tenantId = userData?.username;
-  
+
   // ═══════════════════════════════════════════════════════════
   // SAVE CONFIRMATION HANDLER
   // ═══════════════════════════════════════════════════════════
   const confirmSave = async () => {
     // STEP 1: Execute page-specific save logic
     openSaveDialogFn();
-    
+
     // STEP 2: Get all data from editorStore
     const state = useEditorStore.getState();
-    
+
     // STEP 3: Build payload
     const payload = {
       tenantId: tenantId || "",
@@ -314,7 +325,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         metaTags: { pages: [] }
       }
     };
-    
+
     // STEP 4: Send to API
     await axiosInstance
       .post("/v1/tenant-website/save-pages", payload)
@@ -330,7 +341,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         );
       });
   };
-  
+
   // ═══════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════
@@ -349,16 +360,19 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 ```
 
 **What it provides**:
+
 - Save confirmation dialog (global)
 - Automatic save payload building
 - API integration for saves
 - Toast notifications
 
 **Used in**:
+
 - App header "Publish" button
 - Anywhere requestSave() is called
 
 **Key Integration**:
+
 ```typescript
 // In app header or anywhere
 const { requestSave } = useEditorStore();
@@ -384,6 +398,7 @@ const { requestSave } = useEditorStore();
 **Purpose**: Provide drag & drop functionality
 
 **Implementation**:
+
 ```typescript
 import { DragDropProvider } from "@dnd-kit/react";
 import { ZoneStoreProvider, DropZoneProvider } from "./zoneContext";
@@ -397,9 +412,9 @@ export function EnhancedLiveEditorDragDropContext({
 }) {
   const sensors = useLiveEditorSensors();
   const zoneStore = useMemo(() => createZoneStore(), []);
-  
+
   const [dragListeners, setDragListeners] = useState({});
-  
+
   const handleEnhancedMove = useCallback((
     sourceIndex,
     sourceZone,
@@ -413,7 +428,7 @@ export function EnhancedLiveEditorDragDropContext({
       destinationIndex,
       destinationZone
     );
-    
+
     if (result.success) {
       onComponentMove?.(
         sourceIndex,
@@ -425,7 +440,7 @@ export function EnhancedLiveEditorDragDropContext({
       );
     }
   }, [components, onComponentMove]);
-  
+
   return (
     <dragListenerContext.Provider value={{ dragListeners, setDragListeners }}>
       <DragDropProvider
@@ -433,7 +448,7 @@ export function EnhancedLiveEditorDragDropContext({
         onDragEnd={(event, manager) => {
           // Handle drag end...
           const { source, target } = event.operation;
-          
+
           if (isNewComponent) {
             onComponentAdd?.({
               type: source.data.componentType,
@@ -448,7 +463,7 @@ export function EnhancedLiveEditorDragDropContext({
               "main"
             );
           }
-          
+
           manager.dragOperation.reset();
         }}
         onDragStart={(event, manager) => {
@@ -467,12 +482,14 @@ export function EnhancedLiveEditorDragDropContext({
 ```
 
 **Nested Providers**:
+
 1. **dragListenerContext**: Manage drag listeners
 2. **DragDropProvider**: @dnd-kit main provider
 3. **ZoneStoreProvider**: Drop zone state
 4. **DropZoneProvider**: Drop zone configuration
 
 **What it provides**:
+
 - Drag & drop functionality
 - Drag listeners registry
 - Drop zone tracking
@@ -480,6 +497,7 @@ export function EnhancedLiveEditorDragDropContext({
 - Move/add callbacks
 
 **Used in**:
+
 - LiveEditorUI (wraps iframe content)
 - DraggableComponent (component wrappers)
 - DropZone (drop areas)
@@ -507,20 +525,22 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 function MyComponent() {
   // Subscribe to specific slice
   const tempData = useEditorStore(s => s.tempData);
-  
+
   // Or get entire store
   const store = useEditorStore.getState();
-  
+
   return <div>{tempData.title}</div>;
 }
 ```
 
 **Stores**:
+
 1. **editorStore**: All component states, page management, temp data
 2. **tenantStore**: Tenant data, API integration
 3. **editorI18nStore**: Locale and translations
 
 **Characteristics**:
+
 - No provider wrapper needed
 - Can be accessed from anywhere
 - Selective subscriptions (performance)
@@ -539,7 +559,7 @@ const MyContext = createContext(undefined);
 // Provider component
 export function MyProvider({ children }) {
   const [state, setState] = useState(initialValue);
-  
+
   return (
     <MyContext.Provider value={{ state, setState }}>
       {children}
@@ -564,12 +584,14 @@ function MyComponent() {
 ```
 
 **Contexts**:
+
 1. **AuthContext**: User authentication
 2. **EditorContext** (in EditorProvider): Save dialog
 3. **dragListenerContext**: Drag listeners
 4. **DropZoneContext**: Drop zone configuration
 
 **Characteristics**:
+
 - Requires provider wrapper
 - Scoped to provider tree
 - Easier dependency injection
@@ -586,7 +608,7 @@ function MyComponent() {
 ```typescript
 export default function LiveEditorLayout({ children }) {
   const { setLocale } = useEditorLocale();
-  
+
   // ═══════════════════════════════════════════════════════════
   // RENDER WITH NESTED PROVIDERS
   // ═══════════════════════════════════════════════════════════
@@ -597,10 +619,10 @@ export default function LiveEditorLayout({ children }) {
           <div className="min-h-screen bg-gray-50 flex flex-col" dir="ltr">
             {/* Toaster for notifications */}
             <Toaster position="top-center" reverseOrder={false} />
-            
+
             {/* Navigation bar */}
             <EditorNavBar />
-            
+
             {/* Main content area */}
             <main className="flex-1" dir="ltr">
               {children}
@@ -614,6 +636,7 @@ export default function LiveEditorLayout({ children }) {
 ```
 
 **Wrapping Order (Outside to Inside)**:
+
 ```
 I18nProvider
   └─ Provides translations to all children
@@ -625,6 +648,7 @@ I18nProvider
 ```
 
 **Why This Order?**
+
 1. **I18n first**: Everything needs translations
 2. **Auth second**: Need to check user before anything
 3. **Editor third**: Needs auth data (tenantId from user)
@@ -639,12 +663,12 @@ I18nProvider
 ```typescript
 export function LiveEditorUI({ state, computed, handlers }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
+
   return (
     <div className="live-editor-container">
       {/* Components Sidebar */}
       <ComponentsSidebar />
-      
+
       {/* Main editor area with DragDrop */}
       <div className="editor-main">
         <EnhancedLiveEditorDragDropContext
@@ -663,7 +687,7 @@ export function LiveEditorUI({ state, computed, handlers }) {
                 variant: "global-header"
               }}
             />
-            
+
             {/* Page Components */}
             <LiveEditorDropZone zone="root">
               {state.pageComponents.map((component, index) => (
@@ -689,7 +713,7 @@ export function LiveEditorUI({ state, computed, handlers }) {
                 </LiveEditorDraggableComponent>
               ))}
             </LiveEditorDropZone>
-            
+
             {/* Global Footer */}
             <CachedComponent
               componentName="footer1"
@@ -702,7 +726,7 @@ export function LiveEditorUI({ state, computed, handlers }) {
           </AutoFrame>
         </EnhancedLiveEditorDragDropContext>
       </div>
-      
+
       {/* Editor Sidebar */}
       <EditorSidebar />
     </div>
@@ -744,20 +768,20 @@ import { createContext, useContext } from "react";
 export const createZoneStore = () => create((set) => ({
   zones: {},
   previews: {},
-  
+
   registerZone: (id, config) => set((state) => ({
     zones: { ...state.zones, [id]: config }
   })),
-  
+
   unregisterZone: (id) => set((state) => {
     const { [id]: removed, ...rest } = state.zones;
     return { zones: rest };
   }),
-  
+
   setPreview: (zoneId, preview) => set((state) => ({
     previews: { ...state.previews, [zoneId]: preview }
   })),
-  
+
   clearPreview: (zoneId) => set((state) => {
     const { [zoneId]: removed, ...rest } = state.previews;
     return { previews: rest };
@@ -814,11 +838,12 @@ export const useDropZone = () => {
 ```
 
 **Usage in DropZone**:
+
 ```typescript
 export function LiveEditorDropZone({ zone, children }) {
   const parentContext = useDropZone();
   const zoneStore = useZoneStore();
-  
+
   // Register zone
   useEffect(() => {
     zoneStore.getState().registerZone(zone, {
@@ -826,18 +851,18 @@ export function LiveEditorDropZone({ zone, children }) {
       parentId: parentContext.areaId,
       depth: parentContext.depth + 1
     });
-    
+
     return () => {
       zoneStore.getState().unregisterZone(zone);
     };
   }, [zone]);
-  
+
   const nextContext = {
     mode: parentContext.mode,
     areaId: zone,
     depth: parentContext.depth + 1
   };
-  
+
   return (
     <DropZoneProvider value={nextContext}>
       <div data-dropzone={zone}>
@@ -926,7 +951,7 @@ components/tenant/live-editor/LiveEditorUI.tsx
 STEP 6: Components Access Context
 ────────────────────────────────────────────────────────────────
 Any child component can now use:
-  
+
   const { user, loading } = useAuth();           ← From AuthProvider
   const { locale, t } = useI18n();               ← From I18nProvider
   const { requestSave } = useEditorStore();      ← Zustand (no provider)
@@ -949,10 +974,10 @@ import { useAuth } from "@/context/AuthContext";
 
 function MyComponent() {
   const { user, loading, login, logout } = useAuth();
-  
+
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Not logged in</div>;
-  
+
   return (
     <div>
       <p>Welcome, {user.username}</p>
@@ -969,7 +994,7 @@ import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 function MyComponent() {
   const t = useEditorT();
-  
+
   return (
     <div>
       <h1>{t("live_editor.title")}</h1>
@@ -987,13 +1012,13 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 function MyComponent() {
   // Option 1: Subscribe to specific property
   const tempData = useEditorStore(s => s.tempData);
-  
+
   // Option 2: Get store imperatively
   const handleSave = () => {
     const store = useEditorStore.getState();
     store.setComponentData(type, id, data);
   };
-  
+
   return <div>{tempData.title}</div>;
 }
 ```
@@ -1006,7 +1031,7 @@ import { useZoneStore, useDropZone } from "@/services-liveeditor/live-editor/dra
 function MyComponent() {
   const zoneStore = useZoneStore();
   const dropZone = useDropZone();
-  
+
   const registerMyZone = () => {
     zoneStore.getState().registerZone("my-zone", {
       id: "my-zone",
@@ -1014,7 +1039,7 @@ function MyComponent() {
       depth: dropZone.depth + 1
     });
   };
-  
+
   return <div>Zone: {dropZone.areaId}</div>;
 }
 ```
@@ -1077,10 +1102,10 @@ STEP 6: confirmSave Execution
 const confirmSave = async () => {
   // Call page-specific save function
   openSaveDialogFn();  // Updates store with current page data
-  
+
   // Get all data from store
   const state = useEditorStore.getState();
-  
+
   // Build payload
   const payload = {
     tenantId,
@@ -1088,10 +1113,10 @@ const confirmSave = async () => {
     globalComponentsData: state.globalComponentsData,
     WebsiteLayout: state.WebsiteLayout
   };
-  
+
   // Save to API
   await axiosInstance.post("/v1/tenant-website/save-pages", payload);
-  
+
   // Close dialog and show success
   closeDialog();
   toast.success("Changes saved successfully!");
@@ -1112,10 +1137,10 @@ useEffect(() => {
     const store = useEditorStore.getState();
     store.forceUpdatePageComponents(slug, pageComponents);
   };
-  
+
   // Register save function with editorStore
   useEditorStore.getState().setOpenSaveDialog(saveFn);
-  
+
   // Cleanup on unmount
   return () => {
     useEditorStore.getState().setOpenSaveDialog(() => {});
@@ -1132,6 +1157,7 @@ useEffect(() => {
 ### Use React Context When:
 
 ✅ **Tree-scoped data**: Data only relevant to specific component tree
+
 ```typescript
 // Example: Drop zone configuration
 <DropZoneProvider value={{ mode: "edit", areaId: "root" }}>
@@ -1140,6 +1166,7 @@ useEffect(() => {
 ```
 
 ✅ **Dependency injection**: Provide implementations to children
+
 ```typescript
 // Example: Auth implementation
 <AuthProvider>
@@ -1148,6 +1175,7 @@ useEffect(() => {
 ```
 
 ✅ **Third-party library integration**: Library expects context
+
 ```typescript
 // Example: @dnd-kit requires DragDropProvider
 <DragDropProvider>
@@ -1158,24 +1186,28 @@ useEffect(() => {
 ### Use Zustand Store When:
 
 ✅ **Global application state**: Needed throughout app
+
 ```typescript
 // Example: editorStore
-const tempData = useEditorStore(s => s.tempData);
+const tempData = useEditorStore((s) => s.tempData);
 ```
 
 ✅ **Complex state logic**: Multiple actions and derived state
+
 ```typescript
 // Example: Component state functions
 store.updateComponentByPath(type, id, path, value);
 ```
 
 ✅ **Performance critical**: Need selective subscriptions
+
 ```typescript
 // Only re-render when tempData changes, not entire store
-const tempData = useEditorStore(s => s.tempData);
+const tempData = useEditorStore((s) => s.tempData);
 ```
 
 ✅ **Outside React tree**: Need to access from utilities
+
 ```typescript
 // Can access from anywhere
 const store = useEditorStore.getState();
@@ -1222,11 +1254,11 @@ function MyComponent() {
   // Direct Zustand access (no provider)
   const tempData = useEditorStore(s => s.tempData);
   const tenantData = useTenantStore(s => s.tenantData);
-  
+
   // Context access (requires provider)
   const { user } = useAuth();
   const t = useEditorT();
-  
+
   return <div>{user.username} - {t("title")}</div>;
 }
 ```
@@ -1245,14 +1277,16 @@ function MyComponent() {
 ### Common Integration Mistakes
 
 ❌ **Mistake 1**: Using context outside provider
+
 ```typescript
 // WRONG - No AuthProvider in tree
 function MyComponent() {
-  const { user } = useAuth();  // Throws error!
+  const { user } = useAuth(); // Throws error!
 }
 ```
 
 ❌ **Mistake 2**: Wrong provider order
+
 ```typescript
 // WRONG - EditorProvider needs AuthProvider
 <EditorProvider>
@@ -1263,17 +1297,19 @@ function MyComponent() {
 ```
 
 ❌ **Mistake 3**: Accessing Zustand like Context
+
 ```typescript
 // WRONG - Zustand doesn't need provider
 const MyContext = createContext(useEditorStore);
 
 // CORRECT - Direct access
-const data = useEditorStore(s => s.tempData);
+const data = useEditorStore((s) => s.tempData);
 ```
 
 ### Best Practices
 
 ✅ **Wrap at appropriate level**: Don't wrap entire app if only needed in section
+
 ```typescript
 // GOOD - Only wrap Live Editor
 <AuthProvider>
@@ -1305,6 +1341,7 @@ The Live Editor context system provides:
 5. **Zustand Stores**: Global state (no providers needed)
 
 **Provider Hierarchy**:
+
 ```
 I18nProvider
   └─ AuthProvider
@@ -1317,12 +1354,14 @@ I18nProvider
 ```
 
 **Key Integration Points**:
+
 - Layout wraps with I18n, Auth, Editor providers
 - LiveEditorUI wraps iframe with DragDrop providers
 - Components access via hooks (useAuth, useI18n, useEditorStore)
 - EditorProvider connects Zustand to React Context for save dialog
 
 **For AI**:
+
 - Understand provider hierarchy
 - Know which provider provides what
 - Access correctly (Context hooks vs Zustand hooks)
@@ -1330,9 +1369,9 @@ I18nProvider
 - Don't confuse Zustand with Context
 
 Understanding this system is essential for:
+
 - Accessing user data
 - Triggering save operations
 - Implementing drag & drop
 - Using translations
 - Debugging context issues
-

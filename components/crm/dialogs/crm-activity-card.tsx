@@ -129,7 +129,7 @@ export function CrmActivityCard({
         card_property: property ? parseInt(property) : null,
         card_date: date ? date.toISOString() : new Date().toISOString(),
       };
-      
+
       // Use card_request_id if available, otherwise use card_customer_id
       if (card.card_request_id) {
         payload.card_request_id = card.card_request_id;

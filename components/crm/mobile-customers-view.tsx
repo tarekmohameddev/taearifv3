@@ -302,7 +302,9 @@ export default function MobileCustomersView({
                       </h3>
                       {getPropertyTypeLabel(customer) !== "غير محدد" && (
                         <Badge
-                          className={getPropertyTypeColor(getPropertyTypeLabel(customer))}
+                          className={getPropertyTypeColor(
+                            getPropertyTypeLabel(customer),
+                          )}
                           variant="secondary"
                         >
                           {getPropertyTypeLabel(customer)}

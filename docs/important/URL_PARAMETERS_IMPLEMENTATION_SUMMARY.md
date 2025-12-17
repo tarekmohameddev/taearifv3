@@ -16,7 +16,7 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ✅ Share specific searches via URL  
 ✅ Bookmark filtered results  
 ✅ Navigate directly to pre-filtered property listings  
-✅ Auto-fill search forms from URL parameters  
+✅ Auto-fill search forms from URL parameters
 
 ---
 
@@ -25,15 +25,18 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ### 1. New Files Created
 
 #### `hooks-liveeditor/use-url-filters.ts`
+
 **Purpose:** Custom React hook to manage URL query parameters
 
 **Key Functions:**
+
 - `applyUrlParamsToStore()` - Reads URL params and applies to store
 - `updateUrlFromFilters()` - Updates URL when filters change
 - `navigateWithFilters()` - Navigate to listing page with filters
 - `clearUrlFilters()` - Remove all filters from URL
 
 **Supported Parameters:**
+
 - `city_id` - City filter
 - `state_id` - District/state filter
 - `max_price` - Maximum price filter
@@ -46,7 +49,9 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ### 2. Modified Components
 
 #### `components/tenant/hero/hero1.tsx`
+
 **Changes:**
+
 - ✅ Added imports for `useSearchParams` and `useUrlFilters`
 - ✅ Updated SearchForm to read URL params on mount
 - ✅ Form fields auto-fill from URL parameters
@@ -58,7 +63,9 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ---
 
 #### `components/tenant/grid/grid1.tsx`
+
 **Changes:**
+
 - ✅ Added import for `useUrlFilters`
 - ✅ Calls `applyUrlParamsToStore()` on mount
 - ✅ Automatically fetches properties when URL has filters
@@ -69,7 +76,9 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ---
 
 #### `components/property-filter.tsx`
+
 **Changes:**
+
 - ✅ Added properties store integration
 - ✅ Updates store when form submitted
 - ✅ Reads `max_price` from URL (was just `price`)
@@ -82,7 +91,9 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ### 3. Documentation Created
 
 #### `docs/important/URL_QUERY_PARAMETERS.md`
+
 **Comprehensive documentation including:**
+
 - Supported parameters with examples
 - Architecture overview
 - Data flow diagrams
@@ -97,7 +108,9 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ---
 
 #### `docs/important/URL_PARAMETERS_TEST_CHECKLIST.md`
+
 **Testing checklist with:**
+
 - 20 detailed test cases
 - Pre-test setup checklist
 - Mobile testing scenarios
@@ -130,16 +143,19 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ### Example URLs
 
 **Single Filter:**
+
 ```
 /for-rent?city_id=5
 ```
 
 **Multiple Filters:**
+
 ```
 /for-sale?city_id=5&state_id=10200005003&max_price=5000&category_id=3
 ```
 
 **Search Query:**
+
 ```
 /for-rent?search=الرياض&max_price=3000
 ```
@@ -149,28 +165,33 @@ The property listing pages (`/for-rent` and `/for-sale`) now support URL query p
 ## ✨ Key Features
 
 ### 1. Auto-Fill Search Form
+
 - Form fields populate from URL parameters
 - Updates when URL changes
 - Works across all form variations (desktop/mobile)
 
 ### 2. Automatic Search Execution
+
 - Properties fetch automatically when URL has parameters
 - No manual search button click needed
 - Seamless user experience
 
 ### 3. Shareable URLs
+
 - URLs contain complete filter state
 - Can be bookmarked
 - Can be shared via any channel
 - Consistent experience across users
 
 ### 4. URL Navigation
+
 - Form submission creates URL with parameters
 - Browser back/forward works correctly
 - Pagination preserves filters
 - Clean URL structure
 
 ### 5. Store Integration
+
 - All filters sync with Zustand store
 - Single source of truth
 - Consistent state management
@@ -211,6 +232,7 @@ Use the testing checklist to verify:
 ## 📋 Backend Requirements
 
 ### API Endpoint
+
 ```
 GET /v1/tenant-website/{tenantId}/properties
 ```
@@ -221,7 +243,7 @@ The backend must accept and process:
 
 - ✅ `purpose` - "rent" or "sale"
 - ✅ `city_id` - City filter
-- ✅ `state_id` - District/state filter  
+- ✅ `state_id` - District/state filter
 - ✅ `max_price` - Maximum price filter
 - ✅ `category_id` - Category filter
 - ✅ `page` - Pagination
@@ -268,6 +290,7 @@ The backend must accept and process:
 ## 📚 Code References
 
 ### Modified Files
+
 ```
 hooks-liveeditor/use-url-filters.ts (NEW)
 components/tenant/hero/hero1.tsx (MODIFIED)
@@ -280,6 +303,7 @@ store/propertiesStore.ts (MODIFIED - Added search & type_id to API)
 ### Key Changes
 
 #### `middleware.ts` (Line 329-331) - CRITICAL FIX
+
 **Problem:** Query parameters were lost during locale redirect
 **Solution:** Preserve `request.nextUrl.search` during redirect
 
@@ -293,6 +317,7 @@ const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
 ```
 
 #### `store/propertiesStore.ts` (Line 250-255)
+
 **Added:** Send `search` and `type_id` parameters to API
 
 ```typescript
@@ -305,6 +330,7 @@ if (state.propertyType) {
 ```
 
 ### Documentation
+
 ```
 docs/important/URL_QUERY_PARAMETERS.md (NEW)
 docs/important/URL_PARAMETERS_TEST_CHECKLIST.md (NEW)
@@ -318,6 +344,7 @@ docs/important/URL_PARAMETERS_IMPLEMENTATION_SUMMARY.md (NEW)
 ### For Developers
 
 **Reading URL params in components:**
+
 ```typescript
 import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
 
@@ -329,6 +356,7 @@ useEffect(() => {
 ```
 
 **Navigating with filters:**
+
 ```typescript
 import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
 
@@ -336,22 +364,24 @@ const { navigateWithFilters } = useUrlFilters();
 
 navigateWithFilters("rent", {
   city_id: "5",
-  max_price: "5000"
+  max_price: "5000",
 });
 // Result: /for-rent?city_id=5&max_price=5000
 ```
 
 **Accessing store filters:**
+
 ```typescript
 import { usePropertiesStore } from "@/store/propertiesStore";
 
-const cityId = usePropertiesStore(state => state.cityId);
-const setPrice = usePropertiesStore(state => state.setPrice);
+const cityId = usePropertiesStore((state) => state.cityId);
+const setPrice = usePropertiesStore((state) => state.setPrice);
 ```
 
 ### For End Users
 
 **Searching for properties:**
+
 1. Go to listing page
 2. Fill search form
 3. Click search
@@ -359,6 +389,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 5. Share URL with others
 
 **Using shared URLs:**
+
 1. Click shared link
 2. Page loads with filters applied
 3. Results show automatically
@@ -371,6 +402,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 ### Potential Additions
 
 **More Parameters:**
+
 - `min_price` - Minimum price filter
 - `bedrooms` - Number of bedrooms
 - `bathrooms` - Number of bathrooms
@@ -378,6 +410,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 - `amenities` - Property amenities
 
 **Advanced Features:**
+
 - Saved searches (user accounts)
 - URL shortening service
 - Social media preview cards
@@ -386,6 +419,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 - Analytics dashboard
 
 **UI Improvements:**
+
 - Active filter chips display
 - One-click filter clear
 - Filter animation feedback
@@ -407,6 +441,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 ## 💡 Best Practices
 
 **When extending:**
+
 1. ✅ Add new params to `useUrlFilters` hook
 2. ✅ Update properties store interface
 3. ✅ Update backend API
@@ -415,6 +450,7 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 6. ✅ Maintain backwards compatibility
 
 **When debugging:**
+
 1. ✅ Check browser console
 2. ✅ Inspect Network tab (API calls)
 3. ✅ Verify URL parameters
@@ -427,16 +463,19 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 ## 📞 Support & Questions
 
 **Documentation:**
+
 - Full docs: `docs/important/URL_QUERY_PARAMETERS.md`
 - Test checklist: `docs/important/URL_PARAMETERS_TEST_CHECKLIST.md`
 
 **Code:**
+
 - Hook: `hooks-liveeditor/use-url-filters.ts`
 - Store: `store/propertiesStore.ts`
 - Hero: `components/tenant/hero/hero1.tsx`
 - Grid: `components/tenant/grid/grid1.tsx`
 
 **For issues:**
+
 1. Check documentation
 2. Review test checklist
 3. Inspect console logs
@@ -451,9 +490,10 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 **Documentation Status:** Complete ✅  
 **Test Coverage:** 20 test cases provided ✅  
 **Backend Requirements:** Documented ✅  
-**Ready for Testing:** Yes ✅  
+**Ready for Testing:** Yes ✅
 
 **Next Steps:**
+
 1. Run full test suite (use checklist)
 2. Verify backend compatibility
 3. Deploy to staging
@@ -466,4 +506,3 @@ const setPrice = usePropertiesStore(state => state.setPrice);
 **Implemented By:** AI Assistant  
 **Date:** October 26, 2025  
 **Version:** 1.0.0
-

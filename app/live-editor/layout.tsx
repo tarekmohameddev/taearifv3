@@ -1978,7 +1978,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 {t("editor.dashboard")}
               </span>
             </Link>
-            
+
             <div className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold text-gray-900">
                 {t("editor.title")}
@@ -2441,7 +2441,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               href="/dashboard"
               className="flex items-center px-2 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
             >
-              <span className="ml-2 font-medium text-xs">t("editor.back_to_dashboard")</span>
+              <span className="ml-2 font-medium text-xs">
+                t("editor.back_to_dashboard")
+              </span>
               <svg
                 className="w-3 h-3"
                 fill="none"

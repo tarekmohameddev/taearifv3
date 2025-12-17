@@ -58,8 +58,8 @@ export function PropertyCard({
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  const primaryColor =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"; // emerald-600 default (fallback)
@@ -67,25 +67,34 @@ export function PropertyCard({
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to convert hex color to CSS filter for SVG coloring
   const hexToFilter = (hex: string): string => {
-    if (!hex || !hex.startsWith('#')) {
+    if (!hex || !hex.startsWith("#")) {
       // Default emerald-600 filter (fallback)
       return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
     }
-    
-    const cleanHex = hex.replace('#', '');
+
+    const cleanHex = hex.replace("#", "");
     if (cleanHex.length !== 6) {
       return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
     }
@@ -105,7 +114,7 @@ export function PropertyCard({
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
+
       switch (max) {
         case r:
           h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
@@ -126,7 +135,7 @@ export function PropertyCard({
 
     // Calculate filter values
     const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
-    const contrast = 100 + (saturation * 0.5);
+    const contrast = 100 + saturation * 0.5;
 
     return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
   };
@@ -142,7 +151,7 @@ export function PropertyCard({
   }
 
   const isUnavailable =
-    p.status?.toLowerCase() === "rented" || 
+    p.status?.toLowerCase() === "rented" ||
     p.status?.toLowerCase() === "sold" ||
     p.status?.toLowerCase() === "unavailable";
 
@@ -150,18 +159,18 @@ export function PropertyCard({
   const getStatusText = () => {
     const status = p.status?.toLowerCase();
     const transactionType = p.transactionType_en?.toLowerCase();
-    
+
     // إذا كان unavailable، نحدد النص حسب نوع المعاملة
     if (status === "unavailable") {
       if (transactionType === "sale") return "مُباع";
       if (transactionType === "rent") return "تم تأجيره";
       return "غير متاحة";
     }
-    
+
     // الحالات الأخرى
     if (status === "rented") return "تم تأجيره";
     if (status === "sold") return "مُباع";
-    
+
     return "غير متاحة";
   };
 

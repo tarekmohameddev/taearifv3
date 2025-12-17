@@ -1,6 +1,7 @@
 # EditorSidebar Data Flow - Complete Reference
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Opening EditorSidebar Flow](#opening-editorsidebar-flow)
 3. [Real-Time Editing Flow](#real-time-editing-flow)
@@ -70,7 +71,7 @@ STEP 4A: Initialize Global Header (if CASE A)
 ────────────────────────────────────────────────
 const defaultData = getDefaultHeaderData();
 
-const dataToUse = 
+const dataToUse =
   globalComponentsData?.header ||  // Try unified first
   globalHeaderData ||              // Try individual
   defaultData;                     // Fallback
@@ -84,7 +85,7 @@ STEP 4B: Initialize Global Footer (if CASE B)
 ────────────────────────────────────────────────
 const defaultData = getDefaultFooterData();
 
-const dataToUse = 
+const dataToUse =
   globalComponentsData?.footer ||
   globalFooterData ||
   defaultData;
@@ -108,28 +109,28 @@ const uniqueVariantId = selectedComponent.id;  // UUID!
 let dataToUse;
 
 if (selectedComponent.type === "contactCards") {
-  const hasCards = 
+  const hasCards =
     selectedComponent.data?.cards &&
     Array.isArray(selectedComponent.data.cards) &&
     selectedComponent.data.cards.length > 0;
-  
-  dataToUse = hasCards 
-    ? selectedComponent.data 
+
+  dataToUse = hasCards
+    ? selectedComponent.data
     : defaultData;
-    
+
 } else if (selectedComponent.type === "contactFormSection") {
   const hasSocialLinks =
     selectedComponent.data?.content?.socialLinks &&
     Array.isArray(selectedComponent.data.content.socialLinks) &&
     selectedComponent.data.content.socialLinks.length > 0;
-  
+
   dataToUse = hasSocialLinks
     ? selectedComponent.data
     : defaultData;
-    
+
 } else {
   // Standard logic
-  dataToUse = 
+  dataToUse =
     selectedComponent.data && Object.keys(selectedComponent.data).length > 0
       ? selectedComponent.data
       : defaultData;
@@ -164,28 +165,28 @@ useEffect(() => {
     const structureModule = await import(
       `@/componentsStructure/${type}`
     );
-    
+
     // Extract structure
     const structureName = `${type}Structure`;
     const loadedStructure = structureModule[structureName];
-    
+
     // Translate labels
     const translatedStructure = translateComponentStructure(
       loadedStructure,
       t
     );
-    
+
     // Find matching variant
-    const targetVariant = 
+    const targetVariant =
       translatedStructure.variants.find(v => v.id === componentName) ||
       translatedStructure.variants[0];
-    
+
     setStructure({
       ...translatedStructure,
       currentVariant: targetVariant
     });
   };
-  
+
   loadStructure();
 }, [type]);
 
@@ -272,7 +273,7 @@ Determine which update function to use:
 
 if (onUpdateByPath) {
   // Callback provided from parent
-  
+
   if (
     componentType &&
     variantId &&
@@ -281,15 +282,15 @@ if (onUpdateByPath) {
   ) {
     // Regular components: Update tempData for immediate feedback
     updateByPath(path, value);
-    
+
   } else {
     // Global components: Use provided callback
     onUpdateByPath(path, value);
   }
-  
+
 } else {
   // No callback, use store directly
-  
+
   if (variantId === "global-header") {
     updateByPath(path, value);
   } else if (variantId === "global-footer") {
@@ -309,10 +310,10 @@ updateByPath: (path, value) =>
       .replace(/\[(\d+)\]/g, ".$1")
       .split(".")
       .filter(Boolean);
-    
+
     // Initialize newData
     let newData = { ...(state.tempData || {}) };
-    
+
     // Special handling for global components
     if (
       state.currentPage === "global-header" ||
@@ -324,24 +325,24 @@ updateByPath: (path, value) =>
     } else if (state.currentPage === "global-footer") {
       newData = deepMerge(state.globalFooterData, state.tempData);
     }
-    
+
     // Navigate path and update
     let cursor = newData;
     for (let i = 0; i < segments.length - 1; i++) {
       const key = segments[i];
       const nextIsIndex = !isNaN(Number(segments[i + 1]));
-      
+
       // Create structure if missing
       if (cursor[key] == null) {
         cursor[key] = nextIsIndex ? [] : {};
       }
-      
+
       cursor = cursor[key];
     }
-    
+
     // Set final value
     cursor[segments[segments.length - 1]] = value;
-    
+
     // Return updated tempData
     return { tempData: newData };
   })
@@ -367,13 +368,13 @@ For Global Components:
   const data = useEditorStore(s => s.globalHeaderData);
   // or
   const data = useEditorStore(s => s.globalComponentsData.header);
-  
+
   // During editing, this reflects tempData changes
 
 For Regular Components:
   const storeData = useEditorStore.getState()
     .getComponentData(component.type, component.id);
-  
+
   // This reads from heroStates[id], etc.
   // NOT from tempData directly!
 
@@ -400,14 +401,16 @@ User sees change immediately ✓
 
 ```typescript
 // ❌ Components do NOT do this:
-const data = useEditorStore(s => s.tempData);
+const data = useEditorStore((s) => s.tempData);
 
 // ✅ Components DO this:
-const data = useEditorStore.getState()
+const data = useEditorStore
+  .getState()
   .getComponentData(component.type, component.id);
 ```
 
 **Reason**:
+
 - tempData is for EDITING DRAFTS
 - Component states (heroStates, etc.) are for RENDERING
 - On save, tempData is MERGED into component states
@@ -421,7 +424,7 @@ const data = useEditorStore.getState()
 ```typescript
 // Global header reads from globalHeaderData
 // Which is merged with tempData during editing
-const headerData = useEditorStore(s => s.globalHeaderData);
+const headerData = useEditorStore((s) => s.globalHeaderData);
 
 // In updateByPath for global header:
 if (state.currentPage === "global-header") {
@@ -451,7 +454,7 @@ const handleSave = () => {
 STEP 3: Mark Changes Made
 ────────────────────────────────────────────────
   setHasChangesMade(true);
-  
+
   // This triggers:
   // 1. Unsaved changes dialog (if user tries to leave)
   // 2. UI indicator that changes need to be published
@@ -465,7 +468,7 @@ STEP 4: Get Store State
 
 STEP 5: Get Latest tempData
 ────────────────────────────────────────────────
-  const latestTempData = 
+  const latestTempData =
     selectedComponent.id === "global-header" ||
     selectedComponent.id === "global-footer"
       ? store.tempData || tempData
@@ -474,40 +477,40 @@ STEP 5: Get Latest tempData
 
 STEP 6: Branch by Component Type
 ────────────────────────────────────────────────
-  
+
   ┌─ BRANCH A: Global Header
   │  if (selectedComponent.id === "global-header") {
-  │    
+  │
   │    logChange(id, "header1", "header", latestTempData, "GLOBAL_HEADER");
-  │    
+  │
   │    // Update individual store
   │    setGlobalHeaderData(latestTempData);
-  │    
+  │
   │    // Update unified store
   │    setGlobalComponentsData({
   │      ...globalComponentsData,
   │      header: latestTempData
   │    });
-  │    
+  │
   │    // Notify parent (triggers re-render in LiveEditorUI)
   │    onComponentUpdate(selectedComponent.id, latestTempData);
-  │    
+  │
   │    onClose();
   │    return;
   │  }
   │
   ├─ BRANCH B: Global Footer
   │  if (selectedComponent.id === "global-footer") {
-  │    
+  │
   │    logChange(id, "footer1", "footer", latestTempData, "GLOBAL_FOOTER");
-  │    
+  │
   │    setGlobalFooterData(latestTempData);
   │    setGlobalComponentsData({
   │      ...globalComponentsData,
   │      footer: latestTempData
   │    });
   │    onComponentUpdate(selectedComponent.id, latestTempData);
-  │    
+  │
   │    onClose();
   │    return;
   │  }
@@ -519,17 +522,17 @@ STEP 6: Branch by Component Type
 STEP 7: Get Data Sources (Regular Component)
 ────────────────────────────────────────────────
   const uniqueVariantId = selectedComponent.id;  // UUID
-  
+
   // Get store data
   const storeData = store.getComponentData(
     selectedComponent.type,
     uniqueVariantId
   );
-  
+
   // Get page components
-  const currentPageComponents = 
+  const currentPageComponents =
     store.pageComponentsByPage[currentPage] || [];
-  
+
   // Find existing component
   const existingComponent = currentPageComponents.find(
     comp => comp.id === selectedComponent.id
@@ -544,7 +547,7 @@ STEP 8: Merge Data Sources (Critical!)
         latestTempData
       )
     : deepMerge(storeData, latestTempData);
-  
+
   // Priority order:
   // 1. latestTempData (highest - latest edits)
   // 2. storeData (middle - previous edits)
@@ -558,7 +561,7 @@ STEP 9: Update Component Store
     uniqueVariantId,
     mergedData
   );
-  
+
   // This updates:
   // - heroStates[uniqueVariantId] = mergedData
   // - pageComponentsByPage[currentPage][index].data = mergedData
@@ -572,17 +575,17 @@ STEP 10: Update Page Components Array
     }
     return comp;
   });
-  
+
   store.forceUpdatePageComponents(currentPage, updatedPageComponents);
 
 
 STEP 11: Notify Parent Component
 ────────────────────────────────────────────────
   onComponentUpdate(selectedComponent.id, mergedData);
-  
+
   // This triggers re-render in LiveEditorUI:
   setPageComponents((current) =>
-    current.map(c => 
+    current.map(c =>
       c.id === id ? { ...c, data: newData } : c
     )
   );
@@ -591,7 +594,7 @@ STEP 11: Notify Parent Component
 STEP 12: Sync tempData
 ────────────────────────────────────────────────
   setTempData(mergedData);
-  
+
   // Keep tempData in sync with saved data
   // Allows user to continue editing without reloading
 
@@ -599,7 +602,7 @@ STEP 12: Sync tempData
 STEP 13: Close Sidebar
 ────────────────────────────────────────────────
   onClose();
-  
+
   // Sidebar slides out
   // User sees updated component in iframe ✓
   // Changes persisted in stores ✓
@@ -701,6 +704,7 @@ getValueByPath(path)
 ```
 
 **Priority Summary**:
+
 ```
 1. currentData (explicit override)
 2. globalComponentsData (for global components)
@@ -714,16 +718,19 @@ getValueByPath(path)
 Different contexts need different data sources:
 
 **Context 1: Initial Load**
+
 - currentData passed from parent
 - Use currentData to show existing values
 
 **Context 2: Editing Global Header**
+
 - variantId = "global-header"
 - Use globalComponentsData.header
 - Updates go to tempData
 - On save, tempData → globalComponentsData
 
 **Context 3: Editing Regular Component**
+
 - variantId = component UUID
 - Use tempData if available (live editing)
 - Fallback to componentData from store
@@ -747,30 +754,30 @@ When user edits field in sidebar:
       console.error("Invalid path:", path);
       return;
     }
-    
+
     // Route based on component type
     if (selectedComponent.id === "global-header") {
       // Validate header paths
       const validPaths = ["visible", "position", "logo", "menu", ...];
       const pathRoot = path.split(".")[0];
-      
+
       if (!validPaths.includes(pathRoot)) {
         console.warn("Potentially invalid header path:", path);
       }
-      
+
       updateByPath(path, value);  // Update tempData
-      
+
     } else if (selectedComponent.id === "global-footer") {
       // Validate footer paths
       const validPaths = ["visible", "background", "content", ...];
       const pathRoot = path.split(".")[0];
-      
+
       if (!validPaths.includes(pathRoot)) {
         console.warn("Potentially invalid footer path:", path);
       }
-      
+
       updateByPath(path, value);  // Update tempData
-      
+
     } else {
       // Regular components
       if (
@@ -780,7 +787,7 @@ When user edits field in sidebar:
         // Special: Update both paths
         updateComponentByPath(type, id, "content.imagePosition", value);
         updateComponentByPath(type, id, "imagePosition", value);
-        
+
       } else {
         // Standard update
         updateComponentByPath(type, id, path, value);
@@ -791,6 +798,7 @@ When user edits field in sidebar:
 ```
 
 **Key Points**:
+
 1. **Path validation**: Check if path is valid for component type
 2. **Special cases**: Handle known edge cases (imagePosition)
 3. **Global vs Regular**: Different update functions
@@ -827,7 +835,7 @@ const handleUpdateByPath = (path, value) => {
 // In DynamicFieldsRenderer
 const updateValue = (path, value) => {
   // Special case handling...
-  
+
   if (onUpdateByPath) {
     // Regular components: Update tempData
     if (
@@ -836,9 +844,9 @@ const updateValue = (path, value) => {
       variantId !== "global-header" &&
       variantId !== "global-footer"
     ) {
-      updateByPath(path, value);  // tempData update
+      updateByPath(path, value); // tempData update
     } else {
-      onUpdateByPath(path, value);  // Global component update
+      onUpdateByPath(path, value); // Global component update
     }
   } else {
     updateByPath(path, value);
@@ -847,6 +855,7 @@ const updateValue = (path, value) => {
 ```
 
 **Callback Chain**:
+
 ```
 Field Renderer onChange
   ↓
@@ -872,6 +881,7 @@ Store state updated
 ### Case 1: halfTextHalfImage imagePosition
 
 **Problem**: Component has TWO properties for same data:
+
 - `imagePosition` (top-level, legacy)
 - `content.imagePosition` (nested, new structure)
 
@@ -879,18 +889,15 @@ Store state updated
 
 ```typescript
 // In DynamicFieldsRenderer.updateValue
-if (
-  path === "content.imagePosition" &&
-  componentType === "halfTextHalfImage"
-) {
+if (path === "content.imagePosition" && componentType === "halfTextHalfImage") {
   if (onUpdateByPath) {
     onUpdateByPath("content.imagePosition", value);
-    onUpdateByPath("imagePosition", value);  // ← Update both!
+    onUpdateByPath("imagePosition", value); // ← Update both!
   } else {
     updateComponentByPath(type, id, "content.imagePosition", value);
     updateComponentByPath(type, id, "imagePosition", value);
   }
-  return;  // Early exit
+  return; // Early exit
 }
 ```
 
@@ -903,10 +910,7 @@ if (
 **Solution**: Explicit handling
 
 ```typescript
-if (
-  path === "layout.direction" &&
-  componentType === "halfTextHalfImage"
-) {
+if (path === "layout.direction" && componentType === "halfTextHalfImage") {
   if (onUpdateByPath) {
     onUpdateByPath("layout.direction", value);
   } else {
@@ -925,14 +929,12 @@ if (
 ```typescript
 // In EditorSidebar initialization
 if (selectedComponent.type === "contactCards") {
-  const hasCards = 
+  const hasCards =
     selectedComponent.data?.cards &&
     Array.isArray(selectedComponent.data.cards) &&
     selectedComponent.data.cards.length > 0;
-  
-  dataToUse = hasCards 
-    ? selectedComponent.data 
-    : defaultData;  // ← Use defaults if no cards
+
+  dataToUse = hasCards ? selectedComponent.data : defaultData; // ← Use defaults if no cards
 }
 ```
 
@@ -948,16 +950,24 @@ if (selectedComponent.type === "contactCards") {
 // In EditorSidebar onUpdateByPath
 if (selectedComponent.id === "global-header") {
   const validHeaderPaths = [
-    "visible", "position", "height", "background",
-    "colors", "logo", "menu", "actions", "responsive", "animations"
+    "visible",
+    "position",
+    "height",
+    "background",
+    "colors",
+    "logo",
+    "menu",
+    "actions",
+    "responsive",
+    "animations",
   ];
-  
+
   const pathRoot = path.split(".")[0];
-  
+
   if (!validHeaderPaths.includes(pathRoot)) {
     console.warn("Potentially invalid header path:", path);
   }
-  
+
   updateByPath(path, value);
 }
 ```
@@ -974,21 +984,20 @@ if (selectedComponent.id === "global-header") {
 
 ```typescript
 // In ArrayFieldRenderer
-{arrDef.of.map(f => {
-  // Conditional rendering for Options field
-  if (
-    f.key === "options" &&
-    f.label === "Field Options (for Select/Radio)"
-  ) {
-    const fieldType = getValueByPath(`${itemPath}.type`);
-    
-    if (fieldType !== "radio" && fieldType !== "select") {
-      return null;  // Don't render options field
+{
+  arrDef.of.map((f) => {
+    // Conditional rendering for Options field
+    if (f.key === "options" && f.label === "Field Options (for Select/Radio)") {
+      const fieldType = getValueByPath(`${itemPath}.type`);
+
+      if (fieldType !== "radio" && fieldType !== "select") {
+        return null; // Don't render options field
+      }
     }
-  }
-  
-  return renderField(f, itemPath);
-})}
+
+    return renderField(f, itemPath);
+  });
+}
 ```
 
 ---
@@ -1155,14 +1164,14 @@ Check currentPage:
 // ✅ CORRECT
 const mergedData = deepMerge(
   deepMerge(existingComponent.data, storeData),
-  latestTempData
+  latestTempData,
 );
 
 // ❌ WRONG - Loses nested data
 const mergedData = {
   ...existingComponent.data,
   ...storeData,
-  ...latestTempData
+  ...latestTempData,
 };
 ```
 
@@ -1184,10 +1193,10 @@ if (selectedComponent.componentName === "header1") {
 
 ```typescript
 // ✅ CORRECT - During editing
-updateByPath(path, value);  // Updates tempData
+updateByPath(path, value); // Updates tempData
 
 // ❌ WRONG - During editing
-updateComponentByPath(type, id, path, value);  // Updates component states
+updateComponentByPath(type, id, path, value); // Updates component states
 ```
 
 **Exception**: Only update component states on SAVE, not during editing
@@ -1237,7 +1246,7 @@ console.log("🔍 Data Source Resolution:", {
   variantId,
   isGlobalHeader: variantId === "global-header",
   isGlobalFooter: variantId === "global-footer",
-  selectedSource: cursor ? "determined" : "none"
+  selectedSource: cursor ? "determined" : "none",
 });
 ```
 
@@ -1252,7 +1261,7 @@ console.log("🔍 Update Value:", {
   variantId,
   isGlobal: variantId === "global-header" || variantId === "global-footer",
   hasCallback: !!onUpdateByPath,
-  willUpdateTempData: true
+  willUpdateTempData: true,
 });
 ```
 
@@ -1265,7 +1274,7 @@ console.log("🔧 Merge Process:", {
   storeData,
   latestTempData,
   mergedData,
-  mergePriority: "existing < store < tempData"
+  mergePriority: "existing < store < tempData",
 });
 ```
 
@@ -1276,9 +1285,14 @@ console.log("🔧 Merge Process:", {
 const state = useEditorStore.getState();
 console.log("✅ Post-Save Verification:", {
   componentState: state.heroStates[id],
-  pageComponent: state.pageComponentsByPage[currentPage].find(c => c.id === id),
-  dataMatches: JSON.stringify(state.heroStates[id]) === 
-               JSON.stringify(state.pageComponentsByPage[currentPage].find(c => c.id === id)?.data)
+  pageComponent: state.pageComponentsByPage[currentPage].find(
+    (c) => c.id === id,
+  ),
+  dataMatches:
+    JSON.stringify(state.heroStates[id]) ===
+    JSON.stringify(
+      state.pageComponentsByPage[currentPage].find((c) => c.id === id)?.data,
+    ),
 });
 ```
 
@@ -1294,6 +1308,7 @@ The EditorSidebar data flow is complex but follows clear patterns:
 4. **Canceling**: Discard tempData without affecting stores
 
 **Key Principles**:
+
 - tempData is for drafts
 - Component states are for rendering
 - pageComponentsByPage is source of truth for pages
@@ -1303,9 +1318,9 @@ The EditorSidebar data flow is complex but follows clear patterns:
 - Synchronization keeps all stores aligned
 
 Understanding this flow is essential for:
+
 - Adding new component types
 - Debugging save issues
 - Implementing new field types
 - Optimizing performance
 - Maintaining data consistency
-

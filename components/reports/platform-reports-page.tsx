@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +15,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -31,7 +43,7 @@ import {
   Legend,
   CartesianGrid,
   Cell,
-} from "recharts"
+} from "recharts";
 import {
   Download,
   RefreshCw,
@@ -53,10 +65,10 @@ import {
   MessageSquare,
   Building2,
   HandCoins,
-} from "lucide-react"
+} from "lucide-react";
 
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 // Placeholder data - replace with your actual data fetching logic
 const employeeData = [
@@ -110,7 +122,7 @@ const employeeData = [
     rating: 4.6,
     performance: 88,
   },
-]
+];
 
 const comparisonData = {
   month: [
@@ -121,15 +133,27 @@ const comparisonData = {
     { period: "مايو", current: 690000, previous: 650000, target: 670000 },
     { period: "يونيو", current: 820000, previous: 780000, target: 800000 },
   ],
-}
+};
 
 const geoDistributionData = [
-  { city: "الرياض", properties: 245, revenue: 450000, agents: 45, status: "نشط" },
+  {
+    city: "الرياض",
+    properties: 245,
+    revenue: 450000,
+    agents: 45,
+    status: "نشط",
+  },
   { city: "جدة", properties: 156, revenue: 280000, agents: 28, status: "نشط" },
-  { city: "الدمام", properties: 89, revenue: 160000, agents: 16, status: "نشط" },
+  {
+    city: "الدمام",
+    properties: 89,
+    revenue: 160000,
+    agents: 16,
+    status: "نشط",
+  },
   { city: "المدينة", properties: 34, revenue: 62000, agents: 8, status: "نشط" },
   { city: "مكة", properties: 23, revenue: 42000, agents: 5, status: "نشط" },
-]
+];
 
 const propertyDistributionByArea = [
   {
@@ -212,26 +236,86 @@ const propertyDistributionByArea = [
     availableRentals: 4,
     availableSales: 2,
   },
-]
+];
 
 const performanceAlerts = [
-  { metric: "معدل التحويل", value: 68, threshold: 75, status: "warning", message: "أقل من الهدف المطلوب" },
-  { metric: "رضا العملاء", value: 92, threshold: 90, status: "good", message: "يتجاوز الهدف" },
-  { metric: "وقت الإغلاق", value: 14, threshold: 10, status: "warning", message: "أكثر من المتوقع" },
-  { metric: "نسبة الإلغاء", value: 12, threshold: 15, status: "good", message: "في الحدود المقبولة" },
-]
+  {
+    metric: "معدل التحويل",
+    value: 68,
+    threshold: 75,
+    status: "warning",
+    message: "أقل من الهدف المطلوب",
+  },
+  {
+    metric: "رضا العملاء",
+    value: 92,
+    threshold: 90,
+    status: "good",
+    message: "يتجاوز الهدف",
+  },
+  {
+    metric: "وقت الإغلاق",
+    value: 14,
+    threshold: 10,
+    status: "warning",
+    message: "أكثر من المتوقع",
+  },
+  {
+    metric: "نسبة الإلغاء",
+    value: 12,
+    threshold: 15,
+    status: "good",
+    message: "في الحدود المقبولة",
+  },
+];
 
 const scheduledReports = [
-  { name: "تقرير المبيعات الأسبوعي", frequency: "أسبوعي", email: "manager@realestate.com", nextDate: "2025-01-15" },
-  { name: "تقرير الموظفين الشهري", frequency: "شهري", email: "hr@realestate.com", nextDate: "2025-02-01" },
-  { name: "تقرير الأداء المالي", frequency: "يومي", email: "finance@realestate.com", nextDate: "2025-01-14" },
-]
+  {
+    name: "تقرير المبيعات الأسبوعي",
+    frequency: "أسبوعي",
+    email: "manager@realestate.com",
+    nextDate: "2025-01-15",
+  },
+  {
+    name: "تقرير الموظفين الشهري",
+    frequency: "شهري",
+    email: "hr@realestate.com",
+    nextDate: "2025-02-01",
+  },
+  {
+    name: "تقرير الأداء المالي",
+    frequency: "يومي",
+    email: "finance@realestate.com",
+    nextDate: "2025-01-14",
+  },
+];
 
 const propertyDetails = [
-  { id: 1, address: "حي الروضة - الرياض", type: "شقة", price: 450000, agent: "أحمد محمد", status: "مباعة" },
-  { id: 2, address: "حي السليمانية - جدة", type: "فيلا", price: 850000, agent: "فاطمة علي", status: "معروضة" },
-  { id: 3, address: "حي الخليج - الدمام", type: "شقة", price: 320000, agent: "محمود السيد", status: "مباعة" },
-]
+  {
+    id: 1,
+    address: "حي الروضة - الرياض",
+    type: "شقة",
+    price: 450000,
+    agent: "أحمد محمد",
+    status: "مباعة",
+  },
+  {
+    id: 2,
+    address: "حي السليمانية - جدة",
+    type: "فيلا",
+    price: 850000,
+    agent: "فاطمة علي",
+    status: "معروضة",
+  },
+  {
+    id: 3,
+    address: "حي الخليج - الدمام",
+    type: "شقة",
+    price: 320000,
+    agent: "محمود السيد",
+    status: "مباعة",
+  },
+];
 
 const monthlyRevenueData = [
   { month: "يناير", revenue: 420000, expenses: 240000 },
@@ -240,7 +324,7 @@ const monthlyRevenueData = [
   { month: "أبريل", revenue: 590000, expenses: 300000 },
   { month: "مايو", revenue: 690000, expenses: 350000 },
   { month: "يونيو", revenue: 820000, expenses: 400000 },
-]
+];
 
 const propertyTypeData = [
   { name: "شقق - إيجار", value: 145, color: "#3b82f6", worth: 435000000 },
@@ -250,13 +334,13 @@ const propertyTypeData = [
   { name: "محلات - إيجار", value: 54, color: "#f59e0b", worth: 162000000 },
   { name: "محلات - بيع", value: 35, color: "#fbbf24", worth: 140000000 },
   { name: "أراضي - بيع", value: 56, color: "#8b5cf6", worth: 560000000 },
-]
+];
 
 const reservationStatusData = [
   { name: "مقبولة", value: 156, color: "#10b981" },
   { name: "قيد الانتظار", value: 89, color: "#f59e0b" },
   { name: "مرفوضة", value: 34, color: "#ef4444" },
-]
+];
 
 const employeePerformanceData = [
   { name: "أحمد محمد", sales: 23, conversions: 18 },
@@ -264,7 +348,7 @@ const employeePerformanceData = [
   { name: "محمود السيد", sales: 31, conversions: 26 },
   { name: "سارة خالد", sales: 12, conversions: 9 },
   { name: "علي أحمد", sales: 15, conversions: 11 },
-]
+];
 
 const keyMetrics = [
   {
@@ -299,7 +383,7 @@ const keyMetrics = [
     color: "bg-purple-100 text-purple-600",
     description: "أسرع من المتوسط",
   },
-]
+];
 
 const availableReports = [
   { id: "overview", name: "نظرة عامة", icon: ChartIcon },
@@ -308,21 +392,21 @@ const availableReports = [
   { id: "financial", name: "مالي", icon: DollarSign },
   { id: "geo", name: "الجغرافية", icon: Map },
   { id: "performance", name: "الأداء", icon: Trophy },
-]
+];
 
 const handleExportPDF = () => {
-  console.log("[v0] Exporting reports to PDF")
+  console.log("[v0] Exporting reports to PDF");
   // PDF export logic would go here
-}
+};
 
 const handleExportExcel = () => {
-  console.log("[v0] Exporting reports to Excel")
+  console.log("[v0] Exporting reports to Excel");
   // Excel export logic would go here
-}
+};
 
 export function PlatformReportsPage() {
-  const [refreshing, setRefreshing] = useState(false)
-  const [dateRange, setDateRange] = useState("month")
+  const [refreshing, setRefreshing] = useState(false);
+  const [dateRange, setDateRange] = useState("month");
   const [selectedReports, setSelectedReports] = useState([
     "overview",
     "employees",
@@ -330,27 +414,32 @@ export function PlatformReportsPage() {
     "financial",
     "geo",
     "performance",
-  ])
-  const [activeTab, setActiveTab] = useState("overview")
-  const [searchEmployee, setSearchEmployee] = useState("")
+  ]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [searchEmployee, setSearchEmployee] = useState("");
 
   const handleRefreshData = () => {
-    setRefreshing(true)
+    setRefreshing(true);
     // Simulate data refresh
     setTimeout(() => {
-      setRefreshing(false)
-    }, 1500)
-  }
+      setRefreshing(false);
+    }, 1500);
+  };
 
-  const filteredEmployees = employeeData.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()))
+  const filteredEmployees = employeeData.filter((emp) =>
+    emp.name.toLowerCase().includes(searchEmployee.toLowerCase()),
+  );
 
-  const totalPropertyWorth = propertyTypeData.reduce((sum, prop) => sum + prop.worth, 0)
+  const totalPropertyWorth = propertyTypeData.reduce(
+    (sum, prop) => sum + prop.worth,
+    0,
+  );
   const rentalPortfolioWorth = propertyTypeData
     .filter((p) => p.name.includes("إيجار"))
-    .reduce((sum, p) => sum + p.worth, 0)
+    .reduce((sum, p) => sum + p.worth, 0);
   const salePortfolioWorth = propertyTypeData
     .filter((p) => p.name.includes("بيع") || p.name.includes("أراضي"))
-    .reduce((sum, p) => sum + p.worth, 0)
+    .reduce((sum, p) => sum + p.worth, 0);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -363,8 +452,12 @@ export function PlatformReportsPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">تقارير المنصة</h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">عرض شامل لجميع البيانات والإحصائيات</p>
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                    تقارير المنصة
+                  </h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                    عرض شامل لجميع البيانات والإحصائيات
+                  </p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
                   <Button
@@ -374,12 +467,18 @@ export function PlatformReportsPage() {
                     disabled={refreshing}
                     className="gap-2 bg-transparent"
                   >
-                    <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+                    <RefreshCw
+                      className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                    />
                     {refreshing ? "جاري التحديث..." : "تحديث"}
                   </Button>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button size="sm" variant="outline" className="gap-2 bg-transparent">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-2 bg-transparent"
+                      >
                         <Download className="h-4 w-4" />
                         تصدير
                       </Button>
@@ -387,14 +486,22 @@ export function PlatformReportsPage() {
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>تصدير التقارير</DialogTitle>
-                        <DialogDescription>اختر صيغة التصدير المطلوبة</DialogDescription>
+                        <DialogDescription>
+                          اختر صيغة التصدير المطلوبة
+                        </DialogDescription>
                       </DialogHeader>
                       <div className="flex gap-3">
-                        <Button onClick={handleExportPDF} className="flex-1 gap-2">
+                        <Button
+                          onClick={handleExportPDF}
+                          className="flex-1 gap-2"
+                        >
                           <FileText className="h-4 w-4" />
                           PDF
                         </Button>
-                        <Button onClick={handleExportExcel} className="flex-1 gap-2">
+                        <Button
+                          onClick={handleExportExcel}
+                          className="flex-1 gap-2"
+                        >
                           <FileText className="h-4 w-4" />
                           Excel
                         </Button>
@@ -421,7 +528,11 @@ export function PlatformReportsPage() {
                   </Select>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button size="sm" variant="outline" className="w-full sm:w-auto gap-2 bg-transparent">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto gap-2 bg-transparent"
+                      >
                         <Settings className="h-4 w-4" />
                         تخصيص التقارير
                       </Button>
@@ -429,19 +540,31 @@ export function PlatformReportsPage() {
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>تخصيص التقارير</DialogTitle>
-                        <DialogDescription>اختر التقارير التي تريد عرضها</DialogDescription>
+                        <DialogDescription>
+                          اختر التقارير التي تريد عرضها
+                        </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-3">
                         {availableReports.map((report) => (
-                          <label key={report.id} className="flex items-center gap-2 cursor-pointer">
+                          <label
+                            key={report.id}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
                             <input
                               type="checkbox"
                               checked={selectedReports.includes(report.id)}
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setSelectedReports([...selectedReports, report.id])
+                                  setSelectedReports([
+                                    ...selectedReports,
+                                    report.id,
+                                  ]);
                                 } else {
-                                  setSelectedReports(selectedReports.filter((r) => r !== report.id))
+                                  setSelectedReports(
+                                    selectedReports.filter(
+                                      (r) => r !== report.id,
+                                    ),
+                                  );
                                 }
                               }}
                               className="w-4 h-4"
@@ -462,7 +585,7 @@ export function PlatformReportsPage() {
             {/* Key Metrics */}
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
               {keyMetrics.map((metric, index) => {
-                const Icon = metric.icon
+                const Icon = metric.icon;
                 return (
                   <Card key={index} className="overflow-hidden">
                     <CardContent className="p-4 sm:p-6">
@@ -472,18 +595,26 @@ export function PlatformReportsPage() {
                             {metric.title}
                           </p>
                           <div className="flex items-baseline gap-2 mt-2">
-                            <p className="text-xl sm:text-2xl font-bold truncate">{metric.value}</p>
-                            <span className="text-xs font-semibold text-green-600 shrink-0">{metric.change}</span>
+                            <p className="text-xl sm:text-2xl font-bold truncate">
+                              {metric.value}
+                            </p>
+                            <span className="text-xs font-semibold text-green-600 shrink-0">
+                              {metric.change}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{metric.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {metric.description}
+                          </p>
                         </div>
-                        <div className={`${metric.color} p-2 sm:p-3 rounded-lg shrink-0`}>
+                        <div
+                          className={`${metric.color} p-2 sm:p-3 rounded-lg shrink-0`}
+                        >
                           <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
 
@@ -492,7 +623,9 @@ export function PlatformReportsPage() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">إجمالي قيمة العقارات</p>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        إجمالي قيمة العقارات
+                      </p>
                       <p className="text-2xl sm:text-3xl font-bold mt-2">
                         {(totalPropertyWorth / 1000000).toFixed(0)}م ر.س
                       </p>
@@ -511,12 +644,16 @@ export function PlatformReportsPage() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">قيمة محفظة الإيجارات</p>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        قيمة محفظة الإيجارات
+                      </p>
                       <p className="text-2xl sm:text-3xl font-bold mt-2">
                         {(rentalPortfolioWorth / 1000000).toFixed(0)}م ر.س
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {propertyTypeData.filter((p) => p.name.includes("إيجار")).reduce((sum, p) => sum + p.value, 0)}{" "}
+                        {propertyTypeData
+                          .filter((p) => p.name.includes("إيجار"))
+                          .reduce((sum, p) => sum + p.value, 0)}{" "}
                         عقار للإيجار
                       </p>
                     </div>
@@ -531,13 +668,19 @@ export function PlatformReportsPage() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">قيمة محفظة البيع</p>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        قيمة محفظة البيع
+                      </p>
                       <p className="text-2xl sm:text-3xl font-bold mt-2">
                         {(salePortfolioWorth / 1000000).toFixed(0)}م ر.س
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {propertyTypeData
-                          .filter((p) => p.name.includes("بيع") || p.name.includes("أراضي"))
+                          .filter(
+                            (p) =>
+                              p.name.includes("بيع") ||
+                              p.name.includes("أراضي"),
+                          )
                           .reduce((sum, p) => sum + p.value, 0)}{" "}
                         عقار للبيع
                       </p>
@@ -555,7 +698,9 @@ export function PlatformReportsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>مقارنة الأداء</CardTitle>
-                  <CardDescription>مقارنة الإيرادات مع الفترة السابقة والأهداف</CardDescription>
+                  <CardDescription>
+                    مقارنة الإيرادات مع الفترة السابقة والأهداف
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -565,9 +710,25 @@ export function PlatformReportsPage() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="current" stroke="#3b82f6" name="الفترة الحالية" />
-                      <Line type="monotone" dataKey="previous" stroke="#10b981" name="الفترة السابقة" />
-                      <Line type="monotone" dataKey="target" stroke="#f59e0b" name="الهدف" strokeDasharray="5 5" />
+                      <Line
+                        type="monotone"
+                        dataKey="current"
+                        stroke="#3b82f6"
+                        name="الفترة الحالية"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="previous"
+                        stroke="#10b981"
+                        name="الفترة السابقة"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="target"
+                        stroke="#f59e0b"
+                        name="الهدف"
+                        strokeDasharray="5 5"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -579,11 +740,16 @@ export function PlatformReportsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>تنبيهات الأداء</CardTitle>
-                  <CardDescription>المقاييس التي تتطلب انتباهاً</CardDescription>
+                  <CardDescription>
+                    المقاييس التي تتطلب انتباهاً
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {performanceAlerts.map((alert, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3 flex-1">
                         {alert.status === "warning" ? (
                           <AlertCircle className="h-5 w-5 text-orange-500 shrink-0" />
@@ -592,11 +758,21 @@ export function PlatformReportsPage() {
                         )}
                         <div className="min-w-0">
                           <p className="font-medium text-sm">{alert.metric}</p>
-                          <p className="text-xs text-muted-foreground">{alert.message}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {alert.message}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <Badge variant={alert.status === "warning" ? "destructive" : "default"}>{alert.value}%</Badge>
+                        <Badge
+                          variant={
+                            alert.status === "warning"
+                              ? "destructive"
+                              : "default"
+                          }
+                        >
+                          {alert.value}%
+                        </Badge>
                       </div>
                     </div>
                   ))}
@@ -605,14 +781,30 @@ export function PlatformReportsPage() {
             )}
 
             {/* Tabs for different reports */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 overflow-x-auto">
-                {selectedReports.includes("overview") && <TabsTrigger value="overview">نظرة عامة</TabsTrigger>}
-                {selectedReports.includes("employees") && <TabsTrigger value="employees">الموظفين</TabsTrigger>}
-                {selectedReports.includes("properties") && <TabsTrigger value="properties">العقارات</TabsTrigger>}
-                {selectedReports.includes("financial") && <TabsTrigger value="financial">مالي</TabsTrigger>}
-                {selectedReports.includes("geo") && <TabsTrigger value="geo">الجغرافية</TabsTrigger>}
-                {selectedReports.includes("performance") && <TabsTrigger value="performance">الأداء</TabsTrigger>}
+                {selectedReports.includes("overview") && (
+                  <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+                )}
+                {selectedReports.includes("employees") && (
+                  <TabsTrigger value="employees">الموظفين</TabsTrigger>
+                )}
+                {selectedReports.includes("properties") && (
+                  <TabsTrigger value="properties">العقارات</TabsTrigger>
+                )}
+                {selectedReports.includes("financial") && (
+                  <TabsTrigger value="financial">مالي</TabsTrigger>
+                )}
+                {selectedReports.includes("geo") && (
+                  <TabsTrigger value="geo">الجغرافية</TabsTrigger>
+                )}
+                {selectedReports.includes("performance") && (
+                  <TabsTrigger value="performance">الأداء</TabsTrigger>
+                )}
               </TabsList>
 
               {/* Overview Tab - with Comparison */}
@@ -622,8 +814,12 @@ export function PlatformReportsPage() {
                     {/* Monthly Revenue */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm sm:text-base">الإيرادات الشهرية</CardTitle>
-                        <CardDescription className="text-xs">مقارنة الإيرادات والنفقات</CardDescription>
+                        <CardTitle className="text-sm sm:text-base">
+                          الإيرادات الشهرية
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          مقارنة الإيرادات والنفقات
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -633,8 +829,16 @@ export function PlatformReportsPage() {
                             <YAxis tick={{ fontSize: 12 }} />
                             <Tooltip />
                             <Legend />
-                            <Bar dataKey="revenue" fill="#3b82f6" name="الإيرادات" />
-                            <Bar dataKey="expenses" fill="#ef4444" name="النفقات" />
+                            <Bar
+                              dataKey="revenue"
+                              fill="#3b82f6"
+                              name="الإيرادات"
+                            />
+                            <Bar
+                              dataKey="expenses"
+                              fill="#ef4444"
+                              name="النفقات"
+                            />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -642,19 +846,29 @@ export function PlatformReportsPage() {
 
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm sm:text-base">توزيع العقارات حسب النوع والقيمة</CardTitle>
-                        <CardDescription className="text-xs">الإيجار مقابل البيع</CardDescription>
+                        <CardTitle className="text-sm sm:text-base">
+                          توزيع العقارات حسب النوع والقيمة
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          الإيجار مقابل البيع
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={propertyTypeData} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis type="number" tick={{ fontSize: 11 }} />
-                            <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 10 }} />
+                            <YAxis
+                              dataKey="name"
+                              type="category"
+                              width={100}
+                              tick={{ fontSize: 10 }}
+                            />
                             <Tooltip
                               formatter={(value: number, name: string) => {
-                                if (name === "القيمة") return `${(value / 1000000).toFixed(1)}م ر.س`
-                                return value
+                                if (name === "القيمة")
+                                  return `${(value / 1000000).toFixed(1)}م ر.س`;
+                                return value;
                               }}
                             />
                             <Legend />
@@ -691,21 +905,30 @@ export function PlatformReportsPage() {
                         <Trophy className="h-4 w-4" />
                         أفضل الموظفين أداءً
                       </CardTitle>
-                      <CardDescription className="text-xs">تصنيف الموظفين حسب الأداء</CardDescription>
+                      <CardDescription className="text-xs">
+                        تصنيف الموظفين حسب الأداء
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {employeeData
                         .sort((a, b) => b.performance - a.performance)
                         .slice(0, 5)
                         .map((emp, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-3 border rounded-lg"
+                          >
                             <div className="flex items-center gap-3 flex-1">
                               <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
                                 {idx + 1}
                               </div>
                               <div className="min-w-0">
-                                <p className="font-medium text-sm">{emp.name}</p>
-                                <p className="text-xs text-muted-foreground">{emp.sales} مبيعات</p>
+                                <p className="font-medium text-sm">
+                                  {emp.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {emp.sales} مبيعات
+                                </p>
                               </div>
                             </div>
                             <Badge variant="outline" className="text-xs">
@@ -719,8 +942,12 @@ export function PlatformReportsPage() {
                   {/* Employee Performance Comparison */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">مقارنة أداء الموظفين</CardTitle>
-                      <CardDescription className="text-xs">المبيعات مقابل التحويلات</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        مقارنة أداء الموظفين
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        المبيعات مقابل التحويلات
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <ResponsiveContainer width="100%" height={300}>
@@ -731,7 +958,11 @@ export function PlatformReportsPage() {
                           <Tooltip />
                           <Legend />
                           <Bar dataKey="sales" fill="#3b82f6" name="المبيعات" />
-                          <Bar dataKey="conversions" fill="#10b981" name="التحويلات" />
+                          <Bar
+                            dataKey="conversions"
+                            fill="#10b981"
+                            name="التحويلات"
+                          />
                         </BarChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -740,37 +971,57 @@ export function PlatformReportsPage() {
                   {/* Detailed Employee Table with search filtering and commission tracking */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">بيانات الموظفين المفصلة</CardTitle>
-                      <CardDescription className="text-xs">معلومات مفصلة عن جميع الموظفين والوسطاء</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        بيانات الموظفين المفصلة
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        معلومات مفصلة عن جميع الموظفين والوسطاء
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="overflow-x-auto">
                       <table className="w-full text-xs sm:text-sm">
                         <thead className="border-b bg-muted/50">
                           <tr>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الاسم</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الدور</th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الاسم
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الدور
+                            </th>
                             <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden sm:table-cell">
                               العقارات
                             </th>
                             <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden md:table-cell">
                               المبيعات
                             </th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الإيرادات</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden lg:table-cell">عمولة</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden lg:table-cell">تقييم</th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الإيرادات
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden lg:table-cell">
+                              عمولة
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden lg:table-cell">
+                              تقييم
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y">
                           {filteredEmployees.map((emp, idx) => (
                             <tr key={idx} className="hover:bg-muted/50">
-                              <td className="px-2 sm:px-4 py-3 font-medium text-xs sm:text-sm">{emp.name}</td>
+                              <td className="px-2 sm:px-4 py-3 font-medium text-xs sm:text-sm">
+                                {emp.name}
+                              </td>
                               <td className="px-2 sm:px-4 py-3">
                                 <Badge variant="outline" className="text-xs">
                                   {emp.role}
                                 </Badge>
                               </td>
-                              <td className="px-2 sm:px-4 py-3 hidden sm:table-cell text-xs">{emp.properties}</td>
-                              <td className="px-2 sm:px-4 py-3 hidden md:table-cell text-xs">{emp.sales}</td>
+                              <td className="px-2 sm:px-4 py-3 hidden sm:table-cell text-xs">
+                                {emp.properties}
+                              </td>
+                              <td className="px-2 sm:px-4 py-3 hidden md:table-cell text-xs">
+                                {emp.sales}
+                              </td>
                               <td className="px-2 sm:px-4 py-3 font-semibold text-xs">
                                 {(emp.revenue / 1000).toFixed(0)}ك
                               </td>
@@ -793,20 +1044,33 @@ export function PlatformReportsPage() {
                   {/* Commission and Payment Tracking */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">تتبع العمولات</CardTitle>
-                      <CardDescription className="text-xs">معلومات العمولات والمدفوعات</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        تتبع العمولات
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        معلومات العمولات والمدفوعات
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {filteredEmployees.map((emp, idx) => (
-                        <div key={idx} className="p-3 border rounded-lg space-y-2">
+                        <div
+                          key={idx}
+                          className="p-3 border rounded-lg space-y-2"
+                        >
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-sm">{emp.name}</span>
-                            <Badge className="text-xs">{emp.commission.toLocaleString()} ر.س</Badge>
+                            <span className="font-medium text-sm">
+                              {emp.name}
+                            </span>
+                            <Badge className="text-xs">
+                              {emp.commission.toLocaleString()} ر.س
+                            </Badge>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                             <div
                               className="bg-gradient-to-r from-green-400 to-green-600 h-full"
-                              style={{ width: `${(emp.commission / 12000) * 100}%` }}
+                              style={{
+                                width: `${(emp.commission / 12000) * 100}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -825,25 +1089,43 @@ export function PlatformReportsPage() {
                         <Map className="h-4 w-4" />
                         التوزيع الجغرافي
                       </CardTitle>
-                      <CardDescription className="text-xs">توزيع العقارات والموظفين حسب المدينة</CardDescription>
+                      <CardDescription className="text-xs">
+                        توزيع العقارات والموظفين حسب المدينة
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="overflow-x-auto">
                       <table className="w-full text-xs sm:text-sm">
                         <thead className="border-b bg-muted/50">
                           <tr>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">المدينة</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">العقارات</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الموظفين</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الإيرادات</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الحالة</th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              المدينة
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              العقارات
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الموظفين
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الإيرادات
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الحالة
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y">
                           {geoDistributionData.map((geo, idx) => (
                             <tr key={idx} className="hover:bg-muted/50">
-                              <td className="px-2 sm:px-4 py-3 font-medium text-xs sm:text-sm">{geo.city}</td>
-                              <td className="px-2 sm:px-4 py-3 text-xs">{geo.properties}</td>
-                              <td className="px-2 sm:px-4 py-3 text-xs">{geo.agents}</td>
+                              <td className="px-2 sm:px-4 py-3 font-medium text-xs sm:text-sm">
+                                {geo.city}
+                              </td>
+                              <td className="px-2 sm:px-4 py-3 text-xs">
+                                {geo.properties}
+                              </td>
+                              <td className="px-2 sm:px-4 py-3 text-xs">
+                                {geo.agents}
+                              </td>
                               <td className="px-2 sm:px-4 py-3 font-semibold text-xs">
                                 {(geo.revenue / 1000).toFixed(0)}ك
                               </td>
@@ -861,7 +1143,9 @@ export function PlatformReportsPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">توزيع العقارات حسب المنطقة</CardTitle>
+                      <CardTitle className="text-sm sm:text-base">
+                        توزيع العقارات حسب المنطقة
+                      </CardTitle>
                       <CardDescription className="text-xs">
                         معلومات مفصلة عن العقارات للإيجار والبيع في كل منطقة
                       </CardDescription>
@@ -871,51 +1155,86 @@ export function PlatformReportsPage() {
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={propertyDistributionByArea}>
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="area" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={80} />
+                          <XAxis
+                            dataKey="area"
+                            tick={{ fontSize: 11 }}
+                            angle={-15}
+                            textAnchor="end"
+                            height={80}
+                          />
                           <YAxis tick={{ fontSize: 12 }} />
                           <Tooltip
-                            formatter={(value: number) => `${(Number(value) / 1000000).toFixed(1)}م ر.س`}
+                            formatter={(value: number) =>
+                              `${(Number(value) / 1000000).toFixed(1)}م ر.س`
+                            }
                             labelStyle={{ fontSize: 12 }}
                           />
                           <Legend />
-                          <Bar dataKey="rentalValue" fill="#10b981" name="قيمة عقارات الإيجار" />
-                          <Bar dataKey="saleValue" fill="#3b82f6" name="قيمة عقارات البيع" />
+                          <Bar
+                            dataKey="rentalValue"
+                            fill="#10b981"
+                            name="قيمة عقارات الإيجار"
+                          />
+                          <Bar
+                            dataKey="saleValue"
+                            fill="#3b82f6"
+                            name="قيمة عقارات البيع"
+                          />
                         </BarChart>
                       </ResponsiveContainer>
 
                       {/* Detailed Area Table with Rental and Sale breakdown */}
                       <div className="border-t pt-4">
-                        <h3 className="text-xs sm:text-sm font-semibold mb-3">تفاصيل المناطق - الإيجار والبيع</h3>
+                        <h3 className="text-xs sm:text-sm font-semibold mb-3">
+                          تفاصيل المناطق - الإيجار والبيع
+                        </h3>
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs sm:text-sm">
                             <thead className="border-b bg-muted/50">
                               <tr>
-                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">المنطقة</th>
+                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">
+                                  المنطقة
+                                </th>
                                 <th className="px-2 sm:px-3 py-2 text-right font-semibold hidden lg:table-cell">
                                   المدينة
                                 </th>
-                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">إيجار</th>
-                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">بيع</th>
+                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">
+                                  إيجار
+                                </th>
+                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">
+                                  بيع
+                                </th>
                                 <th className="px-2 sm:px-3 py-2 text-right font-semibold hidden md:table-cell">
                                   قيمة الإيجار
                                 </th>
                                 <th className="px-2 sm:px-3 py-2 text-right font-semibold hidden md:table-cell">
                                   قيمة البيع
                                 </th>
-                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">متاحة</th>
+                                <th className="px-2 sm:px-3 py-2 text-right font-semibold">
+                                  متاحة
+                                </th>
                               </tr>
                             </thead>
                             <tbody className="divide-y">
                               {propertyDistributionByArea.map((area, idx) => (
                                 <tr key={idx} className="hover:bg-muted/50">
-                                  <td className="px-2 sm:px-3 py-2 font-medium text-xs">{area.area}</td>
+                                  <td className="px-2 sm:px-3 py-2 font-medium text-xs">
+                                    {area.area}
+                                  </td>
                                   <td className="px-2 sm:px-3 py-2 hidden lg:table-cell">
-                                    <Badge variant="outline" className="text-xs">
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
                                       {area.city}
                                     </Badge>
                                   </td>
-                                  <td className="px-2 sm:px-3 py-2 text-xs">{area.rentalProperties}</td>
-                                  <td className="px-2 sm:px-3 py-2 text-xs">{area.saleProperties}</td>
+                                  <td className="px-2 sm:px-3 py-2 text-xs">
+                                    {area.rentalProperties}
+                                  </td>
+                                  <td className="px-2 sm:px-3 py-2 text-xs">
+                                    {area.saleProperties}
+                                  </td>
                                   <td className="px-2 sm:px-3 py-2 hidden md:table-cell text-xs font-semibold text-green-600">
                                     {(area.rentalValue / 1000000).toFixed(1)}م
                                   </td>
@@ -941,7 +1260,9 @@ export function PlatformReportsPage() {
 
                       {/* Top Areas by Total Value */}
                       <div className="border-t pt-4">
-                        <h3 className="text-xs sm:text-sm font-semibold mb-3">أفضل المناطق حسب القيمة الإجمالية</h3>
+                        <h3 className="text-xs sm:text-sm font-semibold mb-3">
+                          أفضل المناطق حسب القيمة الإجمالية
+                        </h3>
                         <div className="grid gap-2 md:grid-cols-2">
                           {propertyDistributionByArea
                             .map((area) => ({
@@ -956,14 +1277,20 @@ export function PlatformReportsPage() {
                                 className="flex items-center justify-between p-3 bg-gradient-to-l from-blue-50 to-transparent rounded-lg border"
                               >
                                 <div className="min-w-0 flex-1">
-                                  <p className="font-medium text-xs">{area.area}</p>
-                                  <p className="text-xs text-muted-foreground">{area.city}</p>
+                                  <p className="font-medium text-xs">
+                                    {area.area}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {area.city}
+                                  </p>
                                   <div className="flex gap-2 mt-1">
                                     <span className="text-xs text-green-600">
-                                      إيجار: {(area.rentalValue / 1000000).toFixed(1)}م
+                                      إيجار:{" "}
+                                      {(area.rentalValue / 1000000).toFixed(1)}م
                                     </span>
                                     <span className="text-xs text-blue-600">
-                                      بيع: {(area.saleValue / 1000000).toFixed(1)}م
+                                      بيع:{" "}
+                                      {(area.saleValue / 1000000).toFixed(1)}م
                                     </span>
                                   </div>
                                 </div>
@@ -985,8 +1312,12 @@ export function PlatformReportsPage() {
                   <div className="grid gap-4 md:grid-cols-2">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm sm:text-base">حالة العقارات</CardTitle>
-                        <CardDescription className="text-xs">توزيع الحجوزات</CardDescription>
+                        <CardTitle className="text-sm sm:text-base">
+                          حالة العقارات
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          توزيع الحجوزات
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -1002,7 +1333,10 @@ export function PlatformReportsPage() {
                               dataKey="value"
                             >
                               {reservationStatusData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={entry.color}
+                                />
                               ))}
                             </Pie>
                             <Tooltip />
@@ -1013,28 +1347,42 @@ export function PlatformReportsPage() {
 
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm sm:text-base">إحصائيات العقارات</CardTitle>
-                        <CardDescription className="text-xs">معلومات مفصلة</CardDescription>
+                        <CardTitle className="text-sm sm:text-base">
+                          إحصائيات العقارات
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          معلومات مفصلة
+                        </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-3 text-xs sm:text-sm">
                         <div className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-muted-foreground">إجمالي العقارات</span>
+                          <span className="text-muted-foreground">
+                            إجمالي العقارات
+                          </span>
                           <span className="font-semibold">518</span>
                         </div>
                         <div className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-muted-foreground">العقارات المتاحة</span>
+                          <span className="text-muted-foreground">
+                            العقارات المتاحة
+                          </span>
                           <span className="font-semibold">234</span>
                         </div>
                         <div className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-muted-foreground">العقارات المحجوزة</span>
+                          <span className="text-muted-foreground">
+                            العقارات المحجوزة
+                          </span>
                           <span className="font-semibold">178</span>
                         </div>
                         <div className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-muted-foreground">العقارات المباعة</span>
+                          <span className="text-muted-foreground">
+                            العقارات المباعة
+                          </span>
                           <span className="font-semibold">106</span>
                         </div>
                         <div className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-muted-foreground">متوسط السعر</span>
+                          <span className="text-muted-foreground">
+                            متوسط السعر
+                          </span>
                           <span className="font-semibold">450ك ر.س</span>
                         </div>
                       </CardContent>
@@ -1044,24 +1392,40 @@ export function PlatformReportsPage() {
                   {/* Property Details Drill-down Table */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">تفاصيل العقارات</CardTitle>
-                      <CardDescription className="text-xs">معلومات مفصلة عن كل عقار</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        تفاصيل العقارات
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        معلومات مفصلة عن كل عقار
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="overflow-x-auto">
                       <table className="w-full text-xs sm:text-sm">
                         <thead className="border-b bg-muted/50">
                           <tr>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">العنوان</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">النوع</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden sm:table-cell">السعر</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden md:table-cell">الوسيط</th>
-                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">الحالة</th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              العنوان
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              النوع
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden sm:table-cell">
+                              السعر
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold hidden md:table-cell">
+                              الوسيط
+                            </th>
+                            <th className="px-2 sm:px-4 py-3 text-right font-semibold">
+                              الحالة
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y">
                           {propertyDetails.map((prop, idx) => (
                             <tr key={idx} className="hover:bg-muted/50">
-                              <td className="px-2 sm:px-4 py-3 font-medium text-xs truncate">{prop.address}</td>
+                              <td className="px-2 sm:px-4 py-3 font-medium text-xs truncate">
+                                {prop.address}
+                              </td>
                               <td className="px-2 sm:px-4 py-3 text-xs">
                                 <Badge variant="outline" className="text-xs">
                                   {prop.type}
@@ -1070,7 +1434,9 @@ export function PlatformReportsPage() {
                               <td className="px-2 sm:px-4 py-3 hidden sm:table-cell text-xs">
                                 {(prop.price / 1000).toFixed(0)}ك
                               </td>
-                              <td className="px-2 sm:px-4 py-3 hidden md:table-cell text-xs">{prop.agent}</td>
+                              <td className="px-2 sm:px-4 py-3 hidden md:table-cell text-xs">
+                                {prop.agent}
+                              </td>
                               <td className="px-2 sm:px-4 py-3">
                                 <Badge variant="secondary" className="text-xs">
                                   {prop.status}
@@ -1090,16 +1456,34 @@ export function PlatformReportsPage() {
                 <TabsContent value="financial" className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">الأداء المالي</CardTitle>
-                      <CardDescription className="text-xs">الإيرادات والتوقعات</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        الأداء المالي
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        الإيرادات والتوقعات
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={monthlyRevenueData}>
                           <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                            <linearGradient
+                              id="colorRevenue"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.3}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0}
+                              />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" />
@@ -1123,32 +1507,47 @@ export function PlatformReportsPage() {
                   <div className="grid gap-4 md:grid-cols-3">
                     <Card>
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-xs sm:text-sm font-medium">إجمالي الإيرادات</CardTitle>
+                        <CardTitle className="text-xs sm:text-sm font-medium">
+                          إجمالي الإيرادات
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-xl sm:text-2xl font-bold">3,820ك ر.س</div>
+                        <div className="text-xl sm:text-2xl font-bold">
+                          3,820ك ر.س
+                        </div>
                         <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3" /> +12% من الشهر الماضي
+                          <TrendingUp className="h-3 w-3" /> +12% من الشهر
+                          الماضي
                         </p>
                       </CardContent>
                     </Card>
 
                     <Card>
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-xs sm:text-sm font-medium">إجمالي النفقات</CardTitle>
+                        <CardTitle className="text-xs sm:text-sm font-medium">
+                          إجمالي النفقات
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-xl sm:text-2xl font-bold">1,650ك ر.س</div>
-                        <p className="text-xs text-red-600 mt-1">-8% من الشهر الماضي</p>
+                        <div className="text-xl sm:text-2xl font-bold">
+                          1,650ك ر.س
+                        </div>
+                        <p className="text-xs text-red-600 mt-1">
+                          -8% من الشهر الماضي
+                        </p>
                       </CardContent>
                     </Card>
 
                     <Card>
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-xs sm:text-sm font-medium">الربح الإجمالي</CardTitle>
+                        <CardTitle className="text-xs sm:text-sm font-medium">
+                          الربح الإجمالي
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-xl sm:text-2xl font-bold">2,170ك ر.س</div>
+                        <div className="text-xl sm:text-2xl font-bold">
+                          2,170ك ر.س
+                        </div>
                         <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                           <TrendingUp className="h-3 w-3" /> +15% هامش الربح
                         </p>
@@ -1163,17 +1562,28 @@ export function PlatformReportsPage() {
                         <Mail className="h-4 w-4" />
                         جدولة التقارير
                       </CardTitle>
-                      <CardDescription className="text-xs">إرسال التقارير تلقائياً بالبريد الإلكتروني</CardDescription>
+                      <CardDescription className="text-xs">
+                        إرسال التقارير تلقائياً بالبريد الإلكتروني
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {scheduledReports.map((report, idx) => (
-                        <div key={idx} className="p-3 border rounded-lg space-y-2">
+                        <div
+                          key={idx}
+                          className="p-3 border rounded-lg space-y-2"
+                        >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-xs sm:text-sm">{report.name}</p>
-                              <p className="text-xs text-muted-foreground">{report.email}</p>
+                              <p className="font-medium text-xs sm:text-sm">
+                                {report.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {report.email}
+                              </p>
                             </div>
-                            <Badge className="text-xs shrink-0">{report.frequency}</Badge>
+                            <Badge className="text-xs shrink-0">
+                              {report.frequency}
+                            </Badge>
                           </div>
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock3 className="h-3 w-3" />
@@ -1190,19 +1600,34 @@ export function PlatformReportsPage() {
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle className="text-sm">جدولة تقرير جديد</DialogTitle>
+                            <DialogTitle className="text-sm">
+                              جدولة تقرير جديد
+                            </DialogTitle>
                           </DialogHeader>
                           <div className="space-y-3">
                             <div>
-                              <label className="text-xs font-medium">اسم التقرير</label>
-                              <Input placeholder="مثال: تقرير المبيعات" className="mt-1 text-xs" />
+                              <label className="text-xs font-medium">
+                                اسم التقرير
+                              </label>
+                              <Input
+                                placeholder="مثال: تقرير المبيعات"
+                                className="mt-1 text-xs"
+                              />
                             </div>
                             <div>
-                              <label className="text-xs font-medium">البريد الإلكتروني</label>
-                              <Input type="email" placeholder="example@email.com" className="mt-1 text-xs" />
+                              <label className="text-xs font-medium">
+                                البريد الإلكتروني
+                              </label>
+                              <Input
+                                type="email"
+                                placeholder="example@email.com"
+                                className="mt-1 text-xs"
+                              />
                             </div>
                             <div>
-                              <label className="text-xs font-medium">التكرار</label>
+                              <label className="text-xs font-medium">
+                                التكرار
+                              </label>
                               <Select>
                                 <SelectTrigger className="mt-1 text-xs">
                                   <SelectValue placeholder="اختر التكرار" />
@@ -1230,27 +1655,61 @@ export function PlatformReportsPage() {
                 <TabsContent value="performance" className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm sm:text-base">مؤشرات الأداء الرئيسية</CardTitle>
-                      <CardDescription className="text-xs">قياس أداء المنصة الشاملة</CardDescription>
+                      <CardTitle className="text-sm sm:text-base">
+                        مؤشرات الأداء الرئيسية
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        قياس أداء المنصة الشاملة
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4 sm:space-y-6">
                       <div className="space-y-3 sm:space-y-4">
                         {[
-                          { label: "معدل التحويل", value: 68, max: 100, icon: CheckCircle2, color: "text-green-600" },
-                          { label: "رضا العملاء", value: 92, max: 100, icon: CheckCircle2, color: "text-green-600" },
-                          { label: "نسبة الإكمال", value: 85, max: 100, icon: CheckCircle2, color: "text-green-600" },
-                          { label: "معدل الإلغاء", value: 12, max: 100, icon: AlertCircle, color: "text-orange-600" },
+                          {
+                            label: "معدل التحويل",
+                            value: 68,
+                            max: 100,
+                            icon: CheckCircle2,
+                            color: "text-green-600",
+                          },
+                          {
+                            label: "رضا العملاء",
+                            value: 92,
+                            max: 100,
+                            icon: CheckCircle2,
+                            color: "text-green-600",
+                          },
+                          {
+                            label: "نسبة الإكمال",
+                            value: 85,
+                            max: 100,
+                            icon: CheckCircle2,
+                            color: "text-green-600",
+                          },
+                          {
+                            label: "معدل الإلغاء",
+                            value: 12,
+                            max: 100,
+                            icon: AlertCircle,
+                            color: "text-orange-600",
+                          },
                         ].map((kpi, idx) => {
-                          const Icon = kpi.icon
-                          const percentage = (kpi.value / kpi.max) * 100
+                          const Icon = kpi.icon;
+                          const percentage = (kpi.value / kpi.max) * 100;
                           return (
                             <div key={idx} className="space-y-2">
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <Icon className={`h-4 w-4 ${kpi.color} shrink-0`} />
-                                  <span className="text-xs sm:text-sm font-medium truncate">{kpi.label}</span>
+                                  <Icon
+                                    className={`h-4 w-4 ${kpi.color} shrink-0`}
+                                  />
+                                  <span className="text-xs sm:text-sm font-medium truncate">
+                                    {kpi.label}
+                                  </span>
                                 </div>
-                                <span className="font-semibold text-xs sm:text-sm shrink-0">{kpi.value}%</span>
+                                <span className="font-semibold text-xs sm:text-sm shrink-0">
+                                  {kpi.value}%
+                                </span>
                               </div>
                               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                                 <div
@@ -1259,7 +1718,7 @@ export function PlatformReportsPage() {
                                 />
                               </div>
                             </div>
-                          )
+                          );
                         })}
                       </div>
                     </CardContent>
@@ -1272,21 +1731,48 @@ export function PlatformReportsPage() {
                         <Clock3 className="h-4 w-4" />
                         سجل التغييرات
                       </CardTitle>
-                      <CardDescription className="text-xs">أحدث التحديثات والتغييرات</CardDescription>
+                      <CardDescription className="text-xs">
+                        أحدث التحديثات والتغييرات
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {[
-                        { action: "تم قبول حجز جديد", time: "2025-01-13 14:30", user: "أحمد محمد" },
-                        { action: "تم إضافة موظف جديد", time: "2025-01-13 10:15", user: "الإدارة" },
-                        { action: "تم إغلاق عقار", time: "2025-01-12 16:45", user: "فاطمة علي" },
-                        { action: "تم تحديث الإيرادات", time: "2025-01-12 08:00", user: "النظام" },
+                        {
+                          action: "تم قبول حجز جديد",
+                          time: "2025-01-13 14:30",
+                          user: "أحمد محمد",
+                        },
+                        {
+                          action: "تم إضافة موظف جديد",
+                          time: "2025-01-13 10:15",
+                          user: "الإدارة",
+                        },
+                        {
+                          action: "تم إغلاق عقار",
+                          time: "2025-01-12 16:45",
+                          user: "فاطمة علي",
+                        },
+                        {
+                          action: "تم تحديث الإيرادات",
+                          time: "2025-01-12 08:00",
+                          user: "النظام",
+                        },
                       ].map((log, idx) => (
-                        <div key={idx} className="flex gap-3 py-2 border-l-2 border-blue-500 pl-3">
+                        <div
+                          key={idx}
+                          className="flex gap-3 py-2 border-l-2 border-blue-500 pl-3"
+                        >
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs sm:text-sm font-medium">{log.action}</p>
-                            <p className="text-xs text-muted-foreground">بواسطة: {log.user}</p>
+                            <p className="text-xs sm:text-sm font-medium">
+                              {log.action}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              بواسطة: {log.user}
+                            </p>
                           </div>
-                          <span className="text-xs text-muted-foreground shrink-0">{log.time}</span>
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {log.time}
+                          </span>
                         </div>
                       ))}
                     </CardContent>
@@ -1299,21 +1785,41 @@ export function PlatformReportsPage() {
                         <MessageSquare className="h-4 w-4" />
                         الرسائل والملاحظات
                       </CardTitle>
-                      <CardDescription className="text-xs">آخر 10 رسائل</CardDescription>
+                      <CardDescription className="text-xs">
+                        آخر 10 رسائل
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {[
-                        { from: "محمود السيد", message: "تم إغلاق صفقة جديدة بقيمة 2 مليون", time: "2025-01-13" },
-                        { from: "فاطمة علي", message: "تم توقيع عقد مع عميل جديد", time: "2025-01-12" },
-                        { from: "أحمد محمد", message: "تم استقبال طلب عرض أسعار", time: "2025-01-12" },
+                        {
+                          from: "محمود السيد",
+                          message: "تم إغلاق صفقة جديدة بقيمة 2 مليون",
+                          time: "2025-01-13",
+                        },
+                        {
+                          from: "فاطمة علي",
+                          message: "تم توقيع عقد مع عميل جديد",
+                          time: "2025-01-12",
+                        },
+                        {
+                          from: "أحمد محمد",
+                          message: "تم استقبال طلب عرض أسعار",
+                          time: "2025-01-12",
+                        },
                       ].map((msg, idx) => (
                         <div key={idx} className="p-3 border rounded-lg">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-xs sm:text-sm">{msg.from}</p>
-                              <p className="text-xs text-muted-foreground mt-1 break-words">{msg.message}</p>
+                              <p className="font-medium text-xs sm:text-sm">
+                                {msg.from}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1 break-words">
+                                {msg.message}
+                              </p>
                             </div>
-                            <span className="text-xs text-muted-foreground shrink-0">{msg.time}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">
+                              {msg.time}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -1326,5 +1832,5 @@ export function PlatformReportsPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

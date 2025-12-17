@@ -96,7 +96,10 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
     const currentToken = userData?.token || null;
 
     // إذا لم يتغير الـ token، لا تفعل شيئاً (منع إعادة الجلب عند التنقل)
-    if (currentToken === lastTokenRef.current && lastTokenRef.current !== null) {
+    if (
+      currentToken === lastTokenRef.current &&
+      lastTokenRef.current !== null
+    ) {
       // التحقق من الكوكي فقط إذا لم يتم الجلب من قبل
       if (!hasFetchedPlanRef.current && hasValidPlanCookie()) {
         const cachedPlan = getPlanCookie();
@@ -123,7 +126,11 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
     }
 
     // إذا تم الجلب من قبل في هذه الجلسة (sessionStorage)، لا تعيد الجلب
-    if (hasFetchedPlanInSession() || hasFetchedPlanRef.current || isFetchingRef.current) {
+    if (
+      hasFetchedPlanInSession() ||
+      hasFetchedPlanRef.current ||
+      isFetchingRef.current
+    ) {
       return;
     }
 
@@ -265,7 +272,9 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
                               // التحقق من صحة الـ domain
                               if (!domain || domain.trim() === "") {
-                                alert("يرجى إعداد domain صحيح في إعدادات الحساب");
+                                alert(
+                                  "يرجى إعداد domain صحيح في إعدادات الحساب",
+                                );
                                 return;
                               }
 
@@ -294,7 +303,9 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                                 window.open(url, "_blank");
                               } catch (error) {
                                 console.error("Invalid URL:", url, error);
-                                alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
+                                alert(
+                                  "URL غير صحيح. يرجى التحقق من إعدادات الـ domain",
+                                );
                               }
                             }}
                           >
@@ -512,14 +523,22 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
             <>
               {/* زر الخطة الحالية - يستخدم بيانات الكوكي أو userData */}
               {/* إظهار الزر إذا كان هناك بيانات خطة (من الكوكي أو userData) */}
-              {((currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined)) ||
-                (userData?.package_title !== undefined && userData?.package_title !== null) ||
-                (userData?.is_free_plan !== undefined && userData?.is_free_plan !== null)) && (
+              {((currentPlan &&
+                (currentPlan.package_title ||
+                  currentPlan.is_free_plan !== undefined)) ||
+                (userData?.package_title !== undefined &&
+                  userData?.package_title !== null) ||
+                (userData?.is_free_plan !== undefined &&
+                  userData?.is_free_plan !== null)) && (
                 <>
                   {/* استخدام currentPlan إذا كان موجوداً */}
-                  {currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined) ? (
+                  {currentPlan &&
+                  (currentPlan.package_title ||
+                    currentPlan.is_free_plan !== undefined) ? (
                     <Button
-                      variant={currentPlan.is_free_plan ? "outline" : "secondary"}
+                      variant={
+                        currentPlan.is_free_plan ? "outline" : "secondary"
+                      }
                       size="sm"
                       className={
                         currentPlan.is_free_plan
@@ -548,11 +567,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   ) : (
                     /* استخدام userData كـ fallback */
                     <Button
-                      variant={
-                        userData?.is_free_plan
-                          ? "outline"
-                          : "secondary"
-                      }
+                      variant={userData?.is_free_plan ? "outline" : "secondary"}
                       size="sm"
                       className={
                         userData?.is_free_plan
@@ -686,12 +701,18 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
           <>
             {/* زر الخطة الحالية للجوال - يستخدم بيانات الكوكي أو userData */}
             {/* إظهار الزر إذا كان هناك بيانات خطة (من الكوكي أو userData) */}
-            {((currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined)) ||
-              (userData?.package_title !== undefined && userData?.package_title !== null) ||
-              (userData?.is_free_plan !== undefined && userData?.is_free_plan !== null)) && (
+            {((currentPlan &&
+              (currentPlan.package_title ||
+                currentPlan.is_free_plan !== undefined)) ||
+              (userData?.package_title !== undefined &&
+                userData?.package_title !== null) ||
+              (userData?.is_free_plan !== undefined &&
+                userData?.is_free_plan !== null)) && (
               <>
                 {/* استخدام currentPlan إذا كان موجوداً */}
-                {currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined) ? (
+                {currentPlan &&
+                (currentPlan.package_title ||
+                  currentPlan.is_free_plan !== undefined) ? (
                   <Button
                     variant={currentPlan.is_free_plan ? "outline" : "secondary"}
                     size="sm"
@@ -720,11 +741,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 ) : (
                   /* استخدام userData كـ fallback */
                   <Button
-                    variant={
-                      userData?.is_free_plan
-                        ? "outline"
-                        : "secondary"
-                    }
+                    variant={userData?.is_free_plan ? "outline" : "secondary"}
                     size="sm"
                     className={
                       userData?.is_free_plan
@@ -737,12 +754,11 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                       {userData?.is_free_plan
                         ? `الباقة المجانية `
                         : userData?.package_title || "الخطة الحالية"}
-                      {!userData?.is_free_plan &&
-                        userData?.days_remaining && (
-                          <span className="mr-2 text-xs opacity-75">
-                            ({userData?.days_remaining} يوم متبقي)
-                          </span>
-                        )}
+                      {!userData?.is_free_plan && userData?.days_remaining && (
+                        <span className="mr-2 text-xs opacity-75">
+                          ({userData?.days_remaining} يوم متبقي)
+                        </span>
+                      )}
                     </Link>
                     {!userData?.is_free_plan && (
                       <Star className="h-3 w-3 ml-1" />

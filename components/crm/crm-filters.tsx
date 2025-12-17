@@ -165,7 +165,9 @@ export default function CrmFilters({
                 // Backward compatibility fields
                 nameEn: customer.name || "",
                 whatsapp: "",
-                city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+                city: propertyBasic.address
+                  ? propertyBasic.address.split(",")[1]?.trim() || ""
+                  : "",
                 district: "",
                 assignedAgent: "",
                 lastContact: "",
@@ -201,7 +203,8 @@ export default function CrmFilters({
           const allCustomers = allCustomersRaw.reduce(
             (acc: any[], customer: any) => {
               const existingCustomer = acc.find(
-                (c) => c.id === customer.id || c.request_id === customer.request_id,
+                (c) =>
+                  c.id === customer.id || c.request_id === customer.request_id,
               );
 
               if (!existingCustomer) {

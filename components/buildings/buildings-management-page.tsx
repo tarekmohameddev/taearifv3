@@ -191,7 +191,7 @@ export default function BuildingsManagementPage() {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar  />
+        <EnhancedSidebar />
         <div className="p-6 space-y-6 bg-white flex-1">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

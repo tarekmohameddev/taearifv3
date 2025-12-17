@@ -27,10 +27,12 @@ export function RentalManagementDashboard() {
   const { userData } = useAuthStore();
 
   // Filters state
-  const [collectionsPeriod, setCollectionsPeriod] = useState<string>("this_month");
+  const [collectionsPeriod, setCollectionsPeriod] =
+    useState<string>("this_month");
   const [collectionsFromDate, setCollectionsFromDate] = useState<string>("");
   const [collectionsToDate, setCollectionsToDate] = useState<string>("");
-  const [paymentsDuePeriod, setPaymentsDuePeriod] = useState<string>("this_month");
+  const [paymentsDuePeriod, setPaymentsDuePeriod] =
+    useState<string>("this_month");
   const [paymentsDueFromDate, setPaymentsDueFromDate] = useState<string>("");
   const [paymentsDueToDate, setPaymentsDueToDate] = useState<string>("");
 
@@ -112,7 +114,8 @@ export function RentalManagementDashboard() {
                   نظام إدارة الإيجارات
                 </h1>
                 <p className="text-muted-foreground">
-                  نظام شامل لإدارة الإيجارات العقارية في المملكة العربية السعودية
+                  نظام شامل لإدارة الإيجارات العقارية في المملكة العربية
+                  السعودية
                 </p>
               </div>
 
@@ -141,7 +144,9 @@ export function RentalManagementDashboard() {
                   {/* Collections From Date (when custom) */}
                   {collectionsPeriod === "custom" && (
                     <div className="space-y-2">
-                      <Label htmlFor="collections-from-date">من تاريخ التحصيل</Label>
+                      <Label htmlFor="collections-from-date">
+                        من تاريخ التحصيل
+                      </Label>
                       <Input
                         id="collections-from-date"
                         type="date"
@@ -154,7 +159,9 @@ export function RentalManagementDashboard() {
                   {/* Collections To Date (when custom) */}
                   {collectionsPeriod === "custom" && (
                     <div className="space-y-2">
-                      <Label htmlFor="collections-to-date">إلى تاريخ التحصيل</Label>
+                      <Label htmlFor="collections-to-date">
+                        إلى تاريخ التحصيل
+                      </Label>
                       <Input
                         id="collections-to-date"
                         type="date"
@@ -166,7 +173,9 @@ export function RentalManagementDashboard() {
 
                   {/* Payments Due Period Filter */}
                   <div className="space-y-2">
-                    <Label htmlFor="payments-due-period">فترة المدفوعات المستحقة</Label>
+                    <Label htmlFor="payments-due-period">
+                      فترة المدفوعات المستحقة
+                    </Label>
                     <Select
                       value={paymentsDuePeriod}
                       onValueChange={setPaymentsDuePeriod}
@@ -186,7 +195,9 @@ export function RentalManagementDashboard() {
                   {/* Payments Due From Date (when custom) */}
                   {paymentsDuePeriod === "custom" && (
                     <div className="space-y-2">
-                      <Label htmlFor="payments-due-from-date">من تاريخ المدفوعات</Label>
+                      <Label htmlFor="payments-due-from-date">
+                        من تاريخ المدفوعات
+                      </Label>
                       <Input
                         id="payments-due-from-date"
                         type="date"
@@ -199,7 +210,9 @@ export function RentalManagementDashboard() {
                   {/* Payments Due To Date (when custom) */}
                   {paymentsDuePeriod === "custom" && (
                     <div className="space-y-2">
-                      <Label htmlFor="payments-due-to-date">إلى تاريخ المدفوعات</Label>
+                      <Label htmlFor="payments-due-to-date">
+                        إلى تاريخ المدفوعات
+                      </Label>
                       <Input
                         id="payments-due-to-date"
                         type="date"

@@ -37,8 +37,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "المعاينة الأولية للعقار",
       desc: "زيارة العقار وتقييم حالته ومعرفة ميزاته ومراجعة التفاصيل التي تحتاج إلى توضيح.",
-      image:
-        "/images/MarketingStepsSection/1.svg",
+      image: "/images/MarketingStepsSection/1.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -52,8 +51,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "كتابة تفصيل العقار",
       desc: "وصف دقيق للممتلكات بما في ذلك الموقع، المساحة، المرافق، والحالة العامة.",
-      image:
-        "/images/MarketingStepsSection/2.svg",
+      image: "/images/MarketingStepsSection/2.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -67,8 +65,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "التصوير الاحترافي للعقار",
       desc: "الاستعانة بمصور محترف لالتقاط صور عالية الجودة مع الاهتمام بالإضاءة والزوايا.",
-      image:
-        "/images/MarketingStepsSection/3.svg",
+      image: "/images/MarketingStepsSection/3.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -82,8 +79,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "توقيع اتفاقية الوساطة والتسويق",
       desc: "توقيع عقد رسمي بينك وبين المالك لتنظيم عملية تسويق العقار وحقوق الطرفين.",
-      image:
-        "/images/MarketingStepsSection/4.svg",
+      image: "/images/MarketingStepsSection/4.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -97,8 +93,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "تصميم بوستر للعقار وإضافته لموقعنا",
       desc: "إعداد بوستر يحتوي على الصور والتفاصيل الرئيسية ونشره على موقعنا الإلكتروني.",
-      image:
-        "/images/MarketingStepsSection/5.svg",
+      image: "/images/MarketingStepsSection/5.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -112,8 +107,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "جذب العملاء المحتملين",
       desc: "استخدام وسائل الاتصال المختلفة لجذب المشترين المهتمين مثل الإعلانات.",
-      image:
-        "/images/MarketingStepsSection/6.svg",
+      image: "/images/MarketingStepsSection/6.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",

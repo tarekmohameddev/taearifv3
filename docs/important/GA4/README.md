@@ -30,7 +30,9 @@ The GA4 Analytics System is designed to track user interactions across a **multi
 This documentation is split into focused files for better AI comprehension and maintainability:
 
 ### 1. [Architecture & Components](./ARCHITECTURE.md)
+
 **Topics Covered:**
+
 - System Layers & Flow Diagrams
 - File Structure
 - Multi-Tenant Tracking Strategy
@@ -47,7 +49,9 @@ This documentation is split into focused files for better AI comprehension and m
 ---
 
 ### 2. [Tracking & Events](./TRACKING_AND_EVENTS.md)
+
 **Topics Covered:**
+
 - Event Tracking System (Automatic vs On-Demand)
 - Implementation Patterns (Homepage, Tenant Pages, Property/Project Details)
 - Tenant ID Extraction & Validation
@@ -62,7 +66,9 @@ This documentation is split into focused files for better AI comprehension and m
 ---
 
 ### 3. [Configuration](./CONFIGURATION.md)
+
 **Topics Covered:**
+
 - Environment Variables Setup
 - Environment Variable Usage Map
 - GA4 Admin Configuration
@@ -74,7 +80,9 @@ This documentation is split into focused files for better AI comprehension and m
 ---
 
 ### 4. [Debugging Guide](./DEBUGGING.md)
+
 **Topics Covered:**
+
 - Console Logging Strategy
 - Debugging Steps (Console, Network, GA4 Reports, Middleware)
 - Testing Scenarios
@@ -90,7 +98,9 @@ This documentation is split into focused files for better AI comprehension and m
 ---
 
 ### 5. [Best Practices & Security](./BEST_PRACTICES.md)
+
 **Topics Covered:**
+
 - Performance Optimization
 - Security & Privacy
 - GDPR Compliance
@@ -106,51 +116,59 @@ This documentation is split into focused files for better AI comprehension and m
 ## Quick Start
 
 ### 1. For Understanding the System
+
 Start with → **[ARCHITECTURE.md](./ARCHITECTURE.md)**
 
 ### 2. For Implementing Tracking
+
 Start with → **[TRACKING_AND_EVENTS.md](./TRACKING_AND_EVENTS.md)**
 
 ### 3. For Setup & Configuration
+
 Start with → **[CONFIGURATION.md](./CONFIGURATION.md)**
 
 ### 4. For Troubleshooting
+
 Start with → **[DEBUGGING.md](./DEBUGGING.md)**
 
 ### 5. For Optimization
+
 Start with → **[BEST_PRACTICES.md](./BEST_PRACTICES.md)**
 
 ---
 
 ## Key Files Reference
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| GA4 Provider | `components/GA4Provider.tsx` | Initialize & track |
-| GA4 Functions | `lib/ga4-tracking.ts` | Core tracking logic |
-| GTM Provider | `components/GTMProvider.tsx` | Tag management |
-| GTM Functions | `lib/gtm.ts` | GTM utilities |
-| Homepage Wrapper | `app/HomePageWrapper.tsx` | Homepage tracking |
-| Tenant Wrapper | `app/TenantPageWrapper.tsx` | Tenant pages tracking |
-| Property Wrapper | `app/property/[id]/PropertyPageWrapper.tsx` | Property tracking |
-| Project Wrapper | `app/project/[id]/ProjectPageWrapper.tsx` | Project tracking |
-| Middleware | `middleware.ts` | Tenant detection |
+| Component        | File                                        | Purpose               |
+| ---------------- | ------------------------------------------- | --------------------- |
+| GA4 Provider     | `components/GA4Provider.tsx`                | Initialize & track    |
+| GA4 Functions    | `lib/ga4-tracking.ts`                       | Core tracking logic   |
+| GTM Provider     | `components/GTMProvider.tsx`                | Tag management        |
+| GTM Functions    | `lib/gtm.ts`                                | GTM utilities         |
+| Homepage Wrapper | `app/HomePageWrapper.tsx`                   | Homepage tracking     |
+| Tenant Wrapper   | `app/TenantPageWrapper.tsx`                 | Tenant pages tracking |
+| Property Wrapper | `app/property/[id]/PropertyPageWrapper.tsx` | Property tracking     |
+| Project Wrapper  | `app/project/[id]/ProjectPageWrapper.tsx`   | Project tracking      |
+| Middleware       | `middleware.ts`                             | Tenant detection      |
 
 ---
 
 ## Related Documentation
 
 ### 1. Middleware & Tenant Detection
+
 **File**: `docs/important/MIDDLEWARE_TENANT_DETECTION.md`  
 **Connection**: Middleware sets `x-tenant-id` header that GA4 uses  
 **Key Functions**: `getTenantIdFromHost()`, `getTenantIdFromCustomDomain()`
 
 ### 2. Locale Routing System
+
 **File**: `docs/important/LOCALE_ROUTING_SYSTEM.md`  
 **Connection**: Locale changes trigger page view events  
 **Key Headers**: `x-locale` (used for internationalized tracking)
 
 ### 3. Authentication Systems
+
 **File**: `docs/important/AUTHENTICATION_SYSTEMS.md`  
 **Connection**: Dashboard has separate GTM container (GTM-KBL37C9T)  
 **Separation**: Tenant analytics ≠ Dashboard analytics
@@ -164,6 +182,7 @@ Start with → **[BEST_PRACTICES.md](./BEST_PRACTICES.md)**
 **Challenge**: Track different tenants separately while excluding main platform
 
 **Solution**:
+
 1. **Middleware Detection**: Extract `tenant_id` from subdomain/custom domain
 2. **Header Injection**: Pass `tenant_id` via `x-tenant-id` and `x-domain-type` headers
 3. **API Data Fetching**: For custom domains, fetch tenant data via `getTenant` API
@@ -172,6 +191,7 @@ Start with → **[BEST_PRACTICES.md](./BEST_PRACTICES.md)**
 6. **GA4 Segmentation**: Filter reports by `tenant_id` custom dimension
 
 **Custom Domain Handling** (Added: December 2024):
+
 - **Subdomain** (`lira.taearif.com`): Uses subdomain name (`"lira"`) directly
 - **Custom Domain** (`liraksa.com`): Fetches and uses `username` (`"lira"`) from API
 - **Reason**: Ensures consistent `tenant_id` regardless of domain type
@@ -179,13 +199,14 @@ Start with → **[BEST_PRACTICES.md](./BEST_PRACTICES.md)**
 ### Tracking Flow
 
 ```
-User Visit → Middleware (detect tenant) → Server Component (read headers) 
+User Visit → Middleware (detect tenant) → Server Component (read headers)
 → Client Wrapper (inject providers) → [Custom Domain? → Fetch getTenant API → Extract username]
-→ GA4Provider (initialize & track with username for custom domains) 
+→ GA4Provider (initialize & track with username for custom domains)
 → Google Analytics 4 (collect with tenant_id)
 ```
 
 **New Flow for Custom Domains**:
+
 ```
 Custom Domain (liraksa.com) → Middleware: tenantId="liraksa.com", domainType="custom"
 → Wrapper calls: fetchTenantData("liraksa.com") → API returns: { username: "lira", ... }
@@ -213,6 +234,7 @@ Custom Domain (liraksa.com) → Middleware: tenantId="liraksa.com", domainType="
 ### Recent Changes (December 2024)
 
 **Custom Domain Integration**:
+
 - ✅ Added support for using `username` from API for custom domains
 - ✅ GA4Provider now accepts `domainType` prop
 - ✅ Consistent `tenant_id` across subdomain and custom domain
@@ -220,10 +242,12 @@ Custom Domain (liraksa.com) → Middleware: tenantId="liraksa.com", domainType="
 - ✅ Added validation to prevent sending full domain names
 
 **Example**:
+
 - Before: `liraksa.com` → GA4 `tenant_id: "liraksa.com"`
 - After: `liraksa.com` → API fetch → GA4 `tenant_id: "lira"` ✅
 
 For issues or questions about GA4 tracking:
+
 1. Check console logs first (look for "🌐 GA4: Using username from API")
 2. Verify network requests in DevTools (`ep.tenant_id` parameter)
 3. Review appropriate documentation file (especially ARCHITECTURE.md for custom domain flow)
@@ -233,4 +257,3 @@ For issues or questions about GA4 tracking:
 ---
 
 **Documentation Split Strategy**: Each file is under 800 lines for optimal AI processing and human readability.
-

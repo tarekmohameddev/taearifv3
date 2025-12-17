@@ -5,9 +5,9 @@ export function authenticateOwnerToken(req, res, next) {
     // Get token from cookie
     const token = req.headers.cookie
       ? req.headers.cookie
-          .split('; ')
-          .find(row => row.startsWith('owner_token='))
-          ?.split('=')[1]
+          .split("; ")
+          .find((row) => row.startsWith("owner_token="))
+          ?.split("=")[1]
       : null;
 
     if (!token) {
@@ -16,8 +16,11 @@ export function authenticateOwnerToken(req, res, next) {
 
     try {
       // Verify JWT token
-      const decoded = jwt.verify(token, process.env.SECRET_KEY || "your-secret-key");
-      
+      const decoded = jwt.verify(
+        token,
+        process.env.SECRET_KEY || "your-secret-key",
+      );
+
       // Set owner data in request
       req.owner = {
         id: decoded.id,
