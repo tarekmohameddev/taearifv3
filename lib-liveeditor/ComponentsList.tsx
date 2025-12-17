@@ -47,6 +47,7 @@ import { inputsStructure } from "@/componentsStructure/inputs";
 import { inputs2Structure } from "@/componentsStructure/inputs2";
 import { imageTextStructure } from "@/componentsStructure/imageText";
 import { contactUsHomePageStructure } from "@/componentsStructure/contactUsHomePage";
+import { blogsSectionsStructure } from "@/componentsStructure/blogsSections";
 
 export interface ComponentType {
   id: string;
@@ -381,6 +382,24 @@ export const getComponents = (
     icon: "📧",
     ...contactUsHomePageStructure,
   },
+  blogsSections: {
+    id: "blogsSections",
+    name: "blogsSections",
+    displayName: t("components.blogsSections.display_name"),
+    description: t("components.blogsSections.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "blogsSections",
+    icon: "📰",
+    variants: blogsSectionsStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/blogsSections/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "blogsSections1",
+    ...blogsSectionsStructure,
+  },
   propertiesPage: {
     id: "propertiesPage",
     name: "propertiesPage",
@@ -700,6 +719,24 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "contactUsHomePage",
     icon: "📧",
     ...contactUsHomePageStructure,
+  },
+  blogsSections: {
+    id: "blogsSections",
+    name: "blogsSections",
+    displayName: "Blogs Sections",
+    description: "Blog cards section with paragraphs and grid layout",
+    category: "content",
+    section: "homepage",
+    subPath: "blogsSections",
+    icon: "📰",
+    variants: blogsSectionsStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/blogsSections/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "blogsSections1",
+    ...blogsSectionsStructure,
   },
   propertiesPage: {
     id: "propertiesPage",

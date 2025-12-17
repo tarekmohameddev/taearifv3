@@ -71,6 +71,7 @@ import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
 import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
 import { contactUsHomePageFunctions } from "./editorStoreFunctions/contactUsHomePageFunctions";
+import { blogsSectionsFunctions } from "./editorStoreFunctions/blogsSectionsFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -511,6 +512,20 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Blogs Sections states
+  blogsSectionsStates: Record<string, ComponentData>;
+  ensureBlogsSectionsVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getBlogsSectionsData: (variantId: string) => ComponentData;
+  setBlogsSectionsData: (variantId: string, data: ComponentData) => void;
+  updateBlogsSectionsByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Inputs states
   inputsStates: Record<string, ComponentData>;
   ensureInputsVariant: (variantId: string, initial?: ComponentData) => void;
@@ -620,6 +635,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   inputs2States: {},
   imageTextStates: {},
   contactUsHomePageStates: {},
+  blogsSectionsStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -1097,6 +1113,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return imageTextFunctions.ensureVariant(state, variantId, initial);
         case "contactUsHomePage":
           return contactUsHomePageFunctions.ensureVariant(state, variantId, initial);
+        case "blogsSections":
+          return blogsSectionsFunctions.ensureVariant(state, variantId, initial);
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1207,6 +1225,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return imageTextFunctions.getData(state, variantId);
       case "contactUsHomePage":
         return contactUsHomePageFunctions.getData(state, variantId);
+      case "blogsSections":
+        return blogsSectionsFunctions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -1323,6 +1343,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "contactUsHomePage":
           newState = contactUsHomePageFunctions.setData(state, variantId, data);
+          break;
+        case "blogsSections":
+          newState = blogsSectionsFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1560,6 +1583,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "contactUsHomePage":
           newState = contactUsHomePageFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "blogsSections":
+          newState = blogsSectionsFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -2017,6 +2048,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       contactUsHomePageFunctions.updateByPath(state, variantId, path, value),
     ),
 
+  // Blogs Sections functions using modular approach
+  ensureBlogsSectionsVariant: (variantId, initial) =>
+    set((state) => blogsSectionsFunctions.ensureVariant(state, variantId, initial)),
+  getBlogsSectionsData: (variantId) => {
+    const state = get();
+    return blogsSectionsFunctions.getData(state, variantId);
+  },
+  setBlogsSectionsData: (variantId, data) =>
+    set((state) => blogsSectionsFunctions.setData(state, variantId, data)),
+  updateBlogsSectionsByPath: (variantId, path, value) =>
+    set((state) =>
+      blogsSectionsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -2336,6 +2381,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).contactUsHomePageStates;
                       break;
+                    case "blogsSections":
+                      newState.blogsSectionsStates = blogsSectionsFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).blogsSectionsStates;
+                      break;
                   }
                 }
               },
@@ -2524,6 +2576,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).contactUsHomePageStates;
+              break;
+            case "blogsSections":
+              newState.blogsSectionsStates = blogsSectionsFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).blogsSectionsStates;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =
