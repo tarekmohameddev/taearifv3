@@ -528,3 +528,4 @@ export default function Footer2(props: Footer2Props) {
   );
 }
 
+
