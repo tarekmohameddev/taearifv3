@@ -138,7 +138,9 @@ export default function Hero4(props: Hero4Props = {}) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   return (
-    <div className="relative w-full flex items-center justify-center pb-20 sm:pb-0">
+    <div className={`relative w-full flex items-center justify-center pb-20  ${
+      mergedData.barType === "contact" || mergedData.contact ? "sm:pb-[400px]" : mergedData.barType === "propertyFilter" ? "sm:pb-[50px]" : "sm:pb-[50px] "
+    }`}>
       {/* Hero Section - Image with max height 200px */}
       <section className="relative w-full h-[300px] overflow-visible">
         {/* Background Image */}
@@ -180,7 +182,7 @@ export default function Hero4(props: Hero4Props = {}) {
           </div>
         ) : mergedData.barType === "contact" || mergedData.contact ? (
           // Contact Form
-          <div className="bg-white rounded-2xl shadow-2xl ">
+          <div className="bg-white rounded-2xl shadow-2xl p-5">
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Right Side - Contact Form */}
               <div className="w-full lg:w-[60%]">
