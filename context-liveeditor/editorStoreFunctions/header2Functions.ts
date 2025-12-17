@@ -44,22 +44,22 @@ export const getDefaultHeader2Data = (): ComponentData => {
       },
       {
         ThemeTwo: "link",
+        name: "عقارات للإيجار",
+        path: "/for-rent",
+      },
+      {
+        ThemeTwo: "link",
+        name: "عقارات للبيع",
+        path: "/for-sale",
+      },
+      {
+        ThemeTwo: "link",
         name: "المشاريع",
         path: "/projects",
       },
       {
         ThemeTwo: "link",
-        name: "الأفراد",
-        path: "/individuals",
-      },
-      {
-        ThemeTwo: "link",
-        name: "البيع على الخارطة",
-        path: "/map-sales",
-      },
-      {
-        ThemeTwo: "link",
-        name: "عن باهية العقارية",
+        name: "من نحن",
         path: "/about-us",
       },
       {
