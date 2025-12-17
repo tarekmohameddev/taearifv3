@@ -232,6 +232,10 @@
       "display_name": "Blogs Sections",
       "description": "Blog cards section with paragraphs and grid layout"
     },
+    "contactUsHomePage": {
+      "display_name": "Contact Us Home Page",
+      "description": "Complete contact form with background image and multiple contact fields"
+    },
     "inputs": {
       "display_name": "Dynamic Form System",
       "description": "Advanced form system with dynamic cards, fields, validation, and API integration"
