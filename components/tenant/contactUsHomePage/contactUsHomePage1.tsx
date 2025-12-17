@@ -319,7 +319,7 @@ export default function ContactUsHomePage1(props: ContactUsHomePageProps) {
   };
 
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center py-16 px-4 overflow-hidden">
+    <section className="relative w-[90%]  sm:w-[70%]  md:w-[70%]  lg:w-[70%] xl:w-[60%] 2xl:w-[50%] mx-auto flex items-center justify-center py-16 px-4 overflow-hidden ">
       {/* Form Container */}
       <div className="relative z-10 w-full" style={{ maxWidth: mergedData.layout?.maxWidth || "4xl" }}>
         <div className="relative rounded-lg p-8 md:p-12 shadow-2xl overflow-hidden">
@@ -440,14 +440,17 @@ export default function ContactUsHomePage1(props: ContactUsHomePageProps) {
                       <SelectTrigger
                         dir="rtl"
                         id="city"
-                        className="h-12"
+                        className="h-12 [&_span:empty]:text-[#8b5f46] [&_span:not(:has(*))]:text-[#8b5f46]"
                         style={{
                           backgroundColor: mergedData.styling?.inputBackground || "#f5f0e8",
                           borderColor: mergedData.styling?.inputBorder || "#c4b5a0",
                           color: mergedData.styling?.inputText || "#ffffff",
                         }}
                       >
-                        <SelectValue placeholder={mergedData.form?.fields?.city?.placeholder || "اختر المدينة"} />
+                        <SelectValue 
+                          placeholder={mergedData.form?.fields?.city?.placeholder || "اختر المدينة"}
+                          style={{ color: !city ? "#8b5f46" : undefined }}
+                        />
                       </SelectTrigger>
                       <SelectContent align="end">
                         {mergedData.form?.fields?.city?.options?.map((option) => (
@@ -539,14 +542,17 @@ export default function ContactUsHomePage1(props: ContactUsHomePageProps) {
                       <SelectTrigger
                         dir="rtl"
                         id="paymentMethod"
-                        className="h-12"
+                        className="h-12 [&_span:empty]:text-[#8b5f46] [&_span:not(:has(*))]:text-[#8b5f46]"
                         style={{
                           backgroundColor: mergedData.styling?.inputBackground || "#f5f0e8",
                           borderColor: mergedData.styling?.inputBorder || "#c4b5a0",
                           color: mergedData.styling?.inputText || "#ffffff",
                         }}
                       >
-                        <SelectValue placeholder={mergedData.form?.fields?.paymentMethod?.placeholder || "اختر طريقة الدفع"} />
+                        <SelectValue 
+                          placeholder={mergedData.form?.fields?.paymentMethod?.placeholder || "اختر طريقة الدفع"}
+                          style={{ color: !paymentMethod ? "#8b5f46" : undefined }}
+                        />
                       </SelectTrigger>
                       <SelectContent align="end">
                         {mergedData.form?.fields?.paymentMethod?.options?.map((option) => (
@@ -579,14 +585,17 @@ export default function ContactUsHomePage1(props: ContactUsHomePageProps) {
                       <SelectTrigger
                         id="unitType"
                         dir="rtl"
-                        className="h-12"
+                        className="h-12 [&_span:empty]:text-[#8b5f46] [&_span:not(:has(*))]:text-[#8b5f46]"
                         style={{
                           backgroundColor: mergedData.styling?.inputBackground || "#f5f0e8",
                           borderColor: mergedData.styling?.inputBorder || "#c4b5a0",
                           color: mergedData.styling?.inputText || "#ffffff",
                         }}
                       >
-                        <SelectValue placeholder={mergedData.form?.fields?.unitType?.placeholder || "اختر نوع الوحدة"} />
+                        <SelectValue 
+                          placeholder={mergedData.form?.fields?.unitType?.placeholder || "اختر نوع الوحدة"}
+                          style={{ color: !unitType ? "#8b5f46" : undefined }}
+                        />
                       </SelectTrigger>
                       <SelectContent align="end">
                         {mergedData.form?.fields?.unitType?.options?.map((option) => (
