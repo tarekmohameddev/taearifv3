@@ -214,6 +214,7 @@ const getDefaultFooterData = (): FooterData => ({
 
 interface FooterProps {
   // Editor props
+  overrideData?: any; // ⭐ NEW: Accept override data directly
   variant?: string;
   useStore?: boolean;
   id?: string;
@@ -292,13 +293,14 @@ export default function Footer(props: FooterProps = {}) {
   const tenantComponentData = getTenantComponentData();
 
   // Merge data with priority:
-  // For global footer: globalFooterData > props > default
+  // For global footer: overrideData > globalFooterData > props > default
   // For regular footer: storeData > tenantComponentData > props > default
   const mergedData = isGlobalFooter
     ? {
         ...getDefaultFooterData(),
         ...props,
         ...globalFooterData,
+        ...(props.overrideData || {}), // ⭐ NEW: Highest priority
       }
     : {
         ...getDefaultFooterData(),

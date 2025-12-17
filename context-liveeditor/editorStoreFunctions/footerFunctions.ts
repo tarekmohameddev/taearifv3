@@ -129,7 +129,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       blendMode: "multiply",
       ThemeTwo: "ThemeTwo", // ThemeTwo key added
     },
-    ThemeTwo: "ThemeTwo", // ThemeTwo key added
   },
   layout: {
     columns: "2",

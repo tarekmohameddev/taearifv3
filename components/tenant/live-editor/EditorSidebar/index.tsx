@@ -94,9 +94,11 @@ export function EditorSidebar({
     globalHeaderData,
     globalFooterData,
     globalHeaderVariant,
+    globalFooterVariant, // ⭐ NEW
     setGlobalHeaderData,
     setGlobalFooterData,
     setGlobalHeaderVariant,
+    setGlobalFooterVariant, // ⭐ NEW
     updateGlobalHeaderByPath,
     updateGlobalFooterByPath,
     globalComponentsData,
@@ -876,7 +878,7 @@ export function EditorSidebar({
                     {t("editor_sidebar.switch_visual_styles")}
                   </p>
                   <div className="space-y-4">
-                    {/* Special handling for global-header */}
+                    {/* Special handling for global-header and global-footer */}
                     {selectedComponent.id === "global-header" ? (
                       <ThemeSelector
                         componentType="header"
@@ -907,6 +909,45 @@ export function EditorSidebar({
                               ...globalComponentsData,
                               header: newDefaultDataWithVariant,
                               globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
+                            } as any);
+
+                            // Mark as changed
+                            setHasChangesMade(true);
+                          } catch (error) {
+                            // Silently handle error
+                          }
+                        }}
+                        className="w-full"
+                      />
+                    ) : selectedComponent.id === "global-footer" ? (
+                      <ThemeSelector
+                        componentType="footer"
+                        currentTheme={globalFooterVariant || "StaticFooter1"}
+                        onThemeChange={(newTheme) => {
+                          try {
+                            // Get default data for the new theme
+                            const newDefaultData = createDefaultData(
+                              "footer",
+                              newTheme,
+                            );
+                            
+                            // ⭐ Add variant to newDefaultData to ensure it's included
+                            const newDefaultDataWithVariant = {
+                              ...newDefaultData,
+                              variant: newTheme,
+                            };
+
+                            // IMPORTANT: Update variant FIRST, then data
+                            setGlobalFooterVariant(newTheme);
+
+                            // Update data with variant included
+                            setGlobalFooterData(newDefaultDataWithVariant);
+
+                            // Update globalComponentsData with BOTH variant and data
+                            setGlobalComponentsData({
+                              ...globalComponentsData,
+                              footer: newDefaultDataWithVariant,
+                              globalFooterVariant: newTheme,
                             } as any);
 
                             // Mark as changed

@@ -130,6 +130,7 @@ interface Footer2Props {
   };
   
   // Editor props (always include these)
+  overrideData?: any; // ⭐ NEW: Accept override data directly
   variant?: string;
   useStore?: boolean;
   id?: string;
@@ -151,10 +152,14 @@ export default function Footer2(props: Footer2Props) {
   const ensureComponentVariant = useEditorStore(s => s.ensureComponentVariant);
   const getComponentData = useEditorStore(s => s.getComponentData);
   const footerStates = useEditorStore(s => s.footerStates);
+  const globalFooterData = useEditorStore(s => s.globalFooterData); // ⭐ NEW: For global footer support
   
   const tenantData = useTenantStore(s => s.tenantData);
   const fetchTenantData = useTenantStore(s => s.fetchTenantData);
   const tenantId = useTenantStore(s => s.tenantId);
+  
+  // Check if this is a global footer
+  const isGlobalFooter = uniqueId === "global-footer";
 
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
@@ -231,12 +236,20 @@ export default function Footer2(props: Footer2Props) {
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
-  const mergedData = {
-    ...getDefaultFooter2Data(),    // 1. Defaults (lowest priority)
-    ...storeData,                   // 2. Store state
-    ...currentStoreData,            // 3. Current store data
-    ...props                        // 4. Props (highest priority)
-  };
+  const mergedData = isGlobalFooter
+    ? {
+        ...getDefaultFooter2Data(),    // 1. Defaults (lowest priority)
+        ...globalFooterData,            // 2. Global footer data
+        ...props,                       // 3. Props
+        ...(props.overrideData || {})  // ⭐ NEW: overrideData (highest priority)
+      }
+    : {
+        ...getDefaultFooter2Data(),    // 1. Defaults (lowest priority)
+        ...storeData,                   // 2. Store state
+        ...currentStoreData,            // 3. Current store data
+        ...props,                       // 4. Props
+        ...(props.overrideData || {})  // ⭐ NEW: overrideData (highest priority)
+      };
   
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
@@ -264,27 +277,22 @@ export default function Footer2(props: Footer2Props) {
     }
   };
 
-  const backgroundColor = mergedData.background?.color || "#8b5f46";
-  const accentColor = mergedData.styling?.colors?.accent || "#a67c5a";
-  const hoverAccentColor = "#9a6f4f";
-
   return (
     <>
       <footer 
-        className="relative z-10 pt-16 md:pt-20 lg:pt-24 pb-8"
-        style={{ backgroundColor }}
+        className="relative z-10 bg-[#8b5f46] pt-16 md:pt-20 lg:pt-24 pb-8"
+        style={{ backgroundColor: mergedData.background?.color || "#8b5f46" }}
       >
-        <div className={`container mx-auto px-4 text-white max-w-${mergedData.layout?.maxWidth || "6xl"}`}>
+        <div className="container mx-auto px-4 text-white max-w-6xl">
           {/* Main Content Section */}
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
             {/* Right Section - Company Info */}
-            {mergedData.content?.companyInfo?.enabled && (
-              <div className="w-full lg:w-1/2 xl:w-2/5">
+            <div className="w-full lg:w-1/2 xl:w-2/5">
                 <Link href="/" className="block mb-6">
                   <div className="relative w-48 h-32 mb-6">
                     <Image
                       src={mergedData.content?.companyInfo?.logo || "/images/main/logo.png"}
-                      alt={mergedData.content?.companyInfo?.name || "Logo"}
+                      alt="Baheya Real Estate"
                       fill
                       className="object-contain"
                     />
@@ -292,8 +300,7 @@ export default function Footer2(props: Footer2Props) {
                 </Link>
 
                 {/* Contact Information */}
-                {mergedData.content?.contactInfo?.enabled && (
-                  <ul className="space-y-4 mb-6">
+                <ul className="space-y-4 mb-6">
                     <li className="flex items-center gap-3">
                       <span className="flex-shrink-0">
                         <svg
@@ -346,23 +353,20 @@ export default function Footer2(props: Footer2Props) {
                       </a>
                     </li>
                   </ul>
-                )}
 
                 {/* Company Description */}
                 <p className="text-base leading-relaxed text-white/90">
-                  {mergedData.content?.companyInfo?.description}
+                  {mergedData.content?.companyInfo?.description || "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية."}
                 </p>
               </div>
-            )}
 
             {/* Left Section - Newsletter */}
-            {mergedData.content?.newsletter?.enabled && (
-              <div className="w-full lg:w-1/2 xl:w-3/5">
+            <div className="w-full lg:w-1/2 xl:w-3/5 ">
                 <h5 className="text-xl font-bold text-white mb-4">
-                  {mergedData.content?.newsletter?.title}
+                  {mergedData.content?.newsletter?.title || "اشترك في النشرة البريدية"}
                 </h5>
                 <p className="text-base leading-relaxed text-white/90 mb-6">
-                  {mergedData.content?.newsletter?.description}
+                  {mergedData.content?.newsletter?.description || "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"}
                 </p>
 
                 {/* Newsletter Form */}
@@ -374,35 +378,23 @@ export default function Footer2(props: Footer2Props) {
                     type="tel"
                     value={whatsappNumber}
                     onChange={(e) => setWhatsappNumber(e.target.value)}
-                    placeholder={mergedData.content?.newsletter?.placeholder}
+                    placeholder={mergedData.content?.newsletter?.placeholder || "رقم الواتساب"}
                     required
                     pattern="[0-9()#&+*-=.]+"
                     title="يتم قبول الأرقام وأحرف الهاتف فقط (#، - ، *، إلخ)."
-                    className="flex-1 px-4 py-3 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    style={{ backgroundColor: accentColor }}
+                    className="flex-1 px-4 py-3 rounded-lg bg-[#a67c5a] text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
                   />
                   <button
                     type="submit"
-                    className="px-6 py-3 rounded-lg text-white font-semibold hover:transition-colors whitespace-nowrap"
-                    style={{ 
-                      backgroundColor: accentColor,
-                      transition: mergedData.styling?.effects?.hoverTransition || "0.3s"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = hoverAccentColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = accentColor;
-                    }}
+                    className="px-6 py-3 rounded-lg bg-[#a67c5a] text-white font-semibold hover:bg-[#9a6f4f] transition-colors whitespace-nowrap"
                   >
-                    {mergedData.content?.newsletter?.buttonText}
+                    {mergedData.content?.newsletter?.buttonText || "اشترك الآن"}
                   </button>
                 </form>
 
                 {/* Social Media Icons */}
-                {mergedData.content?.socialMedia?.enabled && (
-                  <div className="flex items-center gap-4">
-                    {mergedData.content?.socialMedia?.platforms?.map((platform, index) => (
+                <div className="flex items-center gap-4">
+                    {mergedData.content?.socialMedia?.platforms?.map((platform: any, index: number) => (
                       <a
                         key={index}
                         href={platform.url}
@@ -464,66 +456,59 @@ export default function Footer2(props: Footer2Props) {
                       </a>
                     ))}
                   </div>
-                )}
               </div>
-            )}
           </div>
 
           {/* Bottom Section - Copyright and Links */}
-          {mergedData.footerBottom?.enabled && (
-            <div className="border-t border-white/20 pt-8">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-base text-white/90 text-center md:text-right">
-                  {mergedData.footerBottom?.copyright?.split("باهية العقارية")[0]}
-                  <Link href={mergedData.footerBottom?.companyUrl || "#"} className="hover:underline">
-                    باهية العقارية
-                  </Link>
-                  {" "}
-                  {mergedData.footerBottom?.copyright?.split("باهية العقارية")[1]?.split("وكالة سهيل")[0]}
-                  <a
-                    href={mergedData.footerBottom?.designerUrl || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
+          <div className="border-t border-white/20 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-base text-white/90 text-center md:text-right">
+                جميع الحقوق محفوظة لشركة{" "}
+                <Link href={mergedData.footerBottom?.companyUrl || "https://baheya.co"} className="hover:underline">
+                  باهية العقارية
+                </Link>{" "}
+                2025© | صمم من طرف{" "}
+                <a
+                  href={mergedData.footerBottom?.designerUrl || "http://souhailagency.com"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  وكالة سهيل
+                </a>
+              </p>
+              <div className="flex items-center gap-6">
+                {mergedData.footerBottom?.legalLinks?.map((link: any, index: number) => (
+                  <Link
+                    key={index}
+                    href={link.url || "#"}
+                    className="text-base text-white hover:underline"
                   >
-                    وكالة سهيل
-                  </a>
-                </p>
-                <div className="flex items-center gap-6">
-                  {mergedData.footerBottom?.legalLinks?.map((link, index) => (
-                    <Link
-                      key={index}
-                      href={link.url || "#"}
-                      className="text-base text-white hover:underline"
-                    >
-                      {link.text}
-                    </Link>
-                  ))}
-                </div>
+                    {link.text}
+                  </Link>
+                ))}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </footer>
 
       {/* Floating WhatsApp Button */}
-      {mergedData.floatingWhatsApp?.enabled && (
-        <a
-          href={mergedData.floatingWhatsApp?.url || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-          aria-label="Contact us on WhatsApp"
+      <a
+        href={mergedData.floatingWhatsApp?.url || "https://wa.link/0ysvug"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        aria-label="Contact us on WhatsApp"
+      >
+        <svg
+          className="w-8 h-8 fill-white"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <svg
-            className="w-8 h-8 fill-white"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-          </svg>
-        </a>
-      )}
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+        </svg>
+      </a>
     </>
   );
 }

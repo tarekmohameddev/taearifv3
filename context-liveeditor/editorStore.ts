@@ -119,9 +119,11 @@ interface EditorStore {
   globalHeaderData: ComponentData;
   globalFooterData: ComponentData;
   globalHeaderVariant: string; // Variant for global header (StaticHeader1, header1, header2)
+  globalFooterVariant: string; // ⭐ NEW: Variant for global footer (StaticFooter1, footer1, footer2)
   setGlobalHeaderData: (data: ComponentData) => void;
   setGlobalFooterData: (data: ComponentData) => void;
   setGlobalHeaderVariant: (variant: string) => void;
+  setGlobalFooterVariant: (variant: string) => void; // ⭐ NEW
   updateGlobalHeaderByPath: (path: string, value: any) => void;
   updateGlobalFooterByPath: (path: string, value: any) => void;
 
@@ -570,6 +572,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   globalHeaderData: getDefaultHeaderData(),
   globalFooterData: getDefaultFooterData(),
   globalHeaderVariant: "StaticHeader1", // Default to StaticHeader1
+  globalFooterVariant: "StaticFooter1", // ⭐ NEW: Default to StaticFooter1
 
   // Initialize Global Components Data
   globalComponentsData: {
@@ -665,6 +668,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setGlobalHeaderVariant: (variant) =>
     set(() => {
       return { globalHeaderVariant: variant };
+    }),
+  setGlobalFooterVariant: (variant) =>
+    set(() => {
+      return { globalFooterVariant: variant };
     }),
 
   updateGlobalHeaderByPath: (path, value) =>
@@ -2083,6 +2090,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState.globalHeaderVariant = tenantData.globalComponentsData.globalHeaderVariant;
         } else if (tenantData.globalComponentsData.header?.variant) {
           newState.globalHeaderVariant = tenantData.globalComponentsData.header.variant;
+        }
+        
+        // ⭐ Load globalFooterVariant from globalComponentsData
+        if (tenantData.globalComponentsData.globalFooterVariant) {
+          newState.globalFooterVariant = tenantData.globalComponentsData.globalFooterVariant;
+        } else if (tenantData.globalComponentsData.footer?.variant) {
+          newState.globalFooterVariant = tenantData.globalComponentsData.footer.variant;
         }
       } else {
         // Only initialize with default data if not already set in editorStore
