@@ -315,15 +315,22 @@ export default function TenantPageWrapper({
   // Get global footer data and variant
   const globalFooterData = tenantData?.globalComponentsData?.footer;
   const globalFooterVariant = useMemo(() => {
-    const globalFooterVariantFromStore = useEditorStore.getState().globalFooterVariant;
-    const isDefaultVariant = globalFooterVariantFromStore === "StaticFooter1";
-    
+    // Priority: footer.variant > globalFooterVariant > default (same as header)
     const variant = 
-      (!isDefaultVariant && globalFooterVariantFromStore) ||
       globalFooterData?.variant ||
       tenantData?.globalComponentsData?.globalFooterVariant ||
-      globalFooterVariantFromStore ||
       "StaticFooter1";
+    
+    // Debug log (can be removed in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[TenantPageWrapper] Footer Variant Debug:', {
+        'globalFooterData?.variant': globalFooterData?.variant,
+        'tenantData?.globalComponentsData?.globalFooterVariant': tenantData?.globalComponentsData?.globalFooterVariant,
+        'resolved variant': variant,
+        'tenantData exists': !!tenantData,
+        'globalComponentsData exists': !!tenantData?.globalComponentsData,
+      });
+    }
     
     return variant;
   }, [globalFooterData?.variant, tenantData?.globalComponentsData?.globalFooterVariant, tenantData]);

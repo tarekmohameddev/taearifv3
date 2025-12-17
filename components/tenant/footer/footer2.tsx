@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { MapPin } from "lucide-react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultFooter2Data } from "@/context-liveeditor/editorStoreFunctions/footerFunctions";
@@ -288,16 +289,42 @@ export default function Footer2(props: Footer2Props) {
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
             {/* Right Section - Company Info */}
             <div className="w-full lg:w-1/2 xl:w-2/5">
-                <Link href="/" className="block mb-6">
-                  <div className="relative w-48 h-32 mb-6">
+              <div className="flex items-center gap-3 mb-6">
+                {mergedData.content?.companyInfo?.logo ? (
+                  <div className="flex">
                     <Image
-                      src={mergedData.content?.companyInfo?.logo || "/images/main/logo.png"}
-                      alt="Baheya Real Estate"
-                      fill
-                      className="object-contain"
+                      src={mergedData.content.companyInfo.logo}
+                      alt={mergedData.content?.companyInfo?.name || "Baheya Real Estate"}
+                      width={100}
+                      height={100}
+                      className="rounded-full object-contain"
                     />
                   </div>
-                </Link>
+                ) : (
+                  <Link href="/" className="block">
+                    <div className="relative w-48 h-32">
+                      <Image
+                        src="/images/main/logo.png"
+                        alt="Baheya Real Estate"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </Link>
+                )}
+                {mergedData.content?.companyInfo?.name && (
+                  <div>
+                    <h3 className="text-lg font-bold text-white">
+                      {mergedData.content.companyInfo.name}
+                    </h3>
+                    {mergedData.content?.companyInfo?.tagline && (
+                      <p className="text-sm text-white/80">
+                        {mergedData.content.companyInfo.tagline}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
 
                 {/* Contact Information */}
                 <ul className="space-y-4 mb-6">

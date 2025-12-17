@@ -112,7 +112,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     type: "color",
     image: "",
     alt: "",
-    color: "#8b5f46",
+    color: "#8b5f46", // Default background color
     ThemeTwo: "ThemeTwo", // ThemeTwo key added
     gradient: {
       enabled: false,
