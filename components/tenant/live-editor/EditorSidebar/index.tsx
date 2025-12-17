@@ -888,18 +888,24 @@ export function EditorSidebar({
                               "header",
                               newTheme,
                             );
+                            
+                            // ⭐ Add variant to newDefaultData to ensure it's included
+                            const newDefaultDataWithVariant = {
+                              ...newDefaultData,
+                              variant: newTheme,
+                            };
 
                             // IMPORTANT: Update variant FIRST, then data
                             // This ensures the variant is saved before any other operations
                             setGlobalHeaderVariant(newTheme);
 
-                            // Update data
-                            setGlobalHeaderData(newDefaultData);
+                            // Update data with variant included
+                            setGlobalHeaderData(newDefaultDataWithVariant);
 
                             // Update globalComponentsData with BOTH variant and data
                             setGlobalComponentsData({
                               ...globalComponentsData,
-                              header: newDefaultData,
+                              header: newDefaultDataWithVariant,
                               globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
                             } as any);
 

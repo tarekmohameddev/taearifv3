@@ -179,17 +179,23 @@ export function useLiveEditorHandlers(state: any) {
       // Get default data for the new theme
       const newDefaultData = createDefaultData("header", newTheme);
       
+      // ⭐ Add variant to newDefaultData to ensure it's included
+      const newDefaultDataWithVariant = {
+        ...newDefaultData,
+        variant: newTheme,
+      };
+      
       // IMPORTANT: Update variant FIRST, then data
       // This ensures the variant is saved before any other operations
       store.setGlobalHeaderVariant(newTheme);
       
-      // Update data
-      store.setGlobalHeaderData(newDefaultData);
+      // Update data with variant included
+      store.setGlobalHeaderData(newDefaultDataWithVariant);
       
       // Update globalComponentsData with BOTH variant and data
       store.setGlobalComponentsData({
         ...store.globalComponentsData,
-        header: newDefaultData,
+        header: newDefaultDataWithVariant,
         globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
       } as any);
       

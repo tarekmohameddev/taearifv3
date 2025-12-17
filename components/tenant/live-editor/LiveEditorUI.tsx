@@ -424,21 +424,30 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // Get tenantData for globalHeaderVariant (same priority as TenantPageWrapper)
   const tenantData = useTenantStore((s) => s.tenantData);
   
-  // Get global header variant with same priority as TenantPageWrapper
+  // Get global header variant with smart priority logic
+  // ⭐ IMPORTANT: Use tenantData/globalHeaderData on initial load, but use store for immediate updates
   const globalHeaderVariant = useMemo(() => {
-    // Priority: header.variant > globalHeaderVariant > default
+    // If globalHeaderVariantFromStore is the default value, prioritize tenantData/globalHeaderData
+    // This handles the case when Live Editor first opens
+    const isDefaultVariant = globalHeaderVariantFromStore === "StaticHeader1";
+    
+    // Priority logic:
+    // 1. If store variant is NOT default, use it (for immediate updates)
+    // 2. Otherwise, use tenantData/globalHeaderData (for initial load)
     const variant = 
+      (!isDefaultVariant && globalHeaderVariantFromStore) ||  // ⭐ Use store if not default
       globalHeaderData?.variant ||
       tenantData?.globalComponentsData?.globalHeaderVariant ||
-      globalHeaderVariantFromStore ||
+      globalHeaderVariantFromStore ||  // Fallback to store
       "StaticHeader1";
     
     // Debug log (can be removed in production)
     if (process.env.NODE_ENV === 'development') {
       console.log('[LiveEditorUI] Header Variant Debug:', {
+        'globalHeaderVariantFromStore': globalHeaderVariantFromStore,
+        'isDefaultVariant': isDefaultVariant,
         'globalHeaderData?.variant': globalHeaderData?.variant,
         'tenantData?.globalComponentsData?.globalHeaderVariant': tenantData?.globalComponentsData?.globalHeaderVariant,
-        'globalHeaderVariantFromStore': globalHeaderVariantFromStore,
         'resolved variant': variant,
         'tenantData exists': !!tenantData,
         'globalComponentsData exists': !!tenantData?.globalComponentsData,
@@ -446,7 +455,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     }
     
     return variant;
-  }, [globalHeaderData?.variant, tenantData?.globalComponentsData?.globalHeaderVariant, globalHeaderVariantFromStore, tenantData]);
+  }, [globalHeaderVariantFromStore, globalHeaderData?.variant, tenantData?.globalComponentsData?.globalHeaderVariant, tenantData]);
 
   // Initialize data immediately if not exists
   if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
@@ -464,6 +473,42 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     }
     setPreviousHasChangesMade(hasChangesMade);
   }, [hasChangesMade, previousHasChangesMade]);
+
+  // Prevent Radix UI from adding pointer-events: none to body
+  useEffect(() => {
+    // Monitor body style changes and remove pointer-events: none immediately
+    const observer = new MutationObserver(() => {
+      const body = document.body;
+      if (body.style.pointerEvents === "none") {
+        body.style.pointerEvents = "";
+      }
+    });
+
+    // Start observing body for style attribute changes
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+
+    // Also check immediately and set up interval as backup
+    const checkAndRemove = () => {
+      const body = document.body;
+      if (body.style.pointerEvents === "none") {
+        body.style.pointerEvents = "";
+      }
+    };
+
+    // Check immediately
+    checkAndRemove();
+
+    // Check periodically as backup (every 50ms)
+    const interval = setInterval(checkAndRemove, 50);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, []);
 
   if (!globalFooterData || Object.keys(globalFooterData).length === 0) {
     const {
@@ -928,9 +973,14 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   console.warn('[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1');
                   return <StaticHeader1 overrideData={headerDataWithoutVariant} />;
                 }
+ 
+                // ⭐ IMPORTANT: Add key prop to force re-render when variant or data changes
+                // This ensures the header updates immediately when theme changes
+                const headerKey = `global-header-${globalHeaderVariant}-${JSON.stringify(headerDataWithoutVariant)}`;
 
                 return (
                   <HeaderComponent
+                    key={headerKey}
                     overrideData={headerDataWithoutVariant}
                     variant={globalHeaderVariant}
                     id="global-header"
@@ -2018,7 +2068,18 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Changes Made Dialog - Modern Popup */}
         <AlertDialog
           open={showChangesDialog}
-          onOpenChange={setShowChangesDialog}
+          onOpenChange={(open) => {
+            setShowChangesDialog(open);
+            // Ensure pointer-events is restored when dialog closes
+            if (!open) {
+              setTimeout(() => {
+                const body = document.body;
+                if (body.style.pointerEvents === 'none') {
+                  body.style.pointerEvents = '';
+                }
+              }, 100); // Small delay to ensure Radix UI cleanup is done
+            }
+          }}
         >
           <AlertDialogContent className="max-w-md border-0 shadow-2xl bg-white">
             <AlertDialogHeader>

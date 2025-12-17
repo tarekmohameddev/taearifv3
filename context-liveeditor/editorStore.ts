@@ -2077,6 +2077,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         Object.keys(tenantData.globalComponentsData).length > 0
       ) {
         newState.globalComponentsData = tenantData.globalComponentsData;
+        
+        // ⭐ Load globalHeaderVariant from globalComponentsData
+        if (tenantData.globalComponentsData.globalHeaderVariant) {
+          newState.globalHeaderVariant = tenantData.globalComponentsData.globalHeaderVariant;
+        } else if (tenantData.globalComponentsData.header?.variant) {
+          newState.globalHeaderVariant = tenantData.globalComponentsData.header.variant;
+        }
       } else {
         // Only initialize with default data if not already set in editorStore
         if (
