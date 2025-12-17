@@ -166,7 +166,10 @@ export function EditorSidebar({
       }
 
       if (selectedComponent.id === "global-footer") {
-        const defaultData = getDefaultFooterData();
+        // Use globalFooterVariant to get correct default data
+        const currentVariant = globalFooterVariant || "StaticFooter1";
+        const defaultData = createDefaultData("footer", currentVariant);
+        
         const dataToUse =
           globalComponentsData?.footer &&
           Object.keys(globalComponentsData.footer).length > 0
@@ -355,7 +358,10 @@ export function EditorSidebar({
 
         setTempData(dataToUse);
       } else if (selectedComponent.id === "global-footer") {
-        const defaultData = getDefaultFooterData();
+        // Use globalFooterVariant to get correct default data
+        const currentVariant = store.globalFooterVariant || "StaticFooter1";
+        const defaultData = createDefaultData("footer", currentVariant);
+        
         const dataToUse =
           store.globalFooterData &&
           Object.keys(store.globalFooterData).length > 0
@@ -376,7 +382,7 @@ export function EditorSidebar({
     } else {
       setTempData({});
     }
-  }, [selectedComponent, globalHeaderData, globalFooterData, view]);
+  }, [selectedComponent, globalHeaderData, globalFooterData, globalFooterVariant, view]);
 
   // Clear tempData when view changes (but not for branding-settings)
   useEffect(() => {
@@ -1007,10 +1013,10 @@ export function EditorSidebar({
                     componentName={(() => {
                       // Handle global components
                       if (selectedComponent.id === "global-header") {
-                        return "header1";
+                        return globalHeaderVariant || "StaticHeader1";
                       }
                       if (selectedComponent.id === "global-footer") {
-                        return "footer1";
+                        return globalFooterVariant || "StaticFooter1";
                       }
 
                       // أولاً: تحقق من componentName مباشرة
@@ -1237,7 +1243,10 @@ export function EditorSidebar({
                     setTempData(originalData);
                   } else if (selectedComponent?.id === "global-footer") {
                     const store = useEditorStore.getState();
-                    const defaultData = getDefaultFooterData();
+                    // Use globalFooterVariant to get correct default data
+                    const currentVariant = store.globalFooterVariant || "StaticFooter1";
+                    const defaultData = createDefaultData("footer", currentVariant);
+                    
                     const originalData =
                       store.globalFooterData &&
                       Object.keys(store.globalFooterData).length > 0
