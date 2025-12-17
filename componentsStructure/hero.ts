@@ -914,9 +914,92 @@ export const heroStructure: ComponentStructure = {
           type: "image",
         },
         {
+          key: "barType",
+          label: "Floating Bar Type",
+          type: "select",
+          options: [
+            { label: "Default Bar (هل لديك استفسار)", value: "default" },
+            { label: "Contact Form", value: "contact" },
+            { label: "Property Filter", value: "propertyFilter" },
+          ],
+          defaultValue: "default",
+        },
+        {
           key: "contact",
           label: "Show Contact Form",
           type: "boolean",
+        },
+        {
+          key: "propertyFilterConfig",
+          label: "Property Filter Configuration",
+          type: "object",
+          fields: [
+            {
+              key: "propertyTypesSource",
+              label: "Property Types Source",
+              type: "select",
+              options: [
+                { label: "Static List", value: "static" },
+                { label: "Dynamic API", value: "dynamic" },
+              ],
+              defaultValue: "dynamic",
+            },
+            {
+              key: "propertyTypes",
+              label: "Property Types List",
+              type: "array",
+              of: [
+                {
+                  key: "value",
+                  label: "Property Type",
+                  type: "text",
+                },
+              ],
+              condition: {
+                field: "propertyFilterConfig.propertyTypesSource",
+                value: "static",
+              },
+            },
+            {
+              key: "propertyTypesApiUrl",
+              label: "Property Types API URL",
+              type: "text",
+              placeholder:
+                "https://api.taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+              condition: {
+                field: "propertyFilterConfig.propertyTypesSource",
+                value: "dynamic",
+              },
+            },
+            {
+              key: "searchPlaceholder",
+              label: "Search Input Placeholder",
+              type: "text",
+              placeholder: "أدخل المدينة أو المنطقة",
+            },
+            {
+              key: "propertyTypePlaceholder",
+              label: "Property Type Placeholder",
+              type: "text",
+              placeholder: "نوع العقار",
+            },
+            {
+              key: "pricePlaceholder",
+              label: "Price Input Placeholder",
+              type: "text",
+              placeholder: "السعر",
+            },
+            {
+              key: "searchButtonText",
+              label: "Search Button Text",
+              type: "text",
+              placeholder: "بحث",
+            },
+          ],
+          condition: {
+            field: "barType",
+            value: "propertyFilter",
+          },
         },
         {
           key: "background",
@@ -1018,6 +1101,17 @@ export const heroStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "backgroundImage", label: "Background Image", type: "image" },
         { key: "title", label: "Title", type: "text" },
+        {
+          key: "barType",
+          label: "Floating Bar Type",
+          type: "select",
+          options: [
+            { label: "Default Bar (هل لديك استفسار)", value: "default" },
+            { label: "Contact Form", value: "contact" },
+            { label: "Property Filter", value: "propertyFilter" },
+          ],
+          defaultValue: "default",
+        },
         { key: "contact", label: "Show Contact Form", type: "boolean" },
       ],
     },

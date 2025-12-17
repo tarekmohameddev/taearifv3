@@ -296,6 +296,7 @@ export const getDefaultHero4Data = (): ComponentData => ({
   visible: true,
   title: "عن باهية العقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
+  barType: "default", // "default" | "contact" | "propertyFilter"
   contact: false,
   background: {
     ThemeTwo: "ThemeTwo",

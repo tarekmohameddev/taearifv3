@@ -6,6 +6,7 @@ import { Mail } from "lucide-react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultHero4Data } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
+import PropertyFilter2 from "@/components/tenant/propertyFilter/propertyFilter2";
 
 interface Hero4Props {
   title?: string;
@@ -163,13 +164,23 @@ export default function Hero4(props: Hero4Props = {}) {
 
       {/* Floating Contact Form Bar - طائرة بين القسمين */}
       <div
-        className={`absolute top-0 ${
-          mergedData.contact ? "max-w-6xl" : "max-w-7xl"
-        } mt-[16rem] z-[10] w-full  px-4 sm:px-6 lg:px-8`}
+        className={`absolute top-0   ${
+          mergedData.barType === "contact" || mergedData.contact ? "max-w-6xl mt-[13rem]" : mergedData.barType === "propertyFilter" ? "max-w-[1000px] mt-[15rem]" : "max-w-7xl mt-[16rem]"
+        }  z-[10] w-full  px-4 sm:px-6 lg:px-8`}
       >
-        {mergedData.contact ? (
+        {mergedData.barType === "propertyFilter" ? (
+          // Property Filter
+          <div className="bg-white rounded-2xl shadow-2xl  py-1">
+            <PropertyFilter2
+              useStore={props.useStore}
+              id={`${uniqueId}-propertyFilter`}
+              variant="propertyFilter2"
+              content={mergedData.propertyFilterConfig}
+            />
+          </div>
+        ) : mergedData.barType === "contact" || mergedData.contact ? (
           // Contact Form
-          <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+          <div className="bg-white rounded-2xl shadow-2xl ">
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Right Side - Contact Form */}
               <div className="w-full lg:w-[60%]">
