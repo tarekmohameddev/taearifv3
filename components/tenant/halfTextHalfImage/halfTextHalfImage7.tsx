@@ -392,3 +392,4 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     </section>
   );
 }
+
