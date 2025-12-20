@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { MapPin } from "lucide-react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
@@ -156,6 +156,7 @@ export default function Footer2(props: Footer2Props) {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const footerStates = useEditorStore((s) => s.footerStates);
   const globalFooterData = useEditorStore((s) => s.globalFooterData); // ⭐ NEW: For global footer support
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -246,20 +247,36 @@ export default function Footer2(props: Footer2Props) {
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
-  const mergedData = isGlobalFooter
-    ? {
-        ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
-        ...globalFooterData, // 2. Global footer data
-        ...props, // 3. Props
-        ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
-      }
-    : {
-        ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
-        ...storeData, // 2. Store state
-        ...currentStoreData, // 3. Current store data
-        ...props, // 4. Props
-        ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
-      };
+  const mergedData = useMemo(() => {
+    return isGlobalFooter
+      ? {
+          ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
+          ...globalFooterData, // 2. Global footer data
+          ...props, // 3. Props
+          ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
+        }
+      : {
+          ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
+          ...storeData, // 2. Store state
+          ...currentStoreData, // 3. Current store data
+          ...props, // 4. Props
+          ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
+        };
+  }, [
+    isGlobalFooter,
+    globalFooterData,
+    props,
+    storeData,
+    currentStoreData,
+    forceUpdate,
+  ]);
+
+  // Force re-render when globalFooterData changes (for global footers)
+  useEffect(() => {
+    if (isGlobalFooter && globalFooterData && Object.keys(globalFooterData).length > 0) {
+      setForceUpdate((prev) => prev + 1);
+    }
+  }, [isGlobalFooter, globalFooterData]);
 
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE

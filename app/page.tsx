@@ -102,11 +102,8 @@ export default async function HomePage() {
     | null;
   const host = headersList.get("host") || "";
 
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain =
-    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
-      host,
-    );
+  // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
+  const isCustomDomain = /\.([a-z]{2,})$/i.test(host);
 
   // إذا لم يكن هناك tenantId، اعرض صفحة تعاريف الرسمية
   if (!tenantId) {

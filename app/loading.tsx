@@ -175,10 +175,7 @@ export default function Loading() {
       }
 
       // 3️⃣ التحقق من Custom Domain (أي domain مختلف تماماً)
-      const hasCustomDomainExtension =
-        /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
-          hostname,
-        );
+      const hasCustomDomainExtension = /\.([a-z]{2,})$/i.test(hostname);
 
       if (hasCustomDomainExtension) {
         // إذا وصلنا هنا، يعني الـ hostname:

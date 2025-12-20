@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
@@ -280,6 +280,40 @@ export function useLiveEditorEffects(state: any) {
   // useEffect(() => {
   //   useEditorStore.getState().setPageComponentsForPage(slug, pageComponents);
   // }, [pageComponents, slug]);
+
+  // Sync pageComponents from store when pageComponentsByPage changes (for theme changes)
+  const lastSyncedRef = useRef<string>("");
+  // Subscribe to pageComponentsByPage changes for current page
+  const storePageComponents = useEditorStore(
+    (state) => state.pageComponentsByPage[slug]
+  );
+
+  useEffect(() => {
+    // Only sync if already initialized to avoid conflicts with initial load
+    if (!initialized) return;
+
+    if (storePageComponents && storePageComponents.length > 0) {
+      // Create a signature to detect actual changes
+      const storeSignature = storePageComponents
+        .map((c) => `${c.id}-${c.type}-${c.componentName}`)
+        .sort()
+        .join(",");
+
+      const currentSignature = pageComponents
+        .map((c) => `${c.id}-${c.type}-${c.componentName}`)
+        .sort()
+        .join(",");
+
+      // Only update if signatures are different and we haven't synced this exact state
+      if (
+        storeSignature !== currentSignature &&
+        lastSyncedRef.current !== storeSignature
+      ) {
+        lastSyncedRef.current = storeSignature;
+        setPageComponents(storePageComponents);
+      }
+    }
+  }, [initialized, slug, storePageComponents, pageComponents, setPageComponents]);
 
   // Update current page in store
   useEffect(() => {

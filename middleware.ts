@@ -46,11 +46,8 @@ function getTenantIdFromCustomDomain(host: string): string | null {
     return null;
   }
 
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain =
-    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
-      host,
-    );
+  // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
+  const isCustomDomain = /\.([a-z]{2,})$/i.test(host);
 
   if (!isCustomDomain) {
     console.log("🔍 Middleware: Host is not a custom domain:", host);
@@ -197,12 +194,9 @@ export function middleware(request: NextRequest) {
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
 
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+  // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
   // لكن ليس الدومين الأساسي
-  const hasCustomDomainExtension =
-    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
-      host,
-    );
+  const hasCustomDomainExtension = /\.([a-z]{2,})$/i.test(host);
   const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
 
   // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant

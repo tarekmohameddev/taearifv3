@@ -359,7 +359,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     if (globalHeaderData && Object.keys(globalHeaderData).length > 0) {
       setForceUpdate((prev) => prev + 1);
     }
-  }, [globalComponentsData]);
+  }, [globalHeaderData]);
 
   // Monitor overrideData changes
   useEffect(() => {

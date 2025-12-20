@@ -68,11 +68,8 @@ function extractTenantFromHostname(hostname: string): string | null {
     "store",
   ];
 
-  // التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain =
-    /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
-      hostname,
-    );
+  // التحقق من Custom Domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
+  const isCustomDomain = /\.([a-z]{2,})$/i.test(hostname);
 
   if (isCustomDomain) {
     // إذا كان Custom Domain، إرجاع الـ hostname نفسه

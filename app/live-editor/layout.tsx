@@ -18,6 +18,12 @@ import {
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/live-editor/LanguageDropdown";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDialog";
+import {
+  applyThemeToAllPages,
+  restoreThemeFromBackup,
+  ThemeNumber,
+} from "@/services-liveeditor/live-editor/themeChangeService";
 import {
   Dialog,
   DialogContent,
@@ -901,6 +907,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
+  const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -1001,6 +1008,52 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     (state) => state.WebsiteLayout,
   );
   const editorWebsiteLayout = editorStoreWebsiteLayout?.metaTags?.pages || [];
+  const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
+  const themeBackup = useEditorStore((state) => state.themeBackup);
+  const themeBackupKey = useEditorStore((state) => state.themeBackupKey);
+  const hasBackup = !!(themeBackup && themeBackupKey && Object.keys(themeBackup).length > 0);
+
+  // Theme change handlers
+  const handleThemeApply = async (themeNumber: ThemeNumber) => {
+    try {
+      await applyThemeToAllPages(themeNumber);
+      toast.success(
+        locale === "ar"
+          ? `تم تطبيق الثيم ${themeNumber} بنجاح`
+          : `Theme ${themeNumber} applied successfully`
+      );
+      // Changes will be reflected automatically via useEffect in LiveEditorEffects
+    } catch (error) {
+      console.error("Error applying theme:", error);
+      toast.error(
+        locale === "ar"
+          ? "حدث خطأ أثناء تطبيق الثيم"
+          : "Error applying theme"
+      );
+      throw error;
+    }
+  };
+
+  const handleThemeRestore = async () => {
+    if (!themeBackupKey || !themeBackup) return;
+    try {
+      await restoreThemeFromBackup(themeBackupKey);
+      toast.success(
+        locale === "ar"
+          ? "تم استرجاع الثيم السابق بنجاح"
+          : "Previous theme restored successfully"
+      );
+      // Changes will be reflected automatically via useEffect in LiveEditorEffects
+    } catch (error) {
+      console.error("Error restoring theme:", error);
+      toast.error(
+        locale === "ar"
+          ? "حدث خطأ أثناء استرجاع الثيم"
+          : "Error restoring theme"
+      );
+      throw error;
+    }
+  };
 
   // دالة للحصول على البيانات الافتراضية للصفحة
   const getDefaultSeoData = (pageSlug: string) => {
@@ -2248,6 +2301,27 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               {t("editor.add_page")}
             </button>
 
+            {/* Change Theme Button for Desktop */}
+            <button
+              onClick={() => setIsThemeDialogOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                />
+              </svg>
+              {locale === "ar" ? "تغيير ثيم الموقع بالكامل" : "Change Site Theme"}
+            </button>
+
             <Link
               href={getTenantUrl(currentPath)}
               target="_blank"
@@ -2374,6 +2448,30 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       />
                     </svg>
                     {t("editor.add_page")}
+                  </button>
+
+                  {/* Change Theme Button */}
+                  <button
+                    onClick={() => {
+                      setIsThemeDialogOpen(true);
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full flex items-center px-4 py-3 text-sm text-purple-700 hover:bg-purple-50 transition-colors duration-200"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                      />
+                    </svg>
+                    {locale === "ar" ? "تغيير ثيم الموقع بالكامل" : "Change Site Theme"}
                   </button>
 
                   {/* Divider */}
@@ -3162,6 +3260,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Theme Change Dialog */}
+      <ThemeChangeDialog
+        isOpen={isThemeDialogOpen}
+        onClose={() => setIsThemeDialogOpen(false)}
+        onThemeApply={handleThemeApply}
+        onThemeRestore={hasBackup ? handleThemeRestore : undefined}
+        hasBackup={hasBackup}
+        currentTheme={currentTheme || null}
+      />
     </nav>
   );
 }

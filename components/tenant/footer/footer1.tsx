@@ -12,7 +12,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { logChange } from "@/lib-liveeditor/debugLogger";
@@ -224,6 +224,9 @@ export default function Footer(props: FooterProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "footer1";
 
+  // Force re-render state
+  const [forceUpdate, setForceUpdate] = useState(0);
+
   // Subscribe to editor store updates for this component variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
@@ -318,8 +321,8 @@ export default function Footer(props: FooterProps = {}) {
 
   // Force re-render when globalFooterData changes
   useEffect(() => {
-    if (isGlobalFooter && globalFooterData) {
-      // This will trigger a re-render when globalFooterData changes
+    if (isGlobalFooter && globalFooterData && Object.keys(globalFooterData).length > 0) {
+      setForceUpdate((prev) => prev + 1);
     }
   }, [isGlobalFooter, globalFooterData]);
 

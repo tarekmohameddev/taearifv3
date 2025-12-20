@@ -12,7 +12,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { FaWhatsapp, FaSnapchat, FaTiktok, FaYoutube } from "react-icons/fa";
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { StaticFooterSkeleton } from "@/components/skeleton/footer/StaticFooterSkeleton";
@@ -248,6 +248,9 @@ export default function StaticFooter({
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Force re-render state
+  const [forceUpdate, setForceUpdate] = useState(0);
+
   // Subscribe to editor store functions
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
@@ -335,7 +338,15 @@ export default function StaticFooter({
     tenantId,
     tenantData,
     loadingTenantData,
+    forceUpdate,
   ]);
+
+  // Force re-render when globalFooterData changes
+  useEffect(() => {
+    if (globalFooterData && Object.keys(globalFooterData).length > 0) {
+      setForceUpdate((prev) => prev + 1);
+    }
+  }, [globalFooterData]);
 
   // منطق مبسط: عرض skeleton loading فقط عند الضرورة القصوى
   const shouldShowSkeleton = loadingTenantData || !mergedData;

@@ -183,9 +183,16 @@ interface EditorStore {
       };
       mainBgColor: string;
     };
+    currentTheme?: number | null; // 1 or 2
   };
   setWebsiteLayout: (data: any) => void;
   addPageToWebsiteLayout: (pageData: any) => void;
+  setCurrentTheme: (themeNumber: number) => void;
+
+  // Theme backup
+  themeBackup: Record<string, any> | null;
+  themeBackupKey: string | null;
+  setThemeBackup: (key: string, backup: Record<string, any>) => void;
 
   // Structures registry
   structures: Record<string, any>;
@@ -572,7 +579,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     metaTags: {
       pages: [],
     },
+    currentTheme: null,
   },
+
+  // Theme backup
+  themeBackup: null,
+  themeBackupKey: null,
 
   structures: Object.keys(COMPONENTS).reduce(
     (acc, componentType) => {
@@ -2142,6 +2154,42 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       }
 
+      // Load WebsiteLayout including currentTheme
+      if (tenantData.WebsiteLayout) {
+        newState.WebsiteLayout = {
+          ...state.WebsiteLayout,
+          ...tenantData.WebsiteLayout,
+          currentTheme: tenantData.WebsiteLayout.currentTheme || null,
+        };
+      } else {
+        // Preserve existing WebsiteLayout if not in tenantData
+        newState.WebsiteLayout = state.WebsiteLayout;
+      }
+
+      // Load theme backups from ThemesBackup object (supports unlimited themes)
+      // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
+      if (tenantData.ThemesBackup && typeof tenantData.ThemesBackup === 'object') {
+        // Initialize WebsiteLayout if it doesn't exist
+        if (!newState.WebsiteLayout) {
+          newState.WebsiteLayout = {
+            metaTags: { pages: [] },
+          };
+        }
+        
+        // Copy all backups from ThemesBackup to WebsiteLayout
+        Object.entries(tenantData.ThemesBackup).forEach(([backupKey, backupData]) => {
+          if (backupKey.match(/^Theme\d+Backup$/)) {
+            newState.WebsiteLayout[backupKey] = backupData;
+          }
+        });
+      }
+      
+      // Preserve existing backup state if not in tenantData
+      if (!tenantData.ThemesBackup) {
+        newState.themeBackup = state.themeBackup;
+        newState.themeBackupKey = state.themeBackupKey;
+      }
+
       // Load Global Components Data
       if (
         tenantData.globalComponentsData &&
@@ -2665,5 +2713,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           pages: [...state.WebsiteLayout.metaTags.pages, pageData],
         },
       },
+    })),
+
+  setCurrentTheme: (themeNumber) =>
+    set((state) => ({
+      WebsiteLayout: {
+        ...state.WebsiteLayout,
+        currentTheme: themeNumber,
+      },
+    })),
+
+  setThemeBackup: (key, backup) =>
+    set(() => ({
+      themeBackup: backup,
+      themeBackupKey: key,
     })),
 }));
