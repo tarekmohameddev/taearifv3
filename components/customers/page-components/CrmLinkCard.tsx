@@ -19,7 +19,7 @@ export const CrmLinkCard = () => {
                 والتفاعلات
               </p>
             </div>
-            <Link href="/crm">
+            <Link href="/dashboard/crm">
               <Button className="w-full">
                 <ArrowRight className="ml-2 h-4 w-4" />
                 انتقل إلى نظام CRM المتقدم
