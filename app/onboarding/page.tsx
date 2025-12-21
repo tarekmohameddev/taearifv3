@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import OnboardingPage from "@/components/signin-up/onboarding-page";
-import TenantPageWrapper from "../[slug]/TenantPageWrapper";
+import TenantPageWrapper from "../TenantPageWrapper";
 
 export const metadata: Metadata = {
   title: "إعداد موقعك | منشئ المواقع",
