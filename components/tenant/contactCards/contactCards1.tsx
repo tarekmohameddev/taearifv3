@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { getDefaultContactCardsData } from "@/context-liveeditor/editorStoreFunctions/contactCardsFunctions";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
@@ -39,7 +40,7 @@ interface ContactCardProps {
   icon: {
     type?: string;
     name?: string;
-    size?: string | number;
+    size?: string | number | { mobile?: string; desktop?: string };
     className?: string;
   };
   title: {
@@ -95,204 +96,6 @@ interface ContactCardProps {
   };
 }
 
-// Default data for the component
-const getDefaultContactCardsData = () => ({
-  visible: true,
-  layout: {
-    container: {
-      padding: {
-        vertical: "py-[48px] md:py-[104px]",
-        horizontal: "px-4 sm:px-10",
-      },
-    },
-    grid: {
-      columns: {
-        mobile: "grid-cols-1",
-        desktop: "md:grid-cols-3",
-      },
-      gap: "gap-[24px]",
-      borderRadius: "rounded-[10px]",
-    },
-  },
-  cards: [
-    {
-      icon: {
-        type: "MapPin",
-        size: 40,
-        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
-      },
-      title: {
-        text: "العنوان",
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[24px]",
-          },
-          weight: "font-bold",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      content: {
-        type: "text",
-        text: "المملكة العربية السعودية",
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[20px]",
-          },
-          weight: "font-normal",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      cardStyle: {
-        height: {
-          mobile: "h-[182px]",
-          desktop: "md:h-[210px]",
-        },
-        gap: {
-          main: "gap-y-[16px]",
-          content: {
-            mobile: "gap-y-[8px]",
-            desktop: "md:gap-y-[16px]",
-          },
-          links: "gap-x-[50px]",
-        },
-        shadow: {
-          enabled: true,
-          value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
-        },
-        alignment: {
-          horizontal: "items-center",
-          vertical: "justify-center",
-        },
-      },
-    },
-    {
-      icon: {
-        type: "Mail",
-        size: 40,
-        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
-      },
-      title: {
-        text: "الايميل",
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[24px]",
-          },
-          weight: "font-bold",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      content: {
-        type: "links",
-        links: [
-          {
-            text: "guidealjiwa22@gmail.com",
-            href: "mailto:guidealjiwa22@gmail.com",
-          },
-        ],
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[20px]",
-          },
-          weight: "font-normal",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      cardStyle: {
-        height: {
-          mobile: "h-[182px]",
-          desktop: "md:h-[210px]",
-        },
-        gap: {
-          main: "gap-y-[16px]",
-          content: {
-            mobile: "gap-y-[8px]",
-            desktop: "md:gap-y-[16px]",
-          },
-          links: "gap-x-[50px]",
-        },
-        shadow: {
-          enabled: true,
-          value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
-        },
-        alignment: {
-          horizontal: "items-center",
-          vertical: "justify-center",
-        },
-      },
-    },
-    {
-      icon: {
-        type: "Phone",
-        size: 40,
-        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
-      },
-      title: {
-        text: "الجوال",
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[24px]",
-          },
-          weight: "font-bold",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      content: {
-        type: "links",
-        links: [
-          {
-            text: "0535150222",
-            href: "tel:0535150222",
-          },
-          {
-            text: "0000",
-            href: "tel:0000",
-          },
-        ],
-        style: {
-          size: {
-            mobile: "text-[16px]",
-            desktop: "md:text-[20px]",
-          },
-          weight: "font-normal",
-          color: "#525252",
-          lineHeight: "leading-[35px]",
-        },
-      },
-      cardStyle: {
-        height: {
-          mobile: "h-[182px]",
-          desktop: "md:h-[210px]",
-        },
-        gap: {
-          main: "gap-y-[16px]",
-          content: {
-            mobile: "gap-y-[8px]",
-            desktop: "md:gap-y-[16px]",
-          },
-          links: "gap-x-[50px]",
-        },
-        shadow: {
-          enabled: true,
-          value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
-        },
-        alignment: {
-          horizontal: "items-center",
-          vertical: "justify-center",
-        },
-      },
-    },
-  ],
-});
 
 interface ContactCardsProps {
   useStore?: boolean;
@@ -311,9 +114,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   const variantId = variant || "contactCards1";
   const uniqueId = id || variantId;
 
-  // Add state to force re-renders when store updates
-  const [forceUpdate, setForceUpdate] = useState(0);
-
   // Subscribe to editor store updates for this contactCards variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
@@ -322,41 +122,10 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   const contactCardsStates = useEditorStore((s) => s.contactCardsStates);
 
   useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultContactCardsData(),
-        ...props,
-      };
-      ensureComponentVariant("contactCards", uniqueId, initialData);
+    if (useStore) {
+      ensureComponentVariant("contactCards", uniqueId, props);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
-
-  // Add effect to listen for store updates
-  useEffect(() => {
-    if (props.useStore) {
-      // Force re-render when store data changes
-      const unsubscribe = useEditorStore.subscribe((state) => {
-        const newContactCardsStates = state.contactCardsStates;
-        console.log("🔄 Store subscription triggered:", {
-          uniqueId,
-          newContactCardsStates,
-          hasData: !!newContactCardsStates[uniqueId],
-          allKeys: Object.keys(newContactCardsStates),
-        });
-        if (newContactCardsStates[uniqueId]) {
-          console.log(
-            "🔄 Store subscription triggered for:",
-            uniqueId,
-            newContactCardsStates[uniqueId],
-          );
-          // Force re-render by updating state
-          setForceUpdate((prev) => prev + 1);
-        }
-      });
-
-      return unsubscribe;
-    }
-  }, [props.useStore, uniqueId]);
+  }, [uniqueId, useStore, ensureComponentVariant]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -370,42 +139,19 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore
+  // Use same pattern as stepsSection1.tsx
+  const storeData = useStore
     ? getComponentData("contactCards", uniqueId) || {}
     : {};
-  const currentStoreData = props.useStore
+  const currentStoreData = useStore
     ? contactCardsStates[uniqueId] || {}
     : {};
-
-  // Debug: Log when data changes
-  useEffect(() => {
-    if (props.useStore) {
-      console.log("🔄 ContactCards Data Updated:", {
-        uniqueId,
-        storeData,
-        currentStoreData,
-        forceUpdate,
-        contactCardsStates,
-        allContactCardsStates: Object.keys(contactCardsStates),
-        getComponentDataResult: getComponentData("contactCards", uniqueId),
-      });
-    }
-  }, [
-    storeData,
-    currentStoreData,
-    forceUpdate,
-    props.useStore,
-    uniqueId,
-    contactCardsStates,
-    getComponentData,
-  ]);
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};
     }
-
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
@@ -419,10 +165,11 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
-          // Check if this is the exact component we're looking for by type and componentName
+          // Check if this is the exact component we're looking for by ID
           if (
             (component as any).type === "contactCards" &&
-            (component as any).componentName === variantId
+            (component as any).componentName === variantId &&
+            componentId === id
           ) {
             return (component as any).data;
           }
@@ -452,6 +199,19 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
       tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
         ? tenantData.WebsiteLayout.branding.colors.accent
         : "#059669", // fallback to primary
+  };
+
+  // Get default data as base (99% of the data)
+  const defaultData = getDefaultContactCardsData();
+
+  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Use same pattern as stepsSection1.tsx
+  const mergedData = {
+    ...defaultData, // 99% - Default data as base
+    ...props, // Props from parent component
+    ...tenantComponentData, // Backend data (tenant data)
+    ...storeData, // Store data
+    ...currentStoreData, // Current store data (highest priority)
   };
 
   // Helper function to get color based on useDefaultColor and globalColorType
@@ -543,54 +303,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
     return brandingColor;
   };
 
-  // Check if we have any data from API/stores first
-  const hasApiData =
-    tenantComponentData && Object.keys(tenantComponentData).length > 0;
-  const hasStoreData =
-    (storeData && Object.keys(storeData).length > 0) ||
-    (currentStoreData && Object.keys(currentStoreData).length > 0);
-  const hasPropsData = props.cards && props.cards.length > 0;
-
-  // Use default data instead of empty cards
-  const createEmptyCards = () => getDefaultContactCardsData().cards;
-
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  const defaultData = getDefaultContactCardsData();
-  const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-    // Ensure nested objects are properly merged
-    layout: {
-      ...defaultData.layout,
-      ...(props.layout || {}),
-      ...(tenantComponentData?.layout || {}),
-      ...(storeData?.layout || {}),
-      ...(currentStoreData?.layout || {}),
-    },
-    cards:
-      currentStoreData?.cards ||
-      storeData?.cards ||
-      tenantComponentData?.cards ||
-      props.cards ||
-      (hasApiData || hasStoreData || hasPropsData
-        ? defaultData.cards
-        : createEmptyCards()),
-  };
-
-  // Debug: Log the final merged data
-  console.log("🔍 ContactCards Final Merge:", {
-    uniqueId,
-    currentStoreData,
-    storeData,
-    mergedData,
-    cards: mergedData.cards?.length || 0,
-    contactCardsStatesKeys: Object.keys(contactCardsStates),
-    getComponentDataResult: getComponentData("contactCards", uniqueId),
-  });
-
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
@@ -598,24 +310,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
 
   // Get colors using getColor function
   const iconColor = getColor("icon.color", brandingColors.primary);
-
-  // Use merged data for cards with proper fallbacks
-  const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map(
-    (card: ContactCardProps) => ({
-      ...card,
-      icon: {
-        type: card.icon?.type || "MapPin",
-        name: card.icon?.name,
-        size: card.icon?.size || 40,
-        className:
-          card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
-      },
-      cardStyle: {
-        ...defaultData.cards[0]?.cardStyle,
-        ...card.cardStyle,
-      },
-    }),
-  );
 
   return (
     <div
@@ -625,32 +319,60 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
       <div
         className={`grid ${mergedData.layout?.grid?.columns?.mobile || "grid-cols-1"} ${mergedData.layout?.grid?.columns?.desktop || "md:grid-cols-3"} ${mergedData.layout?.grid?.gap || "gap-[24px]"} ${mergedData.layout?.grid?.borderRadius || "rounded-[10px]"}`}
       >
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className={`w-full flex flex-col ${card.cardStyle.alignment.horizontal} ${card.cardStyle.alignment.vertical} ${card.cardStyle.height.mobile} ${card.cardStyle.height.desktop} ${card.cardStyle.gap.main}`}
-            style={
-              card.cardStyle.shadow.enabled
-                ? { boxShadow: card.cardStyle.shadow.value }
-                : {}
-            }
-          >
-            {(() => {
-              // Priority: name > type > default
-              const iconNameOrType =
-                card.icon?.name || card.icon?.type || "MapPin";
-              const IconComponent = getContactCardIcon(iconNameOrType);
-
-              // Get icon size
-              const iconSize =
-                typeof card.icon?.size === "number"
-                  ? card.icon.size
-                  : parseInt(card.icon?.size || "40");
-
-              // Get icon className
-              const iconClassName =
+        {/* Use mergedData.cards directly like stepsSection1.tsx uses mergedData.steps */}
+        {(mergedData.cards || defaultData.cards || []).map((card: any, index: number) => {
+          // Process card data inline to ensure it uses latest mergedData
+          const processedCard: ContactCardProps = {
+            ...card,
+            icon: {
+              ...card.icon,
+              // Only support icon.type/name (lucide-react or react-icons)
+              type: card.icon?.type,
+              name: card.icon?.name,
+              size: card.icon?.size || (typeof card.icon?.size === "object" ? card.icon.size : 40),
+              className:
                 card.icon?.className ||
-                "w-[40px] h-[40px] md:w-[60px] md:h-[60px]";
+                (typeof card.icon?.size === "object"
+                  ? `${card.icon.size?.mobile || "w-[40px] h-[40px]"} ${card.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
+                  : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]"),
+            },
+            cardStyle: {
+              ...(defaultData.cards?.[0]?.cardStyle || {}),
+              ...card.cardStyle,
+            },
+          };
+
+          return (
+            <div
+              key={`card-${index}-${processedCard.icon?.type || processedCard.icon?.name || index}`}
+              className={`w-full flex flex-col ${processedCard.cardStyle.alignment.horizontal} ${processedCard.cardStyle.alignment.vertical} ${processedCard.cardStyle.height.mobile} ${processedCard.cardStyle.height.desktop} ${processedCard.cardStyle.gap.main}`}
+              style={
+                processedCard.cardStyle.shadow.enabled
+                  ? { boxShadow: processedCard.cardStyle.shadow.value }
+                  : {}
+              }
+            >
+              {(() => {
+                // Render icon component (lucide-react or react-icons only)
+                // Priority: name > type > default
+                const iconNameOrType =
+                  processedCard.icon?.name || processedCard.icon?.type || "MapPin";
+                const IconComponent = getContactCardIcon(iconNameOrType);
+
+                // Get icon size
+                const iconSize =
+                  typeof processedCard.icon?.size === "number"
+                    ? processedCard.icon.size
+                    : typeof processedCard.icon?.size === "object"
+                      ? 40 // Default size for object-based sizing
+                      : parseInt(String(processedCard.icon?.size || "40"));
+
+                // Get icon className
+                const iconClassName =
+                  processedCard.icon?.className ||
+                  (typeof processedCard.icon?.size === "object"
+                    ? `${processedCard.icon.size?.mobile || "w-[40px] h-[40px]"} ${processedCard.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
+                    : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]");
 
               // Check if it's a React Icon (from react-icons) by checking the icon name pattern
               const isReactIcon =
@@ -697,38 +419,39 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
                 />
               );
             })()}
-            <div
-              className={`flex flex-col ${card.cardStyle?.alignment?.horizontal || "items-center"} ${card.cardStyle?.alignment?.vertical || "justify-center"} ${card.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${card.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}
-            >
-              <h2
-                className={`${card.title?.style?.color || "#525252"} ${card.title?.style?.weight || "font-bold"} ${card.title?.style?.size?.mobile || "text-[16px]"} ${card.title?.style?.size?.desktop || "md:text-[24px]"} ${card.title?.style?.lineHeight || "leading-[35px]"}`}
+              <div
+                className={`flex flex-col ${processedCard.cardStyle?.alignment?.horizontal || "items-center"} ${processedCard.cardStyle?.alignment?.vertical || "justify-center"} ${processedCard.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${processedCard.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}
               >
-                {card.title?.text || ""}
-              </h2>
-              {card.content?.type === "links" ? (
-                <div
-                  className={`flex flex-row items-between justify-between w-full ${card.cardStyle?.gap?.links || "gap-x-[50px]"}`}
+                <h2
+                  className={`${processedCard.title?.style?.color || "#525252"} ${processedCard.title?.style?.weight || "font-bold"} ${processedCard.title?.style?.size?.mobile || "text-[16px]"} ${processedCard.title?.style?.size?.desktop || "md:text-[24px]"} ${processedCard.title?.style?.lineHeight || "leading-[35px]"}`}
                 >
-                  {card.content?.links?.map((item: any, i: number) => (
-                    <a
-                      key={i}
-                      href={item.href}
-                      className={`${card.content?.style?.color || "#525252"} ${card.content?.style?.weight || "font-normal"} ${card.content?.style?.size?.mobile || "text-[16px]"} ${card.content?.style?.size?.desktop || "md:text-[20px]"} ${card.content?.style?.lineHeight || "leading-[35px]"}`}
-                    >
-                      {item.text}
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p
-                  className={`${card.content?.style?.color || "#525252"} ${card.content?.style?.weight || "font-normal"} ${card.content?.style?.size?.mobile || "text-[16px]"} ${card.content?.style?.size?.desktop || "md:text-[20px]"} ${card.content?.style?.lineHeight || "leading-[35px]"}`}
-                >
-                  {card.content?.text || ""}
-                </p>
-              )}
+                  {processedCard.title?.text || ""}
+                </h2>
+                {processedCard.content?.type === "links" ? (
+                  <div
+                    className={`flex flex-row items-between justify-between w-full ${processedCard.cardStyle?.gap?.links || "gap-x-[50px]"}`}
+                  >
+                    {processedCard.content?.links?.map((item: any, i: number) => (
+                      <a
+                        key={i}
+                        href={item.href}
+                        className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
+                      >
+                        {item.text}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
+                  >
+                    {processedCard.content?.text || ""}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

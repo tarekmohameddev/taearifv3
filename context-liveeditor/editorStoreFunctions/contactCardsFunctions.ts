@@ -244,31 +244,29 @@ export const contactCardsFunctions = {
 
   // Ensure variant exists in store
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (!state.contactCardsStates) {
-      state.contactCardsStates = {};
+    // If variant already exists with data, don't override
+    if (
+      state.contactCardsStates?.[variantId] &&
+      Object.keys(state.contactCardsStates[variantId]).length > 0
+    ) {
+      return {} as any;
     }
 
-    if (!state.contactCardsStates[variantId]) {
-      const defaultData = getDefaultContactCardsData();
-      const data: ComponentData = initial || defaultData;
-      state.contactCardsStates[variantId] = data;
-    }
+    // Use initial data if provided, otherwise use default
+    const defaultData = getDefaultContactCardsData();
+    const data: ComponentData = initial || state.tempData || defaultData;
 
     return {
       contactCardsStates: {
-        ...state.contactCardsStates,
-        [variantId]: state.contactCardsStates[variantId],
+        ...(state.contactCardsStates || {}),
+        [variantId]: data,
       },
-    };
+    } as any;
   },
 
   // Get data for variant
   getData: (state: any, variantId: string): ComponentData => {
-    const data = state.contactCardsStates?.[variantId];
-    if (!data || Object.keys(data).length === 0) {
-      return getDefaultContactCardsData();
-    }
-    return data;
+    return state.contactCardsStates?.[variantId] || {};
   },
 
   // Set data for variant
