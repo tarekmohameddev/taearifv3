@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 import { getDefaultHalfTextHalfImage7Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -89,6 +90,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "halfTextHalfImage7";
   const uniqueId = props.id || variantId;
+  const t = useEditorT();
 
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
@@ -287,7 +289,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                     mergedData.image?.src ||
                     "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000"
                   }
-                  alt={mergedData.image?.alt || "صورة"}
+                  alt={mergedData.image?.alt || t("components.halfTextHalfImage.default_image_alt")}
                   fill
                   className="object-cover"
                   priority
@@ -310,7 +312,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                     color: mergedData.styling?.titleColor || "#000000",
                   }}
                 >
-                  {mergedData.content?.title || "خدمات موثوقة تستحق ثقتك"}
+                  {mergedData.content?.title || t("components.halfTextHalfImage.default_title")}
                 </h3>
                 {/* Divider */}
                 <div

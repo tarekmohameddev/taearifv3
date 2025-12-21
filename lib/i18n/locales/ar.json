@@ -149,7 +149,9 @@
     },
     "halfTextHalfImage": {
       "display_name": "نص وصورة",
-      "description": "قسم يحتوي على محتوى نصي وصورة جنباً إلى جنب"
+      "description": "قسم يحتوي على محتوى نصي وصورة جنباً إلى جنب",
+      "default_title": "خدمات موثوقة تستحق ثقتك",
+      "default_image_alt": "صورة"
     },
     "propertySlider": {
       "display_name": "سلايدر العقارات",

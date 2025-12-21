@@ -149,7 +149,9 @@
     },
     "halfTextHalfImage": {
       "display_name": "Half Text Half Image",
-      "description": "Section with text content and image side by side"
+      "description": "Section with text content and image side by side",
+      "default_title": "Trusted Services You Can Rely On",
+      "default_image_alt": "Image"
     },
     "propertySlider": {
       "display_name": "Property Slider",
