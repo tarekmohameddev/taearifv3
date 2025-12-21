@@ -352,12 +352,40 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   const layout = mergedData.layout || defaultData.layout;
   const styling = mergedData.styling || defaultData.styling;
 
+  // Helper function to darken a color significantly
+  const darkenColor = (hex: string, amount: number = 80): string => {
+    if (!hex || !hex.startsWith("#")) return "#000000";
+    const cleanHex = hex.replace("#", "");
+    if (cleanHex.length !== 6) return "#000000";
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  };
+
   // Get colors using getColor function
   const submitButtonBgColor = getColor(
     "submitButton.background",
     brandingColors.primary,
   );
-  const submitButtonTextColor = getColor("submitButton.textColor", "#ffffff");
+  let submitButtonTextColor = getColor("submitButton.textColor", "#ffffff");
+
+  // Ensure text color is never the same as background color
+  // If they match, use a very dark version of the background color
+  if (submitButtonTextColor.toLowerCase() === submitButtonBgColor.toLowerCase()) {
+    submitButtonTextColor = darkenColor(submitButtonBgColor, 80);
+  }
 
   return (
     <section

@@ -267,3 +267,4 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
 
 
 
+
