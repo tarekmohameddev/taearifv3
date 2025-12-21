@@ -498,6 +498,20 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [showChangesDialog, setShowChangesDialog] = useState(false);
   const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
 
+  // State للبيانات المدمجة من الباك اند
+  const [backendDataState, setBackendDataState] = useState<{
+    componentsWithMergedData: Array<{
+      [key: string]: any;
+      mergedData: any;
+    }>;
+    globalHeaderData: any;
+    globalFooterData: any;
+  }>({
+    componentsWithMergedData: [],
+    globalHeaderData: null,
+    globalFooterData: null,
+  });
+
   // Get tenantData for globalHeaderVariant (same priority as TenantPageWrapper)
   const tenantData = useTenantStore((s) => s.tenantData);
 
@@ -741,6 +755,46 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       setIsComponentsSidebarOpen(true);
     }
   }, [sidebarOpen, wasComponentsSidebarManuallyClosed]);
+
+  // تحديث البيانات المدمجة عند تغيير أي مصدر بيانات
+  useEffect(() => {
+    // 1. معالجة pageComponents مع mergedData
+    const componentsWithMergedData = pageComponents
+      .filter(
+        (component: any) =>
+          !component.componentName?.startsWith("header") &&
+          !component.componentName?.startsWith("footer"),
+      )
+      .map((component: any) => {
+        // قراءة البيانات من editorStore
+        const storeData = useEditorStore
+          .getState()
+          .getComponentData(component.type, component.id);
+
+        // دمج البيانات: أولوية للبيانات من editorStore
+        const mergedData =
+          storeData && Object.keys(storeData).length > 0
+            ? storeData
+            : component.data;
+
+        return {
+          ...component,
+          mergedData,
+        };
+      });
+
+    // 2. تحديث state
+    setBackendDataState({
+      componentsWithMergedData,
+      globalHeaderData: globalHeaderData || null,
+      globalFooterData: globalFooterData || null,
+    });
+  }, [
+    pageComponents,
+    globalHeaderData,
+    globalFooterData,
+    selectedComponentId, // للتأكد من تحديث البيانات عند تغيير المكون المحدد
+  ]);
 
   useEffect(() => {
     setSidebarWidth(state.sidebarWidth);
@@ -1088,9 +1142,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             <Suspense fallback={<SkeletonLoader componentName="header" />}>
               {(() => {
                 // Remove variant from data before passing to component (same as TenantPageWrapper)
-                const headerDataWithoutVariant = globalHeaderData
+                const headerDataWithoutVariant = backendDataState.globalHeaderData
                   ? (() => {
-                      const { variant: _variant, ...data } = globalHeaderData;
+                      const { variant: _variant, ...data } = backendDataState.globalHeaderData;
                       return data;
                     })()
                   : {};
@@ -1148,87 +1202,70 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           }}
         >
           {/* عرض المكونات - محسن بانيميشن وتفاعلات */}
-          {pageComponents
-            .filter(
-              (component: any) =>
-                !component.componentName?.startsWith("header") &&
-                !component.componentName?.startsWith("footer"),
-            )
-            .map((component: any, index: number) => {
-              // قراءة البيانات من editorStore باستخدام component.id
-              const storeData = useEditorStore
-                .getState()
-                .getComponentData(component.type, component.id);
-
-              // دمج البيانات: أولوية للبيانات من editorStore
-              const mergedData =
-                storeData && Object.keys(storeData).length > 0
-                  ? storeData
-                  : component.data;
-
-              return (
-                <motion.div
-                  key={component.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  layout
-                  className={`relative ${
-                    component.layout?.span === 2
-                      ? selectedDevice === "phone"
-                        ? "w-full"
-                        : "w-full"
+          {backendDataState.componentsWithMergedData.map((component: any, index: number) => {
+            return (
+              <motion.div
+                key={component.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                layout
+                className={`relative ${
+                  component.layout?.span === 2
+                    ? selectedDevice === "phone"
+                      ? "w-full"
                       : "w-full"
-                  }`}
+                    : "w-full"
+                }`}
+              >
+                <LiveEditorDraggableComponent
+                  id={component.id}
+                  componentType={component.componentName}
+                  depth={1}
+                  index={index}
+                  zoneCompound="root"
+                  isLoading={false}
+                  isSelected={selectedComponentId === component.id}
+                  label={component.componentName}
+                  onEditClick={() => handleEditClick(component.id)}
+                  onDeleteClick={() => handleDeleteClick(component.id)}
+                  inDroppableZone={true}
+                  autoDragAxis="both"
                 >
-                  <LiveEditorDraggableComponent
-                    id={component.id}
-                    componentType={component.componentName}
-                    depth={1}
-                    index={index}
-                    zoneCompound="root"
-                    isLoading={false}
-                    isSelected={selectedComponentId === component.id}
-                    label={component.componentName}
-                    onEditClick={() => handleEditClick(component.id)}
-                    onDeleteClick={() => handleDeleteClick(component.id)}
-                    inDroppableZone={true}
-                    autoDragAxis="both"
-                  >
-                    {(ref: any) => (
-                      <div
-                        ref={ref}
-                        className={`relative ${
-                          selectedDevice === "phone"
-                            ? "text-sm"
-                            : selectedDevice === "tablet"
-                              ? "text-base"
-                              : "text-base"
-                        }`}
-                      >
-                        <CachedComponent
-                          key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
-                          componentName={component.componentName}
-                          section={state.slug}
-                          componentId={component.id}
-                          data={
-                            {
-                              ...mergedData, // ✅ استخدام البيانات المدمجة من editorStore
-                              id: component.id, // ✅ إضافة id بشكل صريح
-                              useStore: true,
-                              variant: component.id,
-                              deviceType: selectedDevice,
-                              forceUpdate: component.forceUpdate,
-                            } as any
-                          }
-                        />
-                      </div>
-                    )}
-                  </LiveEditorDraggableComponent>
-                </motion.div>
-              );
-            })}
+                  {(ref: any) => (
+                    <div
+                      ref={ref}
+                      className={`relative ${
+                        selectedDevice === "phone"
+                          ? "text-sm"
+                          : selectedDevice === "tablet"
+                            ? "text-base"
+                            : "text-base"
+                      }`}
+                    >
+                      <CachedComponent
+                        key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
+                        componentName={component.componentName}
+                        section={state.slug}
+                        componentId={component.id}
+                        data={
+                          {
+                            ...component.mergedData, // ✅ استخدام البيانات من useState
+                            id: component.id,
+                            useStore: true,
+                            variant: component.id,
+                            deviceType: selectedDevice,
+                            forceUpdate: component.forceUpdate,
+                          } as any
+                        }
+                      />
+                    </div>
+                  )}
+                </LiveEditorDraggableComponent>
+              </motion.div>
+            );
+          })}
         </LiveEditorDropZone>
 
         {/* Static Footer - Clickable for editing */}
@@ -1249,9 +1286,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             <Suspense fallback={<SkeletonLoader componentName="footer" />}>
               {(() => {
                 // Remove variant from data before passing to component
-                const footerDataWithoutVariant = globalFooterData
+                const footerDataWithoutVariant = backendDataState.globalFooterData
                   ? (() => {
-                      const { variant: _variant, ...data } = globalFooterData;
+                      const { variant: _variant, ...data } = backendDataState.globalFooterData;
                       return data;
                     })()
                   : {};
@@ -1287,7 +1324,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       </div>
     ),
     [
-      pageComponents,
+      backendDataState.componentsWithMergedData, // بدلاً من pageComponents
       selectedDevice,
       state,
       handleAddComponent,
@@ -1296,11 +1333,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       handleEditClick,
       handleDeleteClick,
       globalHeaderVariant,
-      globalHeaderData,
+      backendDataState.globalHeaderData, // بدلاً من globalHeaderData
       HeaderComponent,
       globalFooterVariant,
       FooterComponent,
-      globalFooterData,
+      backendDataState.globalFooterData, // بدلاً من globalFooterData
     ],
   );
 
