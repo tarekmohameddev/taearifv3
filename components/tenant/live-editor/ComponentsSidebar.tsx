@@ -62,6 +62,7 @@ export const ComponentsSidebar = () => {
     return getAvailableSectionsTranslated(t);
   }, [t]);
 
+  // تصفية المكونات للبحث (يشمل header و footer)
   const filteredSections = useMemo(
     () =>
       availableSections.filter(
@@ -74,6 +75,24 @@ export const ComponentsSidebar = () => {
     [availableSections, searchTerm],
   );
 
+  // تصفية المكونات للعرض فقط (إزالة header و footer و inputs2)
+  const displaySections = useMemo(
+    () =>
+      filteredSections.filter(
+        (section) =>
+          section.type !== "header" &&
+          section.type !== "footer" &&
+          section.type !== "inputs2" &&
+          section.section !== "header" &&
+          section.section !== "footer" &&
+          section.section !== "inputs2" &&
+          !section.component?.toLowerCase().includes("header") &&
+          !section.component?.toLowerCase().includes("footer") &&
+          !section.component?.toLowerCase().includes("inputs2"),
+      ),
+    [filteredSections],
+  );
+
   return (
     <motion.div
       key="components-sidebar"
@@ -81,7 +100,7 @@ export const ComponentsSidebar = () => {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="fixed left-0 top-15 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-30"
+      className="fixed left-0 top-15 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-30 pb-20"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
@@ -170,8 +189,8 @@ export const ComponentsSidebar = () => {
                 animate="show"
                 className="grid grid-cols-2 gap-1.5"
               >
-                {filteredSections.length > 0 ? (
-                  filteredSections.map((section) => (
+                {displaySections.length > 0 ? (
+                  displaySections.map((section) => (
                     <motion.div
                       key={section.type}
                       variants={listItem}
