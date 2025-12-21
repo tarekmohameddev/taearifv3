@@ -6,31 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-// Default data for the component
-const getDefaultCtaValuationData = () => ({
-  visible: true,
-  content: {
-    title: "تقييم عقارك",
-    description1:
-      "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه",
-    description2: "بأفضل طريقة",
-    buttonText: "طلب معاينة",
-    buttonUrl: "#",
-  },
-  image: {
-    src: "https://dalel-lovat.vercel.app/images/cta-valuation%20section/house.webp",
-    alt: "منزل صغير داخل يدين",
-    width: 320,
-    height: 160,
-  },
-  styling: {
-    bgColor: "bg-emerald-600/95",
-    textColor: "text-white",
-    buttonBgColor: "bg-white",
-    buttonTextColor: "text-emerald-700",
-  },
-});
+import { getDefaultCtaValuationData } from "@/context-liveeditor/editorStoreFunctions/ctaValuationFunctions";
 
 interface CtaValuationSectionProps {
   visible?: boolean;
@@ -73,11 +49,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
 
   useEffect(() => {
     if (props.useStore) {
-      const initialData = {
-        ...getDefaultCtaValuationData(),
-        ...props,
-      };
-      ensureComponentVariant("ctaValuation", uniqueId, initialData);
+      ensureComponentVariant("ctaValuation", uniqueId, props);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant]);
 
@@ -94,6 +66,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
   }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
+  // Use same pattern as stepsSection1.tsx
   const storeData = props.useStore
     ? getComponentData("ctaValuation", uniqueId) || {}
     : {};
@@ -106,7 +79,6 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
     if (!tenantData?.componentSettings) {
       return {};
     }
-
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
@@ -120,10 +92,11 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
-          // Check if this is the exact component we're looking for by type and componentName
+          // Check if this is the exact component we're looking for by ID
           if (
             (component as any).type === "ctaValuation" &&
-            (component as any).componentName === variantId
+            (component as any).componentName === variantId &&
+            componentId === props.id
           ) {
             return (component as any).data;
           }
@@ -135,42 +108,24 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Get default data as base (99% of the data)
   const defaultData = getDefaultCtaValuationData();
+
+  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Use same pattern as stepsSection1.tsx
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-    // Ensure nested objects are properly merged
+    ...defaultData, // 99% - Default data as base
+    ...props, // Props from parent component
+    ...tenantComponentData, // Backend data (tenant data)
+    ...storeData, // Store data
+    ...currentStoreData, // Current store data (highest priority)
+    // Ensure content is properly merged (important for text display)
     content: {
       ...defaultData.content,
       ...(props.content || {}),
       ...(tenantComponentData?.content || {}),
       ...(storeData?.content || {}),
       ...(currentStoreData?.content || {}),
-    },
-    texts: {
-      ...(defaultData as any).texts,
-      ...((props as any).texts || {}),
-      ...((tenantComponentData as any)?.texts || {}),
-      ...((storeData as any)?.texts || {}),
-      ...((currentStoreData as any)?.texts || {}),
-    },
-    colors: {
-      ...(defaultData as any).colors,
-      ...((props as any).colors || {}),
-      ...((tenantComponentData as any)?.colors || {}),
-      ...((storeData as any)?.colors || {}),
-      ...((currentStoreData as any)?.colors || {}),
-    },
-    image: {
-      ...defaultData.image,
-      ...(props.image || {}),
-      ...(tenantComponentData?.image || {}),
-      ...(storeData?.image || {}),
-      ...(currentStoreData?.image || {}),
     },
   };
 
@@ -256,12 +211,17 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
       useDefaultColorValue !== undefined ? useDefaultColorValue : true;
 
     // If useDefaultColor is true, use branding color from WebsiteLayout
+    // BUT for textColor, use black (#000000) as default instead of branding color
     if (useDefaultColor) {
+      // Special case: textColor should default to black, not branding color
+      if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+        // If no custom color found, return black for text
+        return "#000000";
+      }
+
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
-      if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
-        defaultGlobalColorType = "secondary";
-      } else if (
+      if (
         fieldPath.includes("button") ||
         fieldPath.includes("Button") ||
         fieldPath.includes("bgColor") ||
@@ -298,11 +258,13 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
       }
     }
 
-    // Final fallback: use default branding color
-    let defaultGlobalColorType = "primary";
+    // Final fallback: use default color
+    // For textColor, use black (#000000) instead of branding color
     if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
-      defaultGlobalColorType = "secondary";
+      return "#000000"; // Black for text
     }
+    
+    let defaultGlobalColorType = "primary";
     const brandingColor =
       brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||
       defaultColor;
@@ -316,7 +278,8 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
 
   // Get colors using getColor function
   const bgColor = getColor("bgColor", brandingColors.primary);
-  const textColor = getColor("textColor", brandingColors.secondary);
+  // Use black (#000000) as default text color instead of secondary branding color
+  const textColor = getColor("textColor", "#000000");
   const buttonBgColor = getColor("buttonBgColor", "#ffffff");
   const buttonTextColor = getColor("buttonTextColor", brandingColors.primary);
 
@@ -365,11 +328,11 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
                 color: textColor,
               }}
             >
-              {mergedData.texts?.title && (
-                <h2 className="text-2xl font-bold mb-4 opacity-95">
-                  {mergedData.texts.title}
-                </h2>
-              )}
+              <h2 className="text-2xl font-bold mb-4 opacity-95">
+                {mergedData.texts?.title ||
+                  mergedData.content?.title ||
+                  "تقييم عقارك"}
+              </h2>
               <p className="text-lg font-semibold opacity-95">
                 {mergedData.texts?.description ||
                   mergedData.content?.description1 ||

@@ -87,27 +87,31 @@ export const getDefaultCtaValuationData = (): ComponentData => ({
 
 export const ctaValuationFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (state.ctaValuationStates[variantId]) {
-      return state;
+    // If variant already exists with data, don't override
+    if (
+      state.ctaValuationStates?.[variantId] &&
+      Object.keys(state.ctaValuationStates[variantId]).length > 0
+    ) {
+      return {} as any;
     }
 
+    // Use initial data if provided, otherwise use default
     const defaultData = getDefaultCtaValuationData();
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {
-      ...state,
-      ctaValuationStates: { ...state.ctaValuationStates, [variantId]: data },
-    };
+      ctaValuationStates: {
+        ...(state.ctaValuationStates || {}),
+        [variantId]: data,
+      },
+    } as any;
   },
 
   getData: (state: any, variantId: string) => {
-    const data =
-      state.ctaValuationStates[variantId] || getDefaultCtaValuationData();
-    return data;
+    return state.ctaValuationStates?.[variantId] || {};
   },
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    ...state,
     ctaValuationStates: { ...state.ctaValuationStates, [variantId]: data },
   }),
 
@@ -116,8 +120,7 @@ export const ctaValuationFunctions = {
     const newData = updateDataByPath(source, path, value);
 
     return {
-      ...state,
       ctaValuationStates: { ...state.ctaValuationStates, [variantId]: newData },
-    };
+    } as any;
   },
 };
