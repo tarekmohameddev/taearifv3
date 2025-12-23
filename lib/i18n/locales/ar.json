@@ -238,6 +238,22 @@
       "display_name": "أقسام المدونات",
       "description": "قسم بطاقات المدونات مع فقرات وتخطيط شبكي"
     },
+    "responsiveImage": {
+      "display_name": "صورة متجاوبة",
+      "description": "صورة متجاوبة مع عرض مريح لجميع مقاسات الشاشات"
+    },
+    "title": {
+      "display_name": "عنوان",
+      "description": "عنوان مركزي بسيط"
+    },
+    "photosGrid": {
+      "display_name": "شبكة الصور",
+      "description": "شبكة صور متجاوبة مع عناوين وتعريفات"
+    },
+    "video": {
+      "display_name": "فيديو",
+      "description": "مشغل فيديو متجاوب بحد أقصى عرض ثابت لجميع الشاشات"
+    },
     "contactUsHomePage": {
       "display_name": "نموذج الاتصال - الصفحة الرئيسية",
       "description": "نموذج اتصال كامل مع خلفية صورة وحقول متعددة للتواصل"

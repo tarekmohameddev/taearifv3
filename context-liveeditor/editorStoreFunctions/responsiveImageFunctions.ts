@@ -5,25 +5,74 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 // DEFAULT DATA - Define your component's data structure
 // ═══════════════════════════════════════════════════════════
 
-export const getDefaultImageTextData = (): ComponentData => ({
+export const getDefaultResponsiveImageData = (): ComponentData => ({
   visible: true,
-  ThemeTwo: "ThemeTwo",
 
-  backgroundImage:
-    "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80",
-  title: "سكن يليق بطموحك وامكاناتك",
-  paragraph:
-    "نحن لا نعرض عقارات فقط، بل نقدّم تجربة مبنية على الثقة، والشفافية، واحترافية عالية في كل خطوة. سواء كنت تبحث عن سكن، استثمار، أو فرصة تبني بها استقرارك نحن هنا لنقودك إلى قرار تعرف أنه لك، ويشبهك.",
-  blockquote:
-    "في باهية، نؤمن أن كل شخص يستحق فرصة لبناء مستقبله العقاري بطريقته الخاصة. نمنحك كامل الحرية في اكتشاف الخيارات التي تناسبك، وبأفضل قيمة ممكنة.",
-  overlayOpacity: 0.3,
+  // Image configuration
+  image: {
+    src: "/images/placeholders/responsiveImage/responsiveImage.jpg",
+    alt: "صورة متجاوبة",
+  },
+
+  // Responsive width settings
+  width: {
+    mobile: "100%", // Full width on mobile
+    tablet: "80%", // 80% width on tablet
+    desktop: "70%", // 70% width on desktop
+  },
+
+  // Max width constraints
+  maxWidth: {
+    mobile: "100%",
+    tablet: "800px",
+    desktop: "1200px",
+  },
+
+  // Alignment
+  alignment: "center", // "left" | "center" | "right"
+
+  // Spacing
+  spacing: {
+    margin: {
+      top: "0",
+      bottom: "0",
+      left: "auto",
+      right: "auto",
+    },
+    padding: {
+      top: "0",
+      bottom: "0",
+      left: "0",
+      right: "0",
+    },
+  },
+
+  // Styling
+  styling: {
+    borderRadius: "0",
+    objectFit: "cover", // "cover" | "contain" | "fill" | "none" | "scale-down"
+    shadow: "none", // "none" | "sm" | "md" | "lg" | "xl" | "2xl"
+    border: {
+      enabled: false,
+      width: "1px",
+      color: "#e5e7eb",
+      style: "solid",
+    },
+  },
+
+  // Responsive behavior
+  responsive: {
+    mobileBreakpoint: "640px",
+    tabletBreakpoint: "1024px",
+    desktopBreakpoint: "1280px",
+  },
 });
 
 // ═══════════════════════════════════════════════════════════
 // COMPONENT FUNCTIONS - Standard 4 functions
 // ═══════════════════════════════════════════════════════════
 
-export const imageTextFunctions = {
+export const responsiveImageFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    *
@@ -35,21 +84,24 @@ export const imageTextFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     // Check if variant already exists
     if (
-      state.imageTextStates[variantId] &&
-      Object.keys(state.imageTextStates[variantId]).length > 0
+      state.responsiveImageStates[variantId] &&
+      Object.keys(state.responsiveImageStates[variantId]).length > 0
     ) {
       return {} as any; // Already exists, skip initialization
     }
 
     // Determine default data
-    const defaultData = getDefaultImageTextData();
+    const defaultData = getDefaultResponsiveImageData();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     // Return new state
     return {
-      imageTextStates: { ...state.imageTextStates, [variantId]: data },
+      responsiveImageStates: {
+        ...state.responsiveImageStates,
+        [variantId]: data,
+      },
     } as any;
   },
 
@@ -61,7 +113,8 @@ export const imageTextFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.imageTextStates[variantId] || getDefaultImageTextData(),
+    state.responsiveImageStates[variantId] ||
+    getDefaultResponsiveImageData(),
 
   /**
    * setData - Set/replace component data completely
@@ -72,7 +125,10 @@ export const imageTextFunctions = {
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    imageTextStates: { ...state.imageTextStates, [variantId]: data },
+    responsiveImageStates: {
+      ...state.responsiveImageStates,
+      [variantId]: data,
+    },
   }),
 
   /**
@@ -80,26 +136,27 @@ export const imageTextFunctions = {
    *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
-   * @param path - Dot-separated path to field (e.g., "content.title")
+   * @param path - Dot-separated path to field (e.g., "image.src")
    * @param value - New value for the field
    * @returns New state object
    */
-  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+  updateByPath: (
+    state: any,
+    variantId: string,
+    path: string,
+    value: any,
+  ) => {
     const source =
-      state.imageTextStates[variantId] || getDefaultImageTextData();
+      state.responsiveImageStates[variantId] ||
+      getDefaultResponsiveImageData();
     const newData = updateDataByPath(source, path, value);
 
     return {
-      imageTextStates: { ...state.imageTextStates, [variantId]: newData },
+      responsiveImageStates: {
+        ...state.responsiveImageStates,
+        [variantId]: newData,
+      },
     } as any;
   },
 };
-
-
-
-
-
-
-
-
 

@@ -20,6 +20,10 @@ export { imageTextStructure } from "./imageText";
 export { contactUsHomePageStructure } from "./contactUsHomePage";
 export { blogsSectionsStructure } from "./blogsSections";
 export { mapSectionStructure } from "./mapSection";
+export { responsiveImageStructure } from "./responsiveImage";
+export { titleStructure } from "./title";
+export { photosGridStructure } from "./photosGrid";
+export { videoStructure } from "./video";
 export type {
   ComponentStructure,
   VariantDefinition,

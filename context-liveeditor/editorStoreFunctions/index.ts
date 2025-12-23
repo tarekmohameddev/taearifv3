@@ -22,3 +22,7 @@ export * from "./imageTextFunctions";
 export * from "./contactUsHomePageFunctions";
 export * from "./blogsSectionsFunctions";
 export * from "./mapSectionFunctions";
+export * from "./responsiveImageFunctions";
+export * from "./titleFunctions";
+export * from "./photosGridFunctions";
+export * from "./videoFunctions";

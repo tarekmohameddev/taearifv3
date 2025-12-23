@@ -7,6 +7,7 @@ import {
   getSectionIconTranslated,
 } from "@/components/tenant/live-editor/EditorSidebar/constants";
 import { DraggableDrawerItem } from "@/services-liveeditor/live-editor/dragDrop";
+import { getComponents } from "@/lib-liveeditor/ComponentsList";
 
 // Animation variants
 const collapseVariants = {
@@ -55,6 +56,7 @@ const listItem = {
 export const ComponentsSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] = useState(true);
   const t = useEditorT();
 
   // الحصول على الأقسام المترجمة
@@ -75,7 +77,7 @@ export const ComponentsSidebar = () => {
     [availableSections, searchTerm],
   );
 
-  // تصفية المكونات للعرض فقط (إزالة header و footer و inputs2)
+  // تصفية المكونات للعرض فقط (إزالة header و footer و inputs2 والمكونات الاساسية)
   const displaySections = useMemo(
     () =>
       filteredSections.filter(
@@ -83,15 +85,34 @@ export const ComponentsSidebar = () => {
           section.type !== "header" &&
           section.type !== "footer" &&
           section.type !== "inputs2" &&
+          section.type !== "responsiveImage" &&
+          section.type !== "title" &&
+          section.type !== "video" &&
+          section.type !== "photosGrid" &&
           section.section !== "header" &&
           section.section !== "footer" &&
           section.section !== "inputs2" &&
           !section.component?.toLowerCase().includes("header") &&
           !section.component?.toLowerCase().includes("footer") &&
-          !section.component?.toLowerCase().includes("inputs2"),
+          !section.component?.toLowerCase().includes("inputs2") &&
+          !section.component?.toLowerCase().includes("responsiveimage") &&
+          !section.component?.toLowerCase().includes("title") &&
+          !section.component?.toLowerCase().includes("video") &&
+          !section.component?.toLowerCase().includes("photosgrid"),
       ),
     [filteredSections],
   );
+
+  // الحصول على معلومات المكونات الاساسية
+  const basicComponentsInfo = useMemo(() => {
+    const components = getComponents(t);
+    return {
+      responsiveImage: components.responsiveImage,
+      title: components.title,
+      video: components.video,
+      photosGrid: components.photosGrid,
+    };
+  }, [t]);
 
   return (
     <motion.div
@@ -182,7 +203,147 @@ export const ComponentsSidebar = () => {
             className="flex-1 overflow-y-auto p-4 relative"
             layout
           >
-            <div className="relative">
+            <div className="relative space-y-3">
+              {/* المكونات الاساسية Dropdown */}
+              <div className="border border-gray-200 rounded-md overflow-hidden">
+                <motion.button
+                  onClick={() => setIsBasicComponentsDropdownOpen((v) => !v)}
+                  className="w-full px-3 py-2 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900">
+                      المكونات الاساسية
+                    </span>
+                  </div>
+                  <motion.svg
+                    className="w-4 h-4 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    animate={{ rotate: isBasicComponentsDropdownOpen ? 180 : 0 }}
+                    transition={{ type: "tween", duration: 0.2 }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </motion.svg>
+                </motion.button>
+                <AnimatePresence initial={false}>
+                  {isBasicComponentsDropdownOpen && (
+                    <motion.div
+                      variants={collapseVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className="p-2 bg-white"
+                    >
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {/* ResponsiveImage */}
+                        {basicComponentsInfo.responsiveImage && (
+                          <DraggableDrawerItem
+                            componentType="responsiveImage"
+                            section="homepage"
+                            data={{
+                              label: basicComponentsInfo.responsiveImage.displayName || "Responsive Image",
+                              description: basicComponentsInfo.responsiveImage.description || "",
+                              icon: basicComponentsInfo.responsiveImage.icon || "🖼️",
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {basicComponentsInfo.responsiveImage.icon || "🖼️"}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-xs leading-tight">
+                                  {basicComponentsInfo.responsiveImage.displayName || "Responsive Image"}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        )}
+
+                        {/* Title */}
+                        {basicComponentsInfo.title && (
+                          <DraggableDrawerItem
+                            componentType="title"
+                            section="homepage"
+                            data={{
+                              label: basicComponentsInfo.title.displayName || "Title",
+                              description: basicComponentsInfo.title.description || "",
+                              icon: basicComponentsInfo.title.icon || "🔠",
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {basicComponentsInfo.title.icon || "🔠"}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-xs leading-tight">
+                                  {basicComponentsInfo.title.displayName || "Title"}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        )}
+
+                        {/* Video */}
+                        {basicComponentsInfo.video && (
+                          <DraggableDrawerItem
+                            componentType="video"
+                            section="homepage"
+                            data={{
+                              label: basicComponentsInfo.video.displayName || "Video",
+                              description: basicComponentsInfo.video.description || "",
+                              icon: basicComponentsInfo.video.icon || "🎥",
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {basicComponentsInfo.video.icon || "🎥"}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-xs leading-tight">
+                                  {basicComponentsInfo.video.displayName || "Video"}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        )}
+
+                        {/* PhotosGrid */}
+                        {basicComponentsInfo.photosGrid && (
+                          <DraggableDrawerItem
+                            componentType="photosGrid"
+                            section="homepage"
+                            data={{
+                              label: basicComponentsInfo.photosGrid.displayName || "Photos Grid",
+                              description: basicComponentsInfo.photosGrid.description || "",
+                              icon: basicComponentsInfo.photosGrid.icon || "📷",
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {basicComponentsInfo.photosGrid.icon || "📷"}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-xs leading-tight">
+                                  {basicComponentsInfo.photosGrid.displayName || "Photos Grid"}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Other Components Grid */}
               <motion.div
                 variants={listContainer}
                 initial="hidden"

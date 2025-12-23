@@ -234,6 +234,22 @@
       "display_name": "Blogs Sections",
       "description": "Blog cards section with paragraphs and grid layout"
     },
+    "responsiveImage": {
+      "display_name": "Responsive Image",
+      "description": "Responsive image with comfortable width for all screen sizes"
+    },
+    "title": {
+      "display_name": "Title",
+      "description": "Centered title block"
+    },
+    "photosGrid": {
+      "display_name": "Photos Grid",
+      "description": "Responsive photo grid with captions and tags"
+    },
+    "video": {
+      "display_name": "Video",
+      "description": "Responsive video player with fixed max width for all screens"
+    },
     "contactUsHomePage": {
       "display_name": "Contact Us Home Page",
       "description": "Complete contact form with background image and multiple contact fields"

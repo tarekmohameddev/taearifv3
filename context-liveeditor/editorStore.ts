@@ -72,6 +72,10 @@ import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
 import { contactUsHomePageFunctions } from "./editorStoreFunctions/contactUsHomePageFunctions";
 import { blogsSectionsFunctions } from "./editorStoreFunctions/blogsSectionsFunctions";
+import { responsiveImageFunctions } from "./editorStoreFunctions/responsiveImageFunctions";
+import { titleFunctions } from "./editorStoreFunctions/titleFunctions";
+import { photosGridFunctions } from "./editorStoreFunctions/photosGridFunctions";
+import { videoFunctions } from "./editorStoreFunctions/videoFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -505,6 +509,45 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Title states
+  titleStates: Record<string, ComponentData>;
+  ensureTitleVariant: (variantId: string, initial?: ComponentData) => void;
+  getTitleData: (variantId: string) => ComponentData;
+  setTitleData: (variantId: string, data: ComponentData) => void;
+  updateTitleByPath: (variantId: string, path: string, value: any) => void;
+
+  // Responsive Image states
+  responsiveImageStates: Record<string, ComponentData>;
+  ensureResponsiveImageVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getResponsiveImageData: (variantId: string) => ComponentData;
+  setResponsiveImageData: (variantId: string, data: ComponentData) => void;
+  updateResponsiveImageByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Photos Grid states
+  photosGridStates: Record<string, ComponentData>;
+  ensurePhotosGridVariant: (variantId: string, initial?: ComponentData) => void;
+  getPhotosGridData: (variantId: string) => ComponentData;
+  setPhotosGridData: (variantId: string, data: ComponentData) => void;
+  updatePhotosGridByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Video states
+  videoStates: Record<string, ComponentData>;
+  ensureVideoVariant: (variantId: string, initial?: ComponentData) => void;
+  getVideoData: (variantId: string) => ComponentData;
+  setVideoData: (variantId: string, data: ComponentData) => void;
+  updateVideoByPath: (variantId: string, path: string, value: any) => void;
+
   // Inputs states
   inputsStates: Record<string, ComponentData>;
   ensureInputsVariant: (variantId: string, initial?: ComponentData) => void;
@@ -620,6 +663,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   imageTextStates: {},
   contactUsHomePageStates: {},
   blogsSectionsStates: {},
+  titleStates: {},
+  responsiveImageStates: {},
+  photosGridStates: {},
+  videoStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -1118,6 +1165,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             initial,
           );
+      case "title":
+        return titleFunctions.ensureVariant(state, variantId, initial);
+        case "responsiveImage":
+          return responsiveImageFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
+        case "photosGrid":
+          return photosGridFunctions.ensureVariant(state, variantId, initial);
+      case "video":
+        return videoFunctions.ensureVariant(state, variantId, initial);
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1239,6 +1298,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return contactUsHomePageFunctions.getData(state, variantId);
       case "blogsSections":
         return blogsSectionsFunctions.getData(state, variantId);
+      case "title":
+        return titleFunctions.getData(state, variantId);
+      case "responsiveImage":
+        return responsiveImageFunctions.getData(state, variantId);
+      case "photosGrid":
+        return photosGridFunctions.getData(state, variantId);
+      case "video":
+        return videoFunctions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -1365,6 +1432,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "blogsSections":
           newState = blogsSectionsFunctions.setData(state, variantId, data);
+          break;
+      case "title":
+        newState = titleFunctions.setData(state, variantId, data);
+        break;
+        case "responsiveImage":
+          newState = responsiveImageFunctions.setData(state, variantId, data);
+          break;
+        case "photosGrid":
+          newState = photosGridFunctions.setData(state, variantId, data);
+          break;
+        case "video":
+          newState = videoFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1625,6 +1704,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             path,
             value,
           );
+          break;
+        case "title":
+          newState = titleFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "responsiveImage":
+          newState = responsiveImageFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "photosGrid":
+          newState = photosGridFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "video":
+          newState = videoFunctions.updateByPath(state, variantId, path, value);
           break;
         default:
           // Fallback to generic component handling
@@ -2093,6 +2199,64 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       blogsSectionsFunctions.updateByPath(state, variantId, path, value),
     ),
 
+  // Title specific functions
+  ensureTitleVariant: (variantId, initial) =>
+    set((state) => titleFunctions.ensureVariant(state, variantId, initial)),
+  getTitleData: (variantId) => {
+    const state = get();
+    return titleFunctions.getData(state, variantId);
+  },
+  setTitleData: (variantId, data) =>
+    set((state) => titleFunctions.setData(state, variantId, data)),
+  updateTitleByPath: (variantId, path, value) =>
+    set((state) => titleFunctions.updateByPath(state, variantId, path, value)),
+
+  // Responsive Image specific functions
+  ensureResponsiveImageVariant: (variantId, initial) =>
+    set((state) =>
+      responsiveImageFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getResponsiveImageData: (variantId) => {
+    const state = get();
+    return responsiveImageFunctions.getData(state, variantId);
+  },
+  setResponsiveImageData: (variantId, data) =>
+    set((state) =>
+      responsiveImageFunctions.setData(state, variantId, data),
+    ),
+  updateResponsiveImageByPath: (variantId, path, value) =>
+    set((state) =>
+      responsiveImageFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Photos Grid specific functions
+  ensurePhotosGridVariant: (variantId, initial) =>
+    set((state) =>
+      photosGridFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getPhotosGridData: (variantId) => {
+    const state = get();
+    return photosGridFunctions.getData(state, variantId);
+  },
+  setPhotosGridData: (variantId, data) =>
+    set((state) => photosGridFunctions.setData(state, variantId, data)),
+  updatePhotosGridByPath: (variantId, path, value) =>
+    set((state) =>
+      photosGridFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Video specific functions
+  ensureVideoVariant: (variantId, initial) =>
+    set((state) => videoFunctions.ensureVariant(state, variantId, initial)),
+  getVideoData: (variantId) => {
+    const state = get();
+    return videoFunctions.getData(state, variantId);
+  },
+  setVideoData: (variantId, data) =>
+    set((state) => videoFunctions.setData(state, variantId, data)),
+  updateVideoByPath: (variantId, path, value) =>
+    set((state) => videoFunctions.updateByPath(state, variantId, path, value)),
+
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -2464,6 +2628,35 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.data,
                         ).blogsSectionsStates;
                       break;
+                    case "title":
+                      newState.titleStates = titleFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).titleStates;
+                      break;
+                    case "responsiveImage":
+                      newState.responsiveImageStates =
+                        responsiveImageFunctions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).responsiveImageStates;
+                      break;
+                    case "photosGrid":
+                      newState.photosGridStates = photosGridFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).photosGridStates;
+                      break;
+                    case "video":
+                      newState.videoStates = videoFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).videoStates;
+                      break;
                   }
                 }
               },
@@ -2660,6 +2853,27 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).blogsSectionsStates;
+              break;
+            case "responsiveImage":
+              newState.responsiveImageStates = responsiveImageFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).responsiveImageStates;
+              break;
+            case "photosGrid":
+              newState.photosGridStates = photosGridFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).photosGridStates;
+              break;
+            case "video":
+              newState.videoStates = videoFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).videoStates;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =

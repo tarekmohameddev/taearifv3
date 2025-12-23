@@ -4,46 +4,61 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultHalfTextHalfImage6Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { getDefaultResponsiveImageData } from "@/context-liveeditor/editorStoreFunctions/responsiveImageFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
 // ═══════════════════════════════════════════════════════════
-interface HalfTextHalfImage6Props {
+interface ResponsiveImageProps {
+  // Component-specific props
   visible?: boolean;
-  ThemeTwo?: string;
-  layout?: {
-    ThemeTwo?: string;
-    maxWidth?: string;
-  };
-  spacing?: {
-    ThemeTwo?: string;
-    padding?: {
-      ThemeTwo?: string;
-      top?: string;
-      bottom?: string;
-    };
-  };
-  content?: {
-    ThemeTwo?: string;
-    title?: string;
-    titleUnderlined?: string;
-    paragraph?: string;
-  };
   image?: {
-    ThemeTwo?: string;
     src?: string;
     alt?: string;
-    visible?: boolean;
+  };
+  width?: {
+    mobile?: string;
+    tablet?: string;
+    desktop?: string;
+  };
+  maxWidth?: {
+    mobile?: string;
+    tablet?: string;
+    desktop?: string;
+  };
+  alignment?: "left" | "center" | "right";
+  spacing?: {
+    margin?: {
+      top?: string;
+      bottom?: string;
+      left?: string;
+      right?: string;
+    };
+    padding?: {
+      top?: string;
+      bottom?: string;
+      left?: string;
+      right?: string;
+    };
   };
   styling?: {
-    ThemeTwo?: string;
-    backgroundColor?: string;
-    titleColor?: string;
-    paragraphColor?: string;
-    dividerColor?: string;
+    borderRadius?: string;
+    objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+    shadow?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
+    border?: {
+      enabled?: boolean;
+      width?: string;
+      color?: string;
+      style?: "solid" | "dashed" | "dotted" | "double";
+    };
   };
-  // Editor props
+  responsive?: {
+    mobileBreakpoint?: string;
+    tabletBreakpoint?: string;
+    desktopBreakpoint?: string;
+  };
+
+  // Editor props (always include these)
   variant?: string;
   useStore?: boolean;
   id?: string;
@@ -52,11 +67,11 @@ interface HalfTextHalfImage6Props {
 // ═══════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
-export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
+export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
   // ─────────────────────────────────────────────────────────
   // 1. EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
-  const variantId = props.variant || "halfTextHalfImage6";
+  const variantId = props.variant || "responsiveImage1";
   const uniqueId = props.id || variantId;
 
   // ─────────────────────────────────────────────────────────
@@ -66,8 +81,8 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
-  const halfTextHalfImageStates = useEditorStore(
-    (s) => s.halfTextHalfImageStates,
+  const responsiveImageStates = useEditorStore(
+    (s) => s.responsiveImageStates,
   );
 
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -83,7 +98,7 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     }
   }, [tenantId, fetchTenantData]);
 
-  // Get tenant data for this specific component variant
+  // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
 
@@ -91,7 +106,7 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
         if (
-          component.type === "halfTextHalfImage" &&
+          component.type === "responsiveImage" &&
           component.componentName === variantId
         ) {
           return component.data;
@@ -112,9 +127,8 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
             pageComponents as any,
           )) {
             if (
-              (component as any).type === "halfTextHalfImage" &&
-              (component as any).componentName === variantId &&
-              componentId === props.id
+              (component as any).type === "responsiveImage" &&
+              (component as any).componentName === variantId
             ) {
               return (component as any).data;
             }
@@ -126,53 +140,52 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     return {};
   };
 
+  const tenantComponentData = getTenantComponentData();
+
   useEffect(() => {
     if (props.useStore) {
-      // Get tenant component data inside useEffect to avoid infinite loops
-      const tenantComponentData = getTenantComponentData();
-
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
           ? {
-              ...getDefaultHalfTextHalfImage6Data(),
+              ...getDefaultResponsiveImageData(),
               ...tenantComponentData, // Database data takes priority
               ...props,
             }
           : {
-              ...getDefaultHalfTextHalfImage6Data(),
+              ...getDefaultResponsiveImageData(),
               ...props,
             };
 
       // Initialize in store
-      ensureComponentVariant("halfTextHalfImage", uniqueId, initialData);
+      ensureComponentVariant("responsiveImage", uniqueId, initialData);
     }
   }, [
     uniqueId,
     props.useStore,
     ensureComponentVariant,
-    variantId,
-    props.id,
-    tenantData,
-  ]);
+    tenantComponentData,
+  ]); // ✅ Add tenantComponentData dependency
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
-  const storeData = halfTextHalfImageStates[uniqueId];
-  const currentStoreData = getComponentData("halfTextHalfImage", uniqueId);
-  const tenantComponentData = getTenantComponentData();
+  const storeData = responsiveImageStates[uniqueId];
+  const currentStoreData = getComponentData("responsiveImage", uniqueId);
 
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultHalfTextHalfImage6Data(), // 1. Defaults (lowest priority)
-    ...tenantComponentData, // 2. Tenant data from database
-    ...storeData, // 3. Store state
-    ...currentStoreData, // 4. Current store data
-    ...props, // 5. Props (highest priority)
+    ...getDefaultResponsiveImageData(), // 1. Defaults (lowest priority)
+    ...storeData, // 2. Store state
+    ...currentStoreData, // 3. Current store data
+    ...props, // 4. Props (highest priority)
   };
+
+  const imageSrc =
+    mergedData.image?.src ||
+    "/images/placeholders/responsiveImage/responsiveImage.jpg";
 
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
@@ -184,88 +197,119 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
+
+  // Get alignment classes
+  const alignmentClasses = {
+    left: "ml-0 mr-auto",
+    center: "mx-auto",
+    right: "ml-auto mr-0",
+  };
+  const alignmentKey =
+    (mergedData.alignment || "center") as keyof typeof alignmentClasses;
+
+  // Get shadow classes
+  const shadowClasses = {
+    none: "",
+    sm: "shadow-sm",
+    md: "shadow-md",
+    lg: "shadow-lg",
+    xl: "shadow-xl",
+    "2xl": "shadow-2xl",
+  };
+  const shadowKey =
+    (mergedData.styling?.shadow || "none") as keyof typeof shadowClasses;
+
+  // Build responsive width styles
+  const enforcedMaxWidth = "1200px";
+  const widthStyles: React.CSSProperties = {
+    width: mergedData.width?.mobile || "100%",
+    maxWidth: `min(${enforcedMaxWidth}, 100%)`,
+  };
+
+  // Build container styles
+  const containerStyles: React.CSSProperties = {
+    marginTop: mergedData.spacing?.margin?.top || "0",
+    marginBottom: mergedData.spacing?.margin?.bottom || "0",
+    marginLeft: mergedData.spacing?.margin?.left || "auto",
+    marginRight: mergedData.spacing?.margin?.right || "auto",
+    paddingTop: mergedData.spacing?.padding?.top || "0",
+    paddingBottom: mergedData.spacing?.padding?.bottom || "0",
+    paddingLeft: mergedData.spacing?.padding?.left || "0",
+    paddingRight: mergedData.spacing?.padding?.right || "0",
+  };
+
+  // Build image styles
+  const imageStyles: React.CSSProperties = {
+    width: "100%",
+    height: "auto",
+    borderRadius: mergedData.styling?.borderRadius || "0",
+    objectFit: mergedData.styling?.objectFit || "cover",
+    border:
+      mergedData.styling?.border?.enabled &&
+      mergedData.styling?.border?.width &&
+      mergedData.styling?.border?.color
+        ? `${mergedData.styling.border.width} ${mergedData.styling.border.style || "solid"} ${mergedData.styling.border.color}`
+        : "none",
+  };
+
   return (
-    <section
-      className="w-full flex items-center justify-center"
-      style={{
-        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
-        paddingTop: mergedData.spacing?.padding?.top || "5rem",
-        paddingBottom: mergedData.spacing?.padding?.bottom || "3rem",
-      }}
+    <div
+      className={`responsive-image-container ${alignmentClasses[alignmentKey]} ${shadowClasses[shadowKey]}`}
+      style={containerStyles}
     >
       <div
-        className="w-full mx-auto px-4 md:px-6 lg:px-8"
-        style={{
-          maxWidth: mergedData.layout?.maxWidth || "1280px",
-        }}
+        className="responsive-image-wrapper"
+        style={widthStyles}
       >
-        <div className="bg-white rounded-2xl overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-            {/* Left Side - Image (40% من العرض) */}
-            {(mergedData.image?.visible ?? true) && (
-              <div className="relative w-full md:w-[40%] h-[300px] md:h-[500px] order-1 md:order-2 rounded-2xl overflow-hidden">
-                <Image
-                  src={
-                    mergedData.image?.src ||
-                    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000"
-                  }
-                  alt={mergedData.image?.alt || "صورة"}
-                  fill
-                  className="object-cover rounded-2xl"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                />
-              </div>
-            )}
+        <style jsx>{`
+          .responsive-image-wrapper {
+            width: ${mergedData.width?.mobile || "100%"};
+            max-width: min(${enforcedMaxWidth}, 100%);
+          }
 
-            {/* Right Side - Text Content (60% من العرض) */}
-            <div className="w-full md:w-[60%] bg-[#f5f0e8] flex flex-col justify-center px-6 md:px-8 lg:px-10 py-8 md:py-12 text-right order-2 md:order-1">
-              {/* Heading */}
-              <h3
-                className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 leading-tight"
-                style={{
-                  color: mergedData.styling?.titleColor || "#000000",
-                }}
-              >
-                <span className="">
-                  {mergedData.content?.titleUnderlined || "خبراء في"}
-                </span>
-                {mergedData.content?.title?.replace(
-                  mergedData.content?.titleUnderlined || "",
-                  "",
-                )}
-              </h3>
-              <div
-                className="w-24 h-[2px] mb-4 ml-auto"
-                style={{
-                  backgroundColor:
-                    mergedData.styling?.dividerColor || "#8b5f46",
-                }}
-              ></div>
+          @media (min-width: ${mergedData.responsive?.tabletBreakpoint || "1024px"}) {
+            .responsive-image-wrapper {
+              width: ${mergedData.width?.tablet || "80%"};
+              max-width: min(${enforcedMaxWidth}, 100%);
+            }
+          }
 
-              {/* Paragraph Text */}
-              <p
-                className="text-sm md:text-base lg:text-lg leading-relaxed"
-                style={{
-                  color: mergedData.styling?.paragraphColor || "#000000",
-                }}
-              >
-                {mergedData.content?.paragraph ||
-                  "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم."}
-              </p>
-            </div>
+          @media (min-width: ${mergedData.responsive?.desktopBreakpoint || "1280px"}) {
+            .responsive-image-wrapper {
+              width: ${mergedData.width?.desktop || "70%"};
+              max-width: min(${enforcedMaxWidth}, 100%);
+            }
+          }
+        `}</style>
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={mergedData.image.alt || "صورة متجاوبة"}
+            width={1200}
+            height={600}
+            style={imageStyles}
+            className="responsive-image"
+            priority={false}
+          />
+        ) : (
+          <div
+            className="responsive-image-placeholder"
+            style={{
+              ...imageStyles,
+              width: "100%",
+              height: "400px",
+              backgroundColor: "#f3f4f6",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#9ca3af",
+            }}
+          >
+            <span>لا توجد صورة</span>
           </div>
-        </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
-
-
-
-
-
-
-
-
 
