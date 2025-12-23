@@ -886,14 +886,16 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       zone: string;
       index: number;
       data?: any;
+      variant?: string;
+      sourceData?: any;
     }) => {
       // تحويل componentType إلى camelCase
       const normalizedComponentType = componentData.type
         .replace(/\s+/g, "")
         .replace(/^\w/, (c) => c.toLowerCase());
 
-      // إضافة رقم 1 لكل مكون
-      const componentName = getComponentNameWithOne(normalizedComponentType);
+      // استخدام variant من sourceData إذا كان موجوداً، وإلا استخدم getComponentNameWithOne
+      const componentName = componentData.variant || getComponentNameWithOne(normalizedComponentType);
 
       const newComponent = {
         id: uuidv4(),

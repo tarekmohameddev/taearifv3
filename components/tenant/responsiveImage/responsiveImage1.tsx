@@ -255,7 +255,12 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
   return (
     <div
       className={`responsive-image-container ${alignmentClasses[alignmentKey]} ${shadowClasses[shadowKey]}`}
-      style={containerStyles}
+      style={{
+        ...containerStyles,
+        // Ensure centering by default
+        marginLeft: mergedData.spacing?.margin?.left || "auto",
+        marginRight: mergedData.spacing?.margin?.right || "auto",
+      }}
     >
       <div
         className="responsive-image-wrapper"
