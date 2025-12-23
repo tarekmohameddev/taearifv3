@@ -492,6 +492,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const globalFooterVariantFromStore = useEditorStore(
     (s) => s.globalFooterVariant,
   );
+  const themeChangeTimestamp = useEditorStore((s) => s.themeChangeTimestamp);
   const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
@@ -556,14 +557,22 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
   // Get global footer variant with smart priority logic
   const globalFooterVariant = useMemo(() => {
+    // ⭐ CRITICAL: If theme was recently changed, prioritize store variant
+    const hasRecentThemeChange = themeChangeTimestamp > 0;
+    
     const isDefaultVariant = globalFooterVariantFromStore === "StaticFooter1";
 
-    const variant =
-      (!isDefaultVariant && globalFooterVariantFromStore) ||
-      globalFooterData?.variant ||
-      tenantData?.globalComponentsData?.globalFooterVariant ||
-      globalFooterVariantFromStore ||
-      "StaticFooter1";
+    // Priority logic:
+    // 1. If theme was recently changed, use store variant (highest priority)
+    // 2. If store variant is NOT default, use it (for immediate updates)
+    // 3. Otherwise, use tenantData/globalFooterData (for initial load)
+    const variant = hasRecentThemeChange
+      ? globalFooterVariantFromStore || "StaticFooter1" // ⭐ Force use store variant after theme change
+      : (!isDefaultVariant && globalFooterVariantFromStore) ||
+        globalFooterData?.variant ||
+        tenantData?.globalComponentsData?.globalFooterVariant ||
+        globalFooterVariantFromStore ||
+        "StaticFooter1";
 
     return variant;
   }, [
@@ -571,6 +580,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     globalFooterData?.variant,
     tenantData?.globalComponentsData?.globalFooterVariant,
     tenantData,
+    themeChangeTimestamp, // ⭐ NEW: Force re-compute when theme changes
   ]);
 
   // Initialize data immediately if not exists
@@ -690,7 +700,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     }
 
     return FooterComponent;
-  }, [globalFooterVariant]);
+  }, [
+    globalFooterVariant,
+    themeChangeTimestamp, // ⭐ NEW: Force re-load when theme changes
+    globalFooterData, // ⭐ NEW: Force re-load when footer data changes
+  ]);
 
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
@@ -793,6 +807,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     pageComponents,
     globalHeaderData,
     globalFooterData,
+    globalFooterVariant, // ⭐ NEW: Update when footer variant changes
+    themeChangeTimestamp, // ⭐ NEW: Force update when theme changes
     selectedComponentId, // للتأكد من تحديث البيانات عند تغيير المكون المحدد
   ]);
 
@@ -1340,6 +1356,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       globalFooterVariant,
       FooterComponent,
       backendDataState.globalFooterData, // بدلاً من globalFooterData
+      themeChangeTimestamp, // ⭐ NEW: Force re-render when theme changes
     ],
   );
 

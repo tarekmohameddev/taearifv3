@@ -60,13 +60,32 @@ export function useLiveEditorEffects(state: any) {
         tenantData: !!tenantData,
         hasComponentSettings: !!tenantData?.componentSettings,
         hasGlobalComponentsData: !!tenantData?.globalComponentsData,
+        themeChangeTimestamp: editorStore.themeChangeTimestamp,
       });
+
+      // ⭐ CRITICAL: Check if theme was recently changed
+      // If themeChangeTimestamp > 0, prioritize pageComponentsByPage from store
+      // over tenantData.componentSettings to avoid loading old theme data
+      const themeChangeTimestamp = editorStore.themeChangeTimestamp;
+      const hasRecentThemeChange = themeChangeTimestamp > 0;
 
       // Load data into editorStore
       editorStore.loadFromDatabase(tenantData);
 
-      // Load page components from database or use defaults
-      if (
+      // ⭐ PRIORITY LOGIC: Check store first if theme was recently changed
+      const storePageComponents = editorStore.pageComponentsByPage[slug];
+      
+      if (hasRecentThemeChange && storePageComponents !== undefined) {
+        // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
+        console.log("🔄 Theme recently changed - using store data instead of tenantData:", {
+          slug,
+          storeComponentCount: storePageComponents.length,
+          tenantDataComponentCount: tenantData?.componentSettings?.[slug] 
+            ? Object.keys(tenantData.componentSettings[slug]).length 
+            : 0,
+        });
+        setPageComponents(storePageComponents || []);
+      } else if (
         tenantData?.componentSettings?.[slug] &&
         Object.keys(tenantData.componentSettings[slug]).length > 0
       ) {
@@ -183,11 +202,21 @@ export function useLiveEditorEffects(state: any) {
         }
         setPageComponents(dbComponents as ComponentInstance[]);
       } else {
-        // استيراد createInitialComponents من الخدمة
-        const {
-          createInitialComponents,
-        } = require("@/services-liveeditor/live-editor");
-        setPageComponents(createInitialComponents(slug));
+        // ⭐ FALLBACK: If no tenantData and no store data, check store first
+        // This handles the case where theme was changed but tenantData wasn't updated yet
+        if (storePageComponents !== undefined) {
+          console.log("🔄 No tenantData for page, using store data:", {
+            slug,
+            componentCount: storePageComponents.length,
+          });
+          setPageComponents(storePageComponents || []);
+        } else {
+          // استيراد createInitialComponents من الخدمة
+          const {
+            createInitialComponents,
+          } = require("@/services-liveeditor/live-editor");
+          setPageComponents(createInitialComponents(slug));
+        }
       }
 
       // Initialize default inputs2 data in editorStore if no inputs2 components exist
@@ -287,33 +316,97 @@ export function useLiveEditorEffects(state: any) {
   const storePageComponents = useEditorStore(
     (state) => state.pageComponentsByPage[slug]
   );
+  
+  // Subscribe to currentTheme changes to detect theme restore
+  const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
+  const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestamp);
 
   useEffect(() => {
     // Only sync if already initialized to avoid conflicts with initial load
     if (!initialized) return;
 
-    if (storePageComponents && storePageComponents.length > 0) {
-      // Create a signature to detect actual changes
-      const storeSignature = storePageComponents
-        .map((c) => `${c.id}-${c.type}-${c.componentName}`)
+    // Create a more comprehensive signature that includes data hash
+    const createSignature = (components: any[]) => {
+      if (!components || components.length === 0) return "empty";
+      return components
+        .map((c) => {
+          // Include data hash in signature to detect data changes
+          const dataHash = JSON.stringify(c.data || {});
+          return `${c.id}-${c.type}-${c.componentName}-${dataHash.substring(0, 50)}`;
+        })
         .sort()
         .join(",");
+    };
 
-      const currentSignature = pageComponents
-        .map((c) => `${c.id}-${c.type}-${c.componentName}`)
-        .sort()
-        .join(",");
-
-      // Only update if signatures are different and we haven't synced this exact state
-      if (
-        storeSignature !== currentSignature &&
-        lastSyncedRef.current !== storeSignature
-      ) {
+    // ⭐ CRITICAL: Force sync if themeChangeTimestamp changed (after theme restore)
+    // This ensures immediate update after clearAllStates() and restore
+    // We need to check the store directly to get the latest data, not rely on subscription
+    if (themeChangeTimestamp > 0) {
+      // Get fresh data from store (bypass subscription timing issues)
+      const store = useEditorStore.getState();
+      const freshStorePageComponents = store.pageComponentsByPage[slug];
+      
+      if (freshStorePageComponents !== undefined) {
+        const storeSignature = createSignature(freshStorePageComponents);
+        console.log("[LiveEditorEffects] Force sync after theme change:", {
+          slug,
+          componentCount: freshStorePageComponents.length,
+          signature: storeSignature.substring(0, 100),
+        });
+        setPageComponents(freshStorePageComponents || []);
         lastSyncedRef.current = storeSignature;
-        setPageComponents(storePageComponents);
+        return;
+      } else {
+        // If storePageComponents is undefined, set to empty array to clear iframe
+        console.log("[LiveEditorEffects] No components found for page after theme change, clearing:", slug);
+        setPageComponents([]);
+        lastSyncedRef.current = "empty";
+        return;
       }
     }
-  }, [initialized, slug, storePageComponents, pageComponents, setPageComponents]);
+
+    // Normal sync: Force sync if storePageComponents exists (even if empty array)
+    if (storePageComponents !== undefined) {
+      const storeSignature = createSignature(storePageComponents);
+      const currentSignature = createSignature(pageComponents);
+
+      // Force update if:
+      // 1. Signatures are different
+      // 2. We haven't synced this exact state
+      // 3. Store has components but current doesn't (or vice versa)
+      // 4. Store changed from undefined to defined (or vice versa)
+      const shouldUpdate =
+        storeSignature !== currentSignature &&
+        (lastSyncedRef.current !== storeSignature ||
+          (storePageComponents.length > 0 && pageComponents.length === 0) ||
+          (storePageComponents.length === 0 && pageComponents.length > 0));
+
+      if (shouldUpdate) {
+        console.log("[LiveEditorEffects] Normal sync triggered:", {
+          slug,
+          componentCount: storePageComponents.length,
+          shouldUpdate,
+        });
+        lastSyncedRef.current = storeSignature;
+        setPageComponents(storePageComponents || []);
+      }
+    } else {
+      // ⭐ NEW: If storePageComponents is undefined but we have pageComponents, clear them
+      // This handles the case where clearAllStates() was called but pageComponents wasn't updated
+      if (pageComponents.length > 0) {
+        console.log("[LiveEditorEffects] Clearing pageComponents (store is undefined):", slug);
+        setPageComponents([]);
+        lastSyncedRef.current = "empty";
+      }
+    }
+  }, [initialized, slug, storePageComponents, pageComponents, setPageComponents, currentTheme, themeChangeTimestamp]);
+
+  // Reset sync ref when theme changes to force re-sync
+  useEffect(() => {
+    if (themeChangeTimestamp > 0) {
+      lastSyncedRef.current = "";
+    }
+  }, [themeChangeTimestamp]);
 
   // Update current page in store
   useEffect(() => {
@@ -336,3 +429,4 @@ export function useLiveEditorEffects(state: any) {
     };
   }, [slug, pageComponents]);
 }
+

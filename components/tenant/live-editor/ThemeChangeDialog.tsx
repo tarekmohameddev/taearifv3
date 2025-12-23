@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEditorT, useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-import { Palette, AlertTriangle, RotateCcw, Loader2 } from "lucide-react";
+import { Palette, AlertTriangle, Loader2 } from "lucide-react";
 import { ThemeNumber } from "@/services-liveeditor/live-editor/themeChangeService";
 
 interface ThemeOption {
@@ -46,8 +46,6 @@ interface ThemeChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onThemeApply: (themeNumber: ThemeNumber) => Promise<void>;
-  onThemeRestore?: () => Promise<void>;
-  hasBackup: boolean;
   currentTheme: number | null;
 }
 
@@ -55,8 +53,6 @@ export function ThemeChangeDialog({
   isOpen,
   onClose,
   onThemeApply,
-  onThemeRestore,
-  hasBackup,
   currentTheme,
 }: ThemeChangeDialogProps) {
   const t = useEditorT();
@@ -64,7 +60,6 @@ export function ThemeChangeDialog({
   const [selectedTheme, setSelectedTheme] = useState<ThemeNumber | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(false);
 
   const isRTL = locale === "ar";
 
@@ -89,22 +84,8 @@ export function ThemeChangeDialog({
     }
   };
 
-  const handleRestore = async () => {
-    if (!onThemeRestore) return;
-
-    setIsRestoring(true);
-    try {
-      await onThemeRestore();
-      onClose();
-    } catch (error) {
-      console.error("Error restoring theme:", error);
-    } finally {
-      setIsRestoring(false);
-    }
-  };
-
   const handleClose = () => {
-    if (!isApplying && !isRestoring) {
+    if (!isApplying) {
       setSelectedTheme(null);
       setShowWarning(false);
       onClose();
@@ -218,46 +199,27 @@ export function ThemeChangeDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {hasBackup && onThemeRestore && (
-              <Button
-                variant="outline"
-                onClick={handleRestore}
-                disabled={isApplying || isRestoring}
-                className="gap-2"
-              >
-                {isRestoring ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <RotateCcw className="w-4 h-4" />
-                )}
-                {isRTL ? "استرجاع الثيم السابق" : "Restore Previous Theme"}
-              </Button>
+        <DialogFooter className="flex items-center justify-end gap-2">
+          <Button variant="outline" onClick={handleClose} disabled={isApplying}>
+            {isRTL ? "إلغاء" : "Cancel"}
+          </Button>
+          <Button
+            onClick={handleApply}
+            disabled={!selectedTheme || isApplying}
+            className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+          >
+            {isApplying ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {isRTL ? "جاري التطبيق..." : "Applying..."}
+              </>
+            ) : (
+              <>
+                <Palette className="w-4 h-4" />
+                {isRTL ? "تطبيق الثيم" : "Apply Theme"}
+              </>
             )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleClose} disabled={isApplying || isRestoring}>
-              {isRTL ? "إلغاء" : "Cancel"}
-            </Button>
-            <Button
-              onClick={handleApply}
-              disabled={!selectedTheme || isApplying || isRestoring}
-              className="gap-2 bg-indigo-600 hover:bg-indigo-700"
-            >
-              {isApplying ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {isRTL ? "جاري التطبيق..." : "Applying..."}
-                </>
-              ) : (
-                <>
-                  <Palette className="w-4 h-4" />
-                  {isRTL ? "تطبيق الثيم" : "Apply Theme"}
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

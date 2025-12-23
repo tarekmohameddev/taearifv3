@@ -21,7 +21,6 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDialog";
 import {
   applyThemeToAllPages,
-  restoreThemeFromBackup,
   ThemeNumber,
 } from "@/services-liveeditor/live-editor/themeChangeService";
 import {
@@ -1009,9 +1008,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   );
   const editorWebsiteLayout = editorStoreWebsiteLayout?.metaTags?.pages || [];
   const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
-  const themeBackup = useEditorStore((state) => state.themeBackup);
-  const themeBackupKey = useEditorStore((state) => state.themeBackupKey);
-  const hasBackup = !!(themeBackup && themeBackupKey && Object.keys(themeBackup).length > 0);
 
   // Theme change handlers
   const handleThemeApply = async (themeNumber: ThemeNumber) => {
@@ -1034,26 +1030,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     }
   };
 
-  const handleThemeRestore = async () => {
-    if (!themeBackupKey || !themeBackup) return;
-    try {
-      await restoreThemeFromBackup(themeBackupKey);
-      toast.success(
-        locale === "ar"
-          ? "تم استرجاع الثيم السابق بنجاح"
-          : "Previous theme restored successfully"
-      );
-      // Changes will be reflected automatically via useEffect in LiveEditorEffects
-    } catch (error) {
-      console.error("Error restoring theme:", error);
-      toast.error(
-        locale === "ar"
-          ? "حدث خطأ أثناء استرجاع الثيم"
-          : "Error restoring theme"
-      );
-      throw error;
-    }
-  };
 
   // دالة للحصول على البيانات الافتراضية للصفحة
   const getDefaultSeoData = (pageSlug: string) => {
@@ -1644,7 +1620,24 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   useEffect(() => {
     if (!tenantData) return;
 
-    const { setPageComponentsForPage } = useEditorStore.getState();
+    const editorStore = useEditorStore.getState();
+    const { setPageComponentsForPage } = editorStore;
+
+    // ⭐ CRITICAL: Check if theme was recently changed
+    // If themeChangeTimestamp > 0, don't overwrite store data with tenantData
+    // This prevents loading old theme data after a theme change
+    const themeChangeTimestamp = editorStore.themeChangeTimestamp;
+    const hasRecentThemeChange = themeChangeTimestamp > 0;
+
+    if (hasRecentThemeChange) {
+      // Theme was recently changed - tenantStore was already updated by themeChangeService
+      // Don't overwrite the new theme data in editorStore with potentially old tenantData
+      console.log("[EditorNavBar] Skipping componentSettings load - theme recently changed:", {
+        themeChangeTimestamp,
+        storePages: Object.keys(editorStore.pageComponentsByPage).length,
+      });
+      return;
+    }
 
     // التحقق من وجود componentSettings وأنها ليست فارغة
     const hasComponentSettings =
@@ -1657,6 +1650,22 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       // تحميل جميع الصفحات من componentSettings
       Object.entries(tenantData.componentSettings).forEach(
         ([pageSlug, pageData]: [string, any]) => {
+          // ⭐ Check if store already has data for this page (from theme change)
+          // If store has data and it's different, prioritize store data
+          const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
+          if (storePageComponents && storePageComponents.length > 0) {
+            // Store already has data - check if it's different from tenantData
+            const tenantComponentCount = Object.keys(pageData).length;
+            if (storePageComponents.length !== tenantComponentCount) {
+              console.log("[EditorNavBar] Store has different data for page, skipping tenantData load:", {
+                pageSlug,
+                storeCount: storePageComponents.length,
+                tenantCount: tenantComponentCount,
+              });
+              return; // Skip this page - store data takes priority
+            }
+          }
+
           const components = Object.entries(pageData).map(
             ([id, component]: [string, any]) => ({
               id,
@@ -1675,12 +1684,20 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       );
     } else {
       // تحميل البيانات الافتراضية من PAGE_DEFINITIONS
+      // ⭐ Only load defaults if store doesn't already have data (from theme change)
       const {
         PAGE_DEFINITIONS,
       } = require("@/lib-liveeditor/defaultComponents");
 
       Object.entries(PAGE_DEFINITIONS).forEach(
         ([pageSlug, pageData]: [string, any]) => {
+          // Check if store already has data for this page
+          const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
+          if (storePageComponents && storePageComponents.length > 0) {
+            // Store already has data - skip loading defaults
+            return;
+          }
+
           const components = Object.entries(pageData).map(
             ([id, component]: [string, any]) => ({
               id,
@@ -3266,8 +3283,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         isOpen={isThemeDialogOpen}
         onClose={() => setIsThemeDialogOpen(false)}
         onThemeApply={handleThemeApply}
-        onThemeRestore={hasBackup ? handleThemeRestore : undefined}
-        hasBackup={hasBackup}
         currentTheme={currentTheme || null}
       />
     </nav>

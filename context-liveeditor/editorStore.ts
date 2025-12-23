@@ -197,6 +197,9 @@ interface EditorStore {
   themeBackup: Record<string, any> | null;
   themeBackupKey: string | null;
   setThemeBackup: (key: string, backup: Record<string, any>) => void;
+  
+  // Theme change timestamp for forcing sync after theme restore
+  themeChangeTimestamp: number;
 
   // Structures registry
   structures: Record<string, any>;
@@ -596,6 +599,9 @@ interface EditorStore {
 
   // Force update page components for immediate save
   forceUpdatePageComponents: (slug: string, components: any[]) => void;
+
+  // Clear all states (for theme change)
+  clearAllStates: () => void;
 }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
@@ -628,6 +634,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Theme backup
   themeBackup: null,
   themeBackupKey: null,
+  themeChangeTimestamp: 0,
 
   structures: Object.keys(COMPONENTS).reduce(
     (acc, componentType) => {
@@ -2346,6 +2353,34 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             newState.WebsiteLayout[backupKey] = backupData;
           }
         });
+
+        // Auto-detect and set themeBackup and themeBackupKey from loaded backups
+        // Find first available backup that is NOT the current theme
+        const currentTheme = newState.WebsiteLayout?.currentTheme;
+        let foundBackupKey: string | null = null;
+        let foundBackupData: Record<string, any> | null = null;
+
+        Object.entries(tenantData.ThemesBackup).forEach(([backupKey, backupData]) => {
+          if (backupKey.match(/^Theme\d+Backup$/)) {
+            // Extract theme number from backup key
+            const themeMatch = backupKey.match(/^Theme(\d+)Backup$/);
+            const backupThemeNumber = themeMatch ? parseInt(themeMatch[1], 10) : null;
+            
+            // Only use backup if it's not the current theme and we haven't found one yet
+            if (backupThemeNumber !== null && backupThemeNumber !== currentTheme && !foundBackupKey) {
+              if (backupData && typeof backupData === 'object' && Object.keys(backupData).length > 0) {
+                foundBackupKey = backupKey;
+                foundBackupData = backupData as Record<string, any>;
+              }
+            }
+          }
+        });
+
+        // Set themeBackup and themeBackupKey if we found a valid backup
+        if (foundBackupKey && foundBackupData) {
+          newState.themeBackup = foundBackupData;
+          newState.themeBackupKey = foundBackupKey;
+        }
       }
       
       // Preserve existing backup state if not in tenantData
@@ -2935,6 +2970,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         ...state.WebsiteLayout,
         currentTheme: themeNumber,
       },
+      themeChangeTimestamp: Date.now(), // Force sync after theme change
     })),
 
   setThemeBackup: (key, backup) =>
@@ -2942,4 +2978,67 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       themeBackup: backup,
       themeBackupKey: key,
     })),
+
+  // Clear all states (for theme change)
+  clearAllStates: () =>
+    set((state) => {
+      // Get default header and footer data
+      const defaultHeaderData = getDefaultHeaderData();
+      const defaultFooterData = getDefaultFooterData();
+
+      return {
+        // Clear all component type states
+        heroStates: {},
+        headerStates: {},
+        footerStates: {},
+        halfTextHalfImageStates: {},
+        propertySliderStates: {},
+        ctaValuationStates: {},
+        stepsSectionStates: {},
+        testimonialsStates: {},
+        propertiesShowcaseStates: {},
+        card4States: {},
+        card5States: {},
+        logosTickerStates: {},
+        partnersStates: {},
+        whyChooseUsStates: {},
+        contactMapSectionStates: {},
+        gridStates: {},
+        filterButtonsStates: {},
+        propertyFilterStates: {},
+        mapSectionStates: {},
+        contactCardsStates: {},
+        contactFormSectionStates: {},
+        applicationFormStates: {},
+        inputsStates: {},
+        inputs2States: {},
+        imageTextStates: {},
+        contactUsHomePageStates: {},
+        blogsSectionsStates: {},
+        titleStates: {},
+        responsiveImageStates: {},
+        photosGridStates: {},
+        videoStates: {},
+        componentStates: {},
+
+        // Clear page components
+        pageComponentsByPage: {},
+
+        // Reset global components to defaults
+        globalHeaderData: defaultHeaderData,
+        globalFooterData: defaultFooterData,
+        globalHeaderVariant: "StaticHeader1",
+        globalFooterVariant: "StaticFooter1",
+        globalComponentsData: {
+          header: defaultHeaderData,
+          footer: defaultFooterData,
+        },
+
+        // Clear temp data
+        tempData: {},
+
+        // Force sync after clearing
+        themeChangeTimestamp: Date.now(),
+      } as any;
+    }),
 }));
