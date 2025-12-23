@@ -323,6 +323,7 @@ export const ComponentsSidebar = () => {
                               label: basicComponentsInfo.photosGrid.displayName || "Photos Grid",
                               description: basicComponentsInfo.photosGrid.description || "",
                               icon: basicComponentsInfo.photosGrid.icon || "📷",
+                              variant: "photosGrid1",
                             }}
                           >
                             <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
@@ -332,6 +333,31 @@ export const ComponentsSidebar = () => {
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
                                   {basicComponentsInfo.photosGrid.displayName || "Photos Grid"}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        )}
+
+                        {/* PhotosGrid2 */}
+                        {basicComponentsInfo.photosGrid && (
+                          <DraggableDrawerItem
+                            componentType="photosGrid"
+                            section="homepage"
+                            data={{
+                              label: t("components.photosGrid.photos_grid_2") || "Photos Grid 2",
+                              description: basicComponentsInfo.photosGrid.description || "",
+                              icon: basicComponentsInfo.photosGrid.icon || "🖼️",
+                              variant: "photosGrid2",
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {basicComponentsInfo.photosGrid.icon || "🖼️"}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-xs leading-tight">
+                                  {t("components.photosGrid.photos_grid_2") || "Photos Grid 2"}
                                 </h3>
                               </div>
                             </div>
