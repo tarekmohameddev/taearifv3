@@ -58,6 +58,8 @@ interface EnhancedLiveEditorDragDropContextProps {
     type: string;
     index: number;
     zone: string;
+    variant?: string;
+    sourceData?: any;
   }) => void;
   onPositionDebug?: (debugInfo: PositionDebugInfo) => void;
   id?: string;
@@ -574,6 +576,8 @@ export function EnhancedLiveEditorDragDropContext({
                     sourceData.componentType || sourceData.type || "unknown",
                   index: targetIndex,
                   zone: targetZone,
+                  variant: sourceData.data?.variant,
+                  sourceData: sourceData.data,
                 });
               } else {
                 const actualSourceIndex = components.findIndex(
