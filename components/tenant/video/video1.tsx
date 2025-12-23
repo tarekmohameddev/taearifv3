@@ -249,14 +249,49 @@ export default function Video1(props: VideoProps = {}) {
   return (
     <section className="video-section" style={{ width: "100%" }}>
       <div
-        className={`relative w-full overflow-hidden ${shadowClasses[mergedData.styling?.shadow || "lg"]}`}
+        className={`relative w-full overflow-hidden mx-auto ${shadowClasses[mergedData.styling?.shadow || "lg"]}`}
         style={{
-          maxWidth: "100%", // Fixed max width to fit all screens
+          width: "100%",
+          maxWidth: "60%", // Mobile: full width
           backgroundColor: mergedData.styling?.backgroundColor || "#000000",
           borderRadius: mergedData.styling?.borderRadius || "12px",
           aspectRatio: aspectRatioCss,
         }}
       >
+        <style jsx>{`
+          .video-section > div {
+            width: 100%;
+            max-width: 100%;
+          }
+
+          /* Tablet: 768px and up */
+          @media (min-width: 768px) {
+            .video-section > div {
+              max-width: 90%;
+            }
+          }
+
+          /* Desktop: 1024px and up */
+          @media (min-width: 1024px) {
+            .video-section > div {
+              max-width: 85%;
+            }
+          }
+
+          /* Large Desktop: 1280px and up */
+          @media (min-width: 1280px) {
+            .video-section > div {
+              max-width: 80%;
+            }
+          }
+
+          /* Extra Large Desktop: 1536px and up */
+          @media (min-width: 1536px) {
+            .video-section > div {
+              max-width: 75%;
+            }
+          }
+        `}</style>
         {mergedData.styling?.overlay?.enabled && (
           <div
             className="absolute inset-0 z-10 pointer-events-none"
