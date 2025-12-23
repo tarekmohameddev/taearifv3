@@ -204,9 +204,12 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
   // Parse units - for properties, usually 1, but can be extracted from data
   const units = property.units || 1;
 
+  const propertyId = property.id || property.slug || String(Date.now());
+  const propertySlug = property.slug || property.id || String(Date.now());
+  
   return {
     ThemeTwo: "property",
-    id: property.id || property.slug || String(Date.now()),
+    id: propertyId,
     image: property.image || property.images?.[0] || "",
     title: property.title || "عقار",
     city: city,
@@ -239,7 +242,7 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
       max: bathrooms > 0 ? bathrooms : 2,
     },
     featured: property.featured || false,
-    url: property.url || property.slug ? `/${property.slug}` : undefined,
+    url: `/property/${propertySlug}`,
   };
 };
 
@@ -285,9 +288,12 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
       ? "مكتمل"
       : "قيد الإنشاء";
 
+  const projectId = project.id || project.slug || String(Date.now());
+  const projectSlug = project.slug || project.id || String(Date.now());
+  
   return {
     ThemeTwo: "property",
-    id: project.id || project.slug || String(Date.now()),
+    id: projectId,
     image: project.image || project.images?.[0] || "",
     title: project.title || "مشروع",
     city: city,
@@ -320,7 +326,7 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
       max: 4,
     },
     featured: project.featured || false,
-    url: project.url || project.slug ? `/${project.slug}` : undefined,
+    url: `/project/${projectSlug}`,
   };
 };
 
@@ -412,7 +418,7 @@ function ProjectCard({ property }: { property: Property }) {
   };
 
   const CardContent = (
-    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
       {/* Image Section */}
       <div className="relative w-full h-[337px]">
         <Image
@@ -512,15 +518,12 @@ function ProjectCard({ property }: { property: Property }) {
     </div>
   );
 
-  if (property.url) {
-    return (
-      <Link href={property.url} className="block">
-        {CardContent}
-      </Link>
-    );
-  }
-
-  return CardContent;
+  // Always wrap in Link since we now always have a URL
+  return (
+    <Link href={property.url || `#`} className="block">
+      {CardContent}
+    </Link>
+  );
 }
 
 // ═══════════════════════════════════════════════════════════
