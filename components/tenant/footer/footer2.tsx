@@ -304,6 +304,14 @@ export default function Footer2(props: Footer2Props) {
     }
   };
 
+  // دالة لاستبدال "باهية" بـ "تعاريف" و "Baheya" بـ "taearif" تلقائياً
+  const replaceBaheya = (text: string | undefined): string => {
+    if (!text) return "";
+    return text
+      .replace(/باهية/g, "تعاريف")
+      .replace(/Baheya/gi, "taearif"); // case-insensitive للغة الإنجليزية
+  };
+
   return (
     <>
       <footer
@@ -320,10 +328,10 @@ export default function Footer2(props: Footer2Props) {
                   <div className="flex">
                     <Image
                       src={mergedData.content.companyInfo.logo}
-                      alt={
+                      alt={replaceBaheya(
                         mergedData.content?.companyInfo?.name ||
-                        "Baheya Real Estate"
-                      }
+                          "Baheya Real Estate"
+                      )}
                       width={100}
                       height={100}
                       className="rounded-full object-contain"
@@ -334,7 +342,7 @@ export default function Footer2(props: Footer2Props) {
                     <div className="relative w-48 h-32">
                       <Image
                         src="/images/main/logo.png"
-                        alt="Baheya Real Estate"
+                        alt="تعاريف العقارية"
                         fill
                         className="object-contain"
                       />
@@ -344,11 +352,11 @@ export default function Footer2(props: Footer2Props) {
                 {mergedData.content?.companyInfo?.name && (
                   <div>
                     <h3 className="text-lg font-bold text-white">
-                      {mergedData.content.companyInfo.name}
+                      {replaceBaheya(mergedData.content.companyInfo.name)}
                     </h3>
                     {mergedData.content?.companyInfo?.tagline && (
                       <p className="text-sm text-white/80">
-                        {mergedData.content.companyInfo.tagline}
+                        {replaceBaheya(mergedData.content.companyInfo.tagline)}
                       </p>
                     )}
                   </div>
@@ -369,7 +377,7 @@ export default function Footer2(props: Footer2Props) {
                     </svg>
                   </span>
                   <span className="text-base">
-                    {mergedData.content?.contactInfo?.address}
+                    {replaceBaheya(mergedData.content?.contactInfo?.address)}
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
@@ -388,7 +396,7 @@ export default function Footer2(props: Footer2Props) {
                       </svg>
                     </span>
                     <span className="text-base">
-                      {mergedData.content?.contactInfo?.email}
+                      {replaceBaheya(mergedData.content?.contactInfo?.email)}
                     </span>
                   </a>
                 </li>
@@ -410,7 +418,7 @@ export default function Footer2(props: Footer2Props) {
                       </svg>
                     </span>
                     <span className="text-base">
-                      {mergedData.content?.contactInfo?.whatsapp}
+                      {replaceBaheya(mergedData.content?.contactInfo?.whatsapp)}
                     </span>
                   </a>
                 </li>
@@ -418,20 +426,26 @@ export default function Footer2(props: Footer2Props) {
 
               {/* Company Description */}
               <p className="text-base leading-relaxed text-white/90">
-                {mergedData.content?.companyInfo?.description ||
-                  "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية."}
+                {replaceBaheya(
+                  mergedData.content?.companyInfo?.description ||
+                    "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية."
+                )}
               </p>
             </div>
 
             {/* Left Section - Newsletter */}
             <div className="w-full lg:w-1/2 xl:w-3/5 ">
               <h5 className="text-xl font-bold text-white mb-4">
-                {mergedData.content?.newsletter?.title ||
-                  "اشترك في النشرة البريدية"}
+                {replaceBaheya(
+                  mergedData.content?.newsletter?.title ||
+                    "اشترك في النشرة البريدية"
+                )}
               </h5>
               <p className="text-base leading-relaxed text-white/90 mb-6">
-                {mergedData.content?.newsletter?.description ||
-                  "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"}
+                {replaceBaheya(
+                  mergedData.content?.newsletter?.description ||
+                    "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"
+                )}
               </p>
 
               {/* Newsletter Form */}
@@ -443,10 +457,10 @@ export default function Footer2(props: Footer2Props) {
                   type="tel"
                   value={whatsappNumber}
                   onChange={(e) => setWhatsappNumber(e.target.value)}
-                  placeholder={
+                  placeholder={replaceBaheya(
                     mergedData.content?.newsletter?.placeholder ||
-                    "رقم الواتساب"
-                  }
+                      "رقم الواتساب"
+                  )}
                   required
                   pattern="[0-9()#&+*-=.]+"
                   title="يتم قبول الأرقام وأحرف الهاتف فقط (#، - ، *، إلخ)."
@@ -456,7 +470,9 @@ export default function Footer2(props: Footer2Props) {
                   type="submit"
                   className="px-6 py-3 rounded-lg bg-[#a67c5a] text-white font-semibold hover:bg-[#9a6f4f] transition-colors whitespace-nowrap"
                 >
-                  {mergedData.content?.newsletter?.buttonText || "اشترك الآن"}
+                  {replaceBaheya(
+                    mergedData.content?.newsletter?.buttonText || "اشترك الآن"
+                  )}
                 </button>
               </form>
 
@@ -533,27 +549,14 @@ export default function Footer2(props: Footer2Props) {
           <div className="border-t border-white/20 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-base text-white/90 text-center md:text-right">
-                جميع الحقوق محفوظة لشركة{" "}
-                <Link
-                  href={
-                    mergedData.footerBottom?.companyUrl || "https://baheya.co"
-                  }
-                  className="hover:underline"
-                >
-                  تعاريف العقارية
-                </Link>{" "}
-                2025© | صمم من طرف{" "}
-                <a
-                  href={
-                    mergedData.footerBottom?.designerUrl ||
-                    "http://souhailagency.com"
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  وكالة سهيل
-                </a>
+                {(() => {
+                  const copyright = mergedData.footerBottom?.copyright || 
+                    `جميع الحقوق محفوظة لشركة تعاريف العقارية 2025© | صمم من طرف وكالة سهيل`;
+                  // إزالة " | صمم من طرف وكالة سهيل" تلقائياً إذا كان موجوداً
+                  let cleaned = copyright.replace(/\s*\|\s*صمم من طرف وكالة سهيل\s*/g, '');
+                  // استبدال "باهية" بـ "تعاريف" تلقائياً
+                  return replaceBaheya(cleaned);
+                })()}
               </p>
               <div className="flex items-center gap-6">
                 {mergedData.footerBottom?.legalLinks?.map(
@@ -563,7 +566,7 @@ export default function Footer2(props: Footer2Props) {
                       href={link.url || "#"}
                       className="text-base text-white hover:underline"
                     >
-                      {link.text}
+                      {replaceBaheya(link.text)}
                     </Link>
                   ),
                 )}

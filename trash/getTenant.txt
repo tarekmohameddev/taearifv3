@@ -9565,7 +9565,7 @@ https://api.taearif.com/api/v1/tenant-website/getTenant api response example:("{
           },
           "footerBottom": {
             "enabled": true,
-            "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025© | صمم من طرف وكالة سهيل",
+            "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
             "companyUrl": "https://baheya.co",
             "designerUrl": "http://souhailagency.com",
             "legalLinks": [
@@ -12225,7 +12225,7 @@ https://api.taearif.com/api/v1/tenant-website/getTenant api response example:("{
           },
           "footerBottom": {
             "enabled": true,
-            "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025© | صمم من طرف وكالة سهيل",
+            "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
             "companyUrl": "https://baheya.co",
             "designerUrl": "http://souhailagency.com",
             "legalLinks": [

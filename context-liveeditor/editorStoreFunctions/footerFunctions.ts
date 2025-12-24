@@ -200,7 +200,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
   footerBottom: {
     enabled: true,
     copyright:
-      "جميع الحقوق محفوظة لشركة تعاريف العقارية 2025© | صمم من طرف وكالة سهيل",
+      "جميع الحقوق محفوظة لشركة تعاريف العقارية 2025©",
     companyUrl: "https://baheya.co",
     designerUrl: "http://souhailagency.com",
     legalLinks: [
