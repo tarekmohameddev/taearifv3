@@ -69,22 +69,37 @@ export function useLiveEditorEffects(state: any) {
       const themeChangeTimestamp = editorStore.themeChangeTimestamp;
       const hasRecentThemeChange = themeChangeTimestamp > 0;
 
-      // Load data into editorStore
+      // ⭐ PRIORITY LOGIC: Check store first before loading from tenantData
+      // This prevents overwriting recent changes (after save) with old tenantData
+      const storePageComponents = editorStore.pageComponentsByPage[slug];
+
+      if (storePageComponents && storePageComponents.length > 0) {
+        // Store already has data - use it instead of tenantData to avoid overwriting recent changes
+        console.log("🔄 Using store data (has recent changes):", {
+          slug,
+          componentCount: storePageComponents.length,
+        });
+        setPageComponents(storePageComponents);
+        setInitialized(true);
+        return; // Skip loading from tenantData
+      }
+
+      // Load data into editorStore (only if store doesn't have data for this page)
       editorStore.loadFromDatabase(tenantData);
 
-      // ⭐ PRIORITY LOGIC: Check store first if theme was recently changed
-      const storePageComponents = editorStore.pageComponentsByPage[slug];
+      // Re-check store after loadFromDatabase (in case it was updated)
+      const storePageComponentsAfterLoad = editorStore.pageComponentsByPage[slug];
       
-      if (hasRecentThemeChange && storePageComponents !== undefined) {
+      if (hasRecentThemeChange && storePageComponentsAfterLoad !== undefined) {
         // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
         console.log("🔄 Theme recently changed - using store data instead of tenantData:", {
           slug,
-          storeComponentCount: storePageComponents.length,
+          storeComponentCount: storePageComponentsAfterLoad.length,
           tenantDataComponentCount: tenantData?.componentSettings?.[slug] 
             ? Object.keys(tenantData.componentSettings[slug]).length 
             : 0,
         });
-        setPageComponents(storePageComponents || []);
+        setPageComponents(storePageComponentsAfterLoad || []);
       } else if (
         tenantData?.componentSettings?.[slug] &&
         Object.keys(tenantData.componentSettings[slug]).length > 0
@@ -204,12 +219,12 @@ export function useLiveEditorEffects(state: any) {
       } else {
         // ⭐ FALLBACK: If no tenantData and no store data, check store first
         // This handles the case where theme was changed but tenantData wasn't updated yet
-        if (storePageComponents !== undefined) {
+        if (storePageComponentsAfterLoad !== undefined) {
           console.log("🔄 No tenantData for page, using store data:", {
             slug,
-            componentCount: storePageComponents.length,
+            componentCount: storePageComponentsAfterLoad.length,
           });
-          setPageComponents(storePageComponents || []);
+          setPageComponents(storePageComponentsAfterLoad || []);
         } else {
           // استيراد createInitialComponents من الخدمة
           const {

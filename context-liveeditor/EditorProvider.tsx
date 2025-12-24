@@ -7,6 +7,7 @@ import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
 import { useEditorStore } from "./editorStore";
 import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
+import useTenantStore from "./tenantStore";
 
 export function EditorProvider({ children }: { children: ReactNode }) {
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
@@ -90,6 +91,42 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       .then(() => {
         closeDialog();
         toast.success("Changes saved successfully!");
+
+        // ⭐ NEW: Update tenantStore.tenantData with saved data
+        // This prevents loading old data when navigating back to a page
+        const currentTenantData = useTenantStore.getState().tenantData;
+
+        if (currentTenantData) {
+          // Convert pageComponentsByPage to componentSettings format
+          const updatedComponentSettings: Record<string, any> = {};
+          Object.entries(state.pageComponentsByPage).forEach(
+            ([pageSlug, components]) => {
+              updatedComponentSettings[pageSlug] = {};
+              components.forEach((comp) => {
+                updatedComponentSettings[pageSlug][comp.id] = {
+                  type: comp.type,
+                  name: comp.name,
+                  componentName: comp.componentName,
+                  data: comp.data || {},
+                  position: comp.position || 0,
+                  layout: comp.layout || { row: 0, col: 0, span: 2 },
+                };
+              });
+            },
+          );
+
+          // Update tenantStore with new data
+          useTenantStore.setState({
+            tenantData: {
+              ...currentTenantData,
+              componentSettings: updatedComponentSettings,
+              globalComponentsData: state.globalComponentsData,
+              WebsiteLayout: state.WebsiteLayout,
+            },
+          });
+
+          console.log("✅ tenantStore.tenantData updated after save");
+        }
       })
       .catch((e) => {
         console.error("[Save All] Error saving pages:", e);

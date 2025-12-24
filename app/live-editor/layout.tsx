@@ -1650,20 +1650,19 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       // تحميل جميع الصفحات من componentSettings
       Object.entries(tenantData.componentSettings).forEach(
         ([pageSlug, pageData]: [string, any]) => {
-          // ⭐ Check if store already has data for this page (from theme change)
-          // If store has data and it's different, prioritize store data
+          // ⭐ IMPROVED: Check if store already has data for this page
+          // If store has data, don't overwrite it with tenantData
+          // This prevents loading old data after save
           const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
           if (storePageComponents && storePageComponents.length > 0) {
-            // Store already has data - check if it's different from tenantData
+            // Always prioritize store data if it exists (it has recent changes)
             const tenantComponentCount = Object.keys(pageData).length;
-            if (storePageComponents.length !== tenantComponentCount) {
-              console.log("[EditorNavBar] Store has different data for page, skipping tenantData load:", {
-                pageSlug,
-                storeCount: storePageComponents.length,
-                tenantCount: tenantComponentCount,
-              });
-              return; // Skip this page - store data takes priority
-            }
+            console.log("[EditorNavBar] Store has data for page, skipping tenantData load:", {
+              pageSlug,
+              storeCount: storePageComponents.length,
+              tenantCount: tenantComponentCount,
+            });
+            return; // Skip this page - store data takes priority
           }
 
           const components = Object.entries(pageData).map(
