@@ -1,0 +1,317 @@
+# جميع الـ States والـ Stores والـ Contexts في Live Editor
+
+## Zustand Stores
+
+### editorStore
+**الموقع**: context-liveeditor\editorStore.ts
+
+**States**:
+- showDialog
+- openSaveDialogFn
+- hasChangesMade
+- currentPage
+- tempData
+- globalHeaderData
+- globalFooterData
+- globalHeaderVariant
+- globalFooterVariant
+- globalComponentsData
+- WebsiteLayout
+- themeBackup
+- themeBackupKey
+- themeChangeTimestamp
+- structures
+- componentStates
+- componentGetters
+- pageComponentsByPage
+
+**Component States**:
+- heroStates
+- headerStates
+- footerStates
+- halfTextHalfImageStates
+- propertySliderStates
+- ctaValuationStates
+- stepsSectionStates
+- testimonialsStates
+- propertiesShowcaseStates
+- card4States
+- card5States
+- logosTickerStates
+- partnersStates
+- whyChooseUsStates
+- contactMapSectionStates
+- gridStates
+- filterButtonsStates
+- propertyFilterStates
+- mapSectionStates
+- contactFormSectionStates
+- contactCardsStates
+- applicationFormStates
+- inputsStates
+- inputs2States
+- imageTextStates
+- contactUsHomePageStates
+- blogsSectionsStates
+- titleStates
+- responsiveImageStates
+- photosGridStates
+- videoStates
+
+### tenantStore
+**الموقع**: context-liveeditor\tenantStore.jsx
+
+**States**:
+- tenantData
+- loadingTenantData
+- error
+- tenant
+- tenantId
+- lastFetchedWebsite
+
+### editorI18nStore
+**الموقع**: context-liveeditor\editorI18nStore.ts
+
+**States**:
+- locale
+- translations
+
+### clientI18nStore
+**الموقع**: context-liveeditor\clientI18nStore.ts
+
+**States**:
+- locale
+- translations
+
+### SidebarStateManager
+**الموقع**: context-liveeditor\SidebarStateManager.ts
+
+**States**:
+- selectedComponent
+- currentPage
+
+### zoneStore
+**الموقع**: services-liveeditor\live-editor\dragDrop\zoneStore.ts
+
+**States**:
+- zoneDepthIndex
+- nextZoneDepthIndex
+- areaDepthIndex
+- nextAreaDepthIndex
+- draggedItem
+- previewIndex
+- enabledIndex
+- hoveringComponent
+
+### collisionStore
+**الموقع**: services-liveeditor\live-editor\dragDrop\collision\dynamic\store.ts
+
+**States**:
+- fallbackEnabled
+- debugMode
+- sensitivity
+- lastCollisionId
+- collisionHistory
+
+## React Contexts
+
+### EditorContext
+**الموقع**: context-liveeditor\EditorContext.tsx
+
+**States**:
+- showDialog (useState)
+- openSaveDialogFn (useState)
+
+### EditorProvider
+**الموقع**: context-liveeditor\EditorProvider.tsx
+
+**ملاحظة**: يستخدم editorStore states
+
+## Drag & Drop Contexts
+
+### EnhancedLiveEditorDragDropContext
+**الموقع**: services-liveeditor\live-editor\dragDrop\EnhancedLiveEditorDragDropContext.tsx
+
+**States**:
+- dragListeners (useState)
+- zoneStore (useMemo)
+
+### dragListenerContext
+**الموقع**: services-liveeditor\live-editor\dragDrop\EnhancedLiveEditorDragDropContext.tsx
+
+**Context**: createContext
+
+### ZoneStoreContext
+**الموقع**: services-liveeditor\live-editor\dragDrop\zoneContext.tsx
+
+**Context**: createContext
+
+### dropZoneContext
+**الموقع**: services-liveeditor\live-editor\dragDrop\zoneContext.tsx
+
+**Context**: createContext
+
+### LiveEditorDragDropContext
+**الموقع**: services-liveeditor\live-editor\dragDrop\LiveEditorDragDropContext.tsx
+
+**States**:
+- zoneStore (useState)
+- plugins (useState)
+- dragListeners (useState)
+
+### dragListenerContext (LiveEditorDragDropContext)
+**الموقع**: services-liveeditor\live-editor\dragDrop\LiveEditorDragDropContext.tsx
+
+**Context**: createContext
+
+## Component Local States
+
+### DraggableComponent
+**الموقع**: services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx
+
+**States**:
+- localZones (useState)
+- dragAxis (useState)
+- hover (useState)
+- isVisible (useState)
+- dragFinished (useState)
+
+### useSensors
+**الموقع**: services-liveeditor\live-editor\dragDrop\useSensors.ts
+
+**States**:
+- sensors (useState)
+
+### LiveEditorHooks
+**الموقع**: components\tenant\live-editor\LiveEditorHooks.tsx
+
+**States**:
+- sidebarWidth (useState)
+- initialized (useState)
+- pageComponents (useState)
+- registeredComponents (useState)
+- activeId (useState)
+- sidebarOpen (useState)
+- sidebarView (useState)
+- selectedComponentId (useState)
+- deleteDialogOpen (useState)
+- componentToDelete (useState)
+- deletePageDialogOpen (useState)
+
+### UnifiedSidebar
+**الموقع**: components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx
+
+**States**:
+- expanded (useState)
+
+### LiveEditorUI
+**الموقع**: components\tenant\live-editor\LiveEditorUI.tsx
+
+**States**:
+- loaded (useState)
+- mountTarget (useState)
+- stylesLoaded (useState)
+- showChangesDialog (useState)
+- previousHasChangesMade (useState)
+- backendDataState (useState)
+- sidebarWidth (useState)
+- selectedDevice (useState)
+- iframeReady (useState)
+- isComponentsSidebarOpen (useState)
+- screenWidth (useState)
+- debugInfo (useState)
+- showDebugPanel (useState)
+- positionValidation (useState)
+- showDebugControls (useState)
+
+### ComponentsSidebar
+**الموقع**: components\tenant\live-editor\ComponentsSidebar.tsx
+
+**States**:
+- isExpanded (useState)
+- searchTerm (useState)
+- isBasicComponentsDropdownOpen (useState)
+
+### ThemeChangeDialog
+**الموقع**: components\tenant\live-editor\ThemeChangeDialog.tsx
+
+**States**:
+- selectedTheme (useState)
+- showWarning (useState)
+- isApplying (useState)
+
+### ThemeSelector
+**الموقع**: components\tenant\live-editor\ThemeSelector.tsx
+
+**States**:
+- isOpen (useState)
+- selectedTheme (useState)
+- themeOptions (useState)
+
+### LanguageDropdown
+**الموقع**: components\tenant\live-editor\LanguageDropdown.tsx
+
+**States**:
+- isChanging (useState)
+- selectedLang (useState)
+- isOpen (useState)
+
+### LiveEditorLayout (AddPageDialog)
+**الموقع**: app\live-editor\layout.tsx
+
+**States**:
+- internalOpen (useState)
+- isLoading (useState)
+- formData (useState)
+- errors (useState)
+- showAdvanced (useState)
+
+### LiveEditorLayout (Main Component)
+**الموقع**: app\live-editor\layout.tsx
+
+**States**:
+- recentlyAddedPages (useState)
+- isDropdownOpen (useState)
+- isPagesDropdownOpen (useState)
+- isAddPageDialogOpen (useState)
+- isThemeDialogOpen (useState)
+- isLoading (useState)
+- showAdvanced (useState)
+- formData (useState)
+- errors (useState)
+- showArrowTooltip (useState)
+- previousHasChangesMade (useState)
+
+### ModernColorPicker
+**الموقع**: components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx
+
+**States**:
+- isOpen (useState)
+- hue (useState)
+- saturation (useState)
+- lightness (useState)
+- alpha (useState)
+- hexInput (useState)
+
+### ArrayFieldRenderer
+**الموقع**: components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx
+
+**States**:
+- expanded (useState)
+- allCollapsed (useState)
+- nestedExpanded (useState)
+- fieldTypes (useState)
+
+### FieldRenderers
+**الموقع**: components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx
+
+**States**:
+- localValue (useState)
+- isUploading (useState)
+
+### BrandingSettings
+**الموقع**: components\tenant\live-editor\EditorSidebar\components\BrandingSettings.tsx
+
+**States**:
+- brandingData (useState)
+
