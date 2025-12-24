@@ -22,31 +22,39 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Key,
 } from "lucide-react";
 
 // Types
-interface Role {
+interface Permission {
   id: number;
-  team_id: number;
   name: string;
+  name_ar?: string;
+  name_en?: string;
   guard_name: string;
+  team_id: number | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
-  pivot: {
+  pivot?: {
     model_id: number;
-    role_id: number;
+    permission_id: number;
     model_type: string;
     team_id: number;
   };
-  permissions_list?: string[];
-  permissions?: Array<{
-    id: number;
-    name: string;
-    pivot: {
-      role_id: number;
-      permission_id: number;
+}
+
+interface PermissionsResponse {
+  status: string;
+  data: Permission[];
+  grouped: {
+    [key: string]: Permission[];
+  };
+  templates: {
+    [key: string]: {
+      [key: string]: string;
     };
-  }>;
+  };
 }
 
 interface CreateEmployeeRequest {
@@ -65,10 +73,14 @@ interface CreateEmployeeDialogProps {
   onOpenChange: (open: boolean) => void;
   formData: CreateEmployeeRequest;
   setFormData: React.Dispatch<React.SetStateAction<CreateEmployeeRequest>>;
-  selectedRoles: { [key: number]: boolean };
-  handleCreateRoleChange: (roleId: number, checked: boolean) => void;
-  roles: Role[];
-  rolesLoading: boolean;
+  selectedPermissions: { [key: string]: boolean };
+  handlePermissionChange: (permissionName: string, checked: boolean) => void;
+  handleGroupPermissionChange: (groupName: string, checked: boolean) => void;
+  isGroupFullySelected: (groupName: string) => boolean;
+  isGroupPartiallySelected: (groupName: string) => boolean;
+  permissions: PermissionsResponse | null;
+  permissionsLoading: boolean;
+  translatePermission: (permissionName: string) => string;
   createLoading: boolean;
   createError: string | null;
   createSuccess: boolean;
@@ -80,10 +92,14 @@ export function CreateEmployeeDialog({
   onOpenChange,
   formData,
   setFormData,
-  selectedRoles,
-  handleCreateRoleChange,
-  roles,
-  rolesLoading,
+  selectedPermissions,
+  handlePermissionChange,
+  handleGroupPermissionChange,
+  isGroupFullySelected,
+  isGroupPartiallySelected,
+  permissions,
+  permissionsLoading,
+  translatePermission,
   createLoading,
   createError,
   createSuccess,
@@ -278,63 +294,103 @@ export function CreateEmployeeDialog({
 
             <Separator className="my-6 sm:my-8" />
 
-            {/* Roles Section */}
+            {/* Permissions Section */}
             <div className="space-y-4 sm:space-y-6">
               <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
                 <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
-                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  <Key className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-black">
-                  الأدوار
+                  الصلاحيات
                 </h3>
               </div>
 
-              {rolesLoading ? (
+              {permissionsLoading ? (
                 <div className="flex items-center justify-center py-8 sm:py-12">
                   <div className="flex flex-col items-center gap-2 sm:gap-3">
                     <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-gray-400" />
                     <span className="text-sm sm:text-base text-gray-600 font-medium">
-                      جاري تحميل الأدوار...
+                      جاري تحميل الصلاحيات...
                     </span>
                     <div className="w-24 sm:w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                       <div className="h-full bg-black animate-pulse rounded-full"></div>
                     </div>
                   </div>
                 </div>
-              ) : roles.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {roles.map((role) => (
-                    <div
-                      key={role.id}
-                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <Checkbox
-                        id={`create-role-${role.id}`}
-                        checked={selectedRoles[role.id] || false}
-                        onCheckedChange={(checked) =>
-                          handleCreateRoleChange(role.id, checked as boolean)
-                        }
-                        className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                      />
-                      <Label
-                        htmlFor={`create-role-${role.id}`}
-                        className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1"
+              ) : permissions && Object.keys(permissions.grouped).length > 0 ? (
+                <div className="space-y-4 sm:space-y-6">
+                  {Object.entries(permissions.grouped).map(
+                    ([groupName, groupPermissions]) => (
+                      <div
+                        key={groupName}
+                        className="space-y-2 sm:space-y-3 border border-gray-200 rounded-lg p-3 sm:p-4"
                       >
-                        <div className="font-medium text-sm sm:text-base">
-                          {role.name}
+                        <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
+                          <Checkbox
+                            id={`create-group-${groupName}`}
+                            checked={isGroupFullySelected(groupName)}
+                            onCheckedChange={(checked) =>
+                              handleGroupPermissionChange(
+                                groupName,
+                                checked as boolean,
+                              )
+                            }
+                            className="data-[state=checked]:bg-black data-[state=checked]:border-black"
+                          />
+                          <Label
+                            htmlFor={`create-group-${groupName}`}
+                            className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer flex-1 capitalize"
+                          >
+                            {groupName.replace(/\./g, " ")}
+                          </Label>
+                          <span className="text-xs sm:text-sm text-gray-500">
+                            ({groupPermissions.length} صلاحية)
+                          </span>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {role.permissions_list?.length || 0} صلاحية
+                        <div className="space-y-2 pr-4 sm:pr-6">
+                          {Array.isArray(groupPermissions) &&
+                            groupPermissions.map((permission, index) => (
+                              <div
+                                key={permission.id || index}
+                                className="flex items-center gap-2 sm:gap-3"
+                              >
+                                <Checkbox
+                                  id={`create-permission-${groupName}-${permission.id || index}`}
+                                  checked={
+                                    selectedPermissions[permission.name] ||
+                                    false
+                                  }
+                                  onCheckedChange={(checked) =>
+                                    handlePermissionChange(
+                                      permission.name,
+                                      checked as boolean,
+                                    )
+                                  }
+                                  className="data-[state=checked]:bg-black data-[state=checked]:border-black"
+                                />
+                                <Label
+                                  htmlFor={`create-permission-${groupName}-${permission.id || index}`}
+                                  className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1"
+                                >
+                                  {translatePermission(permission.name)}
+                                  {permission.description && (
+                                    <span className="block text-xs text-gray-500 mt-0.5">
+                                      {permission.description}
+                                    </span>
+                                  )}
+                                </Label>
+                              </div>
+                            ))}
                         </div>
-                      </Label>
-                    </div>
-                  ))}
+                      </div>
+                    ),
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-6 sm:py-8">
-                  <Shield className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                  <Key className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
                   <p className="text-sm sm:text-base text-gray-600">
-                    لا توجد أدوار متاحة
+                    لا توجد صلاحيات متاحة
                   </p>
                 </div>
               )}

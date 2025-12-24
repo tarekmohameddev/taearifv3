@@ -1305,15 +1305,33 @@ export default function AccessControlPage() {
     }
   }, [availablePermissions]);
 
+  // Fetch permissions for create dialog
+  const fetchPermissions = async () => {
+    setPermissionsLoading(true);
+    try {
+      const response = await axiosInstance.get<PermissionsResponse>(
+        "/v1/permissions",
+      );
+      setPermissions(response.data);
+    } catch (err: any) {
+      console.error("Error fetching permissions:", err);
+      setCreateError("حدث خطأ في جلب الصلاحيات");
+    } finally {
+      setPermissionsLoading(false);
+    }
+  };
+
   useEffect(() => {
     console.log("🔄 Create dialog useEffect:", {
       showCreateDialog,
       permissions: !!permissions,
       rolesLength: roles.length,
     });
-    if (showCreateDialog && roles.length === 0) {
-      console.log("👥 Fetching roles for create dialog");
-      fetchRoles();
+    if (showCreateDialog) {
+      if (!permissions) {
+        console.log("🔑 Fetching permissions for create dialog");
+        fetchPermissions();
+      }
     }
   }, [showCreateDialog]);
 
@@ -1456,10 +1474,16 @@ export default function AccessControlPage() {
                               onOpenChange={setShowCreateDialog}
                               formData={formData}
                               setFormData={setFormData}
-                              selectedRoles={selectedRoles}
-                              handleCreateRoleChange={handleCreateRoleChange}
-                              roles={roles}
-                              rolesLoading={rolesLoading}
+                              selectedPermissions={selectedPermissions}
+                              handlePermissionChange={handlePermissionChange}
+                              handleGroupPermissionChange={
+                                handleGroupPermissionChange
+                              }
+                              isGroupFullySelected={isGroupFullySelected}
+                              isGroupPartiallySelected={isGroupPartiallySelected}
+                              permissions={permissions}
+                              permissionsLoading={permissionsLoading}
+                              translatePermission={translatePermission}
                               createLoading={createLoading}
                               createError={createError}
                               createSuccess={createSuccess}
