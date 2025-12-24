@@ -107,7 +107,7 @@ export function CreateEmployeeDialog({
   createSuccess,
   onCreateEmployee,
 }: CreateEmployeeDialogProps) {
-  const [isPermissionsExpanded, setIsPermissionsExpanded] = useState(true);
+  const [isPermissionsExpanded, setIsPermissionsExpanded] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
