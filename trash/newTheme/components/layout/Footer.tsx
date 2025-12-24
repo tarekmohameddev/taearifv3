@@ -233,7 +233,7 @@ const Footer = () => {
               <p className="text-base text-white/90 text-center md:text-right">
                 جميع الحقوق محفوظة لشركة{" "}
                 <Link href="https://baheya.co" className="hover:underline">
-                  باهية العقارية
+                  تعاريفالعقارية
                 </Link>{" "}
                 2025© | صمم من طرف{" "}
                 <a

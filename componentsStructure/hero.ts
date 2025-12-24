@@ -909,7 +909,7 @@ export const heroStructure: ComponentStructure = {
           key: "title",
           label: "Title",
           type: "text",
-          placeholder: "عن باهية العقارية",
+          placeholder: "عن تعاريفالعقارية",
         },
         {
           key: "backgroundImage",

@@ -10,7 +10,7 @@ interface Hero2Props {
 }
 
 const Hero2 = ({
-  title = "عن باهية العقارية",
+  title = "عن تعاريفالعقارية",
   backgroundImage = "https://dalel-lovat.vercel.app/images/hero.webp",
   contact = false,
 }: Hero2Props = {}) => {

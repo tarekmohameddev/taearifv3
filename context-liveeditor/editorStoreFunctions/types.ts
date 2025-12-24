@@ -1,4 +1,4 @@
-import { ComponentData } from "@/lib/types";
+import { ComponentData } from "@/lib-liveeditor/types";
 
 // أنواع مشتركة لجميع component functions
 export type ComponentState = Record<string, ComponentData>;

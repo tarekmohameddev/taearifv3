@@ -2630,7 +2630,7 @@
           "ThemeTwo": "ThemeTwo",
           "companyInfo": {
             "enabled": true,
-            "name": "باهية العقارية",
+            "name": "تعاريفالعقارية",
             "description": "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
             "tagline": null,
             "logo": "/images/main/logo.png",
@@ -2686,7 +2686,7 @@
         },
         "footerBottom": {
           "enabled": true,
-          "copyright": "جميع الحقوق محفوظة لشركة باهية العقارية 2025© | صمم من طرف وكالة سهيل",
+          "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025© | صمم من طرف وكالة سهيل",
           "companyUrl": "https://baheya.co",
           "designerUrl": "http://souhailagency.com",
           "legalLinks": [

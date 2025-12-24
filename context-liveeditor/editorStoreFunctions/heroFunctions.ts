@@ -309,35 +309,35 @@ export const getDefaultHero3Data = (): ComponentData => ({
 
 // Default hero4 data structure
 export const getDefaultHero4Data = (): ComponentData => ({
-  ThemeTwo: "ThemeTwo",
+  
   visible: true,
-  title: "عن باهية العقارية",
+  title: "عن تعاريفالعقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
   contact: false,
   background: {
-    ThemeTwo: "ThemeTwo",
+    
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     alt: "صورة خلفية",
     overlay: {
-      ThemeTwo: "ThemeTwo",
+      
       enabled: true,
       opacity: "0.3",
       color: "#000000",
     },
   },
   content: {
-    ThemeTwo: "ThemeTwo",
-    title: "عن باهية العقارية",
+    
+    title: "عن تعاريفالعقارية",
     alignment: "center",
     maxWidth: "5xl",
     font: {
-      ThemeTwo: "ThemeTwo",
+      
       title: {
-        ThemeTwo: "ThemeTwo",
+        
         family: "Tajawal",
         size: {
-          ThemeTwo: "ThemeTwo",
+          
           desktop: "4xl",
           tablet: "3xl",
           mobile: "2xl",
@@ -349,9 +349,9 @@ export const getDefaultHero4Data = (): ComponentData => ({
     },
   },
   animations: {
-    ThemeTwo: "ThemeTwo",
+    
     title: {
-      ThemeTwo: "ThemeTwo",
+      
       enabled: true,
       type: "fade-up",
       duration: 600,

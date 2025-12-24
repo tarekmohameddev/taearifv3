@@ -431,7 +431,7 @@ export default function Footer2(props: Footer2Props) {
               </h5>
               <p className="text-base leading-relaxed text-white/90 mb-6">
                 {mergedData.content?.newsletter?.description ||
-                  "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"}
+                  "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"}
               </p>
 
               {/* Newsletter Form */}
@@ -466,7 +466,7 @@ export default function Footer2(props: Footer2Props) {
                   (platform: any, index: number) => (
                     <a
                       key={index}
-                      href={platform.url}
+                      href={platform.url || "#"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-opacity"
@@ -540,7 +540,7 @@ export default function Footer2(props: Footer2Props) {
                   }
                   className="hover:underline"
                 >
-                  باهية العقارية
+                  تعاريف العقارية
                 </Link>{" "}
                 2025© | صمم من طرف{" "}
                 <a

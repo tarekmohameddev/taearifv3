@@ -7,16 +7,16 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 export const getDefaultContactUsHomePageData = (): ComponentData => ({
   visible: true,
-  ThemeTwo: "ThemeTwo",
+  
 
   // Background configuration
   background: {
-    ThemeTwo: "ThemeTwo",
+    
     image:
       "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     alt: "خلفية",
     overlay: {
-      ThemeTwo: "ThemeTwo",
+      
       enabled: true,
       color: "rgba(139, 95, 70, 0.8)",
     },
@@ -24,15 +24,15 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Header text
   header: {
-    ThemeTwo: "ThemeTwo",
+    
     text: "سنعثر لك على مستأجر موثوق ونتولى إدارة عملية الإيجار بالكامل بكل احترافية.\nنضمن لك مستأجرًا موثوقًا ونتكفّل بجميع خطوات التأجير نيابةً عنك.",
   },
 
   // Form configuration
   form: {
-    ThemeTwo: "ThemeTwo",
+    
     submitButton: {
-      ThemeTwo: "ThemeTwo",
+      
       text: "اشترك الآن",
       loadingText: "جاري الإرسال...",
       backgroundColor: "#c9a882",
@@ -40,85 +40,85 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
       textColor: "#ffffff",
     },
     fields: {
-      ThemeTwo: "ThemeTwo",
+      
       fullName: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "الاسم الكامل",
         placeholder: "الاسم الكامل",
         required: true,
         type: "text",
       },
       whatsappNumber: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "رقم الواتساب",
         placeholder: "رقم الواتساب",
         required: true,
         type: "tel",
       },
       email: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "البريد الالكتروني",
         placeholder: "البريد الالكتروني",
         required: true,
         type: "email",
       },
       paymentMethod: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "طريقة الدفع",
         placeholder: "اختر طريقة الدفع",
         required: true,
         type: "select",
         options: [
-          { ThemeTwo: "ThemeTwo", value: "بنك مدعوم", label: "بنك مدعوم" },
+          {  value: "بنك مدعوم", label: "بنك مدعوم" },
           {
-            ThemeTwo: "ThemeTwo",
+            
             value: "بنك غير مدعوم",
             label: "بنك غير مدعوم",
           },
-          { ThemeTwo: "ThemeTwo", value: "كاش", label: "كاش" },
+          {  value: "كاش", label: "كاش" },
         ],
       },
       city: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "المدينة",
         placeholder: "اختر المدينة",
         required: true,
         type: "select",
         options: [
-          { ThemeTwo: "ThemeTwo", value: "الرياض", label: "الرياض" },
-          { ThemeTwo: "ThemeTwo", value: "جدة", label: "جدة" },
-          { ThemeTwo: "ThemeTwo", value: "مكة المكرمة", label: "مكة المكرمة" },
+          {  value: "الرياض", label: "الرياض" },
+          {  value: "جدة", label: "جدة" },
+          {  value: "مكة المكرمة", label: "مكة المكرمة" },
           {
-            ThemeTwo: "ThemeTwo",
+            
             value: "المدينة المنورة",
             label: "المدينة المنورة",
           },
-          { ThemeTwo: "ThemeTwo", value: "الدمام", label: "الدمام" },
+          {  value: "الدمام", label: "الدمام" },
         ],
       },
       unitType: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "نوع الوحدة",
         placeholder: "اختر نوع الوحدة",
         required: true,
         type: "select",
         options: [
-          { ThemeTwo: "ThemeTwo", value: "أدوار", label: "أدوار" },
-          { ThemeTwo: "ThemeTwo", value: "بنتهاوس", label: "بنتهاوس" },
-          { ThemeTwo: "ThemeTwo", value: "تاون هاوس", label: "تاون هاوس" },
-          { ThemeTwo: "ThemeTwo", value: "شقق", label: "شقق" },
-          { ThemeTwo: "ThemeTwo", value: "فيلا", label: "فيلا" },
+          {  value: "أدوار", label: "أدوار" },
+          {  value: "بنتهاوس", label: "بنتهاوس" },
+          {  value: "تاون هاوس", label: "تاون هاوس" },
+          {  value: "شقق", label: "شقق" },
+          {  value: "فيلا", label: "فيلا" },
         ],
       },
       budget: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "الميزانية",
         placeholder: "الميزانية",
         required: true,
         type: "number",
       },
       message: {
-        ThemeTwo: "ThemeTwo",
+        
         label: "محتوى الرسالة",
         placeholder: "محتوى الرسالة",
         required: true,
@@ -130,7 +130,7 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Styling
   styling: {
-    ThemeTwo: "ThemeTwo",
+    
     inputBackground: "#f5f0e8",
     inputBorder: "#c4b5a0",
     inputText: "#ffffff",
@@ -142,16 +142,16 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Layout
   layout: {
-    ThemeTwo: "ThemeTwo",
+    
     maxWidth: "4xl",
     padding: {
-      ThemeTwo: "ThemeTwo",
+      
       mobile: "1rem",
       tablet: "2rem",
       desktop: "3rem",
     },
     gap: {
-      ThemeTwo: "ThemeTwo",
+      
       mobile: "1rem",
       tablet: "1.5rem",
       desktop: "1.5rem",

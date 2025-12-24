@@ -32,7 +32,7 @@ const Nav = () => {
     { name: "المشاريع", path: "/projects" },
     { name: "الأفراد", path: "/individuals" },
     { name: "البيع على الخارطة", path: "/map-sales" },
-    { name: "عن باهية العقارية", path: "/about-us" },
+    { name: "عن تعاريفالعقارية", path: "/about-us" },
     { name: "تواصل معنا", path: "/contact-us" },
   ];
 
