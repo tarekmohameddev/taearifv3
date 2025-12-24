@@ -1483,7 +1483,6 @@ export default function AccessControlPage() {
                               isGroupPartiallySelected={isGroupPartiallySelected}
                               permissions={permissions}
                               permissionsLoading={permissionsLoading}
-                              translatePermission={translatePermission}
                               createLoading={createLoading}
                               createError={createError}
                               createSuccess={createSuccess}

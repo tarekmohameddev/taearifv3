@@ -1,5 +1,6 @@
 "use client";
 
+import { getPermissionGroupAr } from "@/lib/permissionGroupsTranslation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -80,7 +81,6 @@ interface CreateEmployeeDialogProps {
   isGroupPartiallySelected: (groupName: string) => boolean;
   permissions: PermissionsResponse | null;
   permissionsLoading: boolean;
-  translatePermission: (permissionName: string) => string;
   createLoading: boolean;
   createError: string | null;
   createSuccess: boolean;
@@ -99,7 +99,6 @@ export function CreateEmployeeDialog({
   isGroupPartiallySelected,
   permissions,
   permissionsLoading,
-  translatePermission,
   createLoading,
   createError,
   createSuccess,
@@ -339,9 +338,9 @@ export function CreateEmployeeDialog({
                           />
                           <Label
                             htmlFor={`create-group-${groupName}`}
-                            className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer flex-1 capitalize"
+                            className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer flex-1"
                           >
-                            {groupName.replace(/\./g, " ")}
+                            {getPermissionGroupAr(groupName)} |  {groupName.replace(/\./g, " ")}
                           </Label>
                           <span className="text-xs sm:text-sm text-gray-500">
                             ({groupPermissions.length} صلاحية)
@@ -372,7 +371,7 @@ export function CreateEmployeeDialog({
                                   htmlFor={`create-permission-${groupName}-${permission.id || index}`}
                                   className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1"
                                 >
-                                  {translatePermission(permission.name)}
+                                  {permission.name_ar || permission.name_en || permission.name}
                                   {permission.description && (
                                     <span className="block text-xs text-gray-500 mt-0.5">
                                       {permission.description}
