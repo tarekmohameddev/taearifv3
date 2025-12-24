@@ -62,6 +62,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import { CreateEmployeeDialog } from "@/components/access-control/CreateEmployeeDialog";
 import { ViewEmployeeDialog } from "@/components/access-control/ViewEmployeeDialog";
+import { EditEmployeeDialog } from "@/components/access-control/EditEmployeeDialog";
 
 // Types
 interface Employee {
@@ -752,15 +753,10 @@ export default function AccessControlPage() {
         .filter(([_, selected]) => selected)
         .map(([permissionName, _]) => permissionName);
 
-      // Convert selected roles to array
-      const selectedRolesArray = Object.entries(editSelectedRoles)
-        .filter(([_, selected]) => selected)
-        .map(([roleId, _]) => parseInt(roleId));
-
       const requestData = {
         ...editFormData,
         permissions: selectedPermissionsArray,
-        role_ids: selectedRolesArray,
+        role_ids: [], // إزالة الأدوار
       };
 
       // Remove password if empty
@@ -1340,11 +1336,10 @@ export default function AccessControlPage() {
     console.log("🔄 Edit dialog useEffect:", {
       showEditDialog,
       permissions: !!permissions,
-      rolesLength: roles.length,
     });
-    if (showEditDialog && roles.length === 0) {
-      console.log("👥 Fetching roles for edit dialog");
-      fetchRoles();
+    if (showEditDialog && !permissions) {
+      console.log("🔑 Fetching permissions for edit dialog");
+      fetchPermissions();
     }
   }, [showEditDialog]);
 
@@ -1618,296 +1613,23 @@ export default function AccessControlPage() {
                 </Card>
 
                 {/* Edit Employee Dialog */}
-                <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
-                    <DialogHeader className="border-b border-gray-200 pb-4">
-                      <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-black">
-                        <div className="p-2 bg-black rounded-lg">
-                          <Edit className="h-6 w-6 text-white" />
-                        </div>
-                        تعديل بيانات الموظف
-                      </DialogTitle>
-                      <DialogDescription className="text-gray-600 text-base">
-                        قم بتعديل معلومات الموظف والصلاحيات المخصصة له
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <ScrollArea className="max-h-[70vh] pr-4">
-                      <div className="space-y-8 py-6">
-                        {/* Success Message */}
-                        {editSuccess && (
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="text-green-800 font-medium">
-                              تم تحديث الموظف بنجاح!
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Error Message */}
-                        {editError && (
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-                            <XCircle className="h-5 w-5 text-red-600" />
-                            <span className="text-red-800 font-medium">
-                              {editError}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Basic Information Section */}
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                            <div className="p-2 bg-gray-100 rounded-lg">
-                              <Users className="h-5 w-5 text-gray-700" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-black">
-                              المعلومات الأساسية
-                            </h3>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_first_name"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                الاسم الأول *
-                              </Label>
-                              <Input
-                                id="edit_first_name"
-                                value={editFormData.first_name}
-                                onChange={(e) =>
-                                  setEditFormData((prev) => ({
-                                    ...prev,
-                                    first_name: e.target.value,
-                                  }))
-                                }
-                                placeholder="أدخل الاسم الأول"
-                                className="border-gray-300 focus:border-black focus:ring-black"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_last_name"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                الاسم الأخير *
-                              </Label>
-                              <Input
-                                id="edit_last_name"
-                                value={editFormData.last_name}
-                                onChange={(e) =>
-                                  setEditFormData((prev) => ({
-                                    ...prev,
-                                    last_name: e.target.value,
-                                  }))
-                                }
-                                placeholder="أدخل الاسم الأخير"
-                                className="border-gray-300 focus:border-black focus:ring-black"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_email"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                البريد الإلكتروني *
-                              </Label>
-                              <Input
-                                id="edit_email"
-                                type="email"
-                                value={editFormData.email}
-                                onChange={(e) =>
-                                  setEditFormData((prev) => ({
-                                    ...prev,
-                                    email: e.target.value,
-                                  }))
-                                }
-                                placeholder="example@company.com"
-                                className="border-gray-300 focus:border-black focus:ring-black"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_phone"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                رقم الهاتف *
-                              </Label>
-                              <Input
-                                id="edit_phone"
-                                value={editFormData.phone}
-                                onChange={(e) =>
-                                  setEditFormData((prev) => ({
-                                    ...prev,
-                                    phone: e.target.value,
-                                  }))
-                                }
-                                placeholder="+966501234567"
-                                className="border-gray-300 focus:border-black focus:ring-black"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_password"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                كلمة المرور الجديدة (اختياري)
-                              </Label>
-                              <Input
-                                id="edit_password"
-                                type="password"
-                                value={editFormData.password}
-                                onChange={(e) =>
-                                  setEditFormData((prev) => ({
-                                    ...prev,
-                                    password: e.target.value,
-                                  }))
-                                }
-                                placeholder="اتركه فارغاً للحفاظ على كلمة المرور الحالية"
-                                className="border-gray-300 focus:border-black focus:ring-black"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="edit_active"
-                                className="text-sm font-medium text-gray-700"
-                              >
-                                حالة الحساب
-                              </Label>
-                              <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
-                                <Switch
-                                  id="edit_active"
-                                  checked={editFormData.active}
-                                  onCheckedChange={(checked) =>
-                                    setEditFormData((prev) => ({
-                                      ...prev,
-                                      active: checked,
-                                    }))
-                                  }
-                                  className="data-[state=checked]:bg-black"
-                                />
-                                <span className="text-sm text-gray-600">
-                                  {editFormData.active ? "نشط" : "غير نشط"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Separator className="my-8" />
-
-                        {/* Roles Section */}
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                            <div className="p-2 bg-gray-100 rounded-lg">
-                              <Shield className="h-5 w-5 text-gray-700" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-black">
-                              الأدوار
-                            </h3>
-                          </div>
-
-                          {rolesLoading ? (
-                            <div className="flex items-center justify-center py-12">
-                              <div className="flex flex-col items-center gap-3">
-                                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                <span className="text-gray-600 font-medium">
-                                  جاري تحميل الأدوار...
-                                </span>
-                                <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                  <div className="h-full bg-black animate-pulse rounded-full"></div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : roles.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {roles.map((role) => (
-                                <div
-                                  key={role.id}
-                                  className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                  <Checkbox
-                                    id={`edit-role-${role.id}`}
-                                    checked={
-                                      editSelectedRoles[role.id] || false
-                                    }
-                                    onCheckedChange={(checked) =>
-                                      handleRoleChange(
-                                        role.id,
-                                        checked as boolean,
-                                      )
-                                    }
-                                    className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                  />
-                                  <Label
-                                    htmlFor={`edit-role-${role.id}`}
-                                    className="text-sm text-gray-700 cursor-pointer flex-1"
-                                  >
-                                    <div className="font-medium">
-                                      {role.name}
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                      {role.permissions_list?.length || 0}{" "}
-                                      صلاحية
-                                    </div>
-                                  </Label>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="text-center py-8">
-                              <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                              <p className="text-gray-600">
-                                لا توجد أدوار متاحة
-                              </p>
-                            </div>
-                          )}
-                        </div>
-
-                        <Separator className="my-8" />
-                      </div>
-
-                      <div className="flex justify-end gap-3 pt-4 ">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowEditDialog(false)}
-                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button
-                          onClick={updateEmployee}
-                          disabled={
-                            editLoading ||
-                            !editFormData.first_name ||
-                            !editFormData.last_name ||
-                            !editFormData.email ||
-                            !editFormData.phone
-                          }
-                          className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400"
-                        >
-                          {editLoading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                              جاري التحديث...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="h-4 w-4 ml-2" />
-                              حفظ التغييرات
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </ScrollArea>
-                  </DialogContent>
-                </Dialog>
+                <EditEmployeeDialog
+                  open={showEditDialog}
+                  onOpenChange={setShowEditDialog}
+                  editFormData={editFormData}
+                  setEditFormData={setEditFormData}
+                  selectedPermissions={editSelectedPermissions}
+                  handlePermissionChange={handleEditPermissionChange}
+                  handleGroupPermissionChange={handleEditGroupPermissionChange}
+                  isGroupFullySelected={isEditGroupFullySelected}
+                  isGroupPartiallySelected={isEditGroupPartiallySelected}
+                  permissions={permissions}
+                  permissionsLoading={permissionsLoading}
+                  editLoading={editLoading}
+                  editError={editError}
+                  editSuccess={editSuccess}
+                  onUpdateEmployee={updateEmployee}
+                />
               </TabsContent>
 
               {/* Roles Tab */}
