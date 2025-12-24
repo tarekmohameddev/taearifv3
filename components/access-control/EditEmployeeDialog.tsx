@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +23,8 @@ import {
   XCircle,
   Loader2,
   Save,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { getPermissionGroupAr } from "@/lib/permissionGroupsTranslation";
 
@@ -103,6 +106,8 @@ export function EditEmployeeDialog({
   editSuccess,
   onUpdateEmployee,
 }: EditEmployeeDialogProps) {
+  const [isPermissionsExpanded, setIsPermissionsExpanded] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
@@ -288,16 +293,36 @@ export function EditEmployeeDialog({
 
             {/* Permissions Section */}
             <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
+              <div
+                onClick={() => setIsPermissionsExpanded(!isPermissionsExpanded)}
+                className="flex items-center gap-2 sm:gap-3 pb-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setIsPermissionsExpanded(!isPermissionsExpanded);
+                  }
+                }}
+                aria-label={isPermissionsExpanded ? "طي الصلاحيات" : "فتح الصلاحيات"}
+                aria-expanded={isPermissionsExpanded}
+              >
                 <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
                   <Key className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-black">
+                <h3 className="text-lg sm:text-xl font-semibold text-black flex-1">
                   الصلاحيات
                 </h3>
+                {isPermissionsExpanded ? (
+                  <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                )}
               </div>
 
-              {permissionsLoading ? (
+              {isPermissionsExpanded && (
+                <>
+                  {permissionsLoading ? (
                 <div className="flex items-center justify-center py-8 sm:py-12">
                   <div className="flex flex-col items-center gap-2 sm:gap-3">
                     <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-gray-400" />
@@ -380,13 +405,15 @@ export function EditEmployeeDialog({
                     ),
                   )}
                 </div>
-              ) : (
-                <div className="text-center py-6 sm:py-8">
-                  <Key className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                  <p className="text-sm sm:text-base text-gray-600">
-                    لا توجد صلاحيات متاحة
-                  </p>
-                </div>
+                  ) : (
+                    <div className="text-center py-6 sm:py-8">
+                      <Key className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                      <p className="text-sm sm:text-base text-gray-600">
+                        لا توجد صلاحيات متاحة
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

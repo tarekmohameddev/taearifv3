@@ -300,24 +300,31 @@ export function CreateEmployeeDialog({
 
             {/* Permissions Section */}
             <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
+              <div
+                onClick={() => setIsPermissionsExpanded(!isPermissionsExpanded)}
+                className="flex items-center gap-2 sm:gap-3 pb-2  cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setIsPermissionsExpanded(!isPermissionsExpanded);
+                  }
+                }}
+                aria-label={isPermissionsExpanded ? "طي الصلاحيات" : "فتح الصلاحيات"}
+                aria-expanded={isPermissionsExpanded}
+              >
                 <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
                   <Key className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-black flex-1">
                   الصلاحيات
                 </h3>
-                <button
-                  onClick={() => setIsPermissionsExpanded(!isPermissionsExpanded)}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                  aria-label={isPermissionsExpanded ? "طي الصلاحيات" : "فتح الصلاحيات"}
-                >
-                  {isPermissionsExpanded ? (
-                    <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                  )}
-                </button>
+                {isPermissionsExpanded ? (
+                  <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                )}
               </div>
 
               {isPermissionsExpanded && (
