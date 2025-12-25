@@ -123,8 +123,8 @@ export function EditEmployeeDialog({
           </CustomDialogDescription>
         </CustomDialogHeader>
 
-        <ScrollArea className="max-h-[70vh] pr-4 px-6">
-          <div className="space-y-8 py-6">
+        <ScrollArea className="flex-1 overflow-y-auto max-h-[calc(95vh-200px)] sm:max-h-[70vh] pr-2 sm:pr-4 px-4 sm:px-6">
+          <div className="space-y-4 sm:space-y-6 md:space-y-8 py-3 sm:py-4 md:py-6">
             {/* Success Message */}
             {editSuccess && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
@@ -306,7 +306,7 @@ export function EditEmployeeDialog({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 px-6 pb-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 px-4 sm:px-6 pb-3 sm:pb-4 flex-shrink-0">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
