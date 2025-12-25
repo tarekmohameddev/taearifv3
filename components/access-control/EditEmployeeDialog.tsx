@@ -1,32 +1,28 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "./CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Edit,
   Users,
-  Key,
   CheckCircle,
   XCircle,
   Loader2,
   Save,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
-import { getPermissionGroupAr } from "@/lib/permissionGroupsTranslation";
+import { PermissionsDropdown } from "./PermissionsDropdown";
 
 // Types
 interface Permission {
@@ -106,24 +102,28 @@ export function EditEmployeeDialog({
   editSuccess,
   onUpdateEmployee,
 }: EditEmployeeDialogProps) {
-  const [isPermissionsExpanded, setIsPermissionsExpanded] = useState(false);
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
-        <DialogHeader className="border-b border-gray-200 pb-4">
-          <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-black">
+    <CustomDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      maxWidth="max-w-4xl"
+      className="mx-2 sm:mx-0"
+    >
+      <CustomDialogContent className="overflow-hidden bg-white">
+        <CustomDialogClose onClose={() => onOpenChange(false)} />
+        <CustomDialogHeader className="border-b border-gray-200 pb-4 px-6 pt-6">
+          <CustomDialogTitle className="flex items-center gap-3 text-2xl font-bold text-black">
             <div className="p-2 bg-black rounded-lg">
               <Edit className="h-6 w-6 text-white" />
             </div>
             تعديل بيانات الموظف
-          </DialogTitle>
-          <DialogDescription className="text-gray-600 text-base">
+          </CustomDialogTitle>
+          <CustomDialogDescription className="text-gray-600 text-base mt-2">
             قم بتعديل معلومات الموظف والصلاحيات المخصصة له
-          </DialogDescription>
-        </DialogHeader>
+          </CustomDialogDescription>
+        </CustomDialogHeader>
 
-        <ScrollArea className="max-h-[70vh] pr-4">
+        <ScrollArea className="max-h-[70vh] pr-4 px-6">
           <div className="space-y-8 py-6">
             {/* Success Message */}
             {editSuccess && (
@@ -286,141 +286,27 @@ export function EditEmployeeDialog({
                     </span>
                   </div>
                 </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label
+                    htmlFor="edit_permissions"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    الصلاحيات
+                  </Label>
+                  <PermissionsDropdown
+                    permissions={permissions}
+                    selectedPermissions={selectedPermissions}
+                    handlePermissionChange={handlePermissionChange}
+                    handleGroupPermissionChange={handleGroupPermissionChange}
+                    isLoading={permissionsLoading}
+                  />
+                </div>
               </div>
             </div>
-
-            <Separator className="my-8" />
-
-            {/* Permissions Section */}
-            <div className="space-y-4 sm:space-y-6">
-              <div
-                onClick={() => setIsPermissionsExpanded(!isPermissionsExpanded)}
-                className="flex items-center gap-2 sm:gap-3 pb-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setIsPermissionsExpanded(!isPermissionsExpanded);
-                  }
-                }}
-                aria-label={isPermissionsExpanded ? "طي الصلاحيات" : "فتح الصلاحيات"}
-                aria-expanded={isPermissionsExpanded}
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
-                  <Key className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-black flex-1">
-                  الصلاحيات
-                </h3>
-                {isPermissionsExpanded ? (
-                  <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                )}
-              </div>
-
-              {isPermissionsExpanded && (
-                <>
-                  {permissionsLoading ? (
-                <div className="flex items-center justify-center py-8 sm:py-12">
-                  <div className="flex flex-col items-center gap-2 sm:gap-3">
-                    <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-gray-400" />
-                    <span className="text-sm sm:text-base text-gray-600 font-medium">
-                      جاري تحميل الصلاحيات...
-                    </span>
-                    <div className="w-24 sm:w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-black animate-pulse rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              ) : permissions && Object.keys(permissions.grouped).length > 0 ? (
-                <div className="space-y-4 sm:space-y-6">
-                  {Object.entries(permissions.grouped).map(
-                    ([groupName, groupPermissions]) => (
-                      <div
-                        key={groupName}
-                        className="space-y-2 sm:space-y-3 border border-gray-200 rounded-lg p-3 sm:p-4"
-                      >
-                        <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
-                          <Checkbox
-                            id={`edit-group-${groupName}`}
-                            checked={isGroupFullySelected(groupName)}
-                            onCheckedChange={(checked) =>
-                              handleGroupPermissionChange(
-                                groupName,
-                                checked as boolean,
-                              )
-                            }
-                            className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                          />
-                          <Label
-                            htmlFor={`edit-group-${groupName}`}
-                            className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer flex-1"
-                          >
-                            {getPermissionGroupAr(groupName)}
-                          </Label>
-                          <span className="text-xs sm:text-sm text-gray-500">
-                            ({groupPermissions.length} صلاحية)
-                          </span>
-                        </div>
-                        <div className="space-y-2 pr-4 sm:pr-6">
-                          {Array.isArray(groupPermissions) &&
-                            groupPermissions.map((permission, index) => (
-                              <div
-                                key={permission.id || index}
-                                className="flex items-center gap-2 sm:gap-3"
-                              >
-                                <Checkbox
-                                  id={`edit-permission-${groupName}-${permission.id || index}`}
-                                  checked={
-                                    selectedPermissions[permission.name] ||
-                                    false
-                                  }
-                                  onCheckedChange={(checked) =>
-                                    handlePermissionChange(
-                                      permission.name,
-                                      checked as boolean,
-                                    )
-                                  }
-                                  className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                />
-                                <Label
-                                  htmlFor={`edit-permission-${groupName}-${permission.id || index}`}
-                                  className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1"
-                                >
-                                  {permission.name_ar ||
-                                    permission.name_en ||
-                                    permission.name}
-                                  {permission.description && (
-                                    <span className="block text-xs text-gray-500 mt-0.5">
-                                      {permission.description}
-                                    </span>
-                                  )}
-                                </Label>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
-                  ) : (
-                    <div className="text-center py-6 sm:py-8">
-                      <Key className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                      <p className="text-sm sm:text-base text-gray-600">
-                        لا توجد صلاحيات متاحة
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            <Separator className="my-8" />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-4 px-6 pb-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
@@ -453,8 +339,8 @@ export function EditEmployeeDialog({
             </Button>
           </div>
         </ScrollArea>
-      </DialogContent>
-    </Dialog>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }
 

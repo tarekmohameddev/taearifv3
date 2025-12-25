@@ -1,33 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { getPermissionGroupAr } from "@/lib/permissionGroupsTranslation";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogTrigger,
+  CustomDialogClose,
+} from "./CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   UserPlus,
   Users,
-  Shield,
   CheckCircle,
   XCircle,
   Loader2,
-  Key,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
+import { PermissionsDropdown } from "./PermissionsDropdown";
 
 // Types
 interface Permission {
@@ -107,28 +102,36 @@ export function CreateEmployeeDialog({
   createSuccess,
   onCreateEmployee,
 }: CreateEmployeeDialogProps) {
-  const [isPermissionsExpanded, setIsPermissionsExpanded] = useState(false);
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="bg-black hover:bg-gray-800 text-white">
+    <>
+      <CustomDialogTrigger asChild>
+        <Button
+          className="bg-black hover:bg-gray-800 text-white"
+          onClick={() => onOpenChange(true)}
+        >
           <UserPlus className="h-4 w-4 ml-2" />
           إضافة موظف جديد
         </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white mx-2 sm:mx-0">
-        <DialogHeader className="border-b border-gray-200 pb-4">
-          <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-2xl font-bold text-black">
-            <div className="p-1.5 sm:p-2 bg-black rounded-lg">
-              <UserPlus className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-            </div>
-            <span className="text-sm sm:text-base">إضافة موظف جديد</span>
-          </DialogTitle>
-          <DialogDescription className="text-gray-600 text-sm sm:text-base text-right">
-            قم بإنشاء حساب جديد للموظف وتخصيص الصلاحيات المناسبة
-          </DialogDescription>
-        </DialogHeader>
+      </CustomDialogTrigger>
+      <CustomDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        maxWidth="max-w-4xl"
+        className="mx-2 sm:mx-0"
+      >
+        <CustomDialogContent className="overflow-hidden bg-white">
+          <CustomDialogClose onClose={() => onOpenChange(false)} />
+          <CustomDialogHeader className="border-b border-gray-200 pb-4 px-6 pt-6">
+            <CustomDialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-2xl font-bold text-black">
+              <div className="p-1.5 sm:p-2 bg-black rounded-lg">
+                <UserPlus className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <span className="text-sm sm:text-base">إضافة موظف جديد</span>
+            </CustomDialogTitle>
+            <CustomDialogDescription className="text-gray-600 text-sm sm:text-base text-right mt-2">
+              قم بإنشاء حساب جديد للموظف وتخصيص الصلاحيات المناسبة
+            </CustomDialogDescription>
+          </CustomDialogHeader>
 
         <ScrollArea className="max-h-[70vh] pr-2 sm:pr-4">
           <div className="space-y-6 sm:space-y-8 py-4 sm:py-6">
@@ -293,139 +296,27 @@ export function CreateEmployeeDialog({
                     </span>
                   </div>
                 </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label
+                    htmlFor="permissions"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    الصلاحيات
+                  </Label>
+                  <PermissionsDropdown
+                    permissions={permissions}
+                    selectedPermissions={selectedPermissions}
+                    handlePermissionChange={handlePermissionChange}
+                    handleGroupPermissionChange={handleGroupPermissionChange}
+                    isLoading={permissionsLoading}
+                  />
+                </div>
               </div>
             </div>
-
-            <Separator className="my-6 sm:my-8" />
-
-            {/* Permissions Section */}
-            <div className="space-y-4 sm:space-y-6">
-              <div
-                onClick={() => setIsPermissionsExpanded(!isPermissionsExpanded)}
-                className="flex items-center gap-2 sm:gap-3 pb-2  cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setIsPermissionsExpanded(!isPermissionsExpanded);
-                  }
-                }}
-                aria-label={isPermissionsExpanded ? "طي الصلاحيات" : "فتح الصلاحيات"}
-                aria-expanded={isPermissionsExpanded}
-              >
-                <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
-                  <Key className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-black flex-1">
-                  الصلاحيات
-                </h3>
-                {isPermissionsExpanded ? (
-                  <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                )}
-              </div>
-
-              {isPermissionsExpanded && (
-                <>
-                  {permissionsLoading ? (
-                <div className="flex items-center justify-center py-8 sm:py-12">
-                  <div className="flex flex-col items-center gap-2 sm:gap-3">
-                    <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-gray-400" />
-                    <span className="text-sm sm:text-base text-gray-600 font-medium">
-                      جاري تحميل الصلاحيات...
-                    </span>
-                    <div className="w-24 sm:w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-black animate-pulse rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              ) : permissions && Object.keys(permissions.grouped).length > 0 ? (
-                <div className="space-y-4 sm:space-y-6">
-                  {Object.entries(permissions.grouped).map(
-                    ([groupName, groupPermissions]) => (
-                      <div
-                        key={groupName}
-                        className="space-y-2 sm:space-y-3 border border-gray-200 rounded-lg p-3 sm:p-4"
-                      >
-                        <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b border-gray-200">
-                          <Checkbox
-                            id={`create-group-${groupName}`}
-                            checked={isGroupFullySelected(groupName)}
-                            onCheckedChange={(checked) =>
-                              handleGroupPermissionChange(
-                                groupName,
-                                checked as boolean,
-                              )
-                            }
-                            className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                          />
-                          <Label
-                            htmlFor={`create-group-${groupName}`}
-                            className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer flex-1"
-                          >
-                            {getPermissionGroupAr(groupName)} |  {groupName.replace(/\./g, " ")}
-                          </Label>
-                          <span className="text-xs sm:text-sm text-gray-500">
-                            ({groupPermissions.length} صلاحية)
-                          </span>
-                        </div>
-                        <div className="space-y-2 pr-4 sm:pr-6">
-                          {Array.isArray(groupPermissions) &&
-                            groupPermissions.map((permission, index) => (
-                              <div
-                                key={permission.id || index}
-                                className="flex items-center gap-2 sm:gap-3"
-                              >
-                                <Checkbox
-                                  id={`create-permission-${groupName}-${permission.id || index}`}
-                                  checked={
-                                    selectedPermissions[permission.name] ||
-                                    false
-                                  }
-                                  onCheckedChange={(checked) =>
-                                    handlePermissionChange(
-                                      permission.name,
-                                      checked as boolean,
-                                    )
-                                  }
-                                  className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                />
-                                <Label
-                                  htmlFor={`create-permission-${groupName}-${permission.id || index}`}
-                                  className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1"
-                                >
-                                  {permission.name_ar || permission.name_en || permission.name}
-                                  {permission.description && (
-                                    <span className="block text-xs text-gray-500 mt-0.5">
-                                      {permission.description}
-                                    </span>
-                                  )}
-                                </Label>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
-                  ) : (
-                    <div className="text-center py-6 sm:py-8">
-                      <Key className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                      <p className="text-sm sm:text-base text-gray-600">
-                        لا توجد صلاحيات متاحة
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            <Separator className="my-6 sm:my-8" />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 px-6 pb-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
@@ -459,8 +350,9 @@ export function CreateEmployeeDialog({
             </Button>
           </div>
         </ScrollArea>
-      </DialogContent>
-    </Dialog>
+      </CustomDialogContent>
+      </CustomDialog>
+    </>
   );
 }
 
