@@ -276,7 +276,7 @@ export default function EditEmployeePage() {
 
             {/* Content Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <ScrollArea className="max-h-[calc(100vh-300px)]">
+              <ScrollArea className="max-h-[calc(100vh-300px)] ">
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 md:space-y-8">
                   {/* Success Message */}
                   {editSuccess && (
@@ -449,7 +449,8 @@ export default function EditEmployeePage() {
                         >
                           الصلاحيات
                         </Label>
-                        <PermissionsDropdown
+                      <div className="pb-[20rem]">
+                      <PermissionsDropdown
                           permissions={permissions}
                           selectedPermissions={selectedPermissions}
                           handlePermissionChange={handlePermissionChange}
@@ -457,17 +458,19 @@ export default function EditEmployeePage() {
                           isLoading={permissionsLoading}
                         />
                       </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </ScrollArea>
 
               {/* Footer Actions */}
-              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 px-4 sm:px-6 pb-3 sm:pb-4">
+                <div className="w-full pt-3 sm:pt-[10rem] "/>
+              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3  pt-3 px-4 sm:px-6 pb-3 sm:pb-4 ">
                 <Button
                   variant="outline"
                   onClick={() => router.back()}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto " 
                 >
                   إلغاء
                 </Button>
