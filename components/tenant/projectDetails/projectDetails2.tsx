@@ -235,8 +235,62 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // Tenant ID hook
   const { tenantId: hookTenantId, isLoading: tenantLoading } = useTenantId();
 
+  // Check if we're in Live Editor
+  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+
+  // Mock data for Live Editor
+  const mockProject: Project = {
+    id: "mock-project-1",
+    slug: "mock-project",
+    title: "مشروع عقاري متميز",
+    description: "هذا مشروع عقاري متميز يقع في موقع استراتيجي ويوفر جميع المرافق والخدمات الحديثة. المشروع مصمم بأحدث المعايير العالمية ويوفر تجربة سكنية فريدة.",
+    address: "الرياض، حي النرجس، شارع الملك فهد",
+    district: "حي النرجس",
+    developer: "شركة التطوير العقاري المتميزة",
+    units: 150,
+    completionDate: "2025-12-31",
+    minPrice: "500000",
+    maxPrice: "2000000",
+    price: "1250000",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+    ],
+    floorplans: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    ],
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    amenities: ["موقف سيارات", "حديقة", "صالة ألعاب", "مسبح", "نادي صحي", "أمن 24/7"],
+    location: {
+      lat: 24.7136,
+      lng: 46.6753,
+      address: "الرياض، حي النرجس",
+    },
+    specifications: [
+      { name: "المساحة الإجمالية", value: "50,000 متر مربع" },
+      { name: "عدد الطوابق", value: "15 طابق" },
+      { name: "نوع البناء", value: "خرسانة مسلحة" },
+    ],
+    types: [
+      { name: "شقق", value: "apartments" },
+      { name: "فلل", value: "villas" },
+    ],
+    features: ["إطلالة رائعة", "تصميم عصري", "مواصلات قريبة"],
+  };
+
   // جلب بيانات المشروع
   const fetchProject = async () => {
+    // ⭐ NEW: Use mock data in Live Editor
+    if (isLiveEditor) {
+      setProject(mockProject);
+      setLoadingProject(false);
+      setSelectedImage(mockProject.image || "");
+      return;
+    }
+
     try {
       setLoadingProject(true);
       setProjectError(null);
@@ -283,11 +337,17 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
 
   // جلب بيانات المشروع عند تحميل المكون
   useEffect(() => {
+    // ⭐ NEW: In Live Editor, always use mock data
+    if (isLiveEditor) {
+      fetchProject();
+      return;
+    }
+
     const finalTenantId = hookTenantId || tenantId;
     if (finalTenantId && props.projectSlug) {
       fetchProject();
     }
-  }, [hookTenantId, tenantId, props.projectSlug]);
+  }, [hookTenantId, tenantId, props.projectSlug, isLiveEditor]);
 
   // تحديث الصورة المختارة عند تحميل المشروع
   useEffect(() => {
@@ -392,7 +452,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 className="text-3xl md:text-4xl font-bold drop-shadow-md text-right"
                 style={{
                   fontSize: mergedData.typography?.title?.fontSize?.desktop,
-                  fontFamily: mergedData.typography?.title?.fontFamily,
                 }}
               >
                 {project.title}
@@ -496,7 +555,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             dir="rtl"
           >
             <h2
-              className="text-3xl font-extrabold mb-6 text-right"
+              className="text-3xl font-bold mb-6 text-right"
               style={{ color: mergedData.styling?.textColor || primaryColor }}
             >
               {mergedData.content?.descriptionTitle || "وصف العقار"}
@@ -519,7 +578,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             {mergedData.displaySettings?.showSpecs && (
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
-                  className="text-3xl font-extrabold mb-8 text-right"
+                  className="text-3xl font-bold mb-8 text-right"
                   style={{ color: mergedData.styling?.textColor || primaryColor }}
                 >
                   {mergedData.content?.specsTitle || "مواصفات العقار"}
@@ -699,7 +758,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 }}
               >
                 <h2
-                  className="text-2xl font-extrabold mb-2 text-right"
+                  className="text-2xl font-bold mb-2 text-right"
                   style={{ color: mergedData.styling?.formTextColor || "#ffffff" }}
                 >
                   {mergedData.content?.contactFormTitle || "استفسر عن هذا العقار"}
