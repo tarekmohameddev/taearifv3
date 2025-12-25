@@ -496,6 +496,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
+  const getStaticPageData = useEditorStore((s) => s.getStaticPageData);
+  
+  // التحقق من أن الصفحة الحالية هي صفحة ثابتة
+  const isStaticPage = useMemo(() => {
+    const currentSlug = state.slug || "";
+    if (!currentSlug) return false;
+    
+    // الصفحات الثابتة المعرفة: "project" هي صفحة ثابتة دائماً
+    const staticPageSlugs = ["project"];
+    if (staticPageSlugs.includes(currentSlug)) {
+      return true;
+    }
+    
+    // التحقق من staticPagesData
+    const staticPageData = getStaticPageData(currentSlug);
+    return !!staticPageData;
+  }, [state.slug, getStaticPageData]);
   const [showChangesDialog, setShowChangesDialog] = useState(false);
   const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
 
@@ -1550,25 +1567,28 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   {t("live_editor.add_new_section")}
                 </button>
 
-                <button
-                  onClick={handleDeletePage}
-                  className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {/* زر حذف الصفحة - يختفي للصفحات الثابتة */}
+                {!isStaticPage && (
+                  <button
+                    onClick={handleDeletePage}
+                    className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                  {t("live_editor.delete_page")}
-                </button>
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    {t("live_editor.delete_page")}
+                  </button>
+                )}
                 {/* Debug Toggle Button - Development Only */}
                 {process.env.NODE_ENV === "development" && (
                   <button
