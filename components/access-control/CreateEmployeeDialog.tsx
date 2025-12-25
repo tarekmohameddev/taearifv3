@@ -9,7 +9,7 @@ import {
   CustomDialogTitle,
   CustomDialogTrigger,
   CustomDialogClose,
-} from "./CustomDialog";
+} from "@/components/customComponents/CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";

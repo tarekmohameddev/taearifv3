@@ -60,9 +60,7 @@ import {
   Database,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { CreateEmployeeDialog } from "@/components/access-control/CreateEmployeeDialog";
 import { ViewEmployeeDialog } from "@/components/access-control/ViewEmployeeDialog";
-import { EditEmployeeDialog } from "@/components/access-control/EditEmployeeDialog";
 
 // Types
 interface Employee {
@@ -1465,25 +1463,17 @@ export default function AccessControlPage() {
                               <Shield className="h-4 w-4 ml-2" />
                               إدارة الأدوار
                             </Button> */}
-                            <CreateEmployeeDialog
-                              open={showCreateDialog}
-                              onOpenChange={setShowCreateDialog}
-                              formData={formData}
-                              setFormData={setFormData}
-                              selectedPermissions={selectedPermissions}
-                              handlePermissionChange={handlePermissionChange}
-                              handleGroupPermissionChange={
-                                handleGroupPermissionChange
+                            <Button
+                              className="bg-black hover:bg-gray-800 text-white"
+                              onClick={() =>
+                                router.push(
+                                  "/dashboard/access-control/create-employee",
+                                )
                               }
-                              isGroupFullySelected={isGroupFullySelected}
-                              isGroupPartiallySelected={isGroupPartiallySelected}
-                              permissions={permissions}
-                              permissionsLoading={permissionsLoading}
-                              createLoading={createLoading}
-                              createError={createError}
-                              createSuccess={createSuccess}
-                              onCreateEmployee={createEmployee}
-                            />
+                            >
+                              <UserPlus className="h-4 w-4 ml-2" />
+                              إضافة موظف جديد
+                            </Button>
                           </div>
                         </div>
 
@@ -1574,7 +1564,9 @@ export default function AccessControlPage() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() =>
-                                        handleEditEmployee(employee)
+                                        router.push(
+                                          `/dashboard/access-control/edit-employee/${employee.id}`,
+                                        )
                                       }
                                       className="flex items-center gap-2"
                                     >
@@ -1612,24 +1604,6 @@ export default function AccessControlPage() {
                   </CardContent>
                 </Card>
 
-                {/* Edit Employee Dialog */}
-                <EditEmployeeDialog
-                  open={showEditDialog}
-                  onOpenChange={setShowEditDialog}
-                  editFormData={editFormData}
-                  setEditFormData={setEditFormData}
-                  selectedPermissions={editSelectedPermissions}
-                  handlePermissionChange={handleEditPermissionChange}
-                  handleGroupPermissionChange={handleEditGroupPermissionChange}
-                  isGroupFullySelected={isEditGroupFullySelected}
-                  isGroupPartiallySelected={isEditGroupPartiallySelected}
-                  permissions={permissions}
-                  permissionsLoading={permissionsLoading}
-                  editLoading={editLoading}
-                  editError={editError}
-                  editSuccess={editSuccess}
-                  onUpdateEmployee={updateEmployee}
-                />
               </TabsContent>
 
               {/* Roles Tab */}
