@@ -189,7 +189,7 @@ export function CustomDialogClose({
     <button
       onClick={onClose}
       className={`
-        absolute right-2 top-2 sm:right-4 sm:top-4 
+        absolute left-2 top-2 sm:left-4 sm:top-4 
         p-1.5 sm:p-2 rounded-sm opacity-70 
         hover:opacity-100 transition-opacity
         focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
