@@ -173,6 +173,10 @@
       "display_name": "Testimonials",
       "description": "Section displaying customer testimonials and reviews in a carousel format"
     },
+    "projectDetails": {
+      "display_name": "Project Details",
+      "description": "Display real estate project details"
+    },
     "propertiesShowcase": {
       "display_name": "Properties Showcase",
       "description": "Section displaying properties and projects in a grid layout"

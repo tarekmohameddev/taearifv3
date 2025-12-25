@@ -76,6 +76,7 @@ import { responsiveImageFunctions } from "./editorStoreFunctions/responsiveImage
 import { titleFunctions } from "./editorStoreFunctions/titleFunctions";
 import { photosGridFunctions } from "./editorStoreFunctions/photosGridFunctions";
 import { videoFunctions } from "./editorStoreFunctions/videoFunctions";
+import { projectDetailsFunctions } from "./editorStoreFunctions/projectDetailsFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -307,6 +308,19 @@ interface EditorStore {
   getTestimonialsData: (variantId: string) => ComponentData;
   setTestimonialsData: (variantId: string, data: ComponentData) => void;
   updateTestimonialsByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+  // Project Details states
+  projectDetailsStates: Record<string, ComponentData>;
+  ensureProjectDetailsVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getProjectDetailsData: (variantId: string) => ComponentData;
+  setProjectDetailsData: (variantId: string, data: ComponentData) => void;
+  updateProjectDetailsByPath: (
     variantId: string,
     path: string,
     value: any,
@@ -650,9 +664,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   propertySliderStates: {},
   ctaValuationStates: {},
   stepsSectionStates: {},
-  testimonialsStates: {},
-  propertiesShowcaseStates: {},
-  card4States: {},
+        testimonialsStates: {},
+        projectDetailsStates: {},
+        propertiesShowcaseStates: {},
+        card4States: {},
   card5States: {},
   logosTickerStates: {},
   partnersStates: {},
@@ -1112,6 +1127,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return stepsSectionFunctions.ensureVariant(state, variantId, initial);
         case "testimonials":
           return testimonialsFunctions.ensureVariant(state, variantId, initial);
+        case "projectDetails":
+          return projectDetailsFunctions.ensureVariant(state, variantId, initial);
         case "logosTicker":
           return logosTickerFunctions.ensureVariant(state, variantId, initial);
         case "partners":
@@ -1246,6 +1263,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return stepsSectionFunctions.getData(state, variantId);
       case "testimonials":
         return testimonialsFunctions.getData(state, variantId);
+      case "projectDetails":
+        return projectDetailsFunctions.getData(state, variantId);
       case "propertiesShowcase":
         return propertiesShowcaseFunctions.getData(state, variantId);
       case "card":
@@ -1353,6 +1372,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.setData(state, variantId, data);
+          break;
+        case "projectDetails":
+          newState = projectDetailsFunctions.setData(state, variantId, data);
           break;
         case "propertiesShowcase":
           newState = propertiesShowcaseFunctions.setData(
@@ -1549,6 +1571,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "projectDetails":
+          newState = projectDetailsFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1894,6 +1924,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateTestimonialsByPath: (variantId, path, value) =>
     set((state) =>
       testimonialsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Project Details functions using modular approach
+  ensureProjectDetailsVariant: (variantId, initial) =>
+    set((state) =>
+      projectDetailsFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getProjectDetailsData: (variantId) => {
+    const state = get();
+    return projectDetailsFunctions.getData(state, variantId);
+  },
+  setProjectDetailsData: (variantId, data) =>
+    set((state) => projectDetailsFunctions.setData(state, variantId, data)),
+  updateProjectDetailsByPath: (variantId, path, value) =>
+    set((state) =>
+      projectDetailsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Properties Showcase specific functions
@@ -2509,6 +2555,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.data,
                         ).testimonialsStates;
                       break;
+                    case "projectDetails":
+                      newState.projectDetailsStates =
+                        projectDetailsFunctions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).projectDetailsStates;
+                      break;
                     case "propertiesShowcase":
                       newState.propertiesShowcaseStates =
                         propertiesShowcaseFunctions.setData(
@@ -2781,6 +2835,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.data,
               ).testimonialsStates;
               break;
+            case "projectDetails":
+              newState.projectDetailsStates = projectDetailsFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).projectDetailsStates;
+              break;
             case "whyChooseUs":
               newState.whyChooseUsStates = whyChooseUsFunctions.setData(
                 newState,
@@ -2996,6 +3057,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         ctaValuationStates: {},
         stepsSectionStates: {},
         testimonialsStates: {},
+        projectDetailsStates: {},
         propertiesShowcaseStates: {},
         card4States: {},
         card5States: {},

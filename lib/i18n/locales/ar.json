@@ -181,6 +181,10 @@
       "display_name": "الشهادات",
       "description": "قسم يعرض شهادات العملاء والمراجعات بتنسيق سلايدر"
     },
+    "projectDetails": {
+      "display_name": "تفاصيل المشروع",
+      "description": "عرض تفاصيل مشروع عقاري"
+    },
     "propertiesShowcase": {
       "display_name": "عرض العقارات",
       "description": "قسم يعرض العقارات والمشاريع في تنسيق شبكي"

@@ -31,6 +31,7 @@ import { ctaValuationStructure } from "@/componentsStructure/ctaValuation";
 import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
 import { footerStructure } from "@/componentsStructure/footer";
 import { testimonialsStructure } from "@/componentsStructure/testimonials";
+import { projectDetailsStructure } from "@/componentsStructure/projectDetails";
 import { logosTickerStructure } from "@/componentsStructure/logosTicker";
 import { partnersStructure } from "@/componentsStructure/partners";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
@@ -247,6 +248,24 @@ export const getComponents = (
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  projectDetails: {
+    id: "projectDetails",
+    name: "projectDetails",
+    displayName: t("components.projectDetails.display_name"),
+    description: t("components.projectDetails.description"),
+    category: "content",
+    section: "project",
+    subPath: "projectDetails",
+    icon: "🏗️",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "projectDetails1",
+    variants: projectDetailsStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/projectDetails/${variant.id}.tsx`,
+    })),
+    ...projectDetailsStructure,
   },
   propertiesShowcase: {
     id: "propertiesShowcase",
@@ -632,6 +651,24 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  projectDetails: {
+    id: "projectDetails",
+    name: "projectDetails",
+    displayName: "Project Details",
+    description: "Display real estate project details with images, specifications, and similar projects",
+    category: "content",
+    section: "project",
+    subPath: "projectDetails",
+    icon: "🏗️",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "projectDetails1",
+    variants: projectDetailsStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/projectDetails/${variant.id}.tsx`,
+    })),
+    ...projectDetailsStructure,
   },
   propertiesShowcase: {
     id: "propertiesShowcase",

@@ -6,7 +6,7 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
-import ProjectDetail from "@/components/project-detail";
+import ProjectDetails1 from "@/components/tenant/projectDetails/projectDetails1";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
 import { trackProjectView } from "@/lib/ga4-tracking";
@@ -61,7 +61,7 @@ export default function ProjectPageWrapper({
           <div className="min-h-screen flex flex-col" dir="rtl">
             <StaticHeader1 />
             <main className="flex-1">
-              <ProjectDetail projectSlug={projectSlug} />
+              <ProjectDetails1 projectSlug={projectSlug} useStore={true} />
             </main>
             <StaticFooter1 />
           </div>
