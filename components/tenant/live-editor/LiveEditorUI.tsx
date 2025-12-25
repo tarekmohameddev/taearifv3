@@ -300,6 +300,11 @@ const AutoFrame = ({
     // إضافة CSS إضافي للـ iframe
     const additionalStyles = document.createElement("style");
     additionalStyles.textContent = `
+      html {
+        direction: rtl !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
       body {
         margin: 0;
         padding: 0;
@@ -307,6 +312,7 @@ const AutoFrame = ({
         min-height: 100vh;
         overflow-x: hidden;
         overflow-y: auto;
+        direction: rtl !important;
       }
       * {
         box-sizing: border-box;
@@ -317,10 +323,7 @@ const AutoFrame = ({
         min-height: 100vh;
         overflow-x: hidden;
         overflow-y: auto;
-      }
-      html {
-        overflow-x: hidden;
-        overflow-y: auto;
+        direction: rtl !important;
       }
       /* ضمان عمل الـ scroll في الـ iframe */
       iframe {
@@ -329,6 +332,12 @@ const AutoFrame = ({
       /* إزالة أي قيود على الـ scroll */
       .overflow-hidden {
         overflow: auto !important;
+      }
+      /* فرض RTL على جميع العناصر */
+      html[dir="rtl"],
+      body[dir="rtl"],
+      [dir="rtl"] {
+        direction: rtl !important;
       }
     `;
     iframeHead.appendChild(additionalStyles);
@@ -389,6 +398,12 @@ const AutoFrame = ({
       const win = frameRef.current.contentWindow;
 
       if (doc && win) {
+        // فرض RTL بشكل إجباري على الـ iframe
+        doc.documentElement.setAttribute("dir", "rtl");
+        if (doc.body) {
+          doc.body.setAttribute("dir", "rtl");
+        }
+        
         // نسخ الـ styles أولاً
         copyStylesToIframe(doc);
 
@@ -451,7 +466,7 @@ const AutoFrame = ({
     <iframe
       className={className}
       style={{ ...style, overflow: "auto" }}
-      srcDoc='<!DOCTYPE html><html><head></head><body><div id="frame-root" data-live-editor-entry></div></body></html>'
+      srcDoc='<!DOCTYPE html><html dir="rtl"><head></head><body dir="rtl"><div id="frame-root" data-live-editor-entry></div></body></html>'
       ref={frameRef}
       onLoad={() => setLoaded(true)}
     >
