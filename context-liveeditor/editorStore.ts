@@ -194,6 +194,21 @@ interface EditorStore {
   addPageToWebsiteLayout: (pageData: any) => void;
   setCurrentTheme: (themeNumber: number) => void;
 
+  // Static Pages Data - Pages with fixed API endpoints (e.g., /project/[id])
+  staticPagesData: Record<
+    string,
+    {
+      slug: string;
+      components: ComponentInstanceWithPosition[];
+      apiEndpoints?: {
+        fetchData?: string;
+        [key: string]: string | undefined;
+      };
+    }
+  >;
+  setStaticPageData: (slug: string, data: any) => void;
+  getStaticPageData: (slug: string) => any;
+
   // Theme backup
   themeBackup: Record<string, any> | null;
   themeBackupKey: string | null;
@@ -644,6 +659,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     },
     currentTheme: null,
   },
+
+  // Static Pages Data - Initialize as empty
+  staticPagesData: {},
 
   // Theme backup
   themeBackup: null,
@@ -2324,6 +2342,29 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       } as any;
     }),
 
+  // ═══════════════════════════════════════════════════════════
+  // STATIC PAGES MANAGEMENT
+  // ═══════════════════════════════════════════════════════════
+
+  // Set static page data
+  setStaticPageData: (slug, data) =>
+    set((state) => {
+      console.log(`📝 Setting static page data for: ${slug}`, data);
+
+      return {
+        staticPagesData: {
+          ...state.staticPagesData,
+          [slug]: data,
+        },
+      };
+    }),
+
+  // Get static page data
+  getStaticPageData: (slug) => {
+    const state = get();
+    return state.staticPagesData[slug] || null;
+  },
+
   loadFromDatabase: (tenantData) =>
     set((state) => {
       if (!tenantData?.componentSettings) {
@@ -2477,7 +2518,16 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       }
 
-      // Load page components from componentSettings
+      // Load StaticPages data (separate from regular pages)
+      if (tenantData.StaticPages && typeof tenantData.StaticPages === "object") {
+        newState.staticPagesData = {
+          ...state.staticPagesData,
+          ...tenantData.StaticPages,
+        };
+      }
+
+      // Load page components from componentSettings (regular pages only)
+      // ⚠️ Note: Static pages should NOT be in componentSettings
       Object.entries(tenantData.componentSettings).forEach(
         ([page, pageSettings]: [string, any]) => {
           if (pageSettings && typeof pageSettings === "object") {

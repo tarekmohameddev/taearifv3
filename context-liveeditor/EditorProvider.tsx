@@ -22,6 +22,11 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     // Collect all component states from the editor store
     const state = useEditorStore.getState();
 
+    // Get tenantData for username and websiteName
+    const currentTenantData = useTenantStore.getState().tenantData;
+    const username = currentTenantData?.username || tenantId || "";
+    const websiteName = currentTenantData?.websiteName || tenantId || "";
+
     // Log detailed component info for each page
     Object.entries(state.pageComponentsByPage).forEach(([page, components]) => {
       // Log detailed data for each component
@@ -34,9 +39,28 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     const headerVariant = state.globalHeaderVariant || "StaticHeader1";
     const footerVariant = state.globalFooterVariant || "StaticFooter1";
 
+    // Convert pageComponentsByPage (array format) to componentSettings (object format)
+    const componentSettings: Record<string, any> = {};
+    Object.entries(state.pageComponentsByPage).forEach(
+      ([pageSlug, components]) => {
+        componentSettings[pageSlug] = {};
+        components.forEach((comp: any) => {
+          componentSettings[pageSlug][comp.id] = {
+            type: comp.type,
+            name: comp.name,
+            componentName: comp.componentName,
+            data: comp.data || {},
+            position: comp.position || 0,
+            layout: (comp as any).layout || { row: 0, col: 0, span: 2 },
+          };
+        });
+      },
+    );
+
     const payload: any = {
-      tenantId: tenantId || "",
-      pages: state.pageComponentsByPage,
+      username: username,
+      websiteName: websiteName,
+      componentSettings: componentSettings,
       globalComponentsData: {
         ...state.globalComponentsData,
         header: {
@@ -73,7 +97,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           
           // Only include backups that are NOT the current theme
           if (backupThemeNumber !== null && backupThemeNumber !== currentTheme) {
-            themesBackup[key] = state.WebsiteLayout[key];
+            themesBackup[key] = (state.WebsiteLayout as any)[key];
           }
         }
       });
@@ -84,6 +108,15 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       payload.ThemesBackup = themesBackup;
     }
 
+    // ⭐ Add StaticPages to payload if it has any data
+    const hasStaticPagesData =
+      state.staticPagesData &&
+      typeof state.staticPagesData === "object" &&
+      Object.keys(state.staticPagesData).length > 0;
+
+    if (hasStaticPagesData) {
+      payload.StaticPages = state.staticPagesData;
+    }
 
     // Send to backend to persist
     await axiosInstance
@@ -102,14 +135,14 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           Object.entries(state.pageComponentsByPage).forEach(
             ([pageSlug, components]) => {
               updatedComponentSettings[pageSlug] = {};
-              components.forEach((comp) => {
+              components.forEach((comp: any) => {
                 updatedComponentSettings[pageSlug][comp.id] = {
                   type: comp.type,
                   name: comp.name,
                   componentName: comp.componentName,
                   data: comp.data || {},
                   position: comp.position || 0,
-                  layout: comp.layout || { row: 0, col: 0, span: 2 },
+                  layout: (comp as any).layout || { row: 0, col: 0, span: 2 },
                 };
               });
             },
