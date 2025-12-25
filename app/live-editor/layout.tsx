@@ -1360,7 +1360,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             slug: pageSlug,
             name: pageName,
             path: `/${pageSlug}`,
-            isStatic: true, // ⭐ علامة للصفحات الثابتة
+            // الصفحات من componentSettings هي صفحات عادية (ليست ثابتة)
             // إضافة بيانات SEO إذا كانت موجودة، وإلا إضافة البيانات الافتراضية
             seo: hasSeoData
               ? {
