@@ -181,13 +181,9 @@ export function PermissionsDropdown({
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected
-        ? "#000"
-        : state.isFocused
-        ? "#f3f4f6"
-        : "white",
-      color: state.isSelected ? "white" : "#111827",
-      paddingRight: state.data.isGroup ? "12px" : "36px",
+      backgroundColor: state.isFocused ? "#f3f4f6" : "white",
+      color: "#111827",
+      paddingRight: state.data.isGroup ? "12px" : "12px",
       paddingLeft: state.data.isGroup ? "12px" : "12px",
       paddingTop: "4px",
       paddingBottom: "4px",
@@ -197,7 +193,7 @@ export function PermissionsDropdown({
       direction: "rtl",
       textAlign: "right",
       "&:active": {
-        backgroundColor: state.isSelected ? "#000" : "#e5e7eb",
+        backgroundColor: "#e5e7eb",
       },
     }),
     multiValue: (provided) => ({
@@ -239,9 +235,41 @@ export function PermissionsDropdown({
     }),
   };
 
+  // Custom Checkbox Component
+  const CustomCheckbox = ({ checked }: { checked: boolean }) => {
+    return (
+      <div className="flex items-center justify-center ml-1 mr-1 flex-shrink-0">
+        <div
+          className={`
+            w-4 h-4 rounded border-2 flex items-center justify-center transition-all duration-200
+            ${
+              checked
+                ? "bg-black border-black"
+                : "bg-white border-gray-300 hover:border-gray-400"
+            }
+          `}
+        >
+          {checked && (
+            <svg
+              className="w-3 h-3 text-white"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M5 13l4 4L19 7"></path>
+            </svg>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   // Custom Option component to handle group clicks
   const CustomOption = (props: any) => {
-    const { data, innerRef, innerProps } = props;
+    const { data, innerRef, innerProps, isSelected } = props;
 
     if (data.isGroup) {
       // Group is a header - make it clickable to select all permissions
@@ -263,10 +291,8 @@ export function PermissionsDropdown({
               handlePermissionChange(permission.name, shouldSelect);
             });
           }}
-          className="react-select__option react-select__option--is-group"
+          className="react-select__option react-select__option--is-group flex items-center cursor-pointer"
           style={{
-            backgroundColor: allSelected ? "#000" : "white",
-            color: allSelected ? "white" : "#111827",
             paddingRight: "12px",
             paddingLeft: "12px",
             paddingTop: "8px",
@@ -276,16 +302,40 @@ export function PermissionsDropdown({
             lineHeight: "1.4",
             direction: "rtl",
             textAlign: "right",
-            cursor: "pointer",
           }}
         >
-          {data.label}
+          <CustomCheckbox checked={allSelected} />
+          <span className="flex-1">{data.label}</span>
         </div>
       );
     }
 
-    // Regular permission option
-    return <components.Option {...props} />;
+    // Regular permission option with checkbox
+    const permissionSelected = data.permission
+      ? selectedPermissions[data.permission.name] === true
+      : false;
+
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className="react-select__option flex items-center cursor-pointer"
+        style={{
+          paddingRight: "36px",
+          paddingLeft: "12px",
+          paddingTop: "8px",
+          paddingBottom: "8px",
+          fontSize: "12px",
+          fontWeight: "400",
+          lineHeight: "1.4",
+          direction: "rtl",
+          textAlign: "right",
+        }}
+      >
+        <CustomCheckbox checked={permissionSelected} />
+        <span className="flex-1">{data.label}</span>
+      </div>
+    );
   };
 
   if (isLoading) {
