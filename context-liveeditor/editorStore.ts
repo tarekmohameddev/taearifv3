@@ -2520,9 +2520,25 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
       // Load StaticPages data (separate from regular pages)
       if (tenantData.StaticPages && typeof tenantData.StaticPages === "object") {
+        // Convert StaticPages format: handle both [slug, components] and { slug, components }
+        const convertedStaticPages: Record<string, any> = {};
+        
+        Object.entries(tenantData.StaticPages).forEach(([pageSlug, pageData]: [string, any]) => {
+          if (Array.isArray(pageData) && pageData.length === 2) {
+            // Format: [slug, components]
+            convertedStaticPages[pageSlug] = {
+              slug: pageData[0] || pageSlug,
+              components: Array.isArray(pageData[1]) ? pageData[1] : [],
+            };
+          } else if (typeof pageData === "object" && !Array.isArray(pageData)) {
+            // Format: { slug, components }
+            convertedStaticPages[pageSlug] = pageData;
+          }
+        });
+        
         newState.staticPagesData = {
           ...state.staticPagesData,
-          ...tenantData.StaticPages,
+          ...convertedStaticPages,
         };
       }
 

@@ -353,6 +353,15 @@ export function middleware(request: NextRequest) {
   const locale = getLocale(pathname);
   const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
 
+  // 🔍 Debug logging for rewrite process
+  console.log("🔍 Middleware - Rewrite Debug:", {
+    originalPathname: pathname,
+    locale,
+    pathnameWithoutLocale,
+    tenantId,
+    host,
+  });
+
   // Special case: if pathname is just /locale (e.g., /en), rewrite to homepage
   if (pathname === `/${locale}`) {
     const url = request.nextUrl.clone();
@@ -389,7 +398,22 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = pathnameWithoutLocale;
 
+  console.log("🔍 Middleware - Before Rewrite:", {
+    originalUrl: request.url,
+    rewriteUrl: url.toString(),
+    pathnameWithoutLocale,
+  });
+
   response = NextResponse.rewrite(url);
+
+  console.log("🔍 Middleware - After Rewrite:", {
+    responseUrl: response.url,
+    headers: {
+      "x-locale": response.headers.get("x-locale"),
+      "x-pathname": response.headers.get("x-pathname"),
+      "x-tenant-id": response.headers.get("x-tenant-id"),
+    },
+  });
 
   // Set locale headers
   response.headers.set("x-locale", locale);

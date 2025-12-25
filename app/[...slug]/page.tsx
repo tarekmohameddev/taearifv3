@@ -1,20 +1,23 @@
 import { headers } from "next/headers";
 import { getMetaForSlugServer } from "@/lib/metaTags";
 import { getDefaultSeoData } from "@/lib/defaultSeo";
-import ProjectPageWrapper from "./ProjectPageWrapper";
+import TenantPageWrapper from "../TenantPageWrapper";
+import { isMultiLevelPage } from "@/lib-liveeditor/multiLevelPages";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string[] }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
-  const { id } = await params;
-  const slugPath = `/project/${id || ""}`;
+  const { slug: slugArray } = await params;
+  
+  // Join slug array to create path (e.g., ["project", "samy"] -> "/project/samy")
+  const slugPath = `/${slugArray?.join("/") || ""}`;
 
   if (!tenantId) return {} as any;
 
@@ -93,10 +96,10 @@ export async function generateMetadata({
   } as any;
 }
 
-export default async function ProjectPage({
+export default async function TenantPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string[] }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
@@ -104,13 +107,44 @@ export default async function ProjectPage({
     | "subdomain"
     | "custom"
     | null;
-  const { id } = await params;
+  const { slug: slugArray } = await params;
+
+  // 🔍 Debug logging for route matching
+  console.log("🔍 [...slug]/page.tsx - Route Match:", {
+    slugArray,
+    slugArrayLength: slugArray?.length,
+    tenantId,
+    domainType,
+  });
+
+  // Handle slug array: ["project", "samy"] -> slug: "project", dynamicSlug: "samy"
+  // Or: ["property", "john"] -> slug: "property", dynamicSlug: "john"
+  // Or single slug: ["about"] -> slug: "about", dynamicSlug: undefined
+  const slug = slugArray?.[0] || "";
+  const isMultiLevel = isMultiLevelPage(slug);
+  const dynamicSlug = isMultiLevel && slugArray?.length > 1 
+    ? slugArray[1] 
+    : undefined;
+
+  console.log("🔍 [...slug]/page.tsx - Processed:", {
+    slug,
+    isMultiLevel,
+    dynamicSlug,
+    tenantId,
+    domainType,
+  });
+
+  if (!tenantId) {
+    console.log("❌ [...slug]/page.tsx - No tenantId found!");
+  }
 
   return (
-    <ProjectPageWrapper
+    <TenantPageWrapper
       tenantId={tenantId}
-      domainType={domainType}
-      projectSlug={id}
+      slug={slug}
+      dynamicSlug={dynamicSlug}
+      domainType={domainType || undefined}
     />
   );
 }
+

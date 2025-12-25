@@ -37,6 +37,8 @@ import {
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
+import { trackProjectView } from "@/lib/ga4-tracking";
+import { isMultiLevelPage, getSlugPropertyName } from "@/lib-liveeditor/multiLevelPages";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -241,18 +243,22 @@ const loadComponent = (section: string, componentName: string) => {
 interface TenantPageWrapperProps {
   tenantId: string | null;
   slug: string;
+  dynamicSlug?: string; // ⭐ NEW: For multi-level pages like project/[slug], property/[slug], etc.
   domainType?: "subdomain" | "custom";
 }
 
 export default function TenantPageWrapper({
   tenantId,
   slug,
+  dynamicSlug,
   domainType = "subdomain",
 }: TenantPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
+  const staticPagesData = useEditorStore((s) => s.staticPagesData);
+  const getStaticPageData = useEditorStore((s) => s.getStaticPageData);
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -290,22 +296,85 @@ export default function TenantPageWrapper({
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
-  // التحقق من وجود الـ slug في componentSettings أو البيانات الافتراضية
+  // Track views for multi-level pages (project, property, etc.)
+  useEffect(() => {
+    if (isMultiLevelPage(slug) && dynamicSlug && tenantId) {
+      // ✅ للـ custom domains: استخدم username من API
+      const finalTenantId =
+        domainType === "custom" && tenantData?.username
+          ? tenantData.username
+          : tenantId;
+
+      // Track project views specifically
+      if (slug === "project") {
+        trackProjectView(finalTenantId, dynamicSlug);
+      }
+      // يمكن إضافة tracking لأنواع أخرى من الصفحات هنا لاحقاً
+    }
+  }, [slug, dynamicSlug, tenantId, domainType, tenantData?.username]);
+
+  // التحقق من وجود الـ slug في staticPagesData, componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
-    if (!slug) return false;
+    if (!slug) {
+      console.log("🔍 TenantPageWrapper - slugExists: false (no slug)");
+      return false;
+    }
 
-    // التحقق من وجود الـ slug في componentSettings
+    // ⭐ Priority 0: Check if it's a multi-level page (project, property, etc.)
+    // Multi-level pages are always valid even if not in StaticPages
+    if (isMultiLevelPage(slug)) {
+      console.log("🔍 TenantPageWrapper - slugExists: true (multi-level page)", {
+        slug,
+        dynamicSlug,
+      });
+      return true;
+    }
+
+    // ⭐ Priority 1: Check static pages
+    const staticPageData = getStaticPageData(slug);
+    if (staticPageData) {
+      console.log("🔍 TenantPageWrapper - slugExists: true (found in staticPagesData)", {
+        slug,
+        staticPageData,
+      });
+      return true;
+    }
+
+    // ⭐ Priority 2: Check tenantData.StaticPages
+    if (tenantData?.StaticPages?.[slug]) {
+      console.log("🔍 TenantPageWrapper - slugExists: true (found in tenantData.StaticPages)", {
+        slug,
+        staticPage: tenantData.StaticPages[slug],
+      });
+      return true;
+    }
+
+    // ⭐ Priority 3: Check componentSettings
     if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
+      console.log("🔍 TenantPageWrapper - slugExists: true (found in componentSettings)", {
+        slug,
+      });
       return true;
     }
 
-    // التحقق من وجود الـ slug في البيانات الافتراضية
+    // ⭐ Priority 4: Check default definitions
     if ((PAGE_DEFINITIONS as any)[slug]) {
+      console.log("🔍 TenantPageWrapper - slugExists: true (found in PAGE_DEFINITIONS)", {
+        slug,
+      });
       return true;
     }
 
+    console.log("🔍 TenantPageWrapper - slugExists: false (not found anywhere)", {
+      slug,
+      hasTenantData: !!tenantData,
+      hasStaticPages: !!tenantData?.StaticPages,
+      hasComponentSettings: !!tenantData?.componentSettings,
+      staticPagesKeys: tenantData?.StaticPages ? Object.keys(tenantData.StaticPages) : [],
+      componentSettingsKeys: tenantData?.componentSettings ? Object.keys(tenantData.componentSettings) : [],
+    });
     return false;
-  }, [tenantData?.componentSettings, slug]);
+  }, [tenantData?.componentSettings, tenantData?.StaticPages, slug, getStaticPageData, dynamicSlug]);
 
   // Get global header data and variant
   const globalHeaderData = tenantData?.globalComponentsData?.header;
@@ -375,8 +444,122 @@ export default function TenantPageWrapper({
     return loadFooterComponent(componentName) || StaticFooter1;
   }, [globalFooterVariant]);
 
-  // Get components from componentSettings or default components
+  // Get components from staticPagesData, componentSettings, or default components
   const componentsList = useMemo(() => {
+    // ⭐ Priority 1: Check multi-level pages (like "project", "property") with dynamicSlug
+    if (isMultiLevelPage(slug) && dynamicSlug) {
+      // Get the slug property name (e.g., "projectSlug", "propertySlug")
+      const slugPropertyName = getSlugPropertyName(slug);
+      
+      // ⭐ Priority 1.1: Try to get from staticPagesData[slug]
+      const staticPageData = getStaticPageData(slug);
+      if (staticPageData && Array.isArray(staticPageData.components)) {
+        return staticPageData.components
+          .map((component: any) => ({
+            id: component.id,
+            componentName: component.componentName,
+            data: { ...component.data, [slugPropertyName]: dynamicSlug },
+            position: component.position || 0,
+          }))
+          .sort((a: any, b: any) => a.position - b.position);
+      }
+
+      // ⭐ Priority 1.2: Try to get from tenantData.StaticPages
+      // Handle both formats: { components: [...] } or [slug, [components...]]
+      if (tenantData?.StaticPages?.[slug]) {
+        const staticPage = tenantData.StaticPages[slug];
+        
+        // Format 1: Array format [slug, [components...]]
+        if (Array.isArray(staticPage) && staticPage.length >= 2) {
+          const components = staticPage[1];
+          if (Array.isArray(components)) {
+            return components
+              .map((component: any) => ({
+                id: component.id,
+                componentName: component.componentName,
+                data: { ...component.data, [slugPropertyName]: dynamicSlug },
+                position: component.position || 0,
+              }))
+              .sort((a: any, b: any) => a.position - b.position);
+          }
+        }
+        
+        // Format 2: Object format { components: [...] }
+        if (staticPage && typeof staticPage === "object" && !Array.isArray(staticPage)) {
+          if (Array.isArray(staticPage.components)) {
+            return staticPage.components
+              .map((component: any) => ({
+                id: component.id,
+                componentName: component.componentName,
+                data: { ...component.data, [slugPropertyName]: dynamicSlug },
+                position: component.position || 0,
+              }))
+              .sort((a: any, b: any) => a.position - b.position);
+          }
+        }
+      }
+
+      // ⭐ Fallback: Return default component based on slug
+      // For project, use projectDetails1; for others, can be customized
+      const defaultComponentName = slug === "project" ? "projectDetails1" : `${slug}1`;
+      return [
+        {
+          id: defaultComponentName,
+          componentName: defaultComponentName,
+          data: { [slugPropertyName]: dynamicSlug },
+          position: 0,
+        },
+      ];
+    }
+
+    // ⭐ Priority 2: Check static pages without additional segments
+    const staticPageData = getStaticPageData(slug);
+    if (staticPageData && Array.isArray(staticPageData.components)) {
+      return staticPageData.components
+        .map((component: any) => ({
+          id: component.id,
+          componentName: component.componentName,
+          data: component.data,
+          position: component.position || 0,
+        }))
+        .sort((a: any, b: any) => a.position - b.position);
+    }
+
+    // ⭐ Priority 3: Check tenantData.StaticPages
+    if (tenantData?.StaticPages?.[slug]) {
+      const staticPage = tenantData.StaticPages[slug];
+      
+      // Format 1: Array format [slug, [components...]]
+      if (Array.isArray(staticPage) && staticPage.length >= 2) {
+        const components = staticPage[1];
+        if (Array.isArray(components)) {
+          return components
+            .map((component: any) => ({
+              id: component.id,
+              componentName: component.componentName,
+              data: component.data,
+              position: component.position || 0,
+            }))
+            .sort((a: any, b: any) => a.position - b.position);
+        }
+      }
+      
+      // Format 2: Object format { components: [...] }
+      if (staticPage && typeof staticPage === "object" && !Array.isArray(staticPage)) {
+        if (Array.isArray(staticPage.components)) {
+          return staticPage.components
+            .map((component: any) => ({
+              id: component.id,
+              componentName: component.componentName,
+              data: component.data,
+              position: component.position || 0,
+            }))
+            .sort((a: any, b: any) => a.position - b.position);
+        }
+      }
+    }
+
+    // ⭐ Priority 4: Check componentSettings (regular pages)
     if (
       tenantData?.componentSettings &&
       slug &&
@@ -397,7 +580,7 @@ export default function TenantPageWrapper({
       return components;
     }
 
-    // استخدام البيانات الافتراضية من PAGE_DEFINITIONS
+    // ⭐ Priority 5: استخدام البيانات الافتراضية من PAGE_DEFINITIONS
     if (slug && (PAGE_DEFINITIONS as any)[slug]) {
       const defaultPageData = (PAGE_DEFINITIONS as any)[slug];
       const components = Object.entries(defaultPageData)
@@ -413,7 +596,7 @@ export default function TenantPageWrapper({
     }
 
     return [];
-  }, [tenantData?.componentSettings, slug]);
+  }, [tenantData?.componentSettings, tenantData?.StaticPages, slug, dynamicSlug, staticPagesData, getStaticPageData]);
 
   // دالة لتحديد الـ skeleton المناسب حسب الـ slug
   const renderSkeletonContent = () => {
@@ -485,6 +668,13 @@ export default function TenantPageWrapper({
 
   // إذا لم يكن الـ slug موجود في componentSettings، أظهر 404
   if (!slugExists) {
+    console.log("❌ TenantPageWrapper - Calling notFound()", {
+      slug,
+      dynamicSlug,
+      tenantId,
+      hasTenantData: !!tenantData,
+      slugExists,
+    });
     notFound();
   }
 

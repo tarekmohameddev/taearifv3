@@ -14,6 +14,71 @@ import {
 import { ComponentInstance } from "@/lib-liveeditor/types";
 
 // ============================================================================
+// Helper Functions for Static Pages
+// ============================================================================
+
+/**
+ * Returns the default component configuration for a static page
+ * @param slug - The slug of the static page
+ * @returns Default component configuration or null if not found
+ */
+function getDefaultComponentForStaticPage(slug: string) {
+  const defaults: Record<string, any> = {
+    project: {
+      id: "projectDetails1",
+      type: "projectDetails",
+      name: "Project Details",
+      componentName: "projectDetails1",
+      data: { projectSlug: "", visible: true },
+      position: 0,
+      layout: { row: 0, col: 0, span: 2 },
+    },
+    // يمكن إضافة صفحات ثابتة أخرى لاحقاً
+    // products: { ... },
+    // checkout: { ... },
+  };
+  
+  return defaults[slug] || null;
+}
+
+/**
+ * Checks if a page is a static page based on tenantData or editorStore
+ * @param slug - The slug of the page to check
+ * @param tenantData - Tenant data from getTenant
+ * @param editorStore - Editor store instance
+ * @returns true if the page is a static page, false otherwise
+ */
+function isStaticPage(
+  slug: string,
+  tenantData: any,
+  editorStore: any
+): boolean {
+  if (!slug) return false;
+  
+  // Check if page exists in tenantData.StaticPages
+  // Handle both formats: [slug, components] or { slug, components }
+  const staticPageFromTenant = tenantData?.StaticPages?.[slug];
+  if (staticPageFromTenant) {
+    // Format 1: Array [slug, components]
+    if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
+      return true;
+    }
+    // Format 2: Object { slug, components }
+    if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
+      return true;
+    }
+  }
+  
+  // Check if page exists in editorStore.staticPagesData
+  const staticPageData = editorStore.getStaticPageData(slug);
+  if (staticPageData) {
+    return true;
+  }
+  
+  return false;
+}
+
+// ============================================================================
 // useEffect Hooks للـ LiveEditor
 // ============================================================================
 
@@ -52,21 +117,26 @@ export function useLiveEditorEffects(state: any) {
 
   // Database Loading Effect
   useEffect(() => {
-    // For static pages like "project", always check even if initialized
-    const isStaticPage = slug === "project";
-    const shouldLoad = isStaticPage 
+    // Always load data into editorStore when tenantData is available
+    const editorStore = useEditorStore.getState();
+    
+    // Check if this is a static page
+    const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
+    
+    // For static pages, always check even if initialized
+    const shouldLoad = pageIsStatic 
       ? (!authLoading && !tenantLoading && tenantData)
       : (!initialized && !authLoading && !tenantLoading && tenantData);
     
     if (shouldLoad) {
-      // Always load data into editorStore when tenantData is available
-      const editorStore = useEditorStore.getState();
-
       console.log("🔄 Loading tenant data into editorStore:", {
         tenantData: !!tenantData,
         hasComponentSettings: !!tenantData?.componentSettings,
         hasGlobalComponentsData: !!tenantData?.globalComponentsData,
+        hasStaticPages: !!tenantData?.StaticPages,
         themeChangeTimestamp: editorStore.themeChangeTimestamp,
+        slug,
+        isStaticPage: pageIsStatic,
       });
 
       // ⭐ CRITICAL: Check if theme was recently changed
@@ -96,68 +166,119 @@ export function useLiveEditorEffects(state: any) {
       // Re-check store after loadFromDatabase (in case it was updated)
       const storePageComponentsAfterLoad = editorStore.pageComponentsByPage[slug];
       
-      // ⭐ NEW: For static pages (like "project"), load from staticPagesData instead of componentSettings
-      if (slug === "project") {
-        console.log("🔍 Processing static page 'project'", {
+      // ⭐ STATIC PAGES: Load with priority from tenantData.StaticPages
+      if (pageIsStatic) {
+        console.log("🔍 Processing static page:", {
           slug,
           hasTenantData: !!tenantData,
           initialized,
         });
         
-        let staticPageData = editorStore.getStaticPageData("project");
+        // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] first (from getTenant)
+        const staticPageFromTenant = tenantData?.StaticPages?.[slug];
+        
+        // Handle different formats: [slug, components] or { slug, components }
+        let tenantComponents: any[] = [];
+        
+        if (staticPageFromTenant) {
+          // Format 1: Array format [slug, components]
+          if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
+            tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
+          }
+          // Format 2: Object format { slug, components }
+          else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
+            tenantComponents = Array.isArray(staticPageFromTenant.components) 
+              ? staticPageFromTenant.components 
+              : [];
+          }
+        }
+        
+        const hasStaticPageInTenant = tenantComponents.length > 0;
+
+        if (hasStaticPageInTenant) {
+          console.log("✅ Loading static page from tenantData.StaticPages:", {
+            slug,
+            componentCount: tenantComponents.length,
+            format: Array.isArray(staticPageFromTenant) ? "array" : "object",
+          });
+          
+          // Convert static page components to the format expected by setPageComponents
+          const staticComponents = tenantComponents.map((comp: any) => ({
+            id: comp.id || getDefaultComponentForStaticPage(slug)?.id || `${slug}1`,
+            type: comp.type || getDefaultComponentForStaticPage(slug)?.type || slug,
+            name: comp.name || getDefaultComponentForStaticPage(slug)?.name || slug,
+            componentName: comp.componentName || getDefaultComponentForStaticPage(slug)?.componentName || `${slug}1`,
+            data: comp.data || getDefaultComponentForStaticPage(slug)?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+            forceUpdate: comp.forceUpdate || 0,
+          }));
+          
+          console.log("✅ Loading static page components from tenantData.StaticPages:", {
+            componentCount: staticComponents.length,
+            components: staticComponents.map((c: any) => c.componentName),
+            firstComponent: staticComponents[0],
+          });
+          
+          setPageComponents(staticComponents);
+          setInitialized(true);
+          return; // Skip further loading logic
+        }
+        
+        // ⭐ PRIORITY 2: Check editorStore.staticPagesData[slug] (after loadFromDatabase)
+        let staticPageData = editorStore.getStaticPageData(slug);
         let staticPageComponents = staticPageData?.components || [];
         
-        console.log("🔍 Static page data check:", {
+        console.log("🔍 Static page data check from editorStore:", {
           hasStaticPageData: !!staticPageData,
           componentCount: staticPageComponents.length,
         });
         
-        // If no components in staticPagesData, add default projectDetails1
+        // ⭐ PRIORITY 3: If no components, add default component
         if (staticPageComponents.length === 0) {
-          console.log("⚠️ No components found, adding default projectDetails1");
+          const defaultComponent = getDefaultComponentForStaticPage(slug);
           
-          const defaultProjectComponent = {
-            id: "projectDetails1",
-            type: "projectDetails",
-            name: "Project Details",
-            componentName: "projectDetails1",
-            data: {
-              projectSlug: "", // Will be set from URL params
-              visible: true,
-            },
-            position: 0,
-            layout: { row: 0, col: 0, span: 2 },
-          };
-          
-          // Add to staticPagesData
-          editorStore.setStaticPageData("project", {
-            slug: "project",
-            components: [defaultProjectComponent],
-          });
-          
-          // Re-read staticPageData after adding
-          staticPageData = editorStore.getStaticPageData("project");
-          staticPageComponents = staticPageData?.components || [];
-          
-          console.log("✅ Added default projectDetails1 component to static page 'project'", {
-            componentCount: staticPageComponents.length,
-          });
+          if (defaultComponent) {
+            console.log("⚠️ No components found, adding default component:", {
+              slug,
+              defaultComponent: defaultComponent.componentName,
+            });
+            
+            // Add to staticPagesData
+            editorStore.setStaticPageData(slug, {
+              slug,
+              components: [defaultComponent],
+            });
+            
+            // Re-read staticPageData after adding
+            staticPageData = editorStore.getStaticPageData(slug);
+            staticPageComponents = staticPageData?.components || [];
+            
+            console.log("✅ Added default component to static page:", {
+              slug,
+              componentCount: staticPageComponents.length,
+              componentName: defaultComponent.componentName,
+            });
+          } else {
+            console.warn("⚠️ No default component found for static page:", slug);
+          }
         }
         
         // Load components from staticPagesData
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
+          const defaultComponent = getDefaultComponentForStaticPage(slug);
           const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || `projectDetails1`,
-            type: comp.type || "projectDetails",
-            name: comp.name || "Project Details",
-            componentName: comp.componentName || "projectDetails1",
-            data: comp.data || { projectSlug: "", visible: true },
+            id: comp.id || defaultComponent?.id || `${slug}1`,
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
             position: comp.position || 0,
             layout: comp.layout || { row: 0, col: 0, span: 2 },
           }));
           
-          console.log("✅ Loading static page 'project' components:", {
+          console.log("✅ Loading static page components from editorStore.staticPagesData:", {
             componentCount: staticComponents.length,
             components: staticComponents.map((c: any) => c.componentName),
             firstComponent: staticComponents[0],
@@ -167,7 +288,7 @@ export function useLiveEditorEffects(state: any) {
           setInitialized(true);
           return; // Skip regular page loading logic
         } else {
-          console.error("❌ No components to load for static page 'project'");
+          console.error("❌ No components to load for static page:", slug);
         }
       }
       
@@ -435,18 +556,21 @@ export function useLiveEditorEffects(state: any) {
     };
 
     // ⭐ NEW: For static pages, always check staticPagesData first
-    if (slug === "project") {
-      const editorStore = useEditorStore.getState();
-      const staticPageData = editorStore.getStaticPageData("project");
+    const editorStore = useEditorStore.getState();
+    const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
+    
+    if (pageIsStatic) {
+      const staticPageData = editorStore.getStaticPageData(slug);
       const staticPageComponents = staticPageData?.components || [];
       
       if (staticPageComponents.length > 0) {
+        const defaultComponent = getDefaultComponentForStaticPage(slug);
         const staticComponents = staticPageComponents.map((comp: any) => ({
-          id: comp.id || `projectDetails1`,
-          type: comp.type || "projectDetails",
-          name: comp.name || "Project Details",
-          componentName: comp.componentName || "projectDetails1",
-          data: comp.data || { projectSlug: "", visible: true },
+          id: comp.id || defaultComponent?.id || `${slug}1`,
+          type: comp.type || defaultComponent?.type || slug,
+          name: comp.name || defaultComponent?.name || slug,
+          componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+          data: comp.data || defaultComponent?.data || {},
           position: comp.position || 0,
           layout: comp.layout || { row: 0, col: 0, span: 2 },
         }));
@@ -479,17 +603,20 @@ export function useLiveEditorEffects(state: any) {
       const freshStorePageComponents = store.pageComponentsByPage[slug];
       
       // ⭐ NEW: For static pages, check staticPagesData first
-      if (slug === "project" && !freshStorePageComponents) {
-        const staticPageData = store.getStaticPageData("project");
+      const pageIsStatic = isStaticPage(slug, tenantData, store);
+      
+      if (pageIsStatic && !freshStorePageComponents) {
+        const staticPageData = store.getStaticPageData(slug);
         const staticPageComponents = staticPageData?.components || [];
         
         if (staticPageComponents.length > 0) {
+          const defaultComponent = getDefaultComponentForStaticPage(slug);
           const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || `projectDetails1`,
-            type: comp.type || "projectDetails",
-            name: comp.name || "Project Details",
-            componentName: comp.componentName || "projectDetails1",
-            data: comp.data || { projectSlug: "", visible: true },
+            id: comp.id || defaultComponent?.id || `${slug}1`,
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
             position: comp.position || 0,
             layout: comp.layout || { row: 0, col: 0, span: 2 },
           }));
@@ -518,8 +645,10 @@ export function useLiveEditorEffects(state: any) {
       } else {
         // If storePageComponents is undefined, set to empty array to clear iframe
         // BUT: Skip for static pages if they have components in staticPagesData
-        if (slug === "project") {
-          const staticPageData = store.getStaticPageData("project");
+        const pageIsStatic = isStaticPage(slug, tenantData, store);
+        
+        if (pageIsStatic) {
+          const staticPageData = store.getStaticPageData(slug);
           if (staticPageData?.components?.length > 0) {
             // Don't clear, static page has components
             return;
@@ -558,20 +687,23 @@ export function useLiveEditorEffects(state: any) {
         setPageComponents(storePageComponents || []);
       }
     } else {
-      // ⭐ NEW: For static pages (like "project"), check staticPagesData before clearing
-      if (slug === "project") {
-        const editorStore = useEditorStore.getState();
-        const staticPageData = editorStore.getStaticPageData("project");
+      // ⭐ NEW: For static pages, check staticPagesData before clearing
+      const editorStore = useEditorStore.getState();
+      const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
+      
+      if (pageIsStatic) {
+        const staticPageData = editorStore.getStaticPageData(slug);
         const staticPageComponents = staticPageData?.components || [];
         
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
+          const defaultComponent = getDefaultComponentForStaticPage(slug);
           const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || `projectDetails1`,
-            type: comp.type || "projectDetails",
-            name: comp.name || "Project Details",
-            componentName: comp.componentName || "projectDetails1",
-            data: comp.data || { projectSlug: "", visible: true },
+            id: comp.id || defaultComponent?.id || `${slug}1`,
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
             position: comp.position || 0,
             layout: comp.layout || { row: 0, col: 0, span: 2 },
           }));
