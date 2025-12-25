@@ -339,6 +339,43 @@ const AutoFrame = ({
       [dir="rtl"] {
         direction: rtl !important;
       }
+      /* إصلاح Swiper في RTL - ضمان أن slides تظهر بجانب بعض */
+      .swiper {
+        direction: rtl !important;
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+      }
+      .swiper-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        height: 100% !important;
+        align-items: stretch !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+      }
+      .swiper-slide {
+        display: block !important;
+        width: auto !important;
+        height: 100% !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+      }
+      /* ضمان أن Swiper يعمل بشكل أفقي في RTL */
+      [dir="rtl"] .swiper,
+      [dir="rtl"] .swiper-wrapper {
+        direction: rtl !important;
+      }
+      [dir="rtl"] .swiper-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+      }
+      [dir="rtl"] .swiper-slide {
+        display: block !important;
+        flex-shrink: 0 !important;
+      }
     `;
     iframeHead.appendChild(additionalStyles);
 
