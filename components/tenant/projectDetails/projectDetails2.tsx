@@ -7,6 +7,14 @@ import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultProjectDetails2Data } from "@/context-liveeditor/editorStoreFunctions/projectDetailsFunctions";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MapPinIcon } from "lucide-react";
+import SwiperCarousel from "@/components/ui/swiper-carousel2";
+import Link from "next/link";
 
 interface Project {
   id: string;
@@ -207,6 +215,85 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#8b5f46");
 
+  // Get logo image from tenantData
+  const { loadingTenantData } = useTenantStore();
+  const logoImage = loadingTenantData
+    ? null
+    : tenantData?.globalComponentsData?.header?.logo?.image ||
+      `${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`;
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
+    if (cleanHex.length !== 6) return "#047857";
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  };
+
+  // Helper function to convert hex color to CSS filter for SVG coloring
+  const hexToFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith("#")) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    const cleanHex = hex.replace("#", "");
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + saturation * 0.5;
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  const primaryColorFilter = hexToFilter(primaryColor);
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
@@ -225,6 +312,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
 
   // UI state
   const [selectedImage, setSelectedImage] = useState<string>("");
+  const [mainImage, setMainImage] = useState<string>("");
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -352,6 +442,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // تحديث الصورة المختارة عند تحميل المشروع
   useEffect(() => {
     if (project?.image) {
+      setMainImage(project.image);
       setSelectedImage(project.image);
     }
   }, [project]);
@@ -364,6 +455,56 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
           ...(project.images || []),
         ].filter((img) => img && img.trim() !== "")
       : [];
+
+  // Get all images (main images + floor planning images)
+  const getAllImages = () => {
+    const allImages = [];
+    if (project?.images) {
+      allImages.push(...project.images);
+    }
+    if (project?.image) {
+      allImages.unshift(project.image);
+    }
+    if (project?.floorplans) {
+      allImages.push(...project.floorplans);
+    }
+    return allImages;
+  };
+
+  // Navigation functions for dialog
+  const handlePreviousImage = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = selectedImageIndex;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      setSelectedImage(allImages[previousIndex]);
+      setSelectedImageIndex(previousIndex);
+    }
+  };
+
+  const handleNextImage = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = selectedImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setSelectedImage(allImages[nextIndex]);
+      setSelectedImageIndex(nextIndex);
+    }
+  };
+
+  const handleImageClick = (imageSrc: string, index?: number) => {
+    if (imageSrc && imageSrc.trim() !== "") {
+      setSelectedImage(imageSrc);
+      setSelectedImageIndex(index || 0);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleThumbnailClick = (imageSrc: string, index: number) => {
+    handleImageClick(imageSrc, index);
+  };
 
   // Show loading skeleton
   if (tenantLoading || loadingProject) {
@@ -425,7 +566,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         style={{ height: mergedData.hero?.height || "500px" }}
       >
         <Image
-          src={project.image || "/placeholder.jpg"}
+          src="/images/placeholders/projectDetails2/hero.jpg"
           alt={project.title || "صورة المشروع"}
           fill
           priority
@@ -434,9 +575,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         />
         {/* Overlay */}
         <div
-          className="absolute inset-0 bg-black"
+          className="absolute inset-0"
           style={{
-            opacity: mergedData.hero?.overlayOpacity || 0.4,
+            backgroundColor: "#361c16",
+            opacity: 0.8,
           }}
         />
 
@@ -502,47 +644,105 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         >
           {/* Main Featured Image */}
           <div className="relative h-[600px] w-full">
-            <Image
-              alt={project.title || "صورة المشروع"}
-              className="w-full h-full object-cover transition-opacity duration-300"
-              src={selectedImage || project.image || "/placeholder.jpg"}
-              fill
-              priority
-            />
+            {mainImage && project ? (
+              <Image
+                src={mainImage}
+                alt={project.title || "صورة المشروع"}
+                fill
+                className="w-full h-full object-cover cursor-pointer rounded-lg"
+                onClick={() => handleImageClick(mainImage, 0)}
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="text-gray-500 text-center">
+                  <svg
+                    className="w-16 h-16 mx-auto mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm">لا توجد صورة متاحة</p>
+                </div>
+              </div>
+            )}
+            {logoImage && (
+              <div className="absolute bottom-2 right-2 opacity-80">
+                <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
+                  <Image
+                    src={logoImage}
+                    alt="Logo"
+                    width={160}
+                    height={80}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </section>
         {/* END: Hero Section */}
 
         {/* BEGIN: Gallery Thumbnails */}
         {mergedData.gallery?.showThumbnails &&
-          projectImages.length > 1 && (
-            <section
-              className={`grid grid-cols-2 md:grid-cols-${mergedData.gallery?.thumbnailGridColumns || 4} gap-4 mt-4`}
-              data-purpose="image-gallery"
-            >
-              {projectImages.slice(1).map((imageSrc, index) => (
-                <div
-                  key={index}
-                  onClick={() => setSelectedImage(imageSrc)}
-                  className={`rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative border-2 ${
-                    selectedImage === imageSrc
-                      ? "shadow-lg scale-105"
-                      : "border-transparent hover:scale-105"
-                  }`}
-                  style={{
-                    height: mergedData.gallery?.thumbnailHeight || "200px",
-                    borderColor:
-                      selectedImage === imageSrc ? primaryColor : "transparent",
-                  }}
-                >
-                  <Image
-                    alt={`${project.title} - صورة ${index + 2}`}
-                    className="w-full h-full object-cover transition-transform duration-300"
-                    src={imageSrc}
-                    fill
-                  />
-                </div>
-              ))}
+          projectImages.length > 0 && (
+            <section className="mt-4" data-purpose="image-gallery">
+              {projectImages.length > 1 && (
+                <p className="text-xs text-gray-500 mb-2 text-center">
+                  اضغط على أي صورة لفتحها في نافذة منبثقة
+                </p>
+              )}
+              <SwiperCarousel
+                items={projectImages
+                  .filter((imageSrc) => imageSrc && imageSrc.trim() !== "")
+                  .map((imageSrc, index) => (
+                    <div key={index} className="relative h-[10rem] md:h-24">
+                      <Image
+                        src={imageSrc}
+                        alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
+                        fill
+                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                          mainImage === imageSrc ? "" : "border-transparent"
+                        }`}
+                        style={
+                          mainImage === imageSrc
+                            ? {
+                                borderColor: primaryColor,
+                                borderWidth: "2px",
+                              }
+                            : {}
+                        }
+                        onClick={() => {
+                          setMainImage(imageSrc);
+                          handleThumbnailClick(imageSrc, index);
+                        }}
+                      />
+                      {logoImage && (
+                        <div className="absolute bottom-2 right-2 opacity-80">
+                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                            <Image
+                              src={logoImage}
+                              alt="Logo"
+                              width={160}
+                              height={80}
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                space={16}
+                autoplay={true}
+                desktopCount={4}
+                slideClassName="!h-[10rem] md:!h-[96px]"
+              />
             </section>
           )}
         {/* END: Gallery Thumbnails */}
@@ -710,23 +910,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   {/* Amenities */}
                   {project.amenities && project.amenities.length > 0 && (
                     <div className="flex flex-col items-center justify-center col-span-2 md:col-span-3">
-                      <div style={{ color: primaryColor }} className="mb-3">
-                        <svg
-                          className="h-8 w-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                          ></path>
-                        </svg>
-                      </div>
                       <div className="flex flex-wrap gap-2 justify-center">
                         {project.amenities.slice(0, 6).map((amenity, index) => (
                           <span
@@ -858,73 +1041,119 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
           {/* END Right Column */}
           {/* Left Column: Video & Map */}
           <div className="space-y-12 order-1 lg:order-2">
-            {/* Video Placeholder */}
+            {/* Floor Plans */}
+            {project.floorplans && project.floorplans.length > 0 && (
+              <div className="mb-8">
+                <h3
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  مخططات الأرضية
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {project.floorplans.map((planImage, index) => (
+                    <div
+                      key={index}
+                      className="relative group"
+                      onClick={() => handleThumbnailClick(planImage, projectImages.length + index)}
+                    >
+                      <Image
+                        src={planImage}
+                        alt={`مخطط الأرضية ${index + 1}`}
+                        width={400}
+                        height={200}
+                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Video */}
             {mergedData.displaySettings?.showVideoUrl &&
               project.videoUrl &&
               project.videoUrl.trim() !== "" && (
-                <section
-                  className="rounded-lg overflow-hidden shadow-md bg-black relative group h-64"
-                  data-purpose="video-section"
-                >
-                  <div className="relative w-full h-full">
-                    <Image
-                      alt="جولة فيديو"
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
-                      src={project.image || "/placeholder.jpg"}
-                      fill
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-black/40"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <a
-                      href={project.videoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-black/60 p-4 rounded-full border-2 border-white/70 cursor-pointer group-hover:scale-110 transition-transform"
-                      style={{
-                        borderColor: primaryColor,
-                      }}
-                    >
-                      <svg
-                        className="h-10 w-10 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M8 5v14l11-7z"></path>
-                      </svg>
-                    </a>
-                  </div>
-                  <div
-                    className="absolute top-4 right-4 text-white px-4 py-2 rounded text-sm font-bold text-right"
+                <div className="mb-8">
+                  <h3
+                    className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {mergedData.content?.videoTourText || "جولة فيديو للمقار"}
+                    فيديو المشروع
+                  </h3>
+                  <div className="w-full rounded-lg overflow-hidden shadow-lg">
+                    <video
+                      controls
+                      className="w-full h-auto"
+                      poster={project.image || undefined}
+                    >
+                      <source src={project.videoUrl} type="video/mp4" />
+                      متصفحك لا يدعم عرض الفيديو.
+                    </video>
                   </div>
-                </section>
+                </div>
               )}
 
-            {/* Map Placeholder */}
+            {/* Map */}
             {mergedData.displaySettings?.showMap &&
               project.location &&
               project.location.lat &&
               project.location.lng && (
-                <section
-                  className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
-                  data-purpose="map-section"
-                  style={{ borderColor: primaryColor }}
-                >
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="موقع المشروع"
-                  />
-                </section>
+                <div className="mb-8">
+                  <h3
+                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    موقع المشروع
+                  </h3>
+                  <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="موقع المشروع"
+                    />
+                  </div>
+                  <div className="mt-4 text-center">
+                    <a
+                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColor;
+                      }}
+                    >
+                      <MapPinIcon className="w-4 h-4" />
+                      فتح في خرائط جوجل
+                    </a>
+                  </div>
+                </div>
               )}
           </div>
           {/* END Left Column */}
@@ -932,6 +1161,75 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* END: Main Grid Layout */}
       </div>
       {/* END: Main Content Container */}
+
+      {/* Dialog لعرض الصورة المكبرة */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">عرض صورة المشروع</DialogTitle>
+          {selectedImage && selectedImage.trim() !== "" && project && (
+            <div className="relative w-full h-[80vh] group">
+              <Image
+                src={selectedImage}
+                alt={project?.title || "صورة المشروع"}
+                fill
+                className="object-contain rounded-lg"
+              />
+
+              {/* أسهم التنقل - تظهر فقط إذا كان هناك أكثر من صورة واحدة */}
+              {getAllImages().length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة السابقة"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة التالية"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </>
+              )}
+
+              {/* عداد الصور */}
+              {getAllImages().length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {getAllImages().length}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
