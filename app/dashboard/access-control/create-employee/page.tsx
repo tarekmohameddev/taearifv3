@@ -378,7 +378,8 @@ export default function CreateEmployeePage() {
                         >
                           الصلاحيات
                         </Label>
-                        <PermissionsDropdown
+                      <div className="pb-[20rem]">
+                      <PermissionsDropdown
                           permissions={permissions}
                           selectedPermissions={selectedPermissions}
                           handlePermissionChange={handlePermissionChange}
@@ -386,13 +387,15 @@ export default function CreateEmployeePage() {
                           isLoading={permissionsLoading}
                         />
                       </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </ScrollArea>
 
               {/* Footer Actions */}
-              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 px-4 sm:px-6 pb-3 sm:pb-4">
+                <div className="w-full pt-3 sm:pt-[10rem] "/>
+              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3  pt-3 px-4 sm:px-6 pb-3 sm:pb-4 ">
                 <Button
                   variant="outline"
                   onClick={() => router.back()}
