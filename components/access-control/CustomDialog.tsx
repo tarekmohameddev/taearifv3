@@ -106,7 +106,7 @@ export function CustomDialog({
       {/* Dialog Content */}
       <div
         className={`
-          relative z-50 w-full mx-2 sm:mx-4 md:mx-auto
+          relative z-50 w-full mx-2 sm:mx-4 md:mx-auto 
           ${maxWidth}
           max-h-[95vh] sm:max-h-[90vh]
           bg-white rounded-lg sm:rounded-lg shadow-2xl
