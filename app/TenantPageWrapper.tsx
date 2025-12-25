@@ -88,31 +88,15 @@ const loadHeaderComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(
-      `[Header Component] No subPath found for baseName: ${baseName}`,
-    );
     return null;
   }
 
   const fullPath = `${subPath}/${componentName}`;
 
-  // Debug log (can be removed in production)
-  if (process.env.NODE_ENV === "development") {
-    console.log("[Header Import Debug]", {
-      baseName,
-      subPath,
-      fullPath,
-      "Import path": `@/components/tenant/${fullPath}`,
-    });
-  }
 
   const component = dynamic(
     () =>
-      import(`@/components/tenant/${fullPath}`).catch((error) => {
-        console.error(
-          `[Header Import Error] Failed to load ${fullPath}:`,
-          error,
-        );
+      import(`@/components/tenant/${fullPath}`).catch(() => {
         return { default: StaticHeader1 };
       }),
     { ssr: false },
@@ -164,9 +148,6 @@ const loadFooterComponent = (componentName: string) => {
   const baseName = match[1];
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.warn(
-      `[Footer Component] No subPath found for baseName: ${baseName}`,
-    );
     return null;
   }
 
@@ -174,11 +155,7 @@ const loadFooterComponent = (componentName: string) => {
 
   const component = dynamic(
     () =>
-      import(`@/components/tenant/${fullPath}`).catch((error) => {
-        console.error(
-          `[Footer Import Error] Failed to load ${fullPath}:`,
-          error,
-        );
+      import(`@/components/tenant/${fullPath}`).catch(() => {
         return { default: StaticFooter1 };
       }),
     { ssr: false },
@@ -199,14 +176,12 @@ const loadComponent = (section: string, componentName: string) => {
   const sectionPath = getSectionPath(section) || section;
 
   if (!sectionPath) {
-    console.error("Invalid section:", section);
     return null;
   }
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.error("Invalid component type:", baseName);
     // استخدام fallback للمكونات غير المعروفة
     const fallbackPath = "hero"; // استخدام hero كـ fallback
     const fallbackFullPath = `${fallbackPath}/${componentName}`;
@@ -264,9 +239,6 @@ export default function TenantPageWrapper({
   useEffect(() => {
     if (tenantId) {
       setTenantId(tenantId);
-      console.log(
-        `🏢 TenantPageWrapper: Setting tenant ID: ${tenantId} (${domainType} domain)`,
-      );
     }
   }, [tenantId, setTenantId, domainType]);
 
@@ -316,63 +288,36 @@ export default function TenantPageWrapper({
   // التحقق من وجود الـ slug في staticPagesData, componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
     if (!slug) {
-      console.log("🔍 TenantPageWrapper - slugExists: false (no slug)");
       return false;
     }
 
     // ⭐ Priority 0: Check if it's a multi-level page (project, property, etc.)
     // Multi-level pages are always valid even if not in StaticPages
     if (isMultiLevelPage(slug)) {
-      console.log("🔍 TenantPageWrapper - slugExists: true (multi-level page)", {
-        slug,
-        dynamicSlug,
-      });
       return true;
     }
 
     // ⭐ Priority 1: Check static pages
     const staticPageData = getStaticPageData(slug);
     if (staticPageData) {
-      console.log("🔍 TenantPageWrapper - slugExists: true (found in staticPagesData)", {
-        slug,
-        staticPageData,
-      });
       return true;
     }
 
     // ⭐ Priority 2: Check tenantData.StaticPages
     if (tenantData?.StaticPages?.[slug]) {
-      console.log("🔍 TenantPageWrapper - slugExists: true (found in tenantData.StaticPages)", {
-        slug,
-        staticPage: tenantData.StaticPages[slug],
-      });
       return true;
     }
 
     // ⭐ Priority 3: Check componentSettings
     if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
-      console.log("🔍 TenantPageWrapper - slugExists: true (found in componentSettings)", {
-        slug,
-      });
       return true;
     }
 
     // ⭐ Priority 4: Check default definitions
     if ((PAGE_DEFINITIONS as any)[slug]) {
-      console.log("🔍 TenantPageWrapper - slugExists: true (found in PAGE_DEFINITIONS)", {
-        slug,
-      });
       return true;
     }
 
-    console.log("🔍 TenantPageWrapper - slugExists: false (not found anywhere)", {
-      slug,
-      hasTenantData: !!tenantData,
-      hasStaticPages: !!tenantData?.StaticPages,
-      hasComponentSettings: !!tenantData?.componentSettings,
-      staticPagesKeys: tenantData?.StaticPages ? Object.keys(tenantData.StaticPages) : [],
-      componentSettingsKeys: tenantData?.componentSettings ? Object.keys(tenantData.componentSettings) : [],
-    });
     return false;
   }, [tenantData?.componentSettings, tenantData?.StaticPages, slug, getStaticPageData, dynamicSlug]);
 
@@ -385,17 +330,6 @@ export default function TenantPageWrapper({
       tenantData?.globalComponentsData?.globalHeaderVariant ||
       "StaticHeader1";
 
-    // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === "development") {
-      console.log("[TenantPageWrapper] Header Variant Debug:", {
-        "globalHeaderData?.variant": globalHeaderData?.variant,
-        "tenantData?.globalComponentsData?.globalHeaderVariant":
-          tenantData?.globalComponentsData?.globalHeaderVariant,
-        "resolved variant": variant,
-        "tenantData exists": !!tenantData,
-        "globalComponentsData exists": !!tenantData?.globalComponentsData,
-      });
-    }
 
     return variant;
   }, [
@@ -413,17 +347,6 @@ export default function TenantPageWrapper({
       tenantData?.globalComponentsData?.globalFooterVariant ||
       "StaticFooter1";
 
-    // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === "development") {
-      console.log("[TenantPageWrapper] Footer Variant Debug:", {
-        "globalFooterData?.variant": globalFooterData?.variant,
-        "tenantData?.globalComponentsData?.globalFooterVariant":
-          tenantData?.globalComponentsData?.globalFooterVariant,
-        "resolved variant": variant,
-        "tenantData exists": !!tenantData,
-        "globalComponentsData exists": !!tenantData?.globalComponentsData,
-      });
-    }
 
     return variant;
   }, [
@@ -668,13 +591,6 @@ export default function TenantPageWrapper({
 
   // إذا لم يكن الـ slug موجود في componentSettings، أظهر 404
   if (!slugExists) {
-    console.log("❌ TenantPageWrapper - Calling notFound()", {
-      slug,
-      dynamicSlug,
-      tenantId,
-      hasTenantData: !!tenantData,
-      slugExists,
-    });
     notFound();
   }
 
@@ -712,22 +628,10 @@ export default function TenantPageWrapper({
                   const componentName =
                     componentMap[globalHeaderVariant] || "StaticHeader1";
 
-                  // Debug log (can be removed in production)
-                  if (process.env.NODE_ENV === "development") {
-                    console.log("[TenantPageWrapper] Header Component Debug:", {
-                      globalHeaderVariant: globalHeaderVariant,
-                      componentName: componentName,
-                      "componentMap[globalHeaderVariant]":
-                        componentMap[globalHeaderVariant],
-                    });
-                  }
 
                   const HeaderComponent = loadHeaderComponent(componentName);
 
                   if (!HeaderComponent) {
-                    console.warn(
-                      "[TenantPageWrapper] HeaderComponent is null, falling back to StaticHeader1",
-                    );
                     return (
                       <StaticHeader1 overrideData={globalHeaderData || {}} />
                     );
