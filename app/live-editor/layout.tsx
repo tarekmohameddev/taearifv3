@@ -1196,6 +1196,33 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         "og:image:type": null,
         "og:image:alt": "المشاريع",
       },
+      project: {
+        TitleAr: "صفحة المشروع",
+        TitleEn: "Project Page",
+        DescriptionAr: "صفحة تفاصيل المشروع",
+        DescriptionEn: "Project details page",
+        KeywordsAr: "مشروع, تفاصيل, عقار",
+        KeywordsEn: "project, details, real estate",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "صفحة المشروع",
+        "og:description": "صفحة تفاصيل المشروع",
+        "og:keywords": "مشروع, تفاصيل",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "صفحة المشروع",
+      },
       "about-us": {
         TitleAr: "من نحن",
         TitleEn: "About Us",
@@ -1333,6 +1360,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             slug: pageSlug,
             name: pageName,
             path: `/${pageSlug}`,
+            isStatic: true, // ⭐ علامة للصفحات الثابتة
             // إضافة بيانات SEO إذا كانت موجودة، وإلا إضافة البيانات الافتراضية
             seo: hasSeoData
               ? {
@@ -1393,6 +1421,64 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         name: "Homepage",
         path: "",
         seo: getDefaultSeoData(""),
+      });
+    }
+
+    // ⭐ إضافة صفحة المشروع بشكل إجباري
+    const projectPageExists = pages.some(
+      (page) => page.slug === "project" || page.path === "/project",
+    );
+    if (!projectPageExists) {
+      // البحث عن بيانات SEO لصفحة project في WebsiteLayout
+      let projectSeoData = null;
+      if (websiteLayout?.metaTags?.pages) {
+        projectSeoData = websiteLayout.metaTags.pages.find(
+          (page: any) =>
+            page.path === "/project" || page.path === "project",
+        );
+      }
+
+      const hasProjectSeoData =
+        projectSeoData &&
+        (projectSeoData.TitleAr ||
+          projectSeoData.TitleEn ||
+          projectSeoData.DescriptionAr ||
+          projectSeoData.DescriptionEn);
+
+      pages.push({
+        slug: "project",
+        name: locale === "ar" ? "صفحة المشروع" : "Project Page",
+        path: "/project",
+        isStatic: true, // ⭐ علامة للصفحات الثابتة
+        seo: hasProjectSeoData
+          ? {
+              TitleAr: projectSeoData.TitleAr,
+              TitleEn: projectSeoData.TitleEn,
+              DescriptionAr: projectSeoData.DescriptionAr,
+              DescriptionEn: projectSeoData.DescriptionEn,
+              KeywordsAr: projectSeoData.KeywordsAr,
+              KeywordsEn: projectSeoData.KeywordsEn,
+              Author: projectSeoData.Author,
+              AuthorEn: projectSeoData.AuthorEn,
+              Robots: projectSeoData.Robots,
+              RobotsEn: projectSeoData.RobotsEn,
+              "og:title": projectSeoData["og:title"],
+              "og:description": projectSeoData["og:description"],
+              "og:keywords": projectSeoData["og:keywords"],
+              "og:author": projectSeoData["og:author"],
+              "og:robots": projectSeoData["og:robots"],
+              "og:url": projectSeoData["og:url"],
+              "og:image": projectSeoData["og:image"],
+              "og:type": projectSeoData["og:type"],
+              "og:locale": projectSeoData["og:locale"],
+              "og:locale:alternate": projectSeoData["og:locale:alternate"],
+              "og:site_name": projectSeoData["og:site_name"],
+              "og:image:width": projectSeoData["og:image:width"],
+              "og:image:height": projectSeoData["og:image:height"],
+              "og:image:type": projectSeoData["og:image:type"],
+              "og:image:alt": projectSeoData["og:image:alt"],
+            }
+          : getDefaultSeoData("project"),
       });
     }
 
@@ -2124,29 +2210,56 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                               onClick={() => setIsPagesDropdownOpen(false)}
                               className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
                                 currentPath === page.path
-                                  ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                  : "text-gray-700 hover:bg-gray-50"
+                                  ? page.isStatic
+                                    ? "bg-yellow-50 text-yellow-800 border border-yellow-200"
+                                    : "bg-blue-50 text-blue-700 border border-blue-200"
+                                  : page.isStatic
+                                    ? "text-yellow-700 hover:bg-yellow-50/50"
+                                    : "text-gray-700 hover:bg-gray-50"
                               }`}
                             >
-                              <svg
-                                className="w-4 h-4 mr-3 flex-shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                              </svg>
-                              <span className="truncate">
+                              {page.isStatic ? (
+                                <svg
+                                  className="w-4 h-4 mr-3 flex-shrink-0 text-yellow-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-4 h-4 mr-3 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                  />
+                                </svg>
+                              )}
+                              <span className="truncate flex-1">
                                 {getPageTitle(page)}
                               </span>
+                              {page.isStatic && (
+                                <span className="ml-2 px-1.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+                                  🔒
+                                </span>
+                              )}
                               {currentPath === page.path && (
                                 <svg
-                                  className="w-4 h-4 ml-auto text-blue-600"
+                                  className={`w-4 h-4 ml-auto ${
+                                    page.isStatic ? "text-yellow-600" : "text-blue-600"
+                                  }`}
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -2642,29 +2755,56 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                             onClick={() => setIsPagesDropdownOpen(false)}
                             className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
                               currentPath === page.path
-                                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                : "text-gray-700 hover:bg-gray-50"
+                                ? page.isStatic
+                                  ? "bg-yellow-50 text-yellow-800 border border-yellow-200"
+                                  : "bg-blue-50 text-blue-700 border border-blue-200"
+                                : page.isStatic
+                                  ? "text-yellow-700 hover:bg-yellow-50/50"
+                                  : "text-gray-700 hover:bg-gray-50"
                             }`}
                           >
-                            <svg
-                              className="w-4 h-4 mr-3 flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                              />
-                            </svg>
-                            <span className="truncate">
+                            {page.isStatic ? (
+                              <svg
+                                className="w-4 h-4 mr-3 flex-shrink-0 text-yellow-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-4 h-4 mr-3 flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            )}
+                            <span className="truncate flex-1">
                               {getPageTitle(page)}
                             </span>
+                            {page.isStatic && (
+                              <span className="ml-2 px-1.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+                                🔒
+                              </span>
+                            )}
                             {currentPath === page.path && (
                               <svg
-                                className="w-4 h-4 ml-auto text-blue-600"
+                                className={`w-4 h-4 ml-auto ${
+                                  page.isStatic ? "text-yellow-600" : "text-blue-600"
+                                }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
