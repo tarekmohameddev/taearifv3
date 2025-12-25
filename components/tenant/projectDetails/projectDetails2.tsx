@@ -758,7 +758,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
               className="text-3xl font-bold mb-6 text-right"
               style={{ color: mergedData.styling?.textColor || primaryColor }}
             >
-              {mergedData.content?.descriptionTitle || "وصف العقار"}
+              {mergedData.content?.descriptionTitle || "وصف المشروع"}
             </h2>
             <p
               className="leading-relaxed text-right text-lg"
@@ -781,7 +781,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   className="text-3xl font-bold mb-8 text-right"
                   style={{ color: mergedData.styling?.textColor || primaryColor }}
                 >
-                  {mergedData.content?.specsTitle || "مواصفات العقار"}
+                  {mergedData.content?.specsTitle || "مواصفات المشروع"}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
                   {/* Developer */}
@@ -944,7 +944,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   className="text-2xl font-bold mb-2 text-right"
                   style={{ color: mergedData.styling?.formTextColor || "#ffffff" }}
                 >
-                  {mergedData.content?.contactFormTitle || "استفسر عن هذا العقار"}
+                  {mergedData.content?.contactFormTitle || "استفسر عن هذا المشروع"}
                 </h2>
                 <p
                   className="text-sm mb-6 text-right"
@@ -955,7 +955,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   }}
                 >
                   {mergedData.content?.contactFormDescription ||
-                    "استفسر عن المنزل واملأ البيانات لهذا العقار"}
+                    "استفسر عن المشروع واملأ البيانات لهذا المشروع"}
                 </p>
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-4">

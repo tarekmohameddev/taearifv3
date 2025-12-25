@@ -147,7 +147,7 @@ const PropertyDetails = () => {
           data-purpose="description-block"
           dir="rtl"
         >
-          <h2 className="text-3xl font-bold text-[#967152] mb-6 font-extrabold text-right">
+          <h2 className="text-3xl font-bold text-[#967152] mb-6  text-right">
             وصف العقار
           </h2>
           <p className="text-[#967152] leading-relaxed text-right text-lg">
@@ -170,7 +170,7 @@ const PropertyDetails = () => {
           <div className="space-y-12 order-2 lg:order-1">
             {/* Specs Section */}
             <section className="bg-transparent" data-purpose="property-specs">
-              <h2 className="text-3xl font-bold text-[#967152] mb-8 text-right font-extrabold">
+              <h2 className="text-3xl font-bold text-[#967152] mb-8 text-right ">
                 مواصفات العقار
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">

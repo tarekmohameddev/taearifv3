@@ -146,11 +146,11 @@ export const getDefaultProjectDetails2Data = (): ComponentData => ({
   // Content - نصوص قابلة للتعديل
   content: {
     badgeText: "مشروع عقاري",
-    descriptionTitle: "وصف العقار",
-    specsTitle: "مواصفات العقار",
-    contactFormTitle: "استفسر عن هذا العقار",
-    contactFormDescription: "استفسر عن المنزل واملأ البيانات لهذا العقار",
-    videoTourText: "جولة فيديو للمقار",
+    descriptionTitle: "وصف المشروع",
+    specsTitle: "مواصفات المشروع",
+    contactFormTitle: "استفسر عن هذا المشروع",
+    contactFormDescription: "استفسر عن المنزل واملأ البيانات لهذا المشروع",
+    videoTourText: "جولة فيديو للمشروع",
     submitButtonText: "أرسل استفسارك",
   },
 
