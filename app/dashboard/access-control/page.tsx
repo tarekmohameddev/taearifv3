@@ -60,7 +60,6 @@ import {
   Database,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { ViewEmployeeDialog } from "@/components/access-control/ViewEmployeeDialog";
 
 // Types
 interface Employee {
@@ -1584,15 +1583,19 @@ export default function AccessControlPage() {
                                       <XCircle className="h-4 w-4" />
                                       حذف
                                     </Button>
-                                    <ViewEmployeeDialog
-                                      employee={employee}
-                                      employeeDetails={employeeDetails}
-                                      detailsLoading={detailsLoading}
-                                      onViewEmployee={handleViewEmployee}
-                                      getInitials={getInitials}
-                                      formatDate={formatDate}
-                                      getStatusBadge={getStatusBadge}
-                                    />
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        router.push(
+                                          `/dashboard/access-control/view-employee/${employee.id}`,
+                                        )
+                                      }
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                      عرض التفاصيل
+                                    </Button>
                                   </div>
                                 </TableCell>
                               </TableRow>
