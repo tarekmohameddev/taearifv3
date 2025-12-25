@@ -52,7 +52,13 @@ export function useLiveEditorEffects(state: any) {
 
   // Database Loading Effect
   useEffect(() => {
-    if (!initialized && !authLoading && !tenantLoading && tenantData) {
+    // For static pages like "project", always check even if initialized
+    const isStaticPage = slug === "project";
+    const shouldLoad = isStaticPage 
+      ? (!authLoading && !tenantLoading && tenantData)
+      : (!initialized && !authLoading && !tenantLoading && tenantData);
+    
+    if (shouldLoad) {
       // Always load data into editorStore when tenantData is available
       const editorStore = useEditorStore.getState();
 
@@ -89,6 +95,81 @@ export function useLiveEditorEffects(state: any) {
 
       // Re-check store after loadFromDatabase (in case it was updated)
       const storePageComponentsAfterLoad = editorStore.pageComponentsByPage[slug];
+      
+      // ⭐ NEW: For static pages (like "project"), load from staticPagesData instead of componentSettings
+      if (slug === "project") {
+        console.log("🔍 Processing static page 'project'", {
+          slug,
+          hasTenantData: !!tenantData,
+          initialized,
+        });
+        
+        let staticPageData = editorStore.getStaticPageData("project");
+        let staticPageComponents = staticPageData?.components || [];
+        
+        console.log("🔍 Static page data check:", {
+          hasStaticPageData: !!staticPageData,
+          componentCount: staticPageComponents.length,
+        });
+        
+        // If no components in staticPagesData, add default projectDetails1
+        if (staticPageComponents.length === 0) {
+          console.log("⚠️ No components found, adding default projectDetails1");
+          
+          const defaultProjectComponent = {
+            id: "projectDetails1",
+            type: "projectDetails",
+            name: "Project Details",
+            componentName: "projectDetails1",
+            data: {
+              projectSlug: "", // Will be set from URL params
+              visible: true,
+            },
+            position: 0,
+            layout: { row: 0, col: 0, span: 2 },
+          };
+          
+          // Add to staticPagesData
+          editorStore.setStaticPageData("project", {
+            slug: "project",
+            components: [defaultProjectComponent],
+          });
+          
+          // Re-read staticPageData after adding
+          staticPageData = editorStore.getStaticPageData("project");
+          staticPageComponents = staticPageData?.components || [];
+          
+          console.log("✅ Added default projectDetails1 component to static page 'project'", {
+            componentCount: staticPageComponents.length,
+          });
+        }
+        
+        // Load components from staticPagesData
+        if (staticPageComponents.length > 0) {
+          // Convert static page components to the format expected by setPageComponents
+          const staticComponents = staticPageComponents.map((comp: any) => ({
+            id: comp.id || `projectDetails1`,
+            type: comp.type || "projectDetails",
+            name: comp.name || "Project Details",
+            componentName: comp.componentName || "projectDetails1",
+            data: comp.data || { projectSlug: "", visible: true },
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          }));
+          
+          console.log("✅ Loading static page 'project' components:", {
+            componentCount: staticComponents.length,
+            components: staticComponents.map((c: any) => c.componentName),
+            firstComponent: staticComponents[0],
+          });
+          
+          setPageComponents(staticComponents);
+          setInitialized(true);
+          return; // Skip regular page loading logic
+        } else {
+          console.error("❌ No components to load for static page 'project'");
+        }
+      }
       
       if (hasRecentThemeChange && storePageComponentsAfterLoad !== undefined) {
         // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
@@ -353,6 +434,42 @@ export function useLiveEditorEffects(state: any) {
         .join(",");
     };
 
+    // ⭐ NEW: For static pages, always check staticPagesData first
+    if (slug === "project") {
+      const editorStore = useEditorStore.getState();
+      const staticPageData = editorStore.getStaticPageData("project");
+      const staticPageComponents = staticPageData?.components || [];
+      
+      if (staticPageComponents.length > 0) {
+        const staticComponents = staticPageComponents.map((comp: any) => ({
+          id: comp.id || `projectDetails1`,
+          type: comp.type || "projectDetails",
+          name: comp.name || "Project Details",
+          componentName: comp.componentName || "projectDetails1",
+          data: comp.data || { projectSlug: "", visible: true },
+          position: comp.position || 0,
+          layout: comp.layout || { row: 0, col: 0, span: 2 },
+        }));
+        
+        const staticSignature = createSignature(staticComponents);
+        
+        // Only update if we haven't synced this exact state (avoid infinite loop)
+        if (lastSyncedRef.current !== staticSignature) {
+          console.log("[LiveEditorEffects] Syncing static page from staticPagesData:", {
+            slug,
+            componentCount: staticComponents.length,
+            staticSignature: staticSignature.substring(0, 50),
+          });
+          setPageComponents(staticComponents);
+          lastSyncedRef.current = staticSignature;
+          return; // Skip normal sync logic for static pages
+        } else {
+          // Already synced, skip to avoid infinite loop
+          return;
+        }
+      }
+    }
+
     // ⭐ CRITICAL: Force sync if themeChangeTimestamp changed (after theme restore)
     // This ensures immediate update after clearAllStates() and restore
     // We need to check the store directly to get the latest data, not rely on subscription
@@ -360,6 +477,33 @@ export function useLiveEditorEffects(state: any) {
       // Get fresh data from store (bypass subscription timing issues)
       const store = useEditorStore.getState();
       const freshStorePageComponents = store.pageComponentsByPage[slug];
+      
+      // ⭐ NEW: For static pages, check staticPagesData first
+      if (slug === "project" && !freshStorePageComponents) {
+        const staticPageData = store.getStaticPageData("project");
+        const staticPageComponents = staticPageData?.components || [];
+        
+        if (staticPageComponents.length > 0) {
+          const staticComponents = staticPageComponents.map((comp: any) => ({
+            id: comp.id || `projectDetails1`,
+            type: comp.type || "projectDetails",
+            name: comp.name || "Project Details",
+            componentName: comp.componentName || "projectDetails1",
+            data: comp.data || { projectSlug: "", visible: true },
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          }));
+          
+          const staticSignature = createSignature(staticComponents);
+          console.log("[LiveEditorEffects] Force sync static page after theme change:", {
+            slug,
+            componentCount: staticComponents.length,
+          });
+          setPageComponents(staticComponents);
+          lastSyncedRef.current = staticSignature;
+          return;
+        }
+      }
       
       if (freshStorePageComponents !== undefined) {
         const storeSignature = createSignature(freshStorePageComponents);
@@ -373,6 +517,14 @@ export function useLiveEditorEffects(state: any) {
         return;
       } else {
         // If storePageComponents is undefined, set to empty array to clear iframe
+        // BUT: Skip for static pages if they have components in staticPagesData
+        if (slug === "project") {
+          const staticPageData = store.getStaticPageData("project");
+          if (staticPageData?.components?.length > 0) {
+            // Don't clear, static page has components
+            return;
+          }
+        }
         console.log("[LiveEditorEffects] No components found for page after theme change, clearing:", slug);
         setPageComponents([]);
         lastSyncedRef.current = "empty";
@@ -406,15 +558,47 @@ export function useLiveEditorEffects(state: any) {
         setPageComponents(storePageComponents || []);
       }
     } else {
+      // ⭐ NEW: For static pages (like "project"), check staticPagesData before clearing
+      if (slug === "project") {
+        const editorStore = useEditorStore.getState();
+        const staticPageData = editorStore.getStaticPageData("project");
+        const staticPageComponents = staticPageData?.components || [];
+        
+        if (staticPageComponents.length > 0) {
+          // Convert static page components to the format expected by setPageComponents
+          const staticComponents = staticPageComponents.map((comp: any) => ({
+            id: comp.id || `projectDetails1`,
+            type: comp.type || "projectDetails",
+            name: comp.name || "Project Details",
+            componentName: comp.componentName || "projectDetails1",
+            data: comp.data || { projectSlug: "", visible: true },
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          }));
+          
+          const staticSignature = createSignature(staticComponents);
+          if (lastSyncedRef.current !== staticSignature) {
+            console.log("[LiveEditorEffects] Syncing static page components from staticPagesData:", {
+              slug,
+              componentCount: staticComponents.length,
+            });
+            setPageComponents(staticComponents);
+            lastSyncedRef.current = staticSignature;
+            return;
+          }
+        }
+      }
+      
       // ⭐ NEW: If storePageComponents is undefined but we have pageComponents, clear them
       // This handles the case where clearAllStates() was called but pageComponents wasn't updated
+      // BUT: Skip this for static pages if they have components in staticPagesData
       if (pageComponents.length > 0) {
         console.log("[LiveEditorEffects] Clearing pageComponents (store is undefined):", slug);
         setPageComponents([]);
         lastSyncedRef.current = "empty";
       }
     }
-  }, [initialized, slug, storePageComponents, pageComponents, setPageComponents, currentTheme, themeChangeTimestamp]);
+  }, [initialized, slug, storePageComponents, setPageComponents, currentTheme, themeChangeTimestamp]);
 
   // Reset sync ref when theme changes to force re-sync
   useEffect(() => {
