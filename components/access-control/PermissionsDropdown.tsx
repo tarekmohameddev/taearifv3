@@ -165,14 +165,12 @@ export function PermissionsDropdown({
         borderColor: "#000",
       },
       minHeight: "32px",
-      maxWidth: "400px",
       width: "100%",
       padding: "2px 4px",
       fontSize: "12px",
     }),
     menu: (provided) => ({
       ...provided,
-      maxWidth: "400px",
       zIndex: 9999,
     }),
     menuPortal: (provided) => ({
@@ -360,7 +358,7 @@ export function PermissionsDropdown({
   }
 
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full">
       <Select<OptionType, true>
         isMulti
         options={options}
