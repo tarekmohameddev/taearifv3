@@ -124,7 +124,7 @@ export default function CreateEmployeePage() {
   };
 
   // Create employee
-  const createEmployee = async () => {
+  const createEmployee = async () => { 
     setCreateLoading(true);
     setCreateError(null);
 
@@ -172,10 +172,10 @@ export default function CreateEmployeePage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <EnhancedSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col h-screen bg-gray-50">
         <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
+      <EnhancedSidebar />
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}

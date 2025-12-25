@@ -1386,10 +1386,10 @@ export default function AccessControlPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="analytics" setActiveTab={() => {}} />
+    <div className="flex min-h-screen flex-col h-screen bg-gray-50">
+        <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
+      <EnhancedSidebar />
 
         <div className="flex-1 overflow-auto p-6">
           <div className=" mx-auto">
