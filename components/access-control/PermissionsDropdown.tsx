@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import Select, { MultiValue, StylesConfig } from "react-select";
+import Select, { MultiValue, StylesConfig, components } from "react-select";
 import { getPermissionGroupAr } from "@/lib/permissionGroupsTranslation";
 
 // Types
@@ -72,7 +72,7 @@ export function PermissionsDropdown({
     const formattedOptions: OptionType[] = [];
 
     Object.entries(permissions.grouped).forEach(([groupName, groupPermissions]) => {
-      // Add parent option (group)
+      // Add parent option (group) - as header only, not selectable
       const groupLabel = getPermissionGroupAr(groupName) || groupName.replace(/\./g, " ");
       formattedOptions.push({
         value: `group:${groupName}`,
@@ -98,52 +98,33 @@ export function PermissionsDropdown({
     return formattedOptions;
   }, [permissions]);
 
-  // Get currently selected values
+  // Get currently selected values - only individual permissions, no groups
   const selectedValues = useMemo(() => {
     const values: OptionType[] = [];
 
     if (!permissions || !permissions.grouped) return values;
 
+    // Only add individual permissions, never add groups
     Object.entries(permissions.grouped).forEach(([groupName, groupPermissions]) => {
-      // Check if all permissions in group are selected
-      const allSelected = groupPermissions.every(
-        (p) => selectedPermissions[p.name] === true
-      );
-      const someSelected = groupPermissions.some(
-        (p) => selectedPermissions[p.name] === true
-      );
-
-      if (allSelected && groupPermissions.length > 0) {
-        // Add group if all children selected
-        const groupLabel = getPermissionGroupAr(groupName) || groupName.replace(/\./g, " ");
-        values.push({
-          value: `group:${groupName}`,
-          label: `${groupLabel} (${groupPermissions.length} صلاحية)`,
-          isGroup: true,
-          groupName: groupName,
-        });
-      } else if (someSelected) {
-        // Add individual permissions if only some selected
-        groupPermissions.forEach((permission) => {
-          if (selectedPermissions[permission.name]) {
-            const permissionLabel =
-              permission.name_ar || permission.name_en || permission.name;
-            values.push({
-              value: `permission:${permission.name}`,
-              label: permissionLabel,
-              isGroup: false,
-              groupName: groupName,
-              permission: permission,
-            });
-          }
-        });
-      }
+      groupPermissions.forEach((permission) => {
+        if (selectedPermissions[permission.name]) {
+          const permissionLabel =
+            permission.name_ar || permission.name_en || permission.name;
+          values.push({
+            value: `permission:${permission.name}`,
+            label: permissionLabel,
+            isGroup: false,
+            groupName: groupName,
+            permission: permission,
+          });
+        }
+      });
     });
 
     return values;
   }, [permissions, selectedPermissions]);
 
-  // Handle selection change
+  // Handle selection change - only handle individual permissions
   const handleChange = (selected: MultiValue<OptionType>) => {
     if (!permissions || !permissions.grouped) return;
 
@@ -157,16 +138,9 @@ export function PermissionsDropdown({
       });
     });
 
-    // Process selected items
+    // Process only individual permissions (groups are not selectable)
     selectedArray.forEach((option) => {
-      if (option.isGroup && option.groupName) {
-        // If group selected, select all its permissions
-        const groupPermissions = permissions.grouped[option.groupName] || [];
-        groupPermissions.forEach((permission) => {
-          newSelectedPermissions[permission.name] = true;
-        });
-      } else if (option.permission) {
-        // If individual permission selected
+      if (option.permission && !option.isGroup) {
         newSelectedPermissions[option.permission.name] = true;
       }
     });
@@ -265,6 +239,55 @@ export function PermissionsDropdown({
     }),
   };
 
+  // Custom Option component to handle group clicks
+  const CustomOption = (props: any) => {
+    const { data, innerRef, innerProps } = props;
+
+    if (data.isGroup) {
+      // Group is a header - make it clickable to select all permissions
+      const allSelected = permissions?.grouped[data.groupName]?.every(
+        (p: Permission) => selectedPermissions[p.name] === true
+      ) || false;
+
+      return (
+        <div
+          ref={innerRef}
+          {...innerProps}
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Toggle all permissions in the group
+            const groupPermissions = permissions?.grouped[data.groupName] || [];
+            const shouldSelect = !allSelected;
+            groupPermissions.forEach((permission: Permission) => {
+              handlePermissionChange(permission.name, shouldSelect);
+            });
+          }}
+          className="react-select__option react-select__option--is-group"
+          style={{
+            backgroundColor: allSelected ? "#000" : "white",
+            color: allSelected ? "white" : "#111827",
+            paddingRight: "12px",
+            paddingLeft: "12px",
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            fontSize: "12px",
+            fontWeight: "600",
+            lineHeight: "1.4",
+            direction: "rtl",
+            textAlign: "right",
+            cursor: "pointer",
+          }}
+        >
+          {data.label}
+        </div>
+      );
+    }
+
+    // Regular permission option
+    return <components.Option {...props} />;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -306,6 +329,10 @@ export function PermissionsDropdown({
         menuPortalTarget={menuPortalTarget}
         menuPosition="fixed"
         menuShouldScrollIntoView={false}
+        components={{
+          Option: CustomOption,
+        }}
+        isOptionDisabled={(option) => option.isGroup === true}
       />
     </div>
   );
