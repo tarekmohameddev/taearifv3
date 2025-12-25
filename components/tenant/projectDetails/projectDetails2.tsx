@@ -750,7 +750,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* BEGIN: Property Description */}
         {mergedData.displaySettings?.showDescription && (
           <section
-            className="bg-transparent p-10 rounded-lg"
+            className="bg-transparent py-10 rounded-lg"
             data-purpose="description-block"
             dir="rtl"
           >
