@@ -804,6 +804,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
   // تحديث البيانات المدمجة عند تغيير أي مصدر بيانات
   useEffect(() => {
+    // Check if this is a static page
+    const editorStore = useEditorStore.getState();
+    const staticPageData = editorStore.getStaticPageData(state.slug);
+    const isStaticPage = !!staticPageData;
+
     // 1. معالجة pageComponents مع mergedData
     const componentsWithMergedData = pageComponents
       .filter(
@@ -812,10 +817,31 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           !component.componentName?.startsWith("footer"),
       )
       .map((component: any) => {
+        // For static pages, get componentName and id from staticPagesData (more up-to-date)
+        let finalComponentName = component.componentName;
+        let finalId = component.id;
+        if (isStaticPage && staticPageData) {
+          // First try to find by id, then by componentName (in case id changed)
+          let storeComp = staticPageData.components.find(
+            (sc: any) => sc.id === component.id
+          );
+          // If not found by id, try to find by componentName (for cases where id was updated)
+          if (!storeComp) {
+            storeComp = staticPageData.components.find(
+              (sc: any) => sc.componentName === component.componentName
+            );
+          }
+          if (storeComp) {
+            finalComponentName = storeComp.componentName;
+            finalId = storeComp.id; // ✅ Sync id (should match componentName for static pages)
+          }
+        }
+
         // قراءة البيانات من editorStore
+        // For static pages, use finalId (which may have been updated to match componentName)
         const storeData = useEditorStore
           .getState()
-          .getComponentData(component.type, component.id);
+          .getComponentData(component.type, finalId);
 
         // دمج البيانات: أولوية للبيانات من editorStore
         const mergedData =
@@ -825,6 +851,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
         return {
           ...component,
+          id: finalId, // ✅ Use updated id (should match componentName for static pages)
+          componentName: finalComponentName, // ✅ Use updated componentName from staticPagesData
           mergedData,
         };
       });
@@ -837,6 +865,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     });
   }, [
     pageComponents,
+    state.slug, // ✅ Add slug to detect static pages and trigger update when page changes
     globalHeaderData,
     globalFooterData,
     globalFooterVariant, // ⭐ NEW: Update when footer variant changes
@@ -1295,7 +1324,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       }`}
                     >
                       <CachedComponent
-                        key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
+                        key={`${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`}
                         componentName={component.componentName}
                         section={state.slug}
                         componentId={component.id}

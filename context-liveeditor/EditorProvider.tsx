@@ -17,9 +17,11 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 
   const confirmSave = async () => {
     // Execute any page-provided save logic first (if set)
+    // This updates staticPagesData from pageComponents for static pages
     openSaveDialogFn();
 
     // Collect all component states from the editor store
+    // Get fresh state after openSaveDialogFn() has updated staticPagesData
     const state = useEditorStore.getState();
 
     // Get tenantData for username and websiteName
@@ -39,11 +41,34 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     const headerVariant = state.globalHeaderVariant || "StaticHeader1";
     const footerVariant = state.globalFooterVariant || "StaticFooter1";
 
+    // Get static page slugs to exclude them from pages and componentSettings
+    const staticPageSlugs = new Set(
+      Object.keys(state.staticPagesData || {})
+    );
+
     // Convert pageComponentsByPage (array format) to componentSettings (object format)
+    // ⚠️ Exclude static pages - they should only be in StaticPages, not in pages/componentSettings
     const componentSettings: Record<string, any> = {};
+    // Also create pages format (array format) for API
+    const pages: Record<string, any[]> = {};
     Object.entries(state.pageComponentsByPage).forEach(
       ([pageSlug, components]) => {
+        // Skip static pages - they are handled separately in StaticPages
+        if (staticPageSlugs.has(pageSlug)) {
+          return;
+        }
+
         componentSettings[pageSlug] = {};
+        // pages format: array of components (API expects this format)
+        pages[pageSlug] = components.map((comp: any) => ({
+          id: comp.id,
+          type: comp.type,
+          name: comp.name,
+          componentName: comp.componentName,
+          data: comp.data || {},
+          position: comp.position || 0,
+          layout: (comp as any).layout || { row: 0, col: 0, span: 2 },
+        }));
         components.forEach((comp: any) => {
           componentSettings[pageSlug][comp.id] = {
             type: comp.type,
@@ -58,8 +83,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     );
 
     const payload: any = {
+      tenantId: username, // API requires tenantId (maps to username in database)
       username: username,
       websiteName: websiteName,
+      pages: pages, // API requires pages in array format
       componentSettings: componentSettings,
       globalComponentsData: {
         ...state.globalComponentsData,
@@ -109,13 +136,16 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     }
 
     // ⭐ Add StaticPages to payload if it has any data
+    // Get fresh staticPagesData after openSaveDialogFn() has updated it
+    const freshState = useEditorStore.getState();
     const hasStaticPagesData =
-      state.staticPagesData &&
-      typeof state.staticPagesData === "object" &&
-      Object.keys(state.staticPagesData).length > 0;
+      freshState.staticPagesData &&
+      typeof freshState.staticPagesData === "object" &&
+      Object.keys(freshState.staticPagesData).length > 0;
 
     if (hasStaticPagesData) {
-      payload.StaticPages = state.staticPagesData;
+      // Use fresh staticPagesData to ensure we have the latest componentName updates
+      payload.StaticPages = freshState.staticPagesData;
     }
 
     // Send to backend to persist
@@ -130,10 +160,21 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         const currentTenantData = useTenantStore.getState().tenantData;
 
         if (currentTenantData) {
+          // Get static page slugs to exclude them from componentSettings
+          const staticPageSlugs = new Set(
+            Object.keys(state.staticPagesData || {})
+          );
+
           // Convert pageComponentsByPage to componentSettings format
+          // ⚠️ Exclude static pages - they should only be in StaticPages, not in componentSettings
           const updatedComponentSettings: Record<string, any> = {};
           Object.entries(state.pageComponentsByPage).forEach(
             ([pageSlug, components]) => {
+              // Skip static pages - they are handled separately in StaticPages
+              if (staticPageSlugs.has(pageSlug)) {
+                return;
+              }
+
               updatedComponentSettings[pageSlug] = {};
               components.forEach((comp: any) => {
                 updatedComponentSettings[pageSlug][comp.id] = {

@@ -106,24 +106,44 @@ export default function ProjectPageWrapper({
         .map((component: any) => ({
           id: component.id,
           componentName: component.componentName,
-          data: component.data,
+          data: { ...component.data, projectSlug },
           position: component.position || 0,
         }))
         .sort((a: any, b: any) => a.position - b.position);
     }
 
     // ⭐ Priority 2: Try to get from tenantData.StaticPages
-    if (tenantData?.StaticPages?.["project"]?.components) {
+    // Handle both formats: { components: [...] } or ["project", [components...]]
+    if (tenantData?.StaticPages?.["project"]) {
       const staticPage = tenantData.StaticPages["project"];
-      if (Array.isArray(staticPage.components)) {
-        return staticPage.components
-          .map((component: any) => ({
-            id: component.id,
-            componentName: component.componentName,
-            data: component.data,
-            position: component.position || 0,
-          }))
-          .sort((a: any, b: any) => a.position - b.position);
+      
+      // Format 1: Array format ["project", [components...]]
+      if (Array.isArray(staticPage) && staticPage.length >= 2) {
+        const components = staticPage[1];
+        if (Array.isArray(components)) {
+          return components
+            .map((component: any) => ({
+              id: component.id,
+              componentName: component.componentName,
+              data: { ...component.data, projectSlug },
+              position: component.position || 0,
+            }))
+            .sort((a: any, b: any) => a.position - b.position);
+        }
+      }
+      
+      // Format 2: Object format { components: [...] }
+      if (staticPage && typeof staticPage === "object" && !Array.isArray(staticPage)) {
+        if (Array.isArray(staticPage.components)) {
+          return staticPage.components
+            .map((component: any) => ({
+              id: component.id,
+              componentName: component.componentName,
+              data: { ...component.data, projectSlug },
+              position: component.position || 0,
+            }))
+            .sort((a: any, b: any) => a.position - b.position);
+        }
       }
     }
 

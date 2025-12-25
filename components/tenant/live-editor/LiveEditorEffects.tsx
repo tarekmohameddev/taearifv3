@@ -612,11 +612,106 @@ export function useLiveEditorEffects(state: any) {
     useEditorStore.getState().setCurrentPage(slug);
   }, [slug]);
 
+  // ⭐ Sync pageComponents with staticPagesData when componentName changes
+  // This ensures pageComponents is updated when componentName is changed in ComponentEditor
+  // Use Zustand subscription to listen to staticPagesData changes
+  useEffect(() => {
+    const editorStore = useEditorStore.getState();
+    const staticPageData = editorStore.getStaticPageData(slug);
+    const isStaticPage = !!staticPageData;
+
+    if (!isStaticPage || !staticPageData) return;
+
+    // Subscribe to staticPagesData changes
+    const unsubscribe = useEditorStore.subscribe(
+      (state) => state.staticPagesData?.[slug],
+      (staticPageData) => {
+        if (!staticPageData) return;
+
+        // Use functional update to access latest pageComponents (avoids stale closure)
+        setPageComponents((currentPageComponents) => {
+          // Check if staticPagesData has different componentName than pageComponents
+          const needsUpdate = staticPageData.components.some((storeComp: any) => {
+            const localComp = currentPageComponents.find((lc: any) => lc.id === storeComp.id);
+            return localComp && localComp.componentName !== storeComp.componentName;
+          });
+
+          if (needsUpdate) {
+            // Update pageComponents to match staticPagesData (especially componentName and id)
+            return currentPageComponents.map((localComp: any) => {
+              const storeComp = staticPageData.components.find(
+                (sc: any) => sc.id === localComp.id || sc.componentName === localComp.componentName
+              );
+              if (storeComp && (storeComp.componentName !== localComp.componentName || storeComp.id !== localComp.id)) {
+                // Use componentName and id from staticPagesData (more up-to-date)
+                // For static pages, id should match componentName
+                return {
+                  ...localComp,
+                  id: storeComp.id, // ✅ Sync id (should match componentName for static pages)
+                  componentName: storeComp.componentName,
+                  forceUpdate: storeComp.forceUpdate || localComp.forceUpdate || 0, // ✅ Sync forceUpdate
+                };
+              }
+              return localComp;
+            });
+          }
+          return currentPageComponents;
+        });
+      }
+    );
+
+    return unsubscribe;
+  }, [slug, setPageComponents]); // ✅ Removed pageComponents from dependencies to avoid stale closure
+
   // Setup Save Function Effect
   useEffect(() => {
     const saveFn = () => {
-      // Force update the store with current pageComponents state
-      useEditorStore.getState().forceUpdatePageComponents(slug, pageComponents);
+      const store = useEditorStore.getState();
+      // Get fresh staticPagesData from store (has latest componentName updates)
+      const staticPageData = store.getStaticPageData(slug);
+      const isStaticPage = !!staticPageData;
+
+      if (isStaticPage && staticPageData) {
+        // STATIC PAGE - Use staticPagesData from store (which has latest componentName updates)
+        // The staticPagesData is already updated when componentName changes in ComponentEditor
+        // We need to merge pageComponents (local changes) with staticPagesData (latest componentName)
+        // ✅ Get fresh staticPagesData to ensure we have the latest componentName
+        const currentStaticPageData = store.getStaticPageData(slug);
+        if (currentStaticPageData) {
+          // Merge: use componentName and id from staticPagesData (up-to-date), but keep other data from pageComponents
+          const mergedComponents = pageComponents.map((localComp: any) => {
+            // Find matching component in staticPagesData to get latest componentName and id
+            // First try to find by id, then by componentName (in case id changed)
+            let storeComp = currentStaticPageData.components.find(
+              (sc: any) => sc.id === localComp.id
+            );
+            // If not found by id, try to find by componentName (for cases where id was updated)
+            if (!storeComp) {
+              storeComp = currentStaticPageData.components.find(
+                (sc: any) => sc.componentName === localComp.componentName
+              );
+            }
+            // ✅ Use componentName and id from staticPagesData (more up-to-date than pageComponents)
+            // For static pages, id should match componentName
+            return {
+              ...localComp,
+              id: storeComp?.id || localComp.id, // ✅ Sync id (should match componentName for static pages)
+              componentName: storeComp?.componentName || localComp.componentName,
+              forceUpdate: (localComp.forceUpdate || 0) + 1, // Ensure forceUpdate is incremented
+            };
+          });
+          
+          // ✅ Update staticPagesData with merged components (includes latest componentName)
+          store.setStaticPageData(slug, {
+            ...currentStaticPageData,
+            components: mergedComponents,
+            // API endpoints remain unchanged (IMMUTABLE)
+          });
+        }
+      } else {
+        // REGULAR PAGE - Update pageComponentsByPage
+        store.forceUpdatePageComponents(slug, pageComponents);
+      }
     };
 
     // Set the save function in the store

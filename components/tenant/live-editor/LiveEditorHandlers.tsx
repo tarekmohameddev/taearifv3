@@ -252,41 +252,90 @@ export function useLiveEditorHandlers(state: any) {
           // Get new default data for the new theme
           const newDefaultData = createDefaultData(c.type, newTheme);
 
+          // Check if this is a static page (before setTimeout to use in return)
+          const store = useEditorStore.getState();
+          const currentPage = store.currentPage;
+          const staticPageData = store.getStaticPageData(currentPage);
+          const isStaticPage = !!staticPageData;
+
           // Defer store update to avoid render cycle issues
           setTimeout(() => {
             const store = useEditorStore.getState();
             const currentPage = store.currentPage;
 
-            // Update pageComponentsByPage in the store with new data
-            const updatedPageComponents =
-              store.pageComponentsByPage[currentPage] || [];
-            const updatedStoreComponents = updatedPageComponents.map(
-              (comp: any) => {
-                if (comp.id === id) {
-                  return {
-                    ...comp,
-                    componentName: newTheme,
-                    data: newDefaultData,
-                  };
-                }
-                return comp;
-              },
-            );
+            // Check if this is a static page
+            const staticPageData = store.getStaticPageData(currentPage);
+            const isStaticPage = !!staticPageData;
 
-            // Update the store
-            store.forceUpdatePageComponents(
-              currentPage,
-              updatedStoreComponents,
-            );
+            if (isStaticPage && staticPageData) {
+              // ⭐ STATIC PAGE: Update staticPagesData with incremented forceUpdate
+              // For static pages, id should match componentName
+              const updatedComponents = staticPageData.components.map(
+                (comp: any) => {
+                  if (comp.id === id) {
+                    // ⭐ Update id to match newTheme for static pages
+                    const newId = newTheme;
+                    return {
+                      ...comp,
+                      id: newId, // ✅ Update id to match componentName
+                      componentName: newTheme,
+                      data: newDefaultData,
+                      forceUpdate: (comp.forceUpdate || 0) + 1, // ✅ Increment forceUpdate
+                    };
+                  }
+                  return comp;
+                },
+              );
+
+              // ⭐ Also update componentData in store with new id
+              // Move data from old id to new id
+              store.setComponentData(c.type, newTheme, newDefaultData);
+
+              store.setStaticPageData(currentPage, {
+                ...staticPageData,
+                components: updatedComponents,
+                // API endpoints remain unchanged (IMMUTABLE)
+              });
+            } else {
+              // REGULAR PAGE: Update pageComponentsByPage in the store with new data
+              const updatedPageComponents =
+                store.pageComponentsByPage[currentPage] || [];
+              const updatedStoreComponents = updatedPageComponents.map(
+                (comp: any) => {
+                  if (comp.id === id) {
+                    return {
+                      ...comp,
+                      componentName: newTheme,
+                      data: newDefaultData,
+                    };
+                  }
+                  return comp;
+                },
+              );
+
+              // Update the store
+              store.forceUpdatePageComponents(
+                currentPage,
+                updatedStoreComponents,
+              );
+            }
 
             // Also update the component data in the store
-            store.setComponentData(c.type, id, newDefaultData);
+            // For static pages, use newTheme as id; for regular pages, use original id
+            if (isStaticPage && staticPageData) {
+              store.setComponentData(c.type, newTheme, newDefaultData);
+            } else {
+              store.setComponentData(c.type, id, newDefaultData);
+            }
           }, 0);
 
+          // ✅ Update id for static pages to match componentName
           return {
             ...c,
+            id: isStaticPage ? newTheme : c.id, // ✅ Update id for static pages
             componentName: newTheme,
             data: newDefaultData,
+            forceUpdate: (c.forceUpdate || 0) + 1, // ✅ Increment forceUpdate in local state
           };
         }
         return c;
