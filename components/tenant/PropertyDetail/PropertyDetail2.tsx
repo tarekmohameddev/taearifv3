@@ -335,124 +335,124 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     virtual_tour: "https://example.com/virtual-tour",
   };
   
-  // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
-
-  // Mock data for Live Editor
-  const mockProperty: Property = {
-    id: "mock-property-1",
-    slug: "mock-property",
-    title: "عقار فاخر للبيع",
-    district: "حي النرجس",
-    price: "1,250,000",
-    views: 1250,
-    bedrooms: 3,
-    bathrooms: 2,
-    area: "150",
-    type: "شقة",
-    transactionType: "للبيع",
-    transactionType_en: "sale",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
-    ],
-    floor_planning_image: [
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-    ],
-    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
-    status: "available",
-    location: {
-      lat: 24.7136,
-      lng: 46.6753,
-      address: "الرياض، حي النرجس، شارع الملك فهد",
-    },
-    payment_method: "quarterly",
-    pricePerMeter: "8,333",
-    building_age: 5,
-    floors: 10,
-    floor_number: 5,
-    kitchen: 1,
-    living_room: 1,
-    majlis: 1,
-    dining_room: 1,
-    maid_room: 1,
-    driver_room: 1,
-    storage_room: 1,
-    basement: 0,
-    swimming_pool: 1,
-    balcony: 2,
-    garden: 0,
-    elevator: 1,
-    private_parking: 2,
-    length: "15",
-    width: "10",
-    video_url: "https://example.com/video.mp4",
-    virtual_tour: "https://example.com/virtual-tour",
-  };
+  // Property data state
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loadingProperty, setLoadingProperty] = useState(true);
+  const [propertyError, setPropertyError] = useState<string | null>(null);
   
-  // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+  // Image states
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [mainImage, setMainImage] = useState<string>("");
 
-  // Mock data for Live Editor
-  const mockProperty: Property = {
-    id: "mock-property-1",
-    slug: "mock-property",
-    title: "عقار فاخر للبيع",
-    district: "حي النرجس",
-    price: "1,250,000",
-    views: 1250,
-    bedrooms: 3,
-    bathrooms: 2,
-    area: "150",
-    type: "شقة",
-    transactionType: "للبيع",
-    transactionType_en: "sale",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
-    ],
-    floor_planning_image: [
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-    ],
-    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
-    status: "available",
-    location: {
-      lat: 24.7136,
-      lng: 46.6753,
-      address: "الرياض، حي النرجس، شارع الملك فهد",
-    },
-    payment_method: "quarterly",
-    pricePerMeter: "8,333",
-    building_age: 5,
-    floors: 10,
-    floor_number: 5,
-    kitchen: 1,
-    living_room: 1,
-    majlis: 1,
-    dining_room: 1,
-    maid_room: 1,
-    driver_room: 1,
-    storage_room: 1,
-    basement: 0,
-    swimming_pool: 1,
-    balcony: 2,
-    garden: 0,
-    elevator: 1,
-    private_parking: 2,
-    length: "15",
-    width: "10",
-    video_url: "https://example.com/video.mp4",
-    virtual_tour: "https://example.com/virtual-tour",
+  // Form states
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  // Form handlers
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(false);
+
+    try {
+      if (!finalTenantId) {
+        setFormError("لم يتم العثور على معرف المستأجر");
+        return;
+      }
+
+      if (!property?.slug) {
+        setFormError("لم يتم العثور على معرف العقار");
+        return;
+      }
+
+      // Validation
+      if (!formData.name.trim()) {
+        setFormError("يرجى إدخال اسمك");
+        return;
+      }
+
+      if (!formData.phone.trim()) {
+        setFormError("يرجى إدخال رقم الهاتف");
+        return;
+      }
+
+      // Validate phone format
+      const phoneRegex = /^\+?\d{7,15}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
+        setFormError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)");
+        return;
+      }
+
+      const payload: any = {
+        propertySlug: property.slug,
+        customerName: formData.name.trim(),
+        customerPhone: formData.phone.trim(),
+      };
+
+      if (formData.email.trim()) {
+        payload.customerEmail = formData.email.trim();
+      }
+      if (formData.message.trim()) {
+        payload.message = formData.message.trim();
+      }
+
+      const response = await axiosInstance.post(
+        `/api/v1/tenant-website/${finalTenantId}/reservations`,
+        payload,
+      );
+
+      if (response.data.success) {
+        setFormSuccess(true);
+        // Reset form
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          message: "",
+        });
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setFormSuccess(false);
+        }, 3000);
+      }
+    } catch (err: any) {
+      // Handle validation errors from backend
+      if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        const errorMessage =
+          errors.customerName?.[0] ||
+          errors.customerPhone?.[0] ||
+          errors.message?.[0] ||
+          err.response?.data?.message ||
+          "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى";
+        setFormError(errorMessage);
+      } else {
+        setFormError(
+          err.response?.data?.message ||
+            "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى",
+        );
+      }
+    } finally {
+      setFormLoading(false);
+    }
   };
-  
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -525,13 +525,13 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const handleNextImage = () => {
     const allImages = getAllImages();
     if (allImages.length > 0) {
-    // ⭐ NEW: Use mock data in Live Editor
-    if (isLiveEditor) {
-      setProperty(mockProperty);
-      setLoadingProperty(false);
-      setMainImage(mockProperty.image || "");
-      return;
+      const currentIndex = selectedImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setSelectedImage(allImages[nextIndex]);
+      setSelectedImageIndex(nextIndex);
     }
+  };
 
   const handleImageClick = (imageSrc: string, index?: number) => {
     if (imageSrc && imageSrc.trim() !== "") {
