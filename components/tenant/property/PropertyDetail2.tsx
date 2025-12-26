@@ -683,11 +683,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         {mergedData.gallery?.showThumbnails !== false &&
           propertyImages.length > 1 && (
             <section
-              className="grid gap-4"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-10"
               data-purpose="image-gallery"
-              style={{
-                gridTemplateColumns: `repeat(${mergedData.gallery?.thumbnailGridColumns || 4}, 1fr)`,
-              }}
             >
               {propertyImages.slice(1).map((imageSrc, index) => (
                 <div
