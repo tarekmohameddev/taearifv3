@@ -30,7 +30,7 @@ const THEME_OPTIONS: ThemeOption[] = [
     nameAr: "الثيم الأول",
     description: "Modern and clean design with contemporary aesthetics",
     descriptionAr: "تصميم عصري ونظيف مع جماليات معاصرة",
-    image: "/api/placeholder/400/200?text=Theme+1",
+    image: "/images/placeholders/themes/theme1.jpeg",
   },
   {
     id: 2,
@@ -38,7 +38,7 @@ const THEME_OPTIONS: ThemeOption[] = [
     nameAr: "الثيم الثاني",
     description: "Classic and elegant design with timeless appeal",
     descriptionAr: "تصميم كلاسيكي وأنيق مع جاذبية خالدة",
-    image: "/api/placeholder/400/200?text=Theme+2",
+    image: "/images/placeholders/themes/theme2.jpeg",
   },
 ];
 
@@ -159,7 +159,7 @@ export function ThemeChangeDialog({
                       <img
                         src={theme.image}
                         alt={theme.name}
-                        className="w-full h-40 object-cover transition-transform duration-200 group-hover:scale-105"
+                        className="w-full h-fit object-cover transition-transform duration-200 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                     </div>
