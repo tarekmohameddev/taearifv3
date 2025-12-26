@@ -625,7 +625,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
       </section>
 
       {/* Overlay Text Top Right */}
-      <div className="container mx-auto px-4 absolute top-[13rem] left-0 right-0">
+      <div className="max-w-[1250px] mx-auto px-4 absolute top-[13rem] left-0 right-0">
         <div className="flex flex-row justify-between items-center" dir="rtl">
           <div className="text-white z-[10]">
             <h1
