@@ -662,7 +662,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           {/* Mobile Layout - Button on left side */}
           <div className="flex items-center justify-between md:hidden">
             <h2
-              className="section-title font-extrabold"
+              className="section-title font-bold"
               style={{
                 fontFamily:
                   mergedData.typography?.title?.fontFamily || "Tajawal",
@@ -699,7 +699,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           <div className="hidden md:flex items-end justify-between">
             <div>
               <h2
-                className="section-title font-extrabold"
+                className="section-title font-bold"
                 style={{
                   fontFamily:
                     mergedData.typography?.title?.fontFamily || "Tajawal",

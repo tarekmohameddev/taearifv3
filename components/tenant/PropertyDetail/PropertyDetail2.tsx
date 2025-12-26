@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { MapPinIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon } from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
 
@@ -71,6 +71,12 @@ interface Property {
   video_url?: string;
   virtual_tour?: string;
   video_image?: string;
+  faqs?: Array<{
+    id: number;
+    question: string;
+    answer: string;
+    displayOnPage: boolean;
+  }>;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -333,6 +339,20 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     width: "10",
     video_url: "https://example.com/video.mp4",
     virtual_tour: "https://example.com/virtual-tour",
+    faqs: [
+      {
+        id: 1,
+        question: "ما هي مساحة العقار؟",
+        answer: "مساحة العقار 150 متر مربع",
+        displayOnPage: true,
+      },
+      {
+        id: 2,
+        question: "هل يوجد موقف سيارات؟",
+        answer: "نعم، يوجد موقفان للسيارات",
+        displayOnPage: true,
+      },
+    ],
   };
   
   // Property data state
@@ -356,6 +376,22 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState(false);
+
+  // FAQ states
+  const [expandedFaqs, setExpandedFaqs] = useState<Set<number>>(new Set());
+
+  // Function to toggle FAQ expansion
+  const toggleFaq = (faqId: number) => {
+    setExpandedFaqs((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(faqId)) {
+        newSet.delete(faqId);
+      } else {
+        newSet.add(faqId);
+      }
+      return newSet;
+    });
+  };
 
   // Form handlers
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1019,6 +1055,68 @@ export default function propertyDetail2(props: propertyDetail2Props) {
               </section>
             )}
 
+            {/* الأسئلة الشائعة */}
+            {property.faqs && property.faqs.length > 0 && (
+              <section className="bg-transparent" data-purpose="faqs-section">
+                <h2
+                  className="text-3xl font-bold mb-8 text-right"
+                  style={{ color: textColor }}
+                >
+                  الأسئلة الشائعة
+                </h2>
+                <div className="w-full space-y-4">
+                  {property.faqs
+                    .filter((faq) => faq.displayOnPage)
+                    .map((faq) => {
+                      const isExpanded = expandedFaqs.has(faq.id);
+                      return (
+                        <div
+                          key={faq.id}
+                          className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
+                        >
+                          <button
+                            onClick={() => toggleFaq(faq.id)}
+                            className="w-full p-4 text-right flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                          >
+                            <div className="flex-1">
+                              <h4
+                                className="font-semibold text-base leading-6 text-right"
+                                style={{ color: textColor }}
+                              >
+                                {faq.question}
+                              </h4>
+                            </div>
+                            <div className="mr-3 flex-shrink-0">
+                              {isExpanded ? (
+                                <ChevronUpIcon
+                                  className="w-5 h-5"
+                                  style={{ color: primaryColor }}
+                                />
+                              ) : (
+                                <ChevronDownIcon
+                                  className="w-5 h-5"
+                                  style={{ color: primaryColor }}
+                                />
+                              )}
+                            </div>
+                          </button>
+                          {isExpanded && (
+                            <div className="px-4 pb-4">
+                              <p
+                                className="text-sm leading-6 text-right"
+                                style={{ color: textColor }}
+                              >
+                                {faq.answer}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              </section>
+            )}
+
             {/* Contact Form */}
             {mergedData.displaySettings?.showContactForm !== false && (
               <section
@@ -1030,7 +1128,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                 }}
               >
                 <h2
-                  className="text-2xl font-extrabold mb-2 text-right"
+                  className="text-2xl font-bold mb-2 text-right"
                   style={{ color: formTextColor }}
                 >
                   {mergedData.content?.contactFormTitle ||

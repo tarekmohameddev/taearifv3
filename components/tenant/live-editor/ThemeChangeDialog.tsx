@@ -100,7 +100,7 @@ export function ThemeChangeDialog({
             <Palette className="w-5 h-5 text-indigo-600" />
             {isRTL ? "تغيير ثيم الموقع بالكامل" : "Change Site Theme"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-right">
             {isRTL
               ? "اختر ثيم جديد لتطبيقه على جميع الصفحات والكومبوننتات"
               : "Select a new theme to apply to all pages and components"}
