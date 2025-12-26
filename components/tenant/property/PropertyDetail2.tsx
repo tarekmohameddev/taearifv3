@@ -5,6 +5,73 @@ import { useState, useEffect } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultPropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
+import axiosInstance from "@/lib/axiosInstance";
+import { useTenantId } from "@/hooks/useTenantId";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import SwiperCarousel from "@/components/ui/swiper-carousel2";
+import Link from "next/link";
+
+// ═══════════════════════════════════════════════════════════
+// PROPERTY INTERFACE
+// ═══════════════════════════════════════════════════════════
+interface Property {
+  id: string;
+  slug?: string;
+  title: string;
+  district: string;
+  price: string;
+  views: number;
+  bedrooms: number;
+  bathrooms?: number;
+  area?: string;
+  type: string;
+  transactionType: string;
+  transactionType_en?: string;
+  image: string;
+  status?: string;
+  description?: string;
+  features?: string[];
+  location?: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  contact?: {
+    name: string;
+    phone: string;
+    email: string;
+  };
+  images?: string[];
+  payment_method?: string;
+  pricePerMeter?: string;
+  building_age?: number;
+  floors?: number;
+  floor_number?: number;
+  kitchen?: number;
+  living_room?: number;
+  majlis?: number;
+  dining_room?: number;
+  maid_room?: number;
+  driver_room?: number;
+  storage_room?: number;
+  basement?: number;
+  swimming_pool?: number;
+  balcony?: number;
+  garden?: number;
+  elevator?: number;
+  private_parking?: number;
+  length?: string;
+  width?: string;
+  floor_planning_image?: string[];
+  video_url?: string;
+  virtual_tour?: string;
+  video_image?: string;
+}
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -54,11 +121,35 @@ interface PropertyDetail2Props {
     thumbnailHeight?: string;
   };
 
+  // Required prop for fetching property data
+  propertySlug: string;
+
   // Editor props
   variant?: string;
   useStore?: boolean;
   id?: string;
 }
+
+const getTransactionTypeLabel = (
+  transactionType?: string | null,
+  transactionTypeEn?: string | null,
+) => {
+  const normalized = transactionType?.trim().toLowerCase();
+  const normalizedEn = transactionTypeEn?.trim().toLowerCase();
+
+  if (
+    normalizedEn === "rent" ||
+    normalizedEn === "lease" ||
+    normalized === "rent" ||
+    normalized === "للإيجار" ||
+    normalized?.includes("إيجار") ||
+    normalized?.includes("ايجار")
+  ) {
+    return "للإيجار";
+  }
+
+  return "للبيع";
+};
 
 // ═══════════════════════════════════════════════════════════
 // COMPONENT
@@ -82,6 +173,10 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
+  
+  // Tenant ID hook
+  const { tenantId: tenantIdFromHook, isLoading: tenantLoading } = useTenantId();
+  const finalTenantId = tenantId || tenantIdFromHook;
 
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
@@ -178,62 +273,157 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   }
 
   // ─────────────────────────────────────────────────────────
-  // 7. RENDER
+  // 7. PROPERTY DATA FETCHING
   // ─────────────────────────────────────────────────────────
+  
+  // Property data state
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loadingProperty, setLoadingProperty] = useState(true);
+  const [propertyError, setPropertyError] = useState<string | null>(null);
+  
+  // Image states
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [mainImage, setMainImage] = useState<string>("");
 
-  // جميع الصور المتاحة
-  const images = [
-    {
-      id: 1,
-      src: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
-      alt: "فيلا فاخرة في حي المحمدية",
-    },
-    {
-      id: 2,
-      src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2058&auto=format&fit=crop",
-      alt: "صورة داخلية 1",
-    },
-    {
-      id: 3,
-      src: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop",
-      alt: "صورة داخلية 2",
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2070&auto=format&fit=crop",
-      alt: "صورة داخلية 3",
-    },
-    {
-      id: 5,
-      src: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop",
-      alt: "صورة المسبح",
-    },
-  ];
+  // جلب بيانات العقار
+  const fetchProperty = async () => {
+    try {
+      setLoadingProperty(true);
+      setPropertyError(null);
 
-  const [selectedImage, setSelectedImage] = useState(images[0]);
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    message: "",
-  });
+      if (!finalTenantId) {
+        setLoadingProperty(false);
+        return;
+      }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+      const response = await axiosInstance.get(
+        `/v1/tenant-website/${finalTenantId}/properties/${props.propertySlug}`,
+      );
+
+      // Handle new API response format
+      if (response.data && response.data.property) {
+        setProperty(response.data.property);
+      } else if (response.data) {
+        // If the property is returned directly
+        setProperty(response.data);
+      } else {
+        setPropertyError("العقار غير موجود");
+      }
+    } catch (error) {
+      setPropertyError("حدث خطأ في تحميل بيانات العقار");
+    } finally {
+      setLoadingProperty(false);
+    }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  // Get all images (main images + floor planning images)
+  const getAllImages = () => {
+    const allImages = [];
+    if (property?.image) {
+      allImages.push(property.image);
+    }
+    if (property?.images) {
+      allImages.push(...property.images);
+    }
+    if (property?.floor_planning_image) {
+      allImages.push(...property.floor_planning_image);
+    }
+    return allImages;
   };
 
-  const primaryColor = mergedData.styling?.primaryColor || "#8b5f46";
+  // Navigation functions for dialog
+  const handlePreviousImage = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = selectedImageIndex;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      setSelectedImage(allImages[previousIndex]);
+      setSelectedImageIndex(previousIndex);
+    }
+  };
+
+  const handleNextImage = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = selectedImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setSelectedImage(allImages[nextIndex]);
+      setSelectedImageIndex(nextIndex);
+    }
+  };
+
+  const handleImageClick = (imageSrc: string, index?: number) => {
+    if (imageSrc && imageSrc.trim() !== "") {
+      setSelectedImage(imageSrc);
+      setSelectedImageIndex(index || 0);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleThumbnailClick = (imageSrc: string, index: number) => {
+    handleImageClick(imageSrc, index);
+  };
+
+  // جلب بيانات العقار عند تحميل المكون
+  useEffect(() => {
+    if (finalTenantId && props.propertySlug) {
+      fetchProperty();
+    }
+  }, [finalTenantId, props.propertySlug]);
+
+  // تحديث الصورة الرئيسية عند تحميل العقار
+  useEffect(() => {
+    if (property?.image) {
+      setMainImage(property.image);
+    }
+  }, [property]);
+
+  // صور العقار - computed value
+  const propertyImages =
+    property && property.image
+      ? [
+          property.image,
+          ...(property.images || []), // Add additional images if available
+        ].filter((img) => img && img.trim() !== "")
+      : []; // Filter out empty images
+
+  // Get primary color from tenantData or mergedData
+  const primaryColorFromTenant =
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#8b5f46";
+
+  const primaryColor = mergedData.styling?.primaryColor || primaryColorFromTenant;
+  
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    if (!hex || !hex.startsWith("#")) return "#6b4a3a";
+    const cleanHex = hex.replace("#", "");
+    if (cleanHex.length !== 6) return "#6b4a3a";
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+
   const textColor = mergedData.styling?.textColor || "#967152";
   const formBackgroundColor =
     mergedData.styling?.formBackgroundColor || "#8b5f46";
@@ -251,8 +441,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         style={{ height: mergedData.hero?.height || "500px" }}
       >
         <Image
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop"
-          alt="صورة خلفية"
+          src={property.image || "/placeholder.jpg"}
+          alt={property.title || "صورة خلفية"}
           fill
           priority
           sizes="100vw"
@@ -279,7 +469,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
                 fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               }}
             >
-              فيلا فاخرة في حي المحمدية - رياض
+              {property.title}
             </h1>
           </div>
           {/* Overlay Text Top Left */}
@@ -288,7 +478,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
               className="text-white py-2 px-4 rounded font-bold text-xl"
               style={{ backgroundColor: primaryColor }}
             >
-              3,500,000 ريال سعودي
+              {property.price} ريال سعودي
             </span>
           </div>
         </div>
@@ -306,49 +496,59 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         >
           {/* Main Featured Image */}
           <div className="relative h-[600px] w-full">
-            <Image
-              alt={selectedImage.alt}
-              className="w-full h-full object-cover transition-opacity duration-300"
-              src={selectedImage.src}
-              fill
-              priority
-            />
+            {mainImage ? (
+              <Image
+                alt={property.title || "صورة العقار"}
+                className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer rounded-lg"
+                src={mainImage}
+                fill
+                priority
+                onClick={() => handleImageClick(mainImage, 0)}
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500">لا توجد صورة متاحة</p>
+              </div>
+            )}
           </div>
         </section>
         {/* END: Hero Section */}
 
         {/* BEGIN: Gallery Thumbnails */}
-        {mergedData.gallery?.showThumbnails !== false && (
-          <section
-            className="grid gap-4"
-            data-purpose="image-gallery"
-            style={{
-              gridTemplateColumns: `repeat(${mergedData.gallery?.thumbnailGridColumns || 4}, 1fr)`,
-            }}
-          >
-            {images.slice(1).map((image) => (
-              <div
-                key={image.id}
-                onClick={() => setSelectedImage(image)}
-                className={`rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative border-2 ${
-                  selectedImage.id === image.id
-                    ? "border-brand-gold shadow-lg scale-105"
-                    : "border-transparent hover:scale-105"
-                }`}
-                style={{
-                  height: mergedData.gallery?.thumbnailHeight || "200px",
-                }}
-              >
-                <Image
-                  alt={image.alt}
-                  className="w-full h-full object-cover transition-transform duration-300"
-                  src={image.src}
-                  fill
-                />
-              </div>
-            ))}
-          </section>
-        )}
+        {mergedData.gallery?.showThumbnails !== false &&
+          propertyImages.length > 1 && (
+            <section
+              className="grid gap-4"
+              data-purpose="image-gallery"
+              style={{
+                gridTemplateColumns: `repeat(${mergedData.gallery?.thumbnailGridColumns || 4}, 1fr)`,
+              }}
+            >
+              {propertyImages.slice(1).map((imageSrc, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleThumbnailClick(imageSrc, index + 1)}
+                  className={`rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative border-2 ${
+                    mainImage === imageSrc
+                      ? "shadow-lg scale-105"
+                      : "border-transparent hover:scale-105"
+                  }`}
+                  style={{
+                    height: mergedData.gallery?.thumbnailHeight || "200px",
+                    borderColor:
+                      mainImage === imageSrc ? primaryColor : "transparent",
+                  }}
+                >
+                  <Image
+                    alt={`${property.title} - صورة ${index + 2}`}
+                    className="w-full h-full object-cover transition-transform duration-300"
+                    src={imageSrc}
+                    fill
+                  />
+                </div>
+              ))}
+            </section>
+          )}
         {/* END: Gallery Thumbnails */}
 
         {/* BEGIN: Property Description */}
@@ -372,15 +572,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
               className="leading-relaxed text-right text-lg"
               style={{ color: textColor }}
             >
-              فيلا فاخرة في حي المحمدية - الرياض. فيلا فاخرة في حي المحمدية -
-              رياض، مصممة بأحدث المعايير الهندسية والفنية المبتكرة، وتتكون من
-              العديد من المرافق والخدمات الراقية التي تناسب أصحاب الذوق الرفيع.
-              تتميز الفيلا بموقع استراتيجي قريب من جميع الخدمات الحيوية والطرق
-              الرئيسية. تحتوي الفيلا على مساحات واسعة وتشطيبات سوبر ديلوكس، مع
-              نظام تكييف مركزي وأنظمة أمان متطورة. الحديقة الخارجية مصممة بعناية
-              لتوفير جو من الهدوء والخصوصية، مع مسبح خاص يضيف لمسة من الرفاهية.
-              هذه الفرصة المثالية لمن يبحث عن السكن الراقي والاستثمار الناجح في
-              أرقى أحياء الرياض.
+              {property.description || "لا يوجد وصف متاح لهذا العقار"}
             </p>
           </section>
         )}
@@ -407,33 +599,195 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
                   {mergedData.content?.specsTitle || "مواصفات العقار"}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
-                  {/* Spec Items - Same as before */}
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="mb-3" style={{ color: textColor }}>
-                      <svg
-                        className="h-8 w-8"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
+                  {property.bedrooms > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
                       >
-                        <path
-                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                        ></path>
-                      </svg>
+                        غرف النوم: {property.bedrooms}
+                      </span>
                     </div>
-                    <span
-                      className="font-bold text-lg"
-                      style={{ color: textColor }}
-                    >
-                      غرف النوم: 5
-                    </span>
-                  </div>
-                  {/* Add more spec items as needed */}
+                  )}
+                  {property.bathrooms && property.bathrooms > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        الحمامات: {property.bathrooms}
+                      </span>
+                    </div>
+                  )}
+                  {property.area && parseFloat(property.area) > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        المساحة: {property.area} م²
+                      </span>
+                    </div>
+                  )}
+                  {property.private_parking && property.private_parking > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        موقف سيارات: {property.private_parking}
+                      </span>
+                    </div>
+                  )}
+                  {property.building_age && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        عمر العقار: {property.building_age === 0 ? "جديد" : `${property.building_age} سنة`}
+                      </span>
+                    </div>
+                  )}
+                  {property.swimming_pool && property.swimming_pool > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        مسبح خاص
+                      </span>
+                    </div>
+                  )}
+                  {property.maid_room && property.maid_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        غرفة خادمة
+                      </span>
+                    </div>
+                  )}
                 </div>
               </section>
             )}
@@ -523,65 +877,139 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
 
           {/* Left Column: Video & Map */}
           <div className="space-y-12 order-1 lg:order-2">
-            {/* Video Placeholder */}
-            {mergedData.displaySettings?.showVideoUrl !== false && (
-              <section
-                className="rounded-lg overflow-hidden shadow-md bg-black relative group h-64"
-                data-purpose="video-section"
-              >
-                <div className="relative w-full h-full">
-                  <Image
-                    alt="جولة فيديو"
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
-                    src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop"
-                    fill
-                  />
-                </div>
-                <div className="absolute inset-0 bg-black/40"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div
-                    className="bg-black/60 p-4 rounded-full border-2 border-white/70 cursor-pointer group-hover:scale-110 transition-transform"
-                    style={{ backgroundColor: `${primaryColor}80` }}
-                  >
-                    <svg
-                      className="h-10 w-10 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M8 5v14l11-7z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <div
-                  className="absolute top-4 right-4 text-white px-4 py-2 rounded text-sm font-bold text-right"
-                  style={{ backgroundColor: primaryColor }}
+            {/* Video Section */}
+            {mergedData.displaySettings?.showVideoUrl !== false &&
+              property.video_url && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md bg-black relative h-64"
+                  data-purpose="video-section"
                 >
-                  جولة فيديو للمقار
+                  <div className="w-full h-full rounded-lg overflow-hidden">
+                    <video
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={property.video_image || undefined}
+                    >
+                      <source src={property.video_url} type="video/mp4" />
+                      متصفحك لا يدعم عرض الفيديو.
+                    </video>
+                  </div>
+                  <div
+                    className="absolute top-4 right-4 text-white px-4 py-2 rounded text-sm font-bold text-right"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    جولة فيديو للمقار
+                  </div>
+                </section>
+              )}
+
+            {/* Virtual Tour */}
+            {property.virtual_tour && (
+              <section className="rounded-lg overflow-hidden shadow-md bg-black relative h-96">
+                <div className="w-full h-full rounded-lg overflow-hidden">
+                  <iframe
+                    src={property.virtual_tour}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    title="جولة افتراضية للعقار"
+                  />
                 </div>
               </section>
             )}
 
-            {/* Map Placeholder */}
-            {mergedData.displaySettings?.showMap !== false && (
-              <section
-                className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
-                data-purpose="map-section"
-              >
-                <Image
-                  alt="خريطة الموقع"
-                  className="w-full h-full object-cover"
-                  src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop"
-                  fill
-                />
-              </section>
-            )}
+            {/* Map Section */}
+            {mergedData.displaySettings?.showMap !== false &&
+              property.location &&
+              property.location.lat &&
+              property.location.lng && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
+                  data-purpose="map-section"
+                >
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${property.location.lat},${property.location.lng}&hl=ar&z=15&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="موقع العقار"
+                  />
+                  <div className="mt-4 text-center">
+                    <a
+                      href={`https://maps.google.com/?q=${property.location.lat},${property.location.lng}&entry=gps`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColor;
+                      }}
+                    >
+                      <MapPinIcon className="w-4 h-4" />
+                      فتح في خرائط جوجل
+                    </a>
+                  </div>
+                </section>
+              )}
           </div>
           {/* END Left Column */}
         </div>
         {/* END: Main Grid Layout */}
       </div>
       {/* END: Main Content Container */}
+
+      {/* Dialog لعرض الصورة المكبرة */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">عرض صورة العقار</DialogTitle>
+          {selectedImage && selectedImage.trim() !== "" && property && (
+            <div className="relative w-full h-[80vh] group">
+              <Image
+                src={selectedImage}
+                alt={property?.title || "صورة العقار"}
+                fill
+                className="object-contain rounded-lg"
+              />
+
+              {/* أسهم التنقل - تظهر فقط إذا كان هناك أكثر من صورة واحدة */}
+              {getAllImages().length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة السابقة"
+                  >
+                    <ChevronLeftIcon className="w-6 h-6" />
+                  </button>
+
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة التالية"
+                  >
+                    <ChevronRightIcon className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* عداد الصور */}
+              {getAllImages().length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {getAllImages().length}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
