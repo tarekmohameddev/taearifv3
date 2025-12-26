@@ -625,11 +625,11 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
       </section>
 
       {/* Overlay Text Top Right */}
-      <div className="max-w-[1250px] mx-auto px-4 absolute top-[13rem] left-0 right-0">
-        <div className="flex flex-row justify-between items-center" dir="rtl">
-          <div className="text-white z-[10]">
+      <div className="max-w-[1250px] mx-auto px-4 absolute top-[8rem] md:top-[13rem] left-0 right-0">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0" dir="rtl">
+          <div className="text-white z-[10] w-full md:w-auto">
             <h1
-              className="text-3xl md:text-4xl font-bold drop-shadow-md text-right"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-md text-right"
               style={{
                 fontSize: mergedData.typography?.title?.fontSize?.desktop,
               }}
@@ -638,9 +638,9 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
             </h1>
           </div>
           {/* Overlay Text Top Left */}
-          <div className="z-[2]">
+          <div className="z-[2] w-full md:w-auto">
             <span
-              className="text-white py-2 px-4 rounded font-bold text-xl"
+              className="text-white py-2 px-4 rounded font-bold text-base sm:text-lg md:text-xl inline-block"
               style={{ backgroundColor: primaryColor }}
             >
               {property.price} ريال سعودي
