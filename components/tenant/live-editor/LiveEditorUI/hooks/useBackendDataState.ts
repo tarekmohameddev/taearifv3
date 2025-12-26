@@ -2,7 +2,7 @@
 // Hook for managing backend data state
 // ============================================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 interface UseBackendDataStateProps {
@@ -39,8 +39,56 @@ export function useBackendDataState({
     globalFooterData: null,
   });
 
+  // ⭐ CRITICAL: Use refs to track previous values and prevent unnecessary updates
+  const prevPageComponentsRef = useRef<string>("");
+  const prevGlobalHeaderDataRef = useRef<string>("");
+  const prevGlobalFooterDataRef = useRef<string>("");
+  const prevSlugRef = useRef<string | undefined>(slug);
+  const prevThemeChangeTimestampRef = useRef<number>(themeChangeTimestamp);
+  const prevStaticPagesDataRef = useRef<string>("");
+  const prevGlobalFooterVariantRef = useRef<string>(globalFooterVariant);
+
   // تحديث البيانات المدمجة عند تغيير أي مصدر بيانات
   useEffect(() => {
+    // ⭐ CRITICAL: Check if data actually changed using JSON.stringify
+    // This prevents infinite loops from reference changes
+    const currentPageComponentsStr = JSON.stringify(pageComponents);
+    const currentGlobalHeaderDataStr = JSON.stringify(globalHeaderData);
+    const currentGlobalFooterDataStr = JSON.stringify(globalFooterData);
+    const currentStaticPagesDataStr = JSON.stringify(staticPagesData);
+
+    // Check if anything actually changed
+    const pageComponentsChanged = prevPageComponentsRef.current !== currentPageComponentsStr;
+    const globalHeaderChanged = prevGlobalHeaderDataRef.current !== currentGlobalHeaderDataStr;
+    const globalFooterChanged = prevGlobalFooterDataRef.current !== currentGlobalFooterDataStr;
+    const slugChanged = prevSlugRef.current !== slug;
+    const themeChanged = prevThemeChangeTimestampRef.current !== themeChangeTimestamp;
+    const staticPagesChanged = prevStaticPagesDataRef.current !== currentStaticPagesDataStr;
+
+    // Check if globalFooterVariant changed
+    const globalFooterVariantChanged = prevGlobalFooterVariantRef.current !== globalFooterVariant;
+
+    // If nothing changed, skip update
+    if (
+      !pageComponentsChanged &&
+      !globalHeaderChanged &&
+      !globalFooterChanged &&
+      !slugChanged &&
+      !themeChanged &&
+      !staticPagesChanged &&
+      !globalFooterVariantChanged
+    ) {
+      return; // No actual changes, skip update
+    }
+
+    // Update refs
+    prevPageComponentsRef.current = currentPageComponentsStr;
+    prevGlobalHeaderDataRef.current = currentGlobalHeaderDataStr;
+    prevGlobalFooterDataRef.current = currentGlobalFooterDataStr;
+    prevSlugRef.current = slug;
+    prevThemeChangeTimestampRef.current = themeChangeTimestamp;
+    prevStaticPagesDataRef.current = currentStaticPagesDataStr;
+    prevGlobalFooterVariantRef.current = globalFooterVariant;
     // Check if this is a static page
     const editorStore = useEditorStore.getState();
     const staticPageData = editorStore.getStaticPageData(slug);
@@ -110,15 +158,17 @@ export function useBackendDataState({
       globalHeaderData: globalHeaderData || null,
       globalFooterData: globalFooterData || null,
     });
+    // ⭐ CRITICAL: Include all dependencies, but the ref checks prevent unnecessary updates
   }, [
     pageComponents,
-    slug, // ✅ Add slug to detect static pages and trigger update when page changes
+    slug,
     globalHeaderData,
     globalFooterData,
-    globalFooterVariant, // ⭐ NEW: Update when footer variant changes
-    themeChangeTimestamp, // ⭐ NEW: Force update when theme changes
-    selectedComponentId, // للتأكد من تحديث البيانات عند تغيير المكون المحدد
-    staticPagesData, // ⭐ NEW: Trigger update when static pages change
+    globalFooterVariant,
+    themeChangeTimestamp,
+    selectedComponentId,
+    staticPagesData,
+    // Note: backendDataState.globalFooterData?.variant is checked inside effect
   ]);
 
   return { backendDataState, setBackendDataState };
