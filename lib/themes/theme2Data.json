@@ -3000,5 +3000,151 @@
         }
       ]
     }
+  },
+  "staticPages": {
+    "project": {
+      "slug": "project",
+      "components": [
+        {
+          "id": "projectDetails2",
+          "type": "projectDetails",
+          "name": "Project Details",
+          "componentName": "projectDetails2",
+          "data": {
+            "visible": true,
+            "projectSlug": "",
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "0rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#8b5f46",
+              "textColor": "#967152",
+              "secondaryTextColor": "#6b7280",
+              "cardBackgroundColor": "#8b5f46",
+              "borderColor": "#e5e7eb",
+              "badgeBackgroundColor": "#8b5f46",
+              "badgeTextColor": "#ffffff",
+              "formBackgroundColor": "#8b5f46",
+              "formTextColor": "#ffffff",
+              "formButtonBackgroundColor": "#d4b996",
+              "formButtonTextColor": "#7a5c43"
+            },
+            "content": {
+              "badgeText": "مشروع عقاري",
+              "descriptionTitle": "وصف المشروع",
+              "specsTitle": "مواصفات المشروع",
+              "contactFormTitle": "استفسر عن هذا المشروع",
+              "contactFormDescription": "استفسر عن المنزل واملأ البيانات لهذا المشروع",
+              "videoTourText": "جولة فيديو للمشروع",
+              "submitButtonText": "أرسل استفسارك"
+            },
+            "displaySettings": {
+              "showAddress": true,
+              "showDeveloper": true,
+              "showUnits": true,
+              "showCompletionDate": true,
+              "showCompleteStatus": true,
+              "showMinPrice": true,
+              "showMaxPrice": true,
+              "showVideoUrl": true,
+              "showLocation": true,
+              "showCreatedAt": false,
+              "showUpdatedAt": false,
+              "showAmenities": true,
+              "showSpecifications": true,
+              "showTypes": true,
+              "showFeatures": true,
+              "showStatus": true,
+              "showFloorplans": false,
+              "showMap": true,
+              "showSimilarProjects": false,
+              "showShareButton": false,
+              "showContactForm": true,
+              "showDescription": true,
+              "showSpecs": true
+            },
+            "hero": {
+              "height": "500px",
+              "overlayOpacity": 0.4
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {
+        "fetchData": "/api/projects/[slug]"
+      }
+    },
+    "property": {
+      "slug": "property",
+      "components": [
+        {
+          "id": "propertyDetail2",
+          "type": "propertyDetail",
+          "name": "Property Detail",
+          "componentName": "propertyDetail2",
+          "data": {
+            "visible": true,
+            "propertySlug": "",
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "0rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#8b5f46",
+              "textColor": "#967152",
+              "secondaryTextColor": "#6b7280",
+              "formBackgroundColor": "#8b5f46",
+              "formTextColor": "#ffffff",
+              "formButtonBackgroundColor": "#d4b996",
+              "formButtonTextColor": "#7a5c43"
+            },
+            "content": {
+              "descriptionTitle": "وصف العقار",
+              "specsTitle": "مواصفات العقار",
+              "contactFormTitle": "استفسر عن هذا العقار",
+              "contactFormDescription": "استفسر عن المنزل واملأ البيانات لهذا العقار",
+              "submitButtonText": "أرسل استفسارك"
+            },
+            "displaySettings": {
+              "showDescription": true,
+              "showSpecs": true,
+              "showContactForm": true,
+              "showVideoUrl": true,
+              "showMap": true
+            },
+            "hero": {
+              "height": "500px",
+              "overlayOpacity": 0.4
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {
+        "fetchData": "/api/properties/[slug]"
+      }
+    }
   }
 }

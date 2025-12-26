@@ -188,57 +188,117 @@ export function useLiveEditorEffects(state: any) {
           slug,
           hasTenantData: !!tenantData,
           initialized,
+          hasRecentThemeChange,
         });
         
-        // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] first (from getTenant)
-        const staticPageFromTenant = tenantData?.StaticPages?.[slug];
-        
-        // Handle different formats: [slug, components] or { slug, components }
-        let tenantComponents: any[] = [];
-        
-        if (staticPageFromTenant) {
-          // Format 1: Array format [slug, components]
-          if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
-            tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
-          }
-          // Format 2: Object format { slug, components }
-          else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
-            tenantComponents = Array.isArray(staticPageFromTenant.components) 
-              ? staticPageFromTenant.components 
-              : [];
+        // ⭐ PRIORITY 0: If theme was recently changed, prioritize staticPagesData from store
+        // This ensures we use the new theme data instead of old tenantData.StaticPages
+        if (hasRecentThemeChange) {
+          const staticPageDataFromStore = editorStore.getStaticPageData(slug);
+          const staticPageComponentsFromStore = staticPageDataFromStore?.components || [];
+          
+          console.log("🔍 [LiveEditorEffects] Checking staticPagesData after theme change:", {
+            slug,
+            hasStaticPageData: !!staticPageDataFromStore,
+            componentCount: staticPageComponentsFromStore.length,
+            components: staticPageComponentsFromStore.map((c: any) => ({
+              id: c.id,
+              componentName: c.componentName,
+              type: c.type,
+            })),
+            themeChangeTimestamp: hasRecentThemeChange ? editorStore.themeChangeTimestamp : 0,
+          });
+          
+          if (staticPageComponentsFromStore.length > 0) {
+            console.log("🔄 Theme recently changed - using staticPagesData from store:", {
+              slug,
+              componentCount: staticPageComponentsFromStore.length,
+              components: staticPageComponentsFromStore.map((c: any) => c.componentName),
+            });
+            
+            const defaultComponent = getDefaultComponentForStaticPage(slug);
+            const staticComponents = staticPageComponentsFromStore.map((comp: any) => {
+              // Use componentName as id if it exists (for static pages, id should match componentName)
+              const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+              
+              return {
+                id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+                type: comp.type || defaultComponent?.type || slug,
+                name: comp.name || defaultComponent?.name || slug,
+                componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+                data: comp.data || defaultComponent?.data || {},
+                position: comp.position || 0,
+                layout: comp.layout || { row: 0, col: 0, span: 2 },
+              };
+            });
+            
+            setPageComponents(staticComponents);
+            setInitialized(true);
+            return; // Skip further loading logic
           }
         }
         
-        const hasStaticPageInTenant = tenantComponents.length > 0;
+        // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] first (from getTenant)
+        // ⭐ CRITICAL: Skip tenantData.StaticPages if theme was recently changed
+        // This ensures we use the new theme data from staticPagesData instead of old database data
+        if (!hasRecentThemeChange) {
+          const staticPageFromTenant = tenantData?.StaticPages?.[slug];
+          
+          // Handle different formats: [slug, components] or { slug, components }
+          let tenantComponents: any[] = [];
+          
+          if (staticPageFromTenant) {
+            // Format 1: Array format [slug, components]
+            if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
+              tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
+            }
+            // Format 2: Object format { slug, components }
+            else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
+              tenantComponents = Array.isArray(staticPageFromTenant.components) 
+                ? staticPageFromTenant.components 
+                : [];
+            }
+          }
+          
+          const hasStaticPageInTenant = tenantComponents.length > 0;
 
-        if (hasStaticPageInTenant) {
-          console.log("✅ Loading static page from tenantData.StaticPages:", {
-            slug,
-            componentCount: tenantComponents.length,
-            format: Array.isArray(staticPageFromTenant) ? "array" : "object",
-          });
-          
-          // Convert static page components to the format expected by setPageComponents
-          const staticComponents = tenantComponents.map((comp: any) => ({
-            id: comp.id || getDefaultComponentForStaticPage(slug)?.id || `${slug}1`,
-            type: comp.type || getDefaultComponentForStaticPage(slug)?.type || slug,
-            name: comp.name || getDefaultComponentForStaticPage(slug)?.name || slug,
-            componentName: comp.componentName || getDefaultComponentForStaticPage(slug)?.componentName || `${slug}1`,
-            data: comp.data || getDefaultComponentForStaticPage(slug)?.data || {},
-            position: comp.position || 0,
-            layout: comp.layout || { row: 0, col: 0, span: 2 },
-            forceUpdate: comp.forceUpdate || 0,
-          }));
-          
-          console.log("✅ Loading static page components from tenantData.StaticPages:", {
-            componentCount: staticComponents.length,
-            components: staticComponents.map((c: any) => c.componentName),
-            firstComponent: staticComponents[0],
-          });
-          
-          setPageComponents(staticComponents);
-          setInitialized(true);
-          return; // Skip further loading logic
+          if (hasStaticPageInTenant) {
+            console.log("✅ Loading static page from tenantData.StaticPages:", {
+              slug,
+              componentCount: tenantComponents.length,
+              format: Array.isArray(staticPageFromTenant) ? "array" : "object",
+            });
+            
+            // Convert static page components to the format expected by setPageComponents
+            // ⭐ CRITICAL: Ensure id matches componentName for static pages
+            const staticComponents = tenantComponents.map((comp: any) => {
+              // Use componentName as id if it exists (for static pages, id should match componentName)
+              const finalId = comp.componentName || comp.id || getDefaultComponentForStaticPage(slug)?.id || `${slug}1`;
+              
+              return {
+                id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+                type: comp.type || getDefaultComponentForStaticPage(slug)?.type || slug,
+                name: comp.name || getDefaultComponentForStaticPage(slug)?.name || slug,
+                componentName: comp.componentName || getDefaultComponentForStaticPage(slug)?.componentName || `${slug}1`,
+                data: comp.data || getDefaultComponentForStaticPage(slug)?.data || {},
+                position: comp.position || 0,
+                layout: comp.layout || { row: 0, col: 0, span: 2 },
+                forceUpdate: comp.forceUpdate || 0,
+              };
+            });
+            
+            console.log("✅ Loading static page components from tenantData.StaticPages:", {
+              componentCount: staticComponents.length,
+              components: staticComponents.map((c: any) => c.componentName),
+              firstComponent: staticComponents[0],
+            });
+            
+            setPageComponents(staticComponents);
+            setInitialized(true);
+            return; // Skip further loading logic
+          }
+        } else {
+          console.log("⏭️ Skipping tenantData.StaticPages - theme recently changed, using staticPagesData from store");
         }
         
         // ⭐ PRIORITY 2: Check editorStore.staticPagesData[slug] (after loadFromDatabase)
@@ -283,16 +343,22 @@ export function useLiveEditorEffects(state: any) {
         // Load components from staticPagesData
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
+          // ⭐ CRITICAL: Ensure id matches componentName for static pages
           const defaultComponent = getDefaultComponentForStaticPage(slug);
-          const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || defaultComponent?.id || `${slug}1`,
-            type: comp.type || defaultComponent?.type || slug,
-            name: comp.name || defaultComponent?.name || slug,
-            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-            data: comp.data || defaultComponent?.data || {},
-            position: comp.position || 0,
-            layout: comp.layout || { row: 0, col: 0, span: 2 },
-          }));
+          const staticComponents = staticPageComponents.map((comp: any) => {
+            // Use componentName as id if it exists (for static pages, id should match componentName)
+            const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+            
+            return {
+              id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+              type: comp.type || defaultComponent?.type || slug,
+              name: comp.name || defaultComponent?.name || slug,
+              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+              data: comp.data || defaultComponent?.data || {},
+              position: comp.position || 0,
+              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            };
+          });
           
           console.log("✅ Loading static page components from editorStore.staticPagesData:", {
             componentCount: staticComponents.length,
@@ -553,6 +619,7 @@ export function useLiveEditorEffects(state: any) {
   // Subscribe to currentTheme changes to detect theme restore
   const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
   const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestamp);
+  const staticPagesData = useEditorStore((state) => state.staticPagesData); // ⭐ NEW: Subscribe to staticPagesData changes
 
   useEffect(() => {
     // Only sync if already initialized to avoid conflicts with initial load
@@ -572,8 +639,11 @@ export function useLiveEditorEffects(state: any) {
     };
 
     // ⭐ NEW: For static pages, always check staticPagesData first
+    // ⭐ CRITICAL: Also check if theme was recently changed to force update
     const editorStore = useEditorStore.getState();
     const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
+    const currentThemeChangeTimestamp = editorStore.themeChangeTimestamp;
+    const hasRecentThemeChange = currentThemeChangeTimestamp > 0;
     
     if (pageIsStatic) {
       const staticPageData = editorStore.getStaticPageData(slug);
@@ -581,24 +651,36 @@ export function useLiveEditorEffects(state: any) {
       
       if (staticPageComponents.length > 0) {
         const defaultComponent = getDefaultComponentForStaticPage(slug);
-        const staticComponents = staticPageComponents.map((comp: any) => ({
-          id: comp.id || defaultComponent?.id || `${slug}1`,
-          type: comp.type || defaultComponent?.type || slug,
-          name: comp.name || defaultComponent?.name || slug,
-          componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-          data: comp.data || defaultComponent?.data || {},
-          position: comp.position || 0,
-          layout: comp.layout || { row: 0, col: 0, span: 2 },
-        }));
+        // ⭐ CRITICAL: Ensure id matches componentName for static pages
+        const staticComponents = staticPageComponents.map((comp: any) => {
+          // Use componentName as id if it exists (for static pages, id should match componentName)
+          const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+          
+          return {
+            id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          };
+        });
         
         const staticSignature = createSignature(staticComponents);
         
-        // Only update if we haven't synced this exact state (avoid infinite loop)
-        if (lastSyncedRef.current !== staticSignature) {
+        // ⭐ CRITICAL: Force update if theme was recently changed, even if signature matches
+        // This ensures static pages are updated immediately after theme change
+        const shouldUpdate = hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
+        
+        if (shouldUpdate) {
           console.log("[LiveEditorEffects] Syncing static page from staticPagesData:", {
             slug,
             componentCount: staticComponents.length,
+            componentNames: staticComponents.map((c: any) => c.componentName),
             staticSignature: staticSignature.substring(0, 50),
+            hasRecentThemeChange,
+            forceUpdate: hasRecentThemeChange,
           });
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
@@ -618,29 +700,38 @@ export function useLiveEditorEffects(state: any) {
       const store = useEditorStore.getState();
       const freshStorePageComponents = store.pageComponentsByPage[slug];
       
-      // ⭐ NEW: For static pages, check staticPagesData first
+      // ⭐ NEW: For static pages, check staticPagesData first (even if freshStorePageComponents exists)
+      // This ensures static pages are updated from staticPagesData after theme change
       const pageIsStatic = isStaticPage(slug, tenantData, store);
       
-      if (pageIsStatic && !freshStorePageComponents) {
+      if (pageIsStatic) {
         const staticPageData = store.getStaticPageData(slug);
         const staticPageComponents = staticPageData?.components || [];
         
         if (staticPageComponents.length > 0) {
           const defaultComponent = getDefaultComponentForStaticPage(slug);
-          const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || defaultComponent?.id || `${slug}1`,
-            type: comp.type || defaultComponent?.type || slug,
-            name: comp.name || defaultComponent?.name || slug,
-            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-            data: comp.data || defaultComponent?.data || {},
-            position: comp.position || 0,
-            layout: comp.layout || { row: 0, col: 0, span: 2 },
-          }));
+          // ⭐ CRITICAL: Ensure id matches componentName for static pages
+          const staticComponents = staticPageComponents.map((comp: any) => {
+            // Use componentName as id if it exists (for static pages, id should match componentName)
+            const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+            
+            return {
+              id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+              type: comp.type || defaultComponent?.type || slug,
+              name: comp.name || defaultComponent?.name || slug,
+              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+              data: comp.data || defaultComponent?.data || {},
+              position: comp.position || 0,
+              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            };
+          });
           
           const staticSignature = createSignature(staticComponents);
           console.log("[LiveEditorEffects] Force sync static page after theme change:", {
             slug,
             componentCount: staticComponents.length,
+            componentNames: staticComponents.map((c: any) => c.componentName),
+            componentIds: staticComponents.map((c: any) => c.id),
           });
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
@@ -713,22 +804,30 @@ export function useLiveEditorEffects(state: any) {
         
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
+          // ⭐ CRITICAL: Ensure id matches componentName for static pages
           const defaultComponent = getDefaultComponentForStaticPage(slug);
-          const staticComponents = staticPageComponents.map((comp: any) => ({
-            id: comp.id || defaultComponent?.id || `${slug}1`,
-            type: comp.type || defaultComponent?.type || slug,
-            name: comp.name || defaultComponent?.name || slug,
-            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-            data: comp.data || defaultComponent?.data || {},
-            position: comp.position || 0,
-            layout: comp.layout || { row: 0, col: 0, span: 2 },
-          }));
+          const staticComponents = staticPageComponents.map((comp: any) => {
+            // Use componentName as id if it exists (for static pages, id should match componentName)
+            const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+            
+            return {
+              id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+              type: comp.type || defaultComponent?.type || slug,
+              name: comp.name || defaultComponent?.name || slug,
+              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+              data: comp.data || defaultComponent?.data || {},
+              position: comp.position || 0,
+              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            };
+          });
           
           const staticSignature = createSignature(staticComponents);
           if (lastSyncedRef.current !== staticSignature) {
             console.log("[LiveEditorEffects] Syncing static page components from staticPagesData:", {
               slug,
               componentCount: staticComponents.length,
+              componentNames: staticComponents.map((c: any) => c.componentName),
+              componentIds: staticComponents.map((c: any) => c.id),
             });
             setPageComponents(staticComponents);
             lastSyncedRef.current = staticSignature;
@@ -746,7 +845,69 @@ export function useLiveEditorEffects(state: any) {
         lastSyncedRef.current = "empty";
       }
     }
-  }, [initialized, slug, storePageComponents, setPageComponents, currentTheme, themeChangeTimestamp]);
+  }, [initialized, slug, storePageComponents, setPageComponents, currentTheme, themeChangeTimestamp, staticPagesData]); // ⭐ NEW: Add staticPagesData dependency
+
+  // ⭐ NEW: Force update pageComponents when staticPagesData changes for current page
+  // This ensures immediate update when theme changes and staticPagesData is updated
+  useEffect(() => {
+    if (!initialized) return;
+    
+    const editorStore = useEditorStore.getState();
+    const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
+    
+    if (pageIsStatic) {
+      const staticPageData = editorStore.getStaticPageData(slug);
+      const staticPageComponents = staticPageData?.components || [];
+      
+      if (staticPageComponents.length > 0) {
+        const defaultComponent = getDefaultComponentForStaticPage(slug);
+        
+        // Create signature function for comparison
+        const createSignature = (components: any[]) => {
+          if (!components || components.length === 0) return "empty";
+          return components
+            .map((c) => {
+              const dataHash = JSON.stringify(c.data || {});
+              return `${c.id}-${c.type}-${c.componentName}-${dataHash.substring(0, 50)}`;
+            })
+            .sort()
+            .join(",");
+        };
+        
+        const staticComponents = staticPageComponents.map((comp: any) => {
+          // Use componentName as id if it exists (for static pages, id should match componentName)
+          const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+          
+          return {
+            id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          };
+        });
+        
+        const staticSignature = createSignature(staticComponents);
+        
+        // Only update if signature changed to avoid infinite loops
+        if (lastSyncedRef.current !== staticSignature) {
+          console.log("[LiveEditorEffects] Force update pageComponents from staticPagesData:", {
+            slug,
+            componentCount: staticComponents.length,
+            componentNames: staticComponents.map((c: any) => c.componentName),
+            componentIds: staticComponents.map((c: any) => c.id),
+            signature: staticSignature.substring(0, 50),
+          });
+          
+          // Force update immediately
+          setPageComponents(staticComponents);
+          lastSyncedRef.current = staticSignature;
+        }
+      }
+    }
+  }, [slug, staticPagesData, initialized, tenantData]); // ⭐ Listen to staticPagesData changes
 
   // Reset sync ref when theme changes to force re-sync
   useEffect(() => {

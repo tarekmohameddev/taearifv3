@@ -13,6 +13,11 @@ interface ThemeData {
     header?: any;
     footer?: any;
   };
+  staticPages?: Record<string, {
+    slug: string;
+    components: any[];
+    apiEndpoints: Record<string, string>;
+  }>;
 }
 
 /**
@@ -123,7 +128,226 @@ export function backupCurrentComponentSettings(): {
     };
   }
 
+  // Backup staticPagesData
+  if (store.staticPagesData && Object.keys(store.staticPagesData).length > 0) {
+    backup._staticPagesData = { ...store.staticPagesData };
+  }
+
   return { backup, backupKey };
+}
+
+/**
+ * Backup static pages data
+ */
+export function backupStaticPages(): Record<string, any> {
+  const store = useEditorStore.getState();
+  if (store.staticPagesData && Object.keys(store.staticPagesData).length > 0) {
+    return { ...store.staticPagesData };
+  }
+  return {};
+}
+
+/**
+ * Apply static pages from theme data
+ */
+export function applyStaticPagesFromTheme(themeData: ThemeData): void {
+  const store = useEditorStore.getState();
+  
+  if (!themeData.staticPages) {
+    console.log("[applyStaticPagesFromTheme] No static pages in theme data");
+    return;
+  }
+
+  console.log("[applyStaticPagesFromTheme] Applying static pages from theme:", Object.keys(themeData.staticPages));
+
+  // Apply each static page from theme
+  Object.entries(themeData.staticPages).forEach(([slug, pageData]) => {
+    if (pageData && pageData.components && Array.isArray(pageData.components)) {
+      // ⭐ CRITICAL: Ensure id matches componentName (same as handleComponentThemeChange)
+      const updatedComponents = pageData.components.map((comp: any) => {
+        // Use componentName as id if it exists (for static pages, id should match componentName)
+        const finalId = comp.componentName || comp.id;
+        
+        return {
+          ...comp,
+          id: finalId, // ✅ Ensure id matches componentName
+          componentName: comp.componentName,
+          data: comp.data || {},
+          position: comp.position || 0,
+          layout: comp.layout || { row: 0, col: 0, span: 2 },
+          forceUpdate: Date.now(), // ✅ Add forceUpdate to trigger re-render (like handleComponentThemeChange)
+        };
+      });
+      
+      // Set static page data with updated components
+      store.setStaticPageData(slug, {
+        slug: pageData.slug || slug,
+        components: updatedComponents, // ✅ Use updated components with correct id and forceUpdate
+        apiEndpoints: pageData.apiEndpoints || {},
+      });
+
+      // Update component states for each component (same as handleComponentThemeChange)
+      updatedComponents.forEach((comp: any) => {
+        if (comp.id && comp.type && comp.data) {
+          // ⭐ CRITICAL: Use componentName as variantId if it exists, otherwise use id
+          // This ensures projectDetails1 uses "projectDetails1" as variantId, not a UUID
+          // For static pages, id should match componentName
+          const variantId = comp.componentName || comp.id;
+          
+          console.log(`[applyStaticPagesFromTheme] Setting component state:`, {
+            slug,
+            type: comp.type,
+            id: comp.id,
+            componentName: comp.componentName,
+            variantId: variantId,
+          });
+          
+          // ✅ Same as handleComponentThemeChange: ensure variant and set data
+          store.ensureComponentVariant(comp.type, variantId, comp.data);
+          store.setComponentData(comp.type, variantId, comp.data);
+        }
+      });
+
+      // Update metaTags in WebsiteLayout
+      const currentMetaTags = store.WebsiteLayout?.metaTags || {};
+      const staticPagesMetaTags = currentMetaTags.staticPages || [];
+      
+      // Check if page already exists in metaTags
+      const existingPageIndex = staticPagesMetaTags.findIndex(
+        (page: any) => page.slug === slug || page.path === `/${slug}`
+      );
+
+      const pageMetaData = {
+        slug: slug,
+        path: `/${slug}`,
+        TitleAr: pageData.slug === "project" ? "المشروع" : "العقار",
+        TitleEn: pageData.slug === "project" ? "Project" : "Property",
+        DescriptionAr: pageData.slug === "project" ? "تفاصيل المشروع" : "تفاصيل العقار",
+        DescriptionEn: pageData.slug === "project" ? "Project Details" : "Property Details",
+      };
+
+      if (existingPageIndex >= 0) {
+        // Update existing page
+        staticPagesMetaTags[existingPageIndex] = pageMetaData;
+      } else {
+        // Add new page
+        staticPagesMetaTags.push(pageMetaData);
+      }
+
+      store.setWebsiteLayout({
+        ...store.WebsiteLayout,
+        metaTags: {
+          ...currentMetaTags,
+          staticPages: staticPagesMetaTags,
+        },
+      });
+
+      console.log(`[applyStaticPagesFromTheme] Applied static page: ${slug}`, {
+        componentCount: pageData.components.length,
+      });
+    }
+  });
+}
+
+/**
+ * Restore static pages from backup
+ */
+export function restoreStaticPagesFromBackup(backup: Record<string, any>): void {
+  const store = useEditorStore.getState();
+  
+  const staticPagesBackup = backup._staticPagesData;
+  if (!staticPagesBackup || Object.keys(staticPagesBackup).length === 0) {
+    console.log("[restoreStaticPagesFromBackup] No static pages in backup");
+    return;
+  }
+
+  console.log("[restoreStaticPagesFromBackup] Restoring static pages from backup:", Object.keys(staticPagesBackup));
+
+  // Restore each static page from backup
+  Object.entries(staticPagesBackup).forEach(([slug, pageData]: [string, any]) => {
+    if (pageData && pageData.components && Array.isArray(pageData.components)) {
+      // ⭐ CRITICAL: Ensure id matches componentName (same as handleComponentThemeChange)
+      const updatedComponents = pageData.components.map((comp: any) => {
+        const finalId = comp.componentName || comp.id;
+        
+        return {
+          ...comp,
+          id: finalId, // ✅ Ensure id matches componentName
+          componentName: comp.componentName,
+          data: comp.data || {},
+          position: comp.position || 0,
+          layout: comp.layout || { row: 0, col: 0, span: 2 },
+          forceUpdate: Date.now(), // ✅ Add forceUpdate to trigger re-render
+        };
+      });
+      
+      // Set static page data with updated components
+      store.setStaticPageData(slug, {
+        slug: pageData.slug || slug,
+        components: updatedComponents,
+        apiEndpoints: pageData.apiEndpoints || {},
+      });
+
+      // Update component states (same as handleComponentThemeChange)
+      updatedComponents.forEach((comp: any) => {
+        if (comp.id && comp.type && comp.data) {
+          // ⭐ CRITICAL: Use componentName as variantId if it exists, otherwise use id
+          // This ensures projectDetails1 uses "projectDetails1" as variantId, not a UUID
+          // For static pages, id should match componentName
+          const variantId = comp.componentName || comp.id;
+          
+          console.log(`[restoreStaticPagesFromBackup] Setting component state:`, {
+            slug,
+            type: comp.type,
+            id: comp.id,
+            componentName: comp.componentName,
+            variantId: variantId,
+          });
+          
+          store.ensureComponentVariant(comp.type, variantId, comp.data);
+          store.setComponentData(comp.type, variantId, comp.data);
+        }
+      });
+
+      // Update metaTags in WebsiteLayout
+      const currentMetaTags = store.WebsiteLayout?.metaTags || {};
+      const staticPagesMetaTags = currentMetaTags.staticPages || [];
+      
+      // Check if page already exists in metaTags
+      const existingPageIndex = staticPagesMetaTags.findIndex(
+        (page: any) => page.slug === slug || page.path === `/${slug}`
+      );
+
+      const pageMetaData = {
+        slug: slug,
+        path: `/${slug}`,
+        TitleAr: pageData.slug === "project" ? "المشروع" : "العقار",
+        TitleEn: pageData.slug === "project" ? "Project" : "Property",
+        DescriptionAr: pageData.slug === "project" ? "تفاصيل المشروع" : "تفاصيل العقار",
+        DescriptionEn: pageData.slug === "project" ? "Project Details" : "Property Details",
+      };
+
+      if (existingPageIndex >= 0) {
+        // Update existing page
+        staticPagesMetaTags[existingPageIndex] = pageMetaData;
+      } else {
+        // Add new page
+        staticPagesMetaTags.push(pageMetaData);
+      }
+
+      store.setWebsiteLayout({
+        ...store.WebsiteLayout,
+        metaTags: {
+          ...currentMetaTags,
+          staticPages: staticPagesMetaTags,
+        },
+      });
+
+      console.log(`[restoreStaticPagesFromBackup] Restored static page: ${slug}`, {
+        componentCount: pageData.components.length,
+      });
+    }
+  });
 }
 
 /**
@@ -239,13 +463,40 @@ export async function applyThemeToAllPages(themeNumber: ThemeNumber): Promise<vo
   setTimeout(() => {
     const finalStore = useEditorStore.getState();
     const finalCurrentPage = finalStore.currentPage;
-    if (finalCurrentPage && finalStore.pageComponentsByPage[finalCurrentPage]) {
-      const finalComponents = finalStore.pageComponentsByPage[finalCurrentPage];
-      console.log("[applyThemeToAllPages] Final force update for current page:", {
-        page: finalCurrentPage,
-        componentCount: finalComponents.length,
-      });
-      finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+    
+    if (finalCurrentPage) {
+      // ⭐ CRITICAL: For static pages, read from staticPagesData first
+      const staticPageData = finalStore.getStaticPageData(finalCurrentPage);
+      let finalComponents: any[] = [];
+      
+      if (staticPageData && staticPageData.components && staticPageData.components.length > 0) {
+        // Convert static page components to pageComponents format
+        finalComponents = staticPageData.components.map((comp: any) => {
+          const finalId = comp.componentName || comp.id;
+          return {
+            id: finalId,
+            type: comp.type,
+            name: comp.name || comp.type,
+            componentName: comp.componentName,
+            data: comp.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          };
+        });
+      } else if (finalStore.pageComponentsByPage[finalCurrentPage]) {
+        // For regular pages, use pageComponentsByPage
+        finalComponents = finalStore.pageComponentsByPage[finalCurrentPage];
+      }
+      
+      if (finalComponents.length > 0) {
+        console.log("[applyThemeToAllPages] Final force update for current page:", {
+          page: finalCurrentPage,
+          componentCount: finalComponents.length,
+          isStaticPage: !!staticPageData,
+          componentNames: finalComponents.map((c: any) => c.componentName),
+        });
+        finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+      }
     }
   }, 100);
 
@@ -320,10 +571,115 @@ export async function applyThemeToAllPages(themeNumber: ThemeNumber): Promise<vo
     }
   }
 
-  // 7. Update currentTheme
+  // 7. Update currentTheme (يحدث themeChangeTimestamp)
   store.setCurrentTheme(themeNumber);
 
-  // 8. ⭐ CRITICAL: Update tenantStore to sync with editorStore
+  // 8. Apply static pages from theme (بعد setCurrentTheme)
+  // ⭐ LOGGING: Show static pages data BEFORE theme change
+  console.group(`🎨 [Theme Change] Static Pages - BEFORE (Theme ${themeNumber})`);
+  const staticPagesBefore: Record<string, any> = {};
+  Object.keys(themeData.staticPages || {}).forEach((slug) => {
+    const beforeData = store.getStaticPageData(slug);
+    staticPagesBefore[slug] = beforeData ? {
+      slug: beforeData.slug,
+      componentCount: beforeData.components?.length || 0,
+      components: beforeData.components?.map((c: any) => ({
+        id: c.id,
+        componentName: c.componentName,
+        type: c.type,
+      })) || [],
+    } : null;
+  });
+  console.log("Static Pages Data Before:", staticPagesBefore);
+  console.groupEnd();
+
+  // Apply static pages from theme
+  applyStaticPagesFromTheme(themeData);
+
+  // ⭐ LOGGING: Show static pages data AFTER theme change
+  console.group(`🎨 [Theme Change] Static Pages - AFTER (Theme ${themeNumber})`);
+  const staticPagesAfter: Record<string, any> = {};
+  Object.keys(themeData.staticPages || {}).forEach((slug) => {
+    const afterData = store.getStaticPageData(slug);
+    staticPagesAfter[slug] = afterData ? {
+      slug: afterData.slug,
+      componentCount: afterData.components?.length || 0,
+      components: afterData.components?.map((c: any) => ({
+        id: c.id,
+        componentName: c.componentName,
+        type: c.type,
+        forceUpdate: c.forceUpdate,
+      })) || [],
+    } : null;
+  });
+  console.log("Static Pages Data After:", staticPagesAfter);
+  
+  // Show comparison
+  console.log("📊 Comparison:");
+  Object.keys(themeData.staticPages || {}).forEach((slug) => {
+    const before = staticPagesBefore[slug];
+    const after = staticPagesAfter[slug];
+    if (before && after) {
+      const beforeComponentName = before.components?.[0]?.componentName;
+      const afterComponentName = after.components?.[0]?.componentName;
+      const changed = beforeComponentName !== afterComponentName;
+      console.log(`  ${slug}:`, {
+        before: beforeComponentName,
+        after: afterComponentName,
+        changed: changed ? "✅ YES" : "❌ NO",
+      });
+    }
+  });
+  console.groupEnd();
+
+  // 9. Force update ALL static pages (not just current page)
+  // This ensures all static pages are updated in pageComponentsByPage
+  Object.keys(themeData.staticPages || {}).forEach((pageSlug) => {
+    const staticPageData = store.getStaticPageData(pageSlug);
+    if (staticPageData && staticPageData.components && staticPageData.components.length > 0) {
+      // Convert static page components to pageComponents format
+      // ⭐ CRITICAL: Ensure id matches componentName for static pages
+      const staticPageComponents = staticPageData.components.map((comp: any) => {
+        // Use componentName as id if it exists (for static pages, id should match componentName)
+        const finalId = comp.componentName || comp.id;
+        
+        return {
+          id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
+          type: comp.type,
+          name: comp.name || comp.type,
+          componentName: comp.componentName,
+          data: comp.data || {},
+          position: comp.position || 0,
+          layout: comp.layout || { row: 0, col: 0, span: 2 },
+        };
+      });
+      
+      console.log("[applyThemeToAllPages] Force update static page after theme change:", {
+        page: pageSlug,
+        componentCount: staticPageComponents.length,
+        components: staticPageComponents.map((c: any) => ({
+          id: c.id,
+          componentName: c.componentName,
+        })),
+      });
+      
+      // Force update pageComponentsByPage for this static page
+      store.forceUpdatePageComponents(pageSlug, staticPageComponents);
+      store.setPageComponentsForPage(pageSlug, staticPageComponents);
+    }
+  });
+
+  // 10. Force update current page if it's a static page (keep existing logic for immediate visual feedback)
+  const currentPage = store.currentPage;
+  if (currentPage) {
+    const staticPageData = store.getStaticPageData(currentPage);
+    if (staticPageData && staticPageData.components && staticPageData.components.length > 0) {
+      // This is already handled in step 9, but we keep this for immediate visual feedback
+      console.log("[applyThemeToAllPages] Current page is static page:", currentPage);
+    }
+  }
+
+  // 10. ⭐ CRITICAL: Update tenantStore to sync with editorStore
   // This ensures tenantData.componentSettings matches pageComponentsByPage
   // and tenantData.globalComponentsData matches globalComponentsData
   const tenantStore = useTenantStore.getState();
@@ -430,7 +786,86 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
   // This ensures complete removal of all components and data from iframe
   store.clearAllStates();
 
-  // 2. Restore globalComponentsData from backup (complete replacement)
+  // 2. Restore static pages from backup (before global components)
+  // ⭐ LOGGING: Show static pages data BEFORE restore
+  console.group(`🔄 [Theme Restore] Static Pages - BEFORE (${backupKey})`);
+  const staticPagesBackupData = backup._staticPagesData || {};
+  const staticPagesBeforeRestore: Record<string, any> = {};
+  Object.keys(staticPagesBackupData).forEach((slug) => {
+    const pageData = staticPagesBackupData[slug];
+    staticPagesBeforeRestore[slug] = pageData ? {
+      slug: pageData.slug || slug,
+      componentCount: pageData.components?.length || 0,
+      components: pageData.components?.map((c: any) => ({
+        id: c.id,
+        componentName: c.componentName,
+        type: c.type,
+      })) || [],
+    } : null;
+  });
+  console.log("Static Pages Data Before Restore:", staticPagesBeforeRestore);
+  console.log("Has Static Pages in Backup:", Object.keys(staticPagesBackupData).length > 0);
+  console.groupEnd();
+
+  // Restore static pages from backup
+  restoreStaticPagesFromBackup(backup);
+
+  // ⭐ CRITICAL: If no static pages in backup, load from theme data
+  // This handles the case where backup was created before static pages were added
+  if (!staticPagesBackupData || Object.keys(staticPagesBackupData).length === 0) {
+    console.log(`[restoreThemeFromBackup] No static pages in backup, loading from theme data for Theme ${restoredThemeNumber}`);
+    if (restoredThemeNumber) {
+      const themeData = loadThemeData(restoredThemeNumber as ThemeNumber);
+      if (themeData.staticPages) {
+        console.log(`[restoreThemeFromBackup] Applying static pages from theme data:`, Object.keys(themeData.staticPages));
+        applyStaticPagesFromTheme(themeData);
+      }
+    }
+  }
+
+  // ⭐ LOGGING: Show static pages data AFTER restore
+  console.group(`🔄 [Theme Restore] Static Pages - AFTER (${backupKey})`);
+  const staticPagesAfterRestore: Record<string, any> = {};
+  // Get all static pages from store (may include pages from theme data if backup was empty)
+  const allStaticPagesInStore = store.staticPagesData;
+  Object.keys(allStaticPagesInStore).forEach((slug) => {
+    const afterData = store.getStaticPageData(slug);
+    staticPagesAfterRestore[slug] = afterData ? {
+      slug: afterData.slug,
+      componentCount: afterData.components?.length || 0,
+      components: afterData.components?.map((c: any) => ({
+        id: c.id,
+        componentName: c.componentName,
+        type: c.type,
+        forceUpdate: c.forceUpdate,
+      })) || [],
+    } : null;
+  });
+  console.log("Static Pages Data After Restore:", staticPagesAfterRestore);
+  
+  // Show comparison (only if we had data before)
+  if (Object.keys(staticPagesBackupData).length > 0) {
+    console.log("📊 Comparison:");
+    Object.keys(staticPagesBackupData).forEach((slug) => {
+      const before = staticPagesBeforeRestore[slug];
+      const after = staticPagesAfterRestore[slug];
+      if (before && after) {
+        const beforeComponentName = before.components?.[0]?.componentName;
+        const afterComponentName = after.components?.[0]?.componentName;
+        const changed = beforeComponentName !== afterComponentName;
+        console.log(`  ${slug}:`, {
+          before: beforeComponentName,
+          after: afterComponentName,
+          changed: changed ? "✅ YES" : "❌ NO",
+        });
+      }
+    });
+  } else {
+    console.log("📊 No backup data to compare - static pages loaded from theme data");
+  }
+  console.groupEnd();
+
+  // 3. Restore globalComponentsData from backup (complete replacement)
   if (backup._globalComponentsData) {
     const globalData = backup._globalComponentsData;
     
@@ -484,10 +919,10 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
     store.setGlobalComponentsData(restoredGlobalComponentsData);
   }
 
-  // 3. Restore all pages from backup with force update
+  // 4. Restore all pages from backup with force update
   Object.entries(backup).forEach(([page, pageSettings]) => {
-    // Skip globalComponentsData backup - already handled
-    if (page === "_globalComponentsData") {
+    // Skip globalComponentsData and staticPagesData backup - already handled
+    if (page === "_globalComponentsData" || page === "_staticPagesData") {
       return;
     }
 
@@ -535,7 +970,7 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
     }
   });
 
-  // 4. Force update current page components to trigger re-render
+  // 5. Force update current page components to trigger re-render
   // This ensures the current page is updated even if it was already in the backup
   const currentPage = store.currentPage;
   let currentPageComponents: any[] = [];
@@ -575,31 +1010,58 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
     currentPageComponents = store.pageComponentsByPage[currentPage];
   }
 
-  // 5. Restore currentTheme if we extracted it from backup key
+  // 6. Restore currentTheme if we extracted it from backup key
   // This will also set themeChangeTimestamp to force sync
   if (restoredThemeNumber) {
     store.setCurrentTheme(restoredThemeNumber);
   }
 
-  // 6. ⭐ CRITICAL: Add a small delay to ensure store updates are propagated
+  // 7. ⭐ CRITICAL: Add a small delay to ensure store updates are propagated
   // Then force one more update to guarantee sync
   setTimeout(() => {
     const finalStore = useEditorStore.getState();
     const finalCurrentPage = finalStore.currentPage;
-    if (finalCurrentPage && finalStore.pageComponentsByPage[finalCurrentPage]) {
-      const finalComponents = finalStore.pageComponentsByPage[finalCurrentPage];
-      console.log("[restoreThemeFromBackup] Final force update for current page:", {
-        page: finalCurrentPage,
-        componentCount: finalComponents.length,
-      });
-      finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+    
+    if (finalCurrentPage) {
+      // ⭐ CRITICAL: For static pages, read from staticPagesData first
+      const staticPageData = finalStore.getStaticPageData(finalCurrentPage);
+      let finalComponents: any[] = [];
+      
+      if (staticPageData && staticPageData.components && staticPageData.components.length > 0) {
+        // Convert static page components to pageComponents format
+        finalComponents = staticPageData.components.map((comp: any) => {
+          const finalId = comp.componentName || comp.id;
+          return {
+            id: finalId,
+            type: comp.type,
+            name: comp.name || comp.type,
+            componentName: comp.componentName,
+            data: comp.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          };
+        });
+      } else if (finalStore.pageComponentsByPage[finalCurrentPage]) {
+        // For regular pages, use pageComponentsByPage
+        finalComponents = finalStore.pageComponentsByPage[finalCurrentPage];
+      }
+      
+      if (finalComponents.length > 0) {
+        console.log("[restoreThemeFromBackup] Final force update for current page:", {
+          page: finalCurrentPage,
+          componentCount: finalComponents.length,
+          isStaticPage: !!staticPageData,
+          componentNames: finalComponents.map((c: any) => c.componentName),
+        });
+        finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+      }
     }
   }, 100);
 
-  // 7. Clear themeBackup after restoring
+  // 8. Clear themeBackup after restoring
   store.setThemeBackup(null, null);
 
-  // 8. ⭐ CRITICAL: Update tenantStore to sync with editorStore
+  // 9. ⭐ CRITICAL: Update tenantStore to sync with editorStore
   // This ensures tenantData.componentSettings matches pageComponentsByPage
   // and tenantData.globalComponentsData matches globalComponentsData
   const tenantStore = useTenantStore.getState();
@@ -664,12 +1126,16 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
       globalFooterVariant: store.globalFooterVariant || "StaticFooter1",
     };
 
+    // Update staticPagesData in tenantStore from restored backup
+    const updatedStaticPagesData = store.staticPagesData || {};
+
     // Update tenantStore with restored data
     useTenantStore.setState({
       tenantData: {
         ...currentTenantData,
         componentSettings: updatedComponentSettings,
         globalComponentsData: updatedGlobalComponentsData,
+        staticPagesData: updatedStaticPagesData,
         WebsiteLayout: store.WebsiteLayout,
       },
     });

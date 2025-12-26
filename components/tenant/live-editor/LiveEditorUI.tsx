@@ -512,6 +512,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
   const getStaticPageData = useEditorStore((s) => s.getStaticPageData);
+  const staticPagesData = useEditorStore((s) => s.staticPagesData); // ⭐ NEW: Subscribe to staticPagesData changes
   
   // التحقق من أن الصفحة الحالية هي صفحة ثابتة
   const isStaticPage = useMemo(() => {
@@ -809,6 +810,19 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     const staticPageData = editorStore.getStaticPageData(state.slug);
     const isStaticPage = !!staticPageData;
 
+    // ⭐ CRITICAL: Force re-compute for static pages when theme changes
+    // This ensures we get the latest data from staticPagesData after theme change
+    if (isStaticPage && themeChangeTimestamp > 0) {
+      // Force re-read staticPageData to ensure we have the latest data
+      const freshStaticPageData = editorStore.getStaticPageData(state.slug);
+      if (freshStaticPageData) {
+        console.log("[LiveEditorUI] Force re-compute static page after theme change:", {
+          slug: state.slug,
+          componentCount: freshStaticPageData.components?.length || 0,
+        });
+      }
+    }
+
     // 1. معالجة pageComponents مع mergedData
     const componentsWithMergedData = pageComponents
       .filter(
@@ -871,6 +885,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     globalFooterVariant, // ⭐ NEW: Update when footer variant changes
     themeChangeTimestamp, // ⭐ NEW: Force update when theme changes
     selectedComponentId, // للتأكد من تحديث البيانات عند تغيير المكون المحدد
+    staticPagesData, // ⭐ NEW: Trigger update when static pages change
   ]);
 
   useEffect(() => {
@@ -1333,7 +1348,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                             ...component.mergedData, // ✅ استخدام البيانات من useState
                             id: component.id,
                             useStore: true,
-                            variant: component.id,
+                            variant: component.componentName, // ⭐ FIX: Use componentName instead of id for variant
                             deviceType: selectedDevice,
                             forceUpdate: component.forceUpdate,
                           } as any

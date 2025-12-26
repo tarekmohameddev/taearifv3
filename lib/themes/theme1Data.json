@@ -3483,5 +3483,125 @@
         }
       ]
     }
+  },
+  "staticPages": {
+    "project": {
+      "slug": "project",
+      "components": [
+        {
+          "id": "projectDetails1",
+          "type": "projectDetails",
+          "name": "Project Details",
+          "componentName": "projectDetails1",
+          "data": {
+            "visible": true,
+            "projectSlug": "",
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "3rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#059669",
+              "textColor": "#1f2937",
+              "secondaryTextColor": "#6b7280",
+              "cardBackgroundColor": "#ffffff",
+              "borderColor": "#e5e7eb",
+              "badgeBackgroundColor": "#059669",
+              "badgeTextColor": "#ffffff"
+            },
+            "content": {
+              "badgeText": "مشروع عقاري",
+              "similarProjectsTitle": "مشاريع مشابهة",
+              "floorplansTitle": "مخططات الأرضية",
+              "locationTitle": "موقع المشروع",
+              "openInGoogleMapsText": "فتح في خرائط جوجل",
+              "shareTitle": "مشاركة المشروع",
+              "shareDescription": "شارك هذا المشروع مع أصدقائك"
+            },
+            "displaySettings": {
+              "showAddress": true,
+              "showDeveloper": true,
+              "showUnits": true,
+              "showCompletionDate": true,
+              "showCompleteStatus": true,
+              "showMinPrice": true,
+              "showMaxPrice": true,
+              "showVideoUrl": true,
+              "showLocation": true,
+              "showCreatedAt": true,
+              "showUpdatedAt": true,
+              "showAmenities": true,
+              "showSpecifications": true,
+              "showTypes": true,
+              "showFeatures": true,
+              "showStatus": true,
+              "showFloorplans": true,
+              "showMap": true,
+              "showSimilarProjects": true,
+              "showShareButton": true
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {
+        "fetchData": "/api/projects/[slug]"
+      }
+    },
+    "property": {
+      "slug": "property",
+      "components": [
+        {
+          "id": "propertyDetail1",
+          "type": "propertyDetail",
+          "name": "Property Detail",
+          "componentName": "propertyDetail1",
+          "data": {
+            "visible": true,
+            "propertySlug": "",
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "3rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#059669",
+              "textColor": "#1f2937",
+              "secondaryTextColor": "#6b7280"
+            },
+            "displaySettings": {
+              "showDescription": true,
+              "showSpecs": true,
+              "showContactForm": true,
+              "showVideoUrl": true,
+              "showMap": true
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {
+        "fetchData": "/api/properties/[slug]"
+      }
+    }
   }
 }

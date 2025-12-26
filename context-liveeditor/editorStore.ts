@@ -2399,6 +2399,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => {
       console.log(`📝 Setting static page data for: ${slug}`, data);
 
+      // ⭐ NEW: If theme change is in progress, ensure immediate update
+      // If themeChangeTimestamp is recent (within last 5 seconds), 
+      // this is likely a theme change - ensure update
+      const isThemeChangeInProgress = state.themeChangeTimestamp > Date.now() - 5000;
+      
+      if (isThemeChangeInProgress) {
+        console.log(`[setStaticPageData] Theme change in progress, ensuring immediate update for: ${slug}`);
+      }
+
       return {
         staticPagesData: {
           ...state.staticPagesData,
@@ -3187,6 +3196,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         stepsSectionStates: {},
         testimonialsStates: {},
         projectDetailsStates: {},
+        propertyDetailStates: {},
         propertiesShowcaseStates: {},
         card4States: {},
         card5States: {},
@@ -3214,6 +3224,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
         // Clear page components
         pageComponentsByPage: {},
+
+        // Clear static pages data
+        staticPagesData: {},
 
         // Reset global components to defaults
         globalHeaderData: defaultHeaderData,
