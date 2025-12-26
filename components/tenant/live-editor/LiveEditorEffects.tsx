@@ -34,10 +34,10 @@ function getDefaultComponentForStaticPage(slug: string) {
       layout: { row: 0, col: 0, span: 2 },
     },
     property: {
-      id: "propertyDetail2",
+      id: "propertyDetail1",
       type: "propertyDetail",
       name: "Property Detail",
-      componentName: "propertyDetail2",
+      componentName: "propertyDetail1",
       data: { propertySlug: "", visible: true },
       position: 0,
       layout: { row: 0, col: 0, span: 2 },

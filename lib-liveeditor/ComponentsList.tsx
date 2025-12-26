@@ -678,7 +678,7 @@ export const COMPONENTS: Record<string, any> = {
     description: "Property detail page with hero layout",
     category: "content",
     section: "property",
-    subPath: "property",
+    subPath: "PropertyDetail",
     icon: "🏠",
     hasStore: true,
     hasStructure: true,
@@ -688,7 +688,7 @@ export const COMPONENTS: Record<string, any> = {
       const fileName = variant.id.replace(/^propertyDetail/, 'PropertyDetail');
       return {
         ...variant,
-        componentPath: `components/tenant/property/${fileName}.tsx`,
+        componentPath: `components/tenant/PropertyDetail/${fileName}.tsx`,
       };
     }),
     ...propertyDetailStructure,
