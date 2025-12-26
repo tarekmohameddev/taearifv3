@@ -12,6 +12,7 @@ import {
   applyAutoExpandLogic,
 } from "@/services-liveeditor/live-editor";
 import { ComponentInstance } from "@/lib-liveeditor/types";
+import { isMultiLevelPage } from "@/lib-liveeditor/multiLevelPages";
 
 // ============================================================================
 // Helper Functions for Static Pages
@@ -35,7 +36,7 @@ function getDefaultComponentForStaticPage(slug: string) {
     },
     property: {
       id: "propertyDetail1",
-      type: "propertyDetail",
+      type: "PropertyDetail",
       name: "Property Detail",
       componentName: "propertyDetail1",
       data: { propertySlug: "", visible: true },
@@ -63,6 +64,12 @@ function isStaticPage(
   editorStore: any
 ): boolean {
   if (!slug) return false;
+  
+  // ⭐ NEW: Check if page is a multi-level page (like "property", "project")
+  // These pages should always be treated as static pages, even if no data exists
+  if (isMultiLevelPage(slug)) {
+    return true;
+  }
   
   // Check if page exists in tenantData.StaticPages
   // Handle both formats: [slug, components] or { slug, components }

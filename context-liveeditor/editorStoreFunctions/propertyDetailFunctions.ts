@@ -88,7 +88,7 @@ export const getDefaultPropertyDetail2Data = (): ComponentData => ({
 // COMPONENT FUNCTIONS - Standard 4 functions
 // ═══════════════════════════════════════════════════════════
 
-export const propertyDetailFunctions = {
+export const PropertyDetailFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    *

@@ -169,8 +169,14 @@ const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
-  const baseName = match[1];
+  let baseName = match[1];
   const number = match[2];
+
+  // ⭐ Handle special case: propertyDetail -> PropertyDetail
+  // Convert propertyDetail to PropertyDetail to match COMPONENTS key
+  if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
+    baseName = "PropertyDetail";
+  }
 
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
   const sectionPath = getSectionPath(section) || section;
@@ -180,6 +186,7 @@ const loadComponent = (section: string, componentName: string) => {
   }
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
+  // ⭐ IMPORTANT: baseName should be "PropertyDetail" (with capital P and D) to match COMPONENTS key
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
     // استخدام fallback للمكونات غير المعروفة
@@ -206,9 +213,10 @@ const loadComponent = (section: string, componentName: string) => {
   }
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
-  // Handle special case for propertyDetail components (PropertyDetail1, PropertyDetail2)
+  // Handle special case for PropertyDetail components (propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2)
   let fileName = componentName;
-  if (baseName === "propertyDetail") {
+  if (baseName === "PropertyDetail") {
+    // Convert propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2
     fileName = componentName.replace(/^propertyDetail/, 'PropertyDetail');
   }
   const fullPath = `${subPath}/${fileName}`;
@@ -437,7 +445,7 @@ export default function TenantPageWrapper({
         defaultComponentType = "projectDetails";
       } else if (slug === "property") {
         defaultComponentName = "propertyDetail2";
-        defaultComponentType = "propertyDetail";
+        defaultComponentType = "PropertyDetail";
       }
       
       return [

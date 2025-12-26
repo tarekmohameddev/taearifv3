@@ -671,9 +671,9 @@ export const COMPONENTS: Record<string, any> = {
     })),
     ...projectDetailsStructure,
   },
-  propertyDetail: {
-    id: "propertyDetail",
-    name: "propertyDetail",
+  PropertyDetail: {
+    id: "PropertyDetail",
+    name: "PropertyDetail",
     displayName: "Property Detail",
     description: "Property detail page with hero layout",
     category: "content",
@@ -685,7 +685,7 @@ export const COMPONENTS: Record<string, any> = {
     defaultTheme: "propertyDetail2",
     variants: propertyDetailStructure.variants.map((variant) => {
       // Convert propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2
-      const fileName = variant.id.replace(/^propertyDetail/, 'PropertyDetail');
+      const fileName = variant.id.replace(/^PropertyDetail/, 'PropertyDetail');
       return {
         ...variant,
         componentPath: `components/tenant/PropertyDetail/${fileName}.tsx`,
@@ -1120,7 +1120,13 @@ export const getComponentDefaultTheme = (type: string): string => {
 };
 
 export const getComponentSubPath = (baseName: string): string | undefined => {
-  const component = COMPONENTS[baseName];
+  // ⭐ Handle special case: propertyDetail -> PropertyDetail
+  // Convert propertyDetail to PropertyDetail to match COMPONENTS key
+  const normalizedBaseName = baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail" 
+    ? "PropertyDetail" 
+    : baseName;
+  
+  const component = COMPONENTS[normalizedBaseName];
   return component?.subPath;
 };
 

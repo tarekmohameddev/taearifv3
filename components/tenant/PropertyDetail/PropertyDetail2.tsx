@@ -194,7 +194,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
         if (
-          component.type === "propertyDetail" &&
+          component.type === "PropertyDetail" &&
           component.componentName === variantId
         ) {
           return component.data;
@@ -211,7 +211,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
             pageComponents as any,
           )) {
             if (
-              (component as any).type === "propertyDetail" &&
+              (component as any).type === "PropertyDetail" &&
               (component as any).componentName === variantId
             ) {
               return (component as any).data;
@@ -240,7 +240,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
               ...props,
             };
 
-      ensureComponentVariant("propertyDetail", uniqueId, initialData);
+      ensureComponentVariant("PropertyDetail", uniqueId, initialData);
     }
   }, [
     uniqueId,
@@ -253,7 +253,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = propertyDetailStates?.[uniqueId];
-  const currentStoreData = getComponentData("propertyDetail", uniqueId);
+  const currentStoreData = getComponentData("PropertyDetail", uniqueId);
 
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
