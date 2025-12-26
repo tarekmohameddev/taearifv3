@@ -1207,22 +1207,65 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       }
     })();
 
-    // If variant already exists and has data, and no initial data provided, skip update
-    if (existingData && Object.keys(existingData).length > 0 && !initial) {
-      return; // Don't call set() at all - prevents any store update
+    // ⭐ CRITICAL: Check if we actually need to update
+    // If variant already exists and has data, be very conservative about updates
+    if (existingData && Object.keys(existingData).length > 0) {
+      // If no initial data provided, skip update (variant already exists)
+      if (!initial) {
+        return; // Don't call set() at all - prevents any store update
+      }
+      
+      // Initial data provided - but if it's a props object, it changes on every render
+      // So we need to be more careful. Only update if initial is clearly different.
+      // For props objects, we'll skip the update to prevent infinite loops
+      // Components should use setComponentData explicitly if they need to update
+      
+      // Check if initial is a props-like object (has common React props)
+      const isPropsLike = initial && typeof initial === 'object' && (
+        'useStore' in initial ||
+        'variant' in initial ||
+        'id' in initial ||
+        'className' in initial ||
+        'style' in initial
+      );
+      
+      // If it's props-like and data exists, skip update to prevent loops
+      // Components should initialize once, then use setComponentData for updates
+      if (isPropsLike) {
+        return; // Skip update - props change on every render
+      }
+      
+      // For non-props initial data, do deep comparison
+      try {
+        const existingDataStr = JSON.stringify(existingData);
+        const initialDataStr = JSON.stringify(initial);
+        
+        if (existingDataStr === initialDataStr) {
+          // Data is the same - skip update to prevent unnecessary re-renders
+          return;
+        }
+      } catch (e) {
+        // If JSON.stringify fails (circular refs, etc), skip update to be safe
+        // This prevents infinite loops when we can't compare
+        return;
+      }
     }
 
     // Only call set() if we actually need to create/update the variant
     set((state) => {
-
       // Use specific component functions first for better consistency
+      let result: any;
+      
       switch (componentType) {
         case "hero":
-          return heroFunctions.ensureVariant(state, variantId, initial);
+          result = heroFunctions.ensureVariant(state, variantId, initial);
+          break;
         case "header":
-          return headerFunctions.ensureVariant(state, variantId, initial);
+          result = headerFunctions.ensureVariant(state, variantId, initial);
+          break;
         case "footer":
-          return footerFunctions.ensureVariant(state, variantId, initial);
+          result = footerFunctions.ensureVariant(state, variantId, initial);
+          break;
         case "halfTextHalfImage":
           return halfTextHalfImageFunctions.ensureVariant(
             state,
@@ -1356,6 +1399,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             },
           } as any;
       }
+      
+      // ⭐ CRITICAL: If result is empty object (no changes), return state unchanged
+      // This prevents Zustand from triggering unnecessary updates
+      // Note: Zustand should handle {} automatically, but we're being explicit
+      if (!result || (typeof result === 'object' && Object.keys(result).length === 0)) {
+        return state;
+      }
+      
+      return result;
     });
   },
 
