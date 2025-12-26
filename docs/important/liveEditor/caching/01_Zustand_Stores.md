@@ -112,7 +112,7 @@ const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 ```typescript
 const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 3304)
+**الموقع**: `app\live-editor\layout.tsx` (line 3501)
 
 ##### currentPage
 ```typescript
@@ -317,7 +317,7 @@ const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestam
 const editorStore = useEditorStore.getState();
 const themeChangeTimestamp = editorStore.themeChangeTimestamp;
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 1623, 1629)
+**الموقع**: `app\live-editor\layout.tsx` (line 1773)
 
 ##### pageComponentsByPage
 ```typescript
@@ -342,12 +342,12 @@ const storePageComponents = useEditorStore(
 ```typescript
 const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 1655, 1695)
+**الموقع**: `app\live-editor\layout.tsx` (line 1800, 1838)
 
 ```typescript
 storePages: Object.keys(editorStore.pageComponentsByPage).length,
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 1637)
+**الموقع**: `app\live-editor\layout.tsx` (line 1781)
 
 ##### Component States - heroStates
 ```typescript
@@ -594,13 +594,13 @@ const {
 ```typescript
 const { createPage } = useEditorStore.getState();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 160, 1447)
+**الموقع**: `app\live-editor\layout.tsx` (line 1591)
 
 ##### addPageToWebsiteLayout
 ```typescript
 const { addPageToWebsiteLayout } = useEditorStore.getState();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 230, 1517, 1724)
+**الموقع**: `app\live-editor\layout.tsx` (line 1661, 1867)
 
 ##### requestSave
 ```typescript
@@ -739,7 +739,7 @@ const store = useEditorStore.getState();
 ```typescript
 const editorStore = useEditorStore.getState();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 1623)
+**الموقع**: `app\live-editor\layout.tsx` (line 1767)
 
 ```typescript
 const editorStore = useEditorStore.getState();
@@ -923,7 +923,7 @@ const { tenantData } = useTenantStore.getState();
 ```typescript
 const { tenantData } = useTenantStore.getState();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 171, 1458)
+**الموقع**: `app\live-editor\layout.tsx` (line 1602)
 
 ##### setTenantId
 ```typescript
@@ -1104,7 +1104,7 @@ useTenantStore.setState({
   tenantData: updatedTenantData,
 });
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 227, 1514)
+**الموقع**: `app\live-editor\layout.tsx` (line 1658)
 
 ```typescript
 useTenantStore.setState({
@@ -1146,7 +1146,7 @@ const { tenantData } = useTenantStore.getState();
 ```typescript
 const { tenantData } = useTenantStore.getState();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 171, 1458)
+**الموقع**: `app\live-editor\layout.tsx` (line 1602)
 
 ---
 
@@ -1190,7 +1190,7 @@ const t = useEditorT();
 ```typescript
 const t = useEditorT();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 90, 962, 3298)
+**الموقع**: `app\live-editor\layout.tsx` (line 90, 962, 3495)
 
 ```typescript
 const t = useEditorT();
@@ -1221,7 +1221,7 @@ const { locale } = useEditorLocale();
 ```typescript
 const { setLocale } = useEditorLocale();
 ```
-**الموقع**: `app\live-editor\layout.tsx` (line 3297)
+**الموقع**: `app\live-editor\layout.tsx` (line 3494)
 
 ---
 

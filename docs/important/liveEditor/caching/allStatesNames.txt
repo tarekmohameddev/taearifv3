@@ -205,7 +205,7 @@
 - expanded (useState)
 
 ### LiveEditorUI
-**الموقع**: components\tenant\live-editor\LiveEditorUI.tsx
+**الموقع**: components\tenant\live-editor\LiveEditorUI\index.tsx
 
 **States**:
 - loaded (useState)
