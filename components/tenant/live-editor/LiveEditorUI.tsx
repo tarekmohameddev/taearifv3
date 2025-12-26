@@ -566,19 +566,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       globalHeaderVariantFromStore || // Fallback to store
       "StaticHeader1";
 
-    // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === "development") {
-      console.log("[LiveEditorUI] Header Variant Debug:", {
-        globalHeaderVariantFromStore: globalHeaderVariantFromStore,
-        isDefaultVariant: isDefaultVariant,
-        "globalHeaderData?.variant": globalHeaderData?.variant,
-        "tenantData?.globalComponentsData?.globalHeaderVariant":
-          tenantData?.globalComponentsData?.globalHeaderVariant,
-        "resolved variant": variant,
-        "tenantData exists": !!tenantData,
-        "globalComponentsData exists": !!tenantData?.globalComponentsData,
-      });
-    }
 
     return variant;
   }, [
@@ -691,15 +678,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     };
 
     const componentName = componentMap[globalHeaderVariant] || "StaticHeader1";
-
-    // Debug log (can be removed in production)
-    if (process.env.NODE_ENV === "development") {
-      console.log("[LiveEditorUI] Header Component Debug:", {
-        globalHeaderVariant: globalHeaderVariant,
-        componentName: componentName,
-        "componentMap[globalHeaderVariant]": componentMap[globalHeaderVariant],
-      });
-    }
 
     const HeaderComponent = loadHeaderComponent(componentName);
 

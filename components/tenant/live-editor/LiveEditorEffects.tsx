@@ -145,15 +145,6 @@ export function useLiveEditorEffects(state: any) {
       : (!initialized && !authLoading && !tenantLoading && tenantData);
     
     if (shouldLoad) {
-      console.log("🔄 Loading tenant data into editorStore:", {
-        tenantData: !!tenantData,
-        hasComponentSettings: !!tenantData?.componentSettings,
-        hasGlobalComponentsData: !!tenantData?.globalComponentsData,
-        hasStaticPages: !!tenantData?.StaticPages,
-        themeChangeTimestamp: editorStore.themeChangeTimestamp,
-        slug,
-        isStaticPage: pageIsStatic,
-      });
 
       // ⭐ CRITICAL: Check if theme was recently changed
       // If themeChangeTimestamp > 0, prioritize pageComponentsByPage from store
@@ -167,10 +158,6 @@ export function useLiveEditorEffects(state: any) {
 
       if (storePageComponents && storePageComponents.length > 0) {
         // Store already has data - use it instead of tenantData to avoid overwriting recent changes
-        console.log("🔄 Using store data (has recent changes):", {
-          slug,
-          componentCount: storePageComponents.length,
-        });
         setPageComponents(storePageComponents);
         setInitialized(true);
         return; // Skip loading from tenantData
@@ -184,37 +171,13 @@ export function useLiveEditorEffects(state: any) {
       
       // ⭐ STATIC PAGES: Load with priority from tenantData.StaticPages
       if (pageIsStatic) {
-        console.log("🔍 Processing static page:", {
-          slug,
-          hasTenantData: !!tenantData,
-          initialized,
-          hasRecentThemeChange,
-        });
-        
         // ⭐ PRIORITY 0: If theme was recently changed, prioritize staticPagesData from store
         // This ensures we use the new theme data instead of old tenantData.StaticPages
         if (hasRecentThemeChange) {
           const staticPageDataFromStore = editorStore.getStaticPageData(slug);
           const staticPageComponentsFromStore = staticPageDataFromStore?.components || [];
           
-          console.log("🔍 [LiveEditorEffects] Checking staticPagesData after theme change:", {
-            slug,
-            hasStaticPageData: !!staticPageDataFromStore,
-            componentCount: staticPageComponentsFromStore.length,
-            components: staticPageComponentsFromStore.map((c: any) => ({
-              id: c.id,
-              componentName: c.componentName,
-              type: c.type,
-            })),
-            themeChangeTimestamp: hasRecentThemeChange ? editorStore.themeChangeTimestamp : 0,
-          });
-          
           if (staticPageComponentsFromStore.length > 0) {
-            console.log("🔄 Theme recently changed - using staticPagesData from store:", {
-              slug,
-              componentCount: staticPageComponentsFromStore.length,
-              components: staticPageComponentsFromStore.map((c: any) => c.componentName),
-            });
             
             const defaultComponent = getDefaultComponentForStaticPage(slug);
             const staticComponents = staticPageComponentsFromStore.map((comp: any) => {
@@ -263,12 +226,6 @@ export function useLiveEditorEffects(state: any) {
           const hasStaticPageInTenant = tenantComponents.length > 0;
 
           if (hasStaticPageInTenant) {
-            console.log("✅ Loading static page from tenantData.StaticPages:", {
-              slug,
-              componentCount: tenantComponents.length,
-              format: Array.isArray(staticPageFromTenant) ? "array" : "object",
-            });
-            
             // Convert static page components to the format expected by setPageComponents
             // ⭐ CRITICAL: Ensure id matches componentName for static pages
             const staticComponents = tenantComponents.map((comp: any) => {
@@ -287,39 +244,21 @@ export function useLiveEditorEffects(state: any) {
               };
             });
             
-            console.log("✅ Loading static page components from tenantData.StaticPages:", {
-              componentCount: staticComponents.length,
-              components: staticComponents.map((c: any) => c.componentName),
-              firstComponent: staticComponents[0],
-            });
-            
             setPageComponents(staticComponents);
             setInitialized(true);
             return; // Skip further loading logic
           }
-        } else {
-          console.log("⏭️ Skipping tenantData.StaticPages - theme recently changed, using staticPagesData from store");
         }
         
         // ⭐ PRIORITY 2: Check editorStore.staticPagesData[slug] (after loadFromDatabase)
         let staticPageData = editorStore.getStaticPageData(slug);
         let staticPageComponents = staticPageData?.components || [];
         
-        console.log("🔍 Static page data check from editorStore:", {
-          hasStaticPageData: !!staticPageData,
-          componentCount: staticPageComponents.length,
-        });
-        
         // ⭐ PRIORITY 3: If no components, add default component
         if (staticPageComponents.length === 0) {
           const defaultComponent = getDefaultComponentForStaticPage(slug);
           
           if (defaultComponent) {
-            console.log("⚠️ No components found, adding default component:", {
-              slug,
-              defaultComponent: defaultComponent.componentName,
-            });
-            
             // Add to staticPagesData
             editorStore.setStaticPageData(slug, {
               slug,
@@ -329,12 +268,6 @@ export function useLiveEditorEffects(state: any) {
             // Re-read staticPageData after adding
             staticPageData = editorStore.getStaticPageData(slug);
             staticPageComponents = staticPageData?.components || [];
-            
-            console.log("✅ Added default component to static page:", {
-              slug,
-              componentCount: staticPageComponents.length,
-              componentName: defaultComponent.componentName,
-            });
           } else {
             console.warn("⚠️ No default component found for static page:", slug);
           }
@@ -360,29 +293,14 @@ export function useLiveEditorEffects(state: any) {
             };
           });
           
-          console.log("✅ Loading static page components from editorStore.staticPagesData:", {
-            componentCount: staticComponents.length,
-            components: staticComponents.map((c: any) => c.componentName),
-            firstComponent: staticComponents[0],
-          });
-          
           setPageComponents(staticComponents);
           setInitialized(true);
           return; // Skip regular page loading logic
-        } else {
-          console.error("❌ No components to load for static page:", slug);
         }
       }
       
       if (hasRecentThemeChange && storePageComponentsAfterLoad !== undefined) {
         // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
-        console.log("🔄 Theme recently changed - using store data instead of tenantData:", {
-          slug,
-          storeComponentCount: storePageComponentsAfterLoad.length,
-          tenantDataComponentCount: tenantData?.componentSettings?.[slug] 
-            ? Object.keys(tenantData.componentSettings[slug]).length 
-            : 0,
-        });
         setPageComponents(storePageComponentsAfterLoad || []);
       } else if (
         tenantData?.componentSettings?.[slug] &&
@@ -674,14 +592,6 @@ export function useLiveEditorEffects(state: any) {
         const shouldUpdate = hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
         
         if (shouldUpdate) {
-          console.log("[LiveEditorEffects] Syncing static page from staticPagesData:", {
-            slug,
-            componentCount: staticComponents.length,
-            componentNames: staticComponents.map((c: any) => c.componentName),
-            staticSignature: staticSignature.substring(0, 50),
-            hasRecentThemeChange,
-            forceUpdate: hasRecentThemeChange,
-          });
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
           return; // Skip normal sync logic for static pages
@@ -727,12 +637,6 @@ export function useLiveEditorEffects(state: any) {
           });
           
           const staticSignature = createSignature(staticComponents);
-          console.log("[LiveEditorEffects] Force sync static page after theme change:", {
-            slug,
-            componentCount: staticComponents.length,
-            componentNames: staticComponents.map((c: any) => c.componentName),
-            componentIds: staticComponents.map((c: any) => c.id),
-          });
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
           return;
@@ -741,11 +645,6 @@ export function useLiveEditorEffects(state: any) {
       
       if (freshStorePageComponents !== undefined) {
         const storeSignature = createSignature(freshStorePageComponents);
-        console.log("[LiveEditorEffects] Force sync after theme change:", {
-          slug,
-          componentCount: freshStorePageComponents.length,
-          signature: storeSignature.substring(0, 100),
-        });
         setPageComponents(freshStorePageComponents || []);
         lastSyncedRef.current = storeSignature;
         return;
@@ -761,7 +660,6 @@ export function useLiveEditorEffects(state: any) {
             return;
           }
         }
-        console.log("[LiveEditorEffects] No components found for page after theme change, clearing:", slug);
         setPageComponents([]);
         lastSyncedRef.current = "empty";
         return;
@@ -785,11 +683,6 @@ export function useLiveEditorEffects(state: any) {
           (storePageComponents.length === 0 && pageComponents.length > 0));
 
       if (shouldUpdate) {
-        console.log("[LiveEditorEffects] Normal sync triggered:", {
-          slug,
-          componentCount: storePageComponents.length,
-          shouldUpdate,
-        });
         lastSyncedRef.current = storeSignature;
         setPageComponents(storePageComponents || []);
       }
@@ -823,12 +716,6 @@ export function useLiveEditorEffects(state: any) {
           
           const staticSignature = createSignature(staticComponents);
           if (lastSyncedRef.current !== staticSignature) {
-            console.log("[LiveEditorEffects] Syncing static page components from staticPagesData:", {
-              slug,
-              componentCount: staticComponents.length,
-              componentNames: staticComponents.map((c: any) => c.componentName),
-              componentIds: staticComponents.map((c: any) => c.id),
-            });
             setPageComponents(staticComponents);
             lastSyncedRef.current = staticSignature;
             return;
@@ -840,7 +727,6 @@ export function useLiveEditorEffects(state: any) {
       // This handles the case where clearAllStates() was called but pageComponents wasn't updated
       // BUT: Skip this for static pages if they have components in staticPagesData
       if (pageComponents.length > 0) {
-        console.log("[LiveEditorEffects] Clearing pageComponents (store is undefined):", slug);
         setPageComponents([]);
         lastSyncedRef.current = "empty";
       }
