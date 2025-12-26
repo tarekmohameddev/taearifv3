@@ -305,10 +305,14 @@ export default function Card4(props: Card4Props) {
               ...props,
             };
 
-      // Initialize in store
-      ensureComponentVariant("card", uniqueId, initialData);
+      // ⭐ CRITICAL: Use getState() directly to avoid dependency issues
+      const store = useEditorStore.getState();
+      store.ensureComponentVariant("card", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+    // ⭐ CRITICAL: Only depend on uniqueId, props.useStore, and tenantComponentData
+    // Don't include ensureComponentVariant to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniqueId, props.useStore, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE

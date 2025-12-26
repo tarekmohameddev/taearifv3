@@ -265,9 +265,15 @@ const Header1 = (props: HeaderProps = {}) => {
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant("header", uniqueId, props);
+      // ⭐ CRITICAL: Use getState() directly to avoid dependency issues
+      // ensureComponentVariant is stable but including it in deps can cause loops
+      const store = useEditorStore.getState();
+      store.ensureComponentVariant("header", uniqueId, props);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
+    // ⭐ CRITICAL: Only depend on uniqueId and props.useStore
+    // Don't include ensureComponentVariant to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniqueId, props.useStore]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);

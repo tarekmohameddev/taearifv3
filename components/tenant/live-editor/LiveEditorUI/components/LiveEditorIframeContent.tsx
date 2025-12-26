@@ -2,7 +2,7 @@
 // LiveEditor Iframe Content Component
 // ============================================================================
 
-import React, { Suspense } from "react";
+import React, { Suspense, useMemo } from "react";
 import { motion } from "framer-motion";
 import { LiveEditorDropZone } from "@/services-liveeditor/live-editor/dragDrop";
 import { LiveEditorDraggableComponent } from "@/services-liveeditor/live-editor/dragDrop/DraggableComponent";
@@ -48,6 +48,45 @@ export function LiveEditorIframeContent({
   handleEditClick,
   handleDeleteClick,
 }: LiveEditorIframeContentProps) {
+  // ⭐ CRITICAL: Memoize header data and key to prevent infinite loops
+  // Only recalculate when actual data changes, not on every render
+  const { headerDataWithoutVariant, headerKey } = useMemo(() => {
+    const headerData = backendDataState.globalHeaderData
+      ? (() => {
+          const { variant: _variant, ...data } =
+            backendDataState.globalHeaderData;
+          return data;
+        })()
+      : {};
+
+    // Use a simple hash instead of full JSON.stringify to prevent key changes on every render
+    // Only include variant in key, data changes will be handled by props
+    const key = `global-header-${globalHeaderVariant}`;
+
+    return {
+      headerDataWithoutVariant: headerData,
+      headerKey: key,
+    };
+  }, [backendDataState.globalHeaderData, globalHeaderVariant]);
+
+  // ⭐ CRITICAL: Memoize footer data and key to prevent infinite loops
+  const { footerDataWithoutVariant, footerKey } = useMemo(() => {
+    const footerData = backendDataState.globalFooterData
+      ? (() => {
+          const { variant: _variant, ...data } =
+            backendDataState.globalFooterData;
+          return data;
+        })()
+      : {};
+
+    const key = `global-footer-${globalFooterVariant}`;
+
+    return {
+      footerDataWithoutVariant: footerData,
+      footerKey: key,
+    };
+  }, [backendDataState.globalFooterData, globalFooterVariant]);
+
   return (
     <div
       className={`w-full h-full overflow-auto ${
@@ -88,38 +127,16 @@ export function LiveEditorIframeContent({
       >
         <div style={{ pointerEvents: "none" }}>
           <Suspense fallback={<SkeletonLoader componentName="header" />}>
-            {(() => {
-              // Remove variant from data before passing to component (same as TenantPageWrapper)
-              const headerDataWithoutVariant = backendDataState.globalHeaderData
-                ? (() => {
-                    const { variant: _variant, ...data } =
-                      backendDataState.globalHeaderData;
-                    return data;
-                  })()
-                : {};
-
-              if (!HeaderComponent) {
-                console.warn(
-                  "[LiveEditorUI] HeaderComponent is null, falling back to StaticHeader1",
-                );
-                return (
-                  <StaticHeader1 overrideData={headerDataWithoutVariant} />
-                );
-              }
-
-              // ⭐ IMPORTANT: Add key prop to force re-render when variant or data changes
-              // This ensures the header updates immediately when theme changes
-              const headerKey = `global-header-${globalHeaderVariant}-${JSON.stringify(headerDataWithoutVariant)}`;
-
-              return (
-                <HeaderComponent
-                  key={headerKey}
-                  overrideData={headerDataWithoutVariant}
-                  variant={globalHeaderVariant}
-                  id="global-header"
-                />
-              );
-            })()}
+            {!HeaderComponent ? (
+              <StaticHeader1 overrideData={headerDataWithoutVariant} />
+            ) : (
+              <HeaderComponent
+                key={headerKey}
+                overrideData={headerDataWithoutVariant}
+                variant={globalHeaderVariant}
+                id="global-header"
+              />
+            )}
           </Suspense>
         </div>
         {/* Overlay indicator */}
@@ -235,33 +252,16 @@ export function LiveEditorIframeContent({
       >
         <div style={{ pointerEvents: "none" }}>
           <Suspense fallback={<SkeletonLoader componentName="footer" />}>
-            {(() => {
-              // Remove variant from data before passing to component
-              const footerDataWithoutVariant = backendDataState.globalFooterData
-                ? (() => {
-                    const { variant: _variant, ...data } =
-                      backendDataState.globalFooterData;
-                    return data;
-                  })()
-                : {};
-
-              if (!FooterComponent) {
-                return (
-                  <StaticFooter1 overrideData={footerDataWithoutVariant} />
-                );
-              }
-
-              const footerKey = `global-footer-${globalFooterVariant}-${JSON.stringify(footerDataWithoutVariant)}`;
-
-              return (
-                <FooterComponent
-                  key={footerKey}
-                  overrideData={footerDataWithoutVariant}
-                  variant={globalFooterVariant}
-                  id="global-footer"
-                />
-              );
-            })()}
+            {!FooterComponent ? (
+              <StaticFooter1 overrideData={footerDataWithoutVariant} />
+            ) : (
+              <FooterComponent
+                key={footerKey}
+                overrideData={footerDataWithoutVariant}
+                variant={globalFooterVariant}
+                id="global-footer"
+              />
+            )}
           </Suspense>
         </div>
         {/* Overlay indicator */}

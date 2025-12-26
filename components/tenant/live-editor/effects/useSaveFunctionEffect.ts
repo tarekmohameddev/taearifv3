@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { isStaticPage } from "./utils/staticPageHelpers";
@@ -12,10 +12,21 @@ export const useSaveFunctionEffect = ({
   slug,
   pageComponents,
 }: UseSaveFunctionEffectProps) => {
+  // Use ref to store latest pageComponents to avoid recreating function on every change
+  const pageComponentsRef = useRef<ComponentInstance[]>(pageComponents);
+  
+  // Update ref whenever pageComponents changes
+  useEffect(() => {
+    pageComponentsRef.current = pageComponents;
+  }, [pageComponents]);
+
   // Setup Save Function Effect
   useEffect(() => {
     const saveFn = () => {
       const store = useEditorStore.getState();
+      // Get fresh pageComponents from ref (always has latest value)
+      const currentPageComponents = pageComponentsRef.current;
+      
       // Get fresh staticPagesData from store (has latest componentName updates)
       const staticPageData = store.getStaticPageData(slug);
       const isStatic = !!staticPageData;
@@ -28,7 +39,7 @@ export const useSaveFunctionEffect = ({
         const currentStaticPageData = store.getStaticPageData(slug);
         if (currentStaticPageData) {
           // Merge: use componentName and id from staticPagesData (up-to-date), but keep other data from pageComponents
-          const mergedComponents = pageComponents.map((localComp: any) => {
+          const mergedComponents = currentPageComponents.map((localComp: any) => {
             // Find matching component in staticPagesData to get latest componentName and id
             // First try to find by id, then by componentName (in case id changed)
             let storeComp = currentStaticPageData.components.find(
@@ -59,7 +70,7 @@ export const useSaveFunctionEffect = ({
         }
       } else {
         // REGULAR PAGE - Update pageComponentsByPage
-        store.forceUpdatePageComponents(slug, pageComponents);
+        store.forceUpdatePageComponents(slug, currentPageComponents);
       }
     };
 
@@ -70,6 +81,6 @@ export const useSaveFunctionEffect = ({
     return () => {
       useEditorStore.getState().setOpenSaveDialog(() => {});
     };
-  }, [slug, pageComponents]);
+  }, [slug]); // Only depend on slug, not pageComponents
 };
 

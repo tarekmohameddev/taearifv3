@@ -1134,8 +1134,87 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => footerFunctions.updateByPath(state, variantId, path, value)),
 
   // Generic functions for all components
-  ensureComponentVariant: (componentType, variantId, initial) =>
+  ensureComponentVariant: (componentType, variantId, initial) => {
+    // ⭐ CRITICAL: Check if variant already exists BEFORE calling set()
+    // This prevents unnecessary store updates that can cause infinite loops
+    const currentState = get();
+    const existingData = (() => {
+      switch (componentType) {
+        case "hero":
+          return currentState.heroStates[variantId];
+        case "header":
+          return currentState.headerStates[variantId];
+        case "footer":
+          return currentState.footerStates[variantId];
+        case "halfTextHalfImage":
+          return currentState.halfTextHalfImageStates[variantId];
+        case "propertySlider":
+          return currentState.propertySliderStates[variantId];
+        case "ctaValuation":
+          return currentState.ctaValuationStates[variantId];
+        case "stepsSection":
+          return currentState.stepsSectionStates[variantId];
+        case "testimonials":
+          return currentState.testimonialsStates[variantId];
+        case "projectDetails":
+          return currentState.projectDetailsStates[variantId];
+        case "propertyDetail":
+          return currentState.propertyDetailStates[variantId];
+        case "logosTicker":
+          return currentState.logosTickerStates[variantId];
+        case "partners":
+          return currentState.partnersStates[variantId];
+        case "whyChooseUs":
+          return currentState.whyChooseUsStates[variantId];
+        case "contactMapSection":
+          return currentState.contactMapSectionStates[variantId];
+        case "grid":
+          return currentState.gridStates[variantId];
+        case "filterButtons":
+          return currentState.filterButtonsStates[variantId];
+        case "propertyFilter":
+          return currentState.propertyFilterStates[variantId];
+        case "mapSection":
+          return currentState.mapSectionStates[variantId];
+        case "contactFormSection":
+          return currentState.contactFormSectionStates[variantId];
+        case "contactCards":
+          return currentState.contactCardsStates[variantId];
+        case "applicationForm":
+          return currentState.applicationFormStates[variantId];
+        case "inputs":
+          return currentState.inputsStates[variantId];
+        case "inputs2":
+          return currentState.inputs2States[variantId];
+        case "imageText":
+          return currentState.imageTextStates[variantId];
+        case "contactUsHomePage":
+          return currentState.contactUsHomePageStates[variantId];
+        case "blogsSections":
+          return currentState.blogsSectionsStates[variantId];
+        case "title":
+          return currentState.titleStates[variantId];
+        case "responsiveImage":
+          return currentState.responsiveImageStates[variantId];
+        case "photosGrid":
+          return currentState.photosGridStates[variantId];
+        case "video":
+          return currentState.videoStates[variantId];
+        case "propertiesShowcase":
+          return currentState.propertiesShowcaseStates[variantId];
+        default:
+          return currentState.componentStates[componentType]?.[variantId];
+      }
+    })();
+
+    // If variant already exists and has data, and no initial data provided, skip update
+    if (existingData && Object.keys(existingData).length > 0 && !initial) {
+      return; // Don't call set() at all - prevents any store update
+    }
+
+    // Only call set() if we actually need to create/update the variant
     set((state) => {
+
       // Use specific component functions first for better consistency
       switch (componentType) {
         case "hero":
@@ -1277,7 +1356,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             },
           } as any;
       }
-    }),
+    });
+  },
 
   getComponentData: (componentType, variantId) => {
     const state = get();

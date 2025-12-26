@@ -398,53 +398,39 @@ export function useLiveEditorHandlers(state: any) {
     themeId: string,
     components: Record<string, string>,
   ) => {
-    setPageComponents((currentComponents: any[]) =>
-      currentComponents.map((c) => {
-        const newTheme = components[c.type];
-        if (newTheme) {
-          // Get new default data for the new theme
-          const newDefaultData = createDefaultData(c.type, newTheme);
+    // ⭐ CRITICAL: Update store FIRST, then update pageComponents from store
+    // This prevents infinite loops by ensuring single source of truth
+    const store = useEditorStore.getState();
+    const currentPage = store.currentPage;
+    
+    // Get current page components from store (or use current state as fallback)
+    const currentStoreComponents = store.pageComponentsByPage[currentPage] || state.pageComponents || [];
+    
+    // Prepare updated components for store
+    const updatedStoreComponents = currentStoreComponents.map((comp: any) => {
+      const newTheme = components[comp.type];
+      if (newTheme) {
+        // Get new default data for the new theme
+        const newDefaultData = createDefaultData(comp.type, newTheme);
+        
+        // Update component data in store immediately
+        store.setComponentData(comp.type, comp.id, newDefaultData);
+        
+        return {
+          ...comp,
+          componentName: newTheme,
+          data: newDefaultData,
+        };
+      }
+      return comp;
+    });
 
-          // Defer store update to avoid render cycle issues
-          setTimeout(() => {
-            const store = useEditorStore.getState();
-            const currentPage = store.currentPage;
+    // Update store FIRST (single update)
+    store.forceUpdatePageComponents(currentPage, updatedStoreComponents);
 
-            // Update pageComponentsByPage in the store with new data
-            const updatedPageComponents =
-              store.pageComponentsByPage[currentPage] || [];
-            const updatedStoreComponents = updatedPageComponents.map(
-              (comp: any) => {
-                if (comp.id === c.id) {
-                  return {
-                    ...comp,
-                    componentName: newTheme,
-                    data: newDefaultData,
-                  };
-                }
-                return comp;
-              },
-            );
-
-            // Update the store
-            store.forceUpdatePageComponents(
-              currentPage,
-              updatedStoreComponents,
-            );
-
-            // Also update the component data in the store
-            store.setComponentData(c.type, c.id, newDefaultData);
-          }, 0);
-
-          return {
-            ...c,
-            componentName: newTheme,
-            data: newDefaultData,
-          };
-        }
-        return c;
-      }),
-    );
+    // Then update pageComponents from updatedStoreComponents (synchronously)
+    // This ensures both store and local state are in sync without causing loops
+    setPageComponents(updatedStoreComponents);
   };
 
   // Add Section Handler

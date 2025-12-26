@@ -24,6 +24,17 @@ export default function AutoFrame({
   const [mountTarget, setMountTarget] = useState<HTMLElement | null>(null);
   const [stylesLoaded, setStylesLoaded] = useState(false);
   const stylesInitializedRef = useRef(false);
+  const mountTargetRef = useRef<HTMLElement | null>(null);
+  const stylesLoadedRef = useRef(false);
+  // ⭐ CRITICAL: Store callbacks in refs to prevent dependency changes
+  const onReadyRef = useRef(onReady);
+  const onNotReadyRef = useRef(onNotReady);
+  
+  // Update refs when callbacks change
+  useEffect(() => {
+    onReadyRef.current = onReady;
+    onNotReadyRef.current = onNotReady;
+  }, [onReady, onNotReady]);
 
   // دالة نسخ الـ styles من الـ parent window إلى الـ iframe
   const copyStylesToIframe = useCallback((iframeDoc: Document) => {
@@ -174,8 +185,12 @@ export default function AutoFrame({
         // نسخ الـ styles أولاً
         copyStylesToIframe(doc);
 
-        // تعيين mount target
-        setMountTarget(doc.getElementById("frame-root"));
+        // ⭐ CRITICAL: Only set mount target if it changed to prevent unnecessary updates
+        const newMountTarget = doc.getElementById("frame-root");
+        if (newMountTarget !== mountTargetRef.current) {
+          mountTargetRef.current = newMountTarget;
+          setMountTarget(newMountTarget);
+        }
 
         // مراقبة التغييرات في الـ styles
         const styleObserver = observeStyleChanges(doc);
@@ -186,23 +201,35 @@ export default function AutoFrame({
         }, 1000);
 
         // انتظار تحميل الـ styles ثم إعلام أن الـ iframe جاهز
-        const checkStylesLoaded = () => {
-          const iframeStyles = doc.querySelectorAll(
-            'style, link[rel="stylesheet"]',
-          );
-          const parentStyles = document.querySelectorAll(
-            'style, link[rel="stylesheet"]',
-          );
+        // ⭐ CRITICAL: Use ref to track if styles are already loaded
+        if (!stylesLoadedRef.current) {
+          const checkStylesLoaded = () => {
+            // Skip if already loaded
+            if (stylesLoadedRef.current) {
+              return;
+            }
 
-          if (iframeStyles.length >= parentStyles.length) {
-            setStylesLoaded(true);
-            if (onReady) onReady();
-          } else {
-            setTimeout(checkStylesLoaded, 50);
-          }
-        };
+            const iframeStyles = doc.querySelectorAll(
+              'style, link[rel="stylesheet"]',
+            );
+            const parentStyles = document.querySelectorAll(
+              'style, link[rel="stylesheet"]',
+            );
 
-        setTimeout(checkStylesLoaded, 100);
+            if (iframeStyles.length >= parentStyles.length) {
+              stylesLoadedRef.current = true;
+              setStylesLoaded(true);
+              // Use ref to call callback
+              if (onReadyRef.current) {
+                onReadyRef.current();
+              }
+            } else {
+              setTimeout(checkStylesLoaded, 50);
+            }
+          };
+
+          setTimeout(checkStylesLoaded, 100);
+        }
 
         // تنظيف المراقب عند إلغاء المكون
         return () => {
@@ -210,23 +237,28 @@ export default function AutoFrame({
           clearInterval(cssVariablesInterval);
         };
       } else {
-        if (onNotReady) onNotReady();
+        // Use ref to call callback
+        if (onNotReadyRef.current) {
+          onNotReadyRef.current();
+        }
       }
     }
+    // ⭐ CRITICAL: Remove onReady and onNotReady from deps to prevent infinite loops
+    // They are stored in refs and updated separately
   }, [
     frameRef,
     loaded,
     copyStylesToIframe,
     observeStyleChanges,
     updateCSSVariables,
-    onReady,
-    onNotReady,
   ]);
 
   // إعادة تعيين علامة الـ styles عند إلغاء المكون
   useEffect(() => {
     return () => {
       stylesInitializedRef.current = false;
+      stylesLoadedRef.current = false;
+      mountTargetRef.current = null;
     };
   }, []);
 

@@ -13,37 +13,37 @@ export const useVariantInitialization = ({
   componentType,
   tempData,
 }: UseVariantInitializationProps) => {
-  const {
-    ensureComponentVariant,
-    getComponentData,
-    setComponentData,
-  } = useEditorStore();
-
   // Initialize variant data if needed
   useEffect(() => {
-    if (variantId && componentType && COMPONENTS[componentType]) {
-      ensureComponentVariant(componentType, variantId);
+    if (!variantId || !componentType || !COMPONENTS[componentType]) {
+      return;
+    }
 
-      // For non-global components, ensure tempData is initialized with current component data
-      if (variantId !== "global-header" && variantId !== "global-footer") {
-        const componentData = getComponentData(componentType, variantId);
+    // ⭐ CRITICAL: Get fresh store state inside effect to avoid stale closures
+    // Don't subscribe to store functions - they're stable but can cause loops in deps
+    const store = useEditorStore.getState();
+    
+    // Initialize variant (ensureComponentVariant checks if exists before creating)
+    // This is safe to call multiple times - it only creates if doesn't exist
+    store.ensureComponentVariant(componentType, variantId);
 
-        if (
-          componentData &&
-          (!tempData || Object.keys(tempData).length === 0)
-        ) {
-          // Initialize tempData with current component data for live editing
-          setComponentData(componentType, variantId, componentData);
-        }
+    // For non-global components, ensure tempData is initialized with current component data
+    if (variantId !== "global-header" && variantId !== "global-footer") {
+      const componentData = store.getComponentData(componentType, variantId);
+
+      // Only update if tempData is empty and we have component data
+      if (
+        componentData &&
+        (!tempData || Object.keys(tempData).length === 0)
+      ) {
+        // Initialize tempData with current component data for live editing
+        store.setComponentData(componentType, variantId, componentData);
       }
     }
-  }, [
-    componentType,
-    variantId,
-    ensureComponentVariant,
-    getComponentData,
-    setComponentData,
-    tempData,
-  ]);
+    // ⭐ CRITICAL: Only depend on variantId and componentType
+    // Don't include store functions or tempData in deps to prevent infinite loops
+    // tempData changes will be handled by the component that uses this hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [componentType, variantId]);
 };
 
