@@ -423,13 +423,24 @@ export default function TenantPageWrapper({
       }
 
       // ⭐ Fallback: Return default component based on slug
-      // For project, use projectDetails1; for others, can be customized
-      const defaultComponentName = slug === "project" ? "projectDetails1" : `${slug}1`;
+      // For project, use projectDetails1; for property, use propertyDetail2; for others, can be customized
+      let defaultComponentName = `${slug}1`;
+      let defaultComponentType = slug;
+      
+      if (slug === "project") {
+        defaultComponentName = "projectDetails1";
+        defaultComponentType = "projectDetails";
+      } else if (slug === "property") {
+        defaultComponentName = "propertyDetail2";
+        defaultComponentType = "propertyDetail";
+      }
+      
       return [
         {
           id: defaultComponentName,
+          type: defaultComponentType,
           componentName: defaultComponentName,
-          data: { [slugPropertyName]: dynamicSlug },
+          data: { [slugPropertyName]: dynamicSlug, visible: true },
           position: 0,
         },
       ];

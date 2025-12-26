@@ -1482,6 +1482,64 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       });
     }
 
+    // ⭐ إضافة صفحة العقار بشكل إجباري
+    const propertyPageExists = pages.some(
+      (page) => page.slug === "property" || page.path === "/property",
+    );
+    if (!propertyPageExists) {
+      // البحث عن بيانات SEO لصفحة property في WebsiteLayout
+      let propertySeoData = null;
+      if (websiteLayout?.metaTags?.pages) {
+        propertySeoData = websiteLayout.metaTags.pages.find(
+          (page: any) =>
+            page.path === "/property" || page.path === "property",
+        );
+      }
+
+      const hasPropertySeoData =
+        propertySeoData &&
+        (propertySeoData.TitleAr ||
+          propertySeoData.TitleEn ||
+          propertySeoData.DescriptionAr ||
+          propertySeoData.DescriptionEn);
+
+      pages.push({
+        slug: "property",
+        name: locale === "ar" ? "صفحة العقار" : "Property Page",
+        path: "/property",
+        isStatic: true, // ⭐ علامة للصفحات الثابتة
+        seo: hasPropertySeoData
+          ? {
+              TitleAr: propertySeoData.TitleAr,
+              TitleEn: propertySeoData.TitleEn,
+              DescriptionAr: propertySeoData.DescriptionAr,
+              DescriptionEn: propertySeoData.DescriptionEn,
+              KeywordsAr: propertySeoData.KeywordsAr,
+              KeywordsEn: propertySeoData.KeywordsEn,
+              Author: propertySeoData.Author,
+              AuthorEn: propertySeoData.AuthorEn,
+              Robots: propertySeoData.Robots,
+              RobotsEn: propertySeoData.RobotsEn,
+              "og:title": propertySeoData["og:title"],
+              "og:description": propertySeoData["og:description"],
+              "og:keywords": propertySeoData["og:keywords"],
+              "og:author": propertySeoData["og:author"],
+              "og:robots": propertySeoData["og:robots"],
+              "og:url": propertySeoData["og:url"],
+              "og:image": propertySeoData["og:image"],
+              "og:type": propertySeoData["og:type"],
+              "og:locale": propertySeoData["og:locale"],
+              "og:locale:alternate": propertySeoData["og:locale:alternate"],
+              "og:site_name": propertySeoData["og:site_name"],
+              "og:image:width": propertySeoData["og:image:width"],
+              "og:image:height": propertySeoData["og:image:height"],
+              "og:image:type": propertySeoData["og:image:type"],
+              "og:image:alt": propertySeoData["og:image:alt"],
+            }
+          : getDefaultSeoData("property"),
+      });
+    }
+
     // Console log لعرض availablePages بعد الـ merge
     console.log("🔍 availablePages after merge:", pages);
 

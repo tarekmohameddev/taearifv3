@@ -33,6 +33,15 @@ function getDefaultComponentForStaticPage(slug: string) {
       position: 0,
       layout: { row: 0, col: 0, span: 2 },
     },
+    property: {
+      id: "propertyDetail2",
+      type: "propertyDetail",
+      name: "Property Detail",
+      componentName: "propertyDetail2",
+      data: { propertySlug: "", visible: true },
+      position: 0,
+      layout: { row: 0, col: 0, span: 2 },
+    },
     // يمكن إضافة صفحات ثابتة أخرى لاحقاً
     // products: { ... },
     // checkout: { ... },
