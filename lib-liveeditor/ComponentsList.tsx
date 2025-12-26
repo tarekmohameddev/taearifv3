@@ -32,6 +32,7 @@ import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
 import { footerStructure } from "@/componentsStructure/footer";
 import { testimonialsStructure } from "@/componentsStructure/testimonials";
 import { projectDetailsStructure } from "@/componentsStructure/projectDetails";
+import { propertyDetailStructure } from "@/componentsStructure/propertyDetail";
 import { logosTickerStructure } from "@/componentsStructure/logosTicker";
 import { partnersStructure } from "@/componentsStructure/partners";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
@@ -669,6 +670,24 @@ export const COMPONENTS: Record<string, any> = {
       componentPath: `components/tenant/projectDetails/${variant.id}.tsx`,
     })),
     ...projectDetailsStructure,
+  },
+  propertyDetail: {
+    id: "propertyDetail",
+    name: "propertyDetail",
+    displayName: "Property Detail",
+    description: "Property detail page with hero layout",
+    category: "content",
+    section: "property",
+    subPath: "propertyDetail",
+    icon: "🏠",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "propertyDetail2",
+    variants: propertyDetailStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/property/${variant.id}.tsx`,
+    })),
+    ...propertyDetailStructure,
   },
   propertiesShowcase: {
     id: "propertiesShowcase",

@@ -10,6 +10,7 @@ export * from "./stepsSectionFunctions";
 export * from "./ctaValuationFunctions";
 export * from "./testimonialsFunctions";
 export * from "./projectDetailsFunctions";
+export * from "./propertyDetailFunctions";
 export * from "./propertiesShowcaseFunctions";
 export * from "./card4Functions";
 export * from "./logosTickerFunctions";
