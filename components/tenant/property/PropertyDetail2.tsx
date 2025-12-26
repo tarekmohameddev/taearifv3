@@ -629,11 +629,9 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         <div className="flex flex-row justify-between items-center" dir="rtl">
           <div className="text-white z-[10]">
             <h1
-              className="font-bold drop-shadow-md text-right"
+              className="text-3xl md:text-4xl font-bold drop-shadow-md text-right"
               style={{
-                fontSize:
-                  mergedData.typography?.title?.fontSize?.desktop || "4xl",
-                fontWeight: mergedData.typography?.title?.fontWeight || "bold",
+                fontSize: mergedData.typography?.title?.fontSize?.desktop,
               }}
             >
               {property.title}
@@ -726,12 +724,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
             dir="rtl"
           >
             <h2
-              className="font-bold mb-6 text-right"
-              style={{
-                color: textColor,
-                fontSize:
-                  mergedData.typography?.title?.fontSize?.desktop || "3xl",
-              }}
+              className="text-3xl font-bold mb-6 text-right"
+              style={{ color: textColor }}
             >
               {mergedData.content?.descriptionTitle || "وصف العقار"}
             </h2>
@@ -756,12 +750,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
             {mergedData.displaySettings?.showSpecs !== false && (
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
-                  className="font-bold mb-8 text-right"
-                  style={{
-                    color: textColor,
-                    fontSize:
-                      mergedData.typography?.title?.fontSize?.desktop || "3xl",
-                  }}
+                  className="text-3xl font-bold mb-8 text-right"
+                  style={{ color: textColor }}
                 >
                   {mergedData.content?.specsTitle || "مواصفات العقار"}
                 </h2>
