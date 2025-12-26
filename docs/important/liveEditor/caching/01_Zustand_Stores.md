@@ -68,7 +68,7 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 - `components\tenant\title\title1.tsx` (line 4)
 - `components\tenant\photosGrid\photosGrid1.tsx` (line 4)
 - `components\tenant\propertiesShowcase\propertiesShowcase1.tsx` (line 7)
-- `components\tenant\live-editor\LiveEditorUI.tsx` (line 20)
+- `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 4)
 - `components\tenant\live-editor\EditorSidebar\index.tsx` (line 88-112)
 - `components\tenant\live-editor\LiveEditorEffects.tsx` (line 4)
 - `app\live-editor\layout.tsx` (line 6)
@@ -107,7 +107,7 @@ useEditorStore.getState().setOpenSaveDialog(saveFn);
 ```typescript
 const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 498)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 498)
 
 ```typescript
 const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
@@ -135,7 +135,7 @@ const {
 ```typescript
 const globalHeaderData = useEditorStore((s) => s.globalHeaderData);
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 487)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 487)
 
 ```typescript
 const {
@@ -160,7 +160,7 @@ const {
 ```typescript
 const globalFooterData = useEditorStore((s) => s.globalFooterData);
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 488)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 488)
 
 ```typescript
 const globalFooterData = useEditorStore((s) => s.globalFooterData);
@@ -182,7 +182,7 @@ const globalHeaderVariantFromStore = useEditorStore(
   (s) => s.globalHeaderVariant,
 );
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 489-491)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 489-491)
 
 ```typescript
 const {
@@ -203,7 +203,7 @@ const globalFooterVariantFromStore = useEditorStore(
   (s) => s.globalFooterVariant,
 );
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 492-494)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 492-494)
 
 ```typescript
 const {
@@ -306,7 +306,7 @@ if (state.WebsiteLayout) {
 ```typescript
 const themeChangeTimestamp = useEditorStore((s) => s.themeChangeTimestamp);
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 495)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 495)
 
 ```typescript
 const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestamp);
@@ -724,7 +724,7 @@ const state = useEditorStore.getState();
 ```typescript
 const store = useEditorStore.getState();
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 877, 970, 1025, 1066, 1104)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 877, 970, 1025, 1066, 1104)
 
 ```typescript
 const store = useEditorStore.getState();
@@ -812,7 +812,7 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 - `components\tenant\title\title1.tsx` (line 5)
 - `components\tenant\photosGrid\photosGrid1.tsx` (line 5)
 - `components\tenant\propertiesShowcase\propertiesShowcase1.tsx` (line 6)
-- `components\tenant\live-editor\LiveEditorUI.tsx` (line 60)
+- `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 60)
 - `app\live-editor\layout.tsx` (line 9)
 - `app\live-editor\LiveEditorWrapper.tsx` (line 4)
 - `components\tenant\inputs\inputs1.tsx` (line 289-291)
@@ -855,7 +855,7 @@ const tenantData = useTenantStore((s) => s.tenantData);
 ```typescript
 const tenantData = useTenantStore((s) => s.tenantData);
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 517)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 517)
 
 ```typescript
 const tenantData = useTenantStore((s) => s.tenantData);
@@ -1168,7 +1168,7 @@ import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 **المواقع**:
 - `components\tenant\live-editor\ThemeChangeDialog.tsx` (line 13)
-- `components\tenant\live-editor\LiveEditorUI.tsx` (line 21)
+- `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 5)
 - `app\live-editor\layout.tsx` (line 15-16)
 - `components\tenant\live-editor\ComponentsSidebar.tsx` (line 4)
 - `components\tenant\halfTextHalfImage\halfTextHalfImage7.tsx` (line 7)
@@ -1185,7 +1185,7 @@ const t = useEditorT();
 ```typescript
 const t = useEditorT();
 ```
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 467)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 467)
 
 ```typescript
 const t = useEditorT();

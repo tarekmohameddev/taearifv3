@@ -16,7 +16,7 @@ import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-ed
 ```
 
 **المواقع**:
-- `components\tenant\live-editor\LiveEditorUI.tsx` (line 27)
+- `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 6)
 
 #### 2. استخدام EnhancedLiveEditorDragDropContext:
 
@@ -33,7 +33,7 @@ import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-ed
 </EnhancedLiveEditorDragDropContext>
 ```
 
-**الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 1368-1375)
+**الموقع**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 287-294)
 
 ### Implementation Details:
 
@@ -376,7 +376,7 @@ import {
 ```
 
 **المواقع**:
-- `components\tenant\live-editor\LiveEditorUI.tsx` (line 24)
+- `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 6)
 
 **ملاحظة**: LiveEditorDragDropContext موجود في الكود لكن يبدو أنه غير مستخدم حالياً. الـ EnhancedLiveEditorDragDropContext هو المستخدم.
 
@@ -639,7 +639,7 @@ EnhancedLiveEditorDragDropContext
 ## ملخص العلاقات:
 
 ### EnhancedLiveEditorDragDropContext:
-- ✅ **مستخدم بشكل نشط** في `components/tenant/live-editor/LiveEditorUI.tsx`
+- ✅ **مستخدم بشكل نشط** في `components/tenant/live-editor/LiveEditorUI/index.tsx`
 - ✅ يستخدم dragListenerContext (React Context)
 - ✅ يستخدم zoneStore (Zustand store عبر ZoneStoreProvider)
 - ✅ يستخدم DropZoneProvider (React Context)
@@ -695,7 +695,7 @@ EnhancedLiveEditorDragDropContext
 ### EnhancedLiveEditorDragDropContext:
 - **Status**: ✅ مستخدم بشكل نشط
 - **Location**: `services-liveeditor\live-editor\dragDrop\EnhancedLiveEditorDragDropContext.tsx`
-- **Used in**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 1368)
+- **Used in**: `components\tenant\live-editor\LiveEditorUI\index.tsx` (line 287)
 - **States**: dragListeners, zoneStore
 - **Contexts**: dragListenerContext, ZoneStoreProvider, DropZoneProvider
 

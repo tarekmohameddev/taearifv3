@@ -168,7 +168,7 @@ export default function LiveEditorLayout({
 }
 ```
 
-**الموقع**: `app\live-editor\layout.tsx` (line 3344-3364)
+**الموقع**: `app\live-editor\layout.tsx` (line 3541-3561)
 
 ### Implementation Details:
 
@@ -365,7 +365,7 @@ app/live-editor/layout.tsx
 │        └─ [Live Editor Content]
 ```
 
-**الموقع**: `app\live-editor\layout.tsx` (line 3346-3361)
+**الموقع**: `app\live-editor\layout.tsx` (line 3543-3560)
 
 ### ملاحظات مهمة:
 
@@ -418,7 +418,7 @@ app/live-editor/layout.tsx
 ### EditorProvider (Current):
 - **Status**: ✅ مستخدم بشكل نشط
 - **Location**: `context-liveeditor\EditorProvider.tsx`
-- **Used in**: `app\live-editor\layout.tsx` (line 3348)
+- **Used in**: `app\live-editor\layout.tsx` (line 3545)
 - **Dependencies**: useEditorStore, useAuthStore, axiosInstance, SaveConfirmationDialog, toast
 - **Purpose**: إدارة SaveConfirmationDialog وحفظ البيانات إلى الـ backend
 - **Provider Hierarchy**: I18nProvider → AuthProvider → EditorProvider
