@@ -489,13 +489,13 @@ export async function applyThemeToAllPages(themeNumber: ThemeNumber): Promise<vo
       }
       
       if (finalComponents.length > 0) {
-        console.log("[applyThemeToAllPages] Final force update for current page:", {
-          page: finalCurrentPage,
-          componentCount: finalComponents.length,
+      console.log("[applyThemeToAllPages] Final force update for current page:", {
+        page: finalCurrentPage,
+        componentCount: finalComponents.length,
           isStaticPage: !!staticPageData,
           componentNames: finalComponents.map((c: any) => c.componentName),
-        });
-        finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+      });
+      finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
       }
     }
   }, 100);
@@ -1047,13 +1047,13 @@ export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
       }
       
       if (finalComponents.length > 0) {
-        console.log("[restoreThemeFromBackup] Final force update for current page:", {
-          page: finalCurrentPage,
-          componentCount: finalComponents.length,
+      console.log("[restoreThemeFromBackup] Final force update for current page:", {
+        page: finalCurrentPage,
+        componentCount: finalComponents.length,
           isStaticPage: !!staticPageData,
           componentNames: finalComponents.map((c: any) => c.componentName),
-        });
-        finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
+      });
+      finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
       }
     }
   }, 100);

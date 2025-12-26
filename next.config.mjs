@@ -43,7 +43,6 @@ const nextConfig = {
             : []),
         "**/trash/**",
         "**/docs/**",
-        "**/README.md",
       ],
     };
 
@@ -62,21 +61,10 @@ const nextConfig = {
             if (!rule.exclude.some((ex) => ex?.toString().includes("docs"))) {
               rule.exclude.push(/docs/);
             }
-            // استبعاد ملفات README.md
-            if (!rule.exclude.some((ex) => ex?.toString().includes("README"))) {
-              rule.exclude.push(/README\.md$/);
-            }
           }
         }
       });
     }
-
-    // إضافة قاعدة جديدة لاستبعاد ملفات README.md من المعالجة
-    // إرجاع module فارغ عند محاولة استيراد README.md
-    config.module.rules.push({
-      test: /README\.md$/,
-      type: "asset/source",
-    });
 
     return config;
   },

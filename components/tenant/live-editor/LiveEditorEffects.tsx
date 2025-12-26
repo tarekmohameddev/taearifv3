@@ -205,28 +205,28 @@ export function useLiveEditorEffects(state: any) {
         // ⭐ CRITICAL: Skip tenantData.StaticPages if theme was recently changed
         // This ensures we use the new theme data from staticPagesData instead of old database data
         if (!hasRecentThemeChange) {
-          const staticPageFromTenant = tenantData?.StaticPages?.[slug];
-          
-          // Handle different formats: [slug, components] or { slug, components }
-          let tenantComponents: any[] = [];
-          
-          if (staticPageFromTenant) {
-            // Format 1: Array format [slug, components]
-            if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
-              tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
-            }
-            // Format 2: Object format { slug, components }
-            else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
-              tenantComponents = Array.isArray(staticPageFromTenant.components) 
-                ? staticPageFromTenant.components 
-                : [];
-            }
+        const staticPageFromTenant = tenantData?.StaticPages?.[slug];
+        
+        // Handle different formats: [slug, components] or { slug, components }
+        let tenantComponents: any[] = [];
+        
+        if (staticPageFromTenant) {
+          // Format 1: Array format [slug, components]
+          if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
+            tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
           }
-          
-          const hasStaticPageInTenant = tenantComponents.length > 0;
+          // Format 2: Object format { slug, components }
+          else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
+            tenantComponents = Array.isArray(staticPageFromTenant.components) 
+              ? staticPageFromTenant.components 
+              : [];
+          }
+        }
+        
+        const hasStaticPageInTenant = tenantComponents.length > 0;
 
-          if (hasStaticPageInTenant) {
-            // Convert static page components to the format expected by setPageComponents
+        if (hasStaticPageInTenant) {
+          // Convert static page components to the format expected by setPageComponents
             // ⭐ CRITICAL: Ensure id matches componentName for static pages
             const staticComponents = tenantComponents.map((comp: any) => {
               // Use componentName as id if it exists (for static pages, id should match componentName)
@@ -234,19 +234,19 @@ export function useLiveEditorEffects(state: any) {
               
               return {
                 id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
-                type: comp.type || getDefaultComponentForStaticPage(slug)?.type || slug,
-                name: comp.name || getDefaultComponentForStaticPage(slug)?.name || slug,
-                componentName: comp.componentName || getDefaultComponentForStaticPage(slug)?.componentName || `${slug}1`,
-                data: comp.data || getDefaultComponentForStaticPage(slug)?.data || {},
-                position: comp.position || 0,
-                layout: comp.layout || { row: 0, col: 0, span: 2 },
-                forceUpdate: comp.forceUpdate || 0,
+            type: comp.type || getDefaultComponentForStaticPage(slug)?.type || slug,
+            name: comp.name || getDefaultComponentForStaticPage(slug)?.name || slug,
+            componentName: comp.componentName || getDefaultComponentForStaticPage(slug)?.componentName || `${slug}1`,
+            data: comp.data || getDefaultComponentForStaticPage(slug)?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
+            forceUpdate: comp.forceUpdate || 0,
               };
-            });
-            
-            setPageComponents(staticComponents);
-            setInitialized(true);
-            return; // Skip further loading logic
+          });
+          
+          setPageComponents(staticComponents);
+          setInitialized(true);
+          return; // Skip further loading logic
           }
         }
         
@@ -284,12 +284,12 @@ export function useLiveEditorEffects(state: any) {
             
             return {
               id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
-              type: comp.type || defaultComponent?.type || slug,
-              name: comp.name || defaultComponent?.name || slug,
-              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-              data: comp.data || defaultComponent?.data || {},
-              position: comp.position || 0,
-              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
             };
           });
           
@@ -576,12 +576,12 @@ export function useLiveEditorEffects(state: any) {
           
           return {
             id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
-            type: comp.type || defaultComponent?.type || slug,
-            name: comp.name || defaultComponent?.name || slug,
-            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-            data: comp.data || defaultComponent?.data || {},
-            position: comp.position || 0,
-            layout: comp.layout || { row: 0, col: 0, span: 2 },
+          type: comp.type || defaultComponent?.type || slug,
+          name: comp.name || defaultComponent?.name || slug,
+          componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+          data: comp.data || defaultComponent?.data || {},
+          position: comp.position || 0,
+          layout: comp.layout || { row: 0, col: 0, span: 2 },
           };
         });
         
@@ -627,12 +627,12 @@ export function useLiveEditorEffects(state: any) {
             
             return {
               id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
-              type: comp.type || defaultComponent?.type || slug,
-              name: comp.name || defaultComponent?.name || slug,
-              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-              data: comp.data || defaultComponent?.data || {},
-              position: comp.position || 0,
-              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
             };
           });
           
@@ -705,12 +705,12 @@ export function useLiveEditorEffects(state: any) {
             
             return {
               id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
-              type: comp.type || defaultComponent?.type || slug,
-              name: comp.name || defaultComponent?.name || slug,
-              componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
-              data: comp.data || defaultComponent?.data || {},
-              position: comp.position || 0,
-              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            type: comp.type || defaultComponent?.type || slug,
+            name: comp.name || defaultComponent?.name || slug,
+            componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+            data: comp.data || defaultComponent?.data || {},
+            position: comp.position || 0,
+            layout: comp.layout || { row: 0, col: 0, span: 2 },
             };
           });
           
