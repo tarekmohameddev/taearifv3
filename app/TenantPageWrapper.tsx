@@ -172,10 +172,10 @@ const loadComponent = (section: string, componentName: string) => {
   let baseName = match[1];
   const number = match[2];
 
-  // ⭐ Handle special case: propertyDetail -> PropertyDetail
-  // Convert propertyDetail to PropertyDetail to match COMPONENTS key
+  // ⭐ Handle special case: propertyDetail -> propertyDetail
+  // Convert propertyDetail to propertyDetail to match COMPONENTS key
   if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
-    baseName = "PropertyDetail";
+    baseName = "propertyDetail";
   }
 
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
@@ -186,7 +186,7 @@ const loadComponent = (section: string, componentName: string) => {
   }
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
-  // ⭐ IMPORTANT: baseName should be "PropertyDetail" (with capital P and D) to match COMPONENTS key
+  // ⭐ IMPORTANT: baseName should be "propertyDetail" (with capital P and D) to match COMPONENTS key
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
     // استخدام fallback للمكونات غير المعروفة
@@ -213,11 +213,13 @@ const loadComponent = (section: string, componentName: string) => {
   }
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
-  // Handle special case for PropertyDetail components (propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2)
+  // Handle special case for propertyDetail components (propertyDetail1 -> propertyDetail1, propertyDetail1 -> propertyDetail1)
   let fileName = componentName;
-  if (baseName === "PropertyDetail") {
-    // Convert propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2
-    fileName = componentName.replace(/^propertyDetail/, 'PropertyDetail');
+  if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
+    // Extract the number from componentName (e.g., "1" from "propertyDetail1" or "propertyDetail1")
+    const number = componentName.match(/\d+$/)?.[0] || '';
+    // Always construct as propertyDetail + number to ensure correct casing
+    fileName = `propertyDetail${number}`;
   }
   const fullPath = `${subPath}/${fileName}`;
 
@@ -445,7 +447,7 @@ export default function TenantPageWrapper({
         defaultComponentType = "projectDetails";
       } else if (slug === "property") {
         defaultComponentName = "propertyDetail2";
-        defaultComponentType = "PropertyDetail";
+        defaultComponentType = "propertyDetail";
       }
       
       return [

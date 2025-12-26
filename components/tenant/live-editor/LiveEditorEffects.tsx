@@ -36,7 +36,7 @@ function getDefaultComponentForStaticPage(slug: string) {
     },
     property: {
       id: "propertyDetail1",
-      type: "PropertyDetail",
+      type: "propertyDetail",
       name: "Property Detail",
       componentName: "propertyDetail1",
       data: { propertySlug: "", visible: true },

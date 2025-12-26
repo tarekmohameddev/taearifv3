@@ -77,7 +77,7 @@ import { titleFunctions } from "./editorStoreFunctions/titleFunctions";
 import { photosGridFunctions } from "./editorStoreFunctions/photosGridFunctions";
 import { videoFunctions } from "./editorStoreFunctions/videoFunctions";
 import { projectDetailsFunctions } from "./editorStoreFunctions/projectDetailsFunctions";
-import { PropertyDetailFunctions as propertyDetailFunctions } from "./editorStoreFunctions/propertyDetailFunctions";
+import { propertyDetailFunctions as propertyDetailFunctions } from "./editorStoreFunctions/propertyDetailFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -344,13 +344,13 @@ interface EditorStore {
 
   // Property Detail states
   propertyDetailStates: Record<string, ComponentData>;
-  ensurePropertyDetailVariant: (
+  ensurepropertyDetailVariant: (
     variantId: string,
     initial?: ComponentData,
   ) => void;
-  getPropertyDetailData: (variantId: string) => ComponentData;
-  setPropertyDetailData: (variantId: string, data: ComponentData) => void;
-  updatePropertyDetailByPath: (
+  getpropertyDetailData: (variantId: string) => ComponentData;
+  setpropertyDetailData: (variantId: string, data: ComponentData) => void;
+  updatepropertyDetailByPath: (
     variantId: string,
     path: string,
     value: any,
@@ -1164,7 +1164,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return testimonialsFunctions.ensureVariant(state, variantId, initial);
         case "projectDetails":
           return projectDetailsFunctions.ensureVariant(state, variantId, initial);
-        case "PropertyDetail":
+        case "propertyDetail":
           return propertyDetailFunctions.ensureVariant(state, variantId, initial);
         case "logosTicker":
           return logosTickerFunctions.ensureVariant(state, variantId, initial);
@@ -1302,7 +1302,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return testimonialsFunctions.getData(state, variantId);
       case "projectDetails":
         return projectDetailsFunctions.getData(state, variantId);
-      case "PropertyDetail":
+      case "propertyDetail":
         return propertyDetailFunctions.getData(state, variantId);
       case "propertiesShowcase":
         return propertiesShowcaseFunctions.getData(state, variantId);
@@ -1415,7 +1415,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "projectDetails":
           newState = projectDetailsFunctions.setData(state, variantId, data);
           break;
-        case "PropertyDetail":
+        case "propertyDetail":
           newState = propertyDetailFunctions.setData(state, variantId, data);
           break;
         case "propertiesShowcase":
@@ -1627,7 +1627,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             value,
           );
           break;
-        case "PropertyDetail":
+        case "propertyDetail":
           newState = propertyDetailFunctions.updateByPath(
             state,
             variantId,
@@ -1993,17 +1993,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     ),
 
   // Property Detail functions using modular approach
-  ensurePropertyDetailVariant: (variantId, initial) =>
+  ensurepropertyDetailVariant: (variantId, initial) =>
     set((state) =>
       propertyDetailFunctions.ensureVariant(state, variantId, initial),
     ),
-  getPropertyDetailData: (variantId) => {
+  getpropertyDetailData: (variantId) => {
     const state = get();
     return propertyDetailFunctions.getData(state, variantId);
   },
-  setPropertyDetailData: (variantId, data) =>
+  setpropertyDetailData: (variantId, data) =>
     set((state) => propertyDetailFunctions.setData(state, variantId, data)),
-  updatePropertyDetailByPath: (variantId, path, value) =>
+  updatepropertyDetailByPath: (variantId, path, value) =>
     set((state) =>
       propertyDetailFunctions.updateByPath(state, variantId, path, value),
     ),
@@ -2677,7 +2677,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.data,
                         ).projectDetailsStates;
                       break;
-                    case "PropertyDetail":
+                    case "propertyDetail":
                       newState.propertyDetailStates =
                         propertyDetailFunctions.setData(
                           newState,
@@ -2964,7 +2964,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.data,
               ).projectDetailsStates;
               break;
-            case "PropertyDetail":
+            case "propertyDetail":
               newState.propertyDetailStates = propertyDetailFunctions.setData(
                 newState,
                 comp.componentName,

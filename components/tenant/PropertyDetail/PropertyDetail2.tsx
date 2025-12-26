@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultPropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
+import { getDefaultpropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import {
@@ -76,7 +76,7 @@ interface Property {
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
 // ═══════════════════════════════════════════════════════════
-interface PropertyDetail2Props {
+interface propertyDetail2Props {
   // Component-specific props
   visible?: boolean;
   layout?: {
@@ -154,7 +154,7 @@ const getTransactionTypeLabel = (
 // ═══════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
-export default function PropertyDetail2(props: PropertyDetail2Props) {
+export default function propertyDetail2(props: propertyDetail2Props) {
   // ─────────────────────────────────────────────────────────
   // 1. EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
@@ -194,7 +194,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
         if (
-          component.type === "PropertyDetail" &&
+          component.type === "propertyDetail" &&
           component.componentName === variantId
         ) {
           return component.data;
@@ -211,7 +211,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
             pageComponents as any,
           )) {
             if (
-              (component as any).type === "PropertyDetail" &&
+              (component as any).type === "propertyDetail" &&
               (component as any).componentName === variantId
             ) {
               return (component as any).data;
@@ -231,16 +231,16 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
           ? {
-              ...getDefaultPropertyDetail2Data(),
+              ...getDefaultpropertyDetail2Data(),
               ...tenantComponentData,
               ...props,
             }
           : {
-              ...getDefaultPropertyDetail2Data(),
+              ...getDefaultpropertyDetail2Data(),
               ...props,
             };
 
-      ensureComponentVariant("PropertyDetail", uniqueId, initialData);
+      ensureComponentVariant("propertyDetail", uniqueId, initialData);
     }
   }, [
     uniqueId,
@@ -253,13 +253,13 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = propertyDetailStates?.[uniqueId];
-  const currentStoreData = getComponentData("PropertyDetail", uniqueId);
+  const currentStoreData = getComponentData("propertyDetail", uniqueId);
 
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
-    ...getDefaultPropertyDetail2Data(), // 1. Defaults (lowest priority)
+    ...getDefaultpropertyDetail2Data(), // 1. Defaults (lowest priority)
     ...storeData, // 2. Store state
     ...currentStoreData, // 3. Current store data
     ...props, // 4. Props (highest priority)
@@ -276,129 +276,196 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   // 7. PROPERTY DATA FETCHING
   // ─────────────────────────────────────────────────────────
   
-  // Property data state
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loadingProperty, setLoadingProperty] = useState(true);
-  const [propertyError, setPropertyError] = useState<string | null>(null);
-  
-  // Image states
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [mainImage, setMainImage] = useState<string>("");
+  // Check if we're in Live Editor
+  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
 
-  // Form states
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    message: "",
-  });
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [formSuccess, setFormSuccess] = useState(false);
-
-  // Form handlers
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
-    setFormError(null);
-    setFormSuccess(false);
-
-    try {
-      if (!finalTenantId) {
-        setFormError("لم يتم العثور على معرف المستأجر");
-        return;
-      }
-
-      if (!property?.slug) {
-        setFormError("لم يتم العثور على معرف العقار");
-        return;
-      }
-
-      // Validation
-      if (!formData.name.trim()) {
-        setFormError("يرجى إدخال اسمك");
-        return;
-      }
-
-      if (!formData.phone.trim()) {
-        setFormError("يرجى إدخال رقم الهاتف");
-        return;
-      }
-
-      // Validate phone format
-      const phoneRegex = /^\+?\d{7,15}$/;
-      if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
-        setFormError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)");
-        return;
-      }
-
-      const payload: any = {
-        propertySlug: property.slug,
-        customerName: formData.name.trim(),
-        customerPhone: formData.phone.trim(),
-      };
-
-      if (formData.email.trim()) {
-        payload.customerEmail = formData.email.trim();
-      }
-      if (formData.message.trim()) {
-        payload.message = formData.message.trim();
-      }
-
-      const response = await axiosInstance.post(
-        `/api/v1/tenant-website/${finalTenantId}/reservations`,
-        payload,
-      );
-
-      if (response.data.success) {
-        setFormSuccess(true);
-        // Reset form
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          message: "",
-        });
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          setFormSuccess(false);
-        }, 3000);
-      }
-    } catch (err: any) {
-      // Handle validation errors from backend
-      if (err.response?.data?.errors) {
-        const errors = err.response.data.errors;
-        const errorMessage =
-          errors.customerName?.[0] ||
-          errors.customerPhone?.[0] ||
-          errors.message?.[0] ||
-          err.response?.data?.message ||
-          "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى";
-        setFormError(errorMessage);
-      } else {
-        setFormError(
-          err.response?.data?.message ||
-            "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى",
-        );
-      }
-    } finally {
-      setFormLoading(false);
-    }
+  // Mock data for Live Editor
+  const mockProperty: Property = {
+    id: "mock-property-1",
+    slug: "mock-property",
+    title: "عقار فاخر للبيع",
+    district: "حي النرجس",
+    price: "1,250,000",
+    views: 1250,
+    bedrooms: 3,
+    bathrooms: 2,
+    area: "150",
+    type: "شقة",
+    transactionType: "للبيع",
+    transactionType_en: "sale",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
+    ],
+    floor_planning_image: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    ],
+    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    status: "available",
+    location: {
+      lat: 24.7136,
+      lng: 46.6753,
+      address: "الرياض، حي النرجس، شارع الملك فهد",
+    },
+    payment_method: "quarterly",
+    pricePerMeter: "8,333",
+    building_age: 5,
+    floors: 10,
+    floor_number: 5,
+    kitchen: 1,
+    living_room: 1,
+    majlis: 1,
+    dining_room: 1,
+    maid_room: 1,
+    driver_room: 1,
+    storage_room: 1,
+    basement: 0,
+    swimming_pool: 1,
+    balcony: 2,
+    garden: 0,
+    elevator: 1,
+    private_parking: 2,
+    length: "15",
+    width: "10",
+    video_url: "https://example.com/video.mp4",
+    virtual_tour: "https://example.com/virtual-tour",
   };
+  
+  // Check if we're in Live Editor
+  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+  // Mock data for Live Editor
+  const mockProperty: Property = {
+    id: "mock-property-1",
+    slug: "mock-property",
+    title: "عقار فاخر للبيع",
+    district: "حي النرجس",
+    price: "1,250,000",
+    views: 1250,
+    bedrooms: 3,
+    bathrooms: 2,
+    area: "150",
+    type: "شقة",
+    transactionType: "للبيع",
+    transactionType_en: "sale",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
+    ],
+    floor_planning_image: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    ],
+    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    status: "available",
+    location: {
+      lat: 24.7136,
+      lng: 46.6753,
+      address: "الرياض، حي النرجس، شارع الملك فهد",
+    },
+    payment_method: "quarterly",
+    pricePerMeter: "8,333",
+    building_age: 5,
+    floors: 10,
+    floor_number: 5,
+    kitchen: 1,
+    living_room: 1,
+    majlis: 1,
+    dining_room: 1,
+    maid_room: 1,
+    driver_room: 1,
+    storage_room: 1,
+    basement: 0,
+    swimming_pool: 1,
+    balcony: 2,
+    garden: 0,
+    elevator: 1,
+    private_parking: 2,
+    length: "15",
+    width: "10",
+    video_url: "https://example.com/video.mp4",
+    virtual_tour: "https://example.com/virtual-tour",
+  };
+  
+  // Check if we're in Live Editor
+  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+
+  // Mock data for Live Editor
+  const mockProperty: Property = {
+    id: "mock-property-1",
+    slug: "mock-property",
+    title: "عقار فاخر للبيع",
+    district: "حي النرجس",
+    price: "1,250,000",
+    views: 1250,
+    bedrooms: 3,
+    bathrooms: 2,
+    area: "150",
+    type: "شقة",
+    transactionType: "للبيع",
+    transactionType_en: "sale",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
+    ],
+    floor_planning_image: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    ],
+    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    status: "available",
+    location: {
+      lat: 24.7136,
+      lng: 46.6753,
+      address: "الرياض، حي النرجس، شارع الملك فهد",
+    },
+    payment_method: "quarterly",
+    pricePerMeter: "8,333",
+    building_age: 5,
+    floors: 10,
+    floor_number: 5,
+    kitchen: 1,
+    living_room: 1,
+    majlis: 1,
+    dining_room: 1,
+    maid_room: 1,
+    driver_room: 1,
+    storage_room: 1,
+    basement: 0,
+    swimming_pool: 1,
+    balcony: 2,
+    garden: 0,
+    elevator: 1,
+    private_parking: 2,
+    length: "15",
+    width: "10",
+    video_url: "https://example.com/video.mp4",
+    virtual_tour: "https://example.com/virtual-tour",
+  };
+  
     });
   };
 
   // جلب بيانات العقار
   const fetchProperty = async () => {
+    // ⭐ NEW: Use mock data in Live Editor
+    if (isLiveEditor) {
+      setProperty(mockProperty);
+      setLoadingProperty(false);
+      setMainImage(mockProperty.image || "");
+      return;
+    }
+
     try {
       setLoadingProperty(true);
       setPropertyError(null);
@@ -458,13 +525,13 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   const handleNextImage = () => {
     const allImages = getAllImages();
     if (allImages.length > 0) {
-      const currentIndex = selectedImageIndex;
-      const nextIndex =
-        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
-      setSelectedImage(allImages[nextIndex]);
-      setSelectedImageIndex(nextIndex);
+    // ⭐ NEW: Use mock data in Live Editor
+    if (isLiveEditor) {
+      setProperty(mockProperty);
+      setLoadingProperty(false);
+      setMainImage(mockProperty.image || "");
+      return;
     }
-  };
 
   const handleImageClick = (imageSrc: string, index?: number) => {
     if (imageSrc && imageSrc.trim() !== "") {
@@ -480,10 +547,16 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
 
   // جلب بيانات العقار عند تحميل المكون
   useEffect(() => {
+    // ⭐ NEW: In Live Editor, always use mock data
+    if (isLiveEditor) {
+      fetchProperty();
+      return;
+    }
+
     if (finalTenantId && props.propertySlug) {
       fetchProperty();
     }
-  }, [finalTenantId, props.propertySlug]);
+  }, [finalTenantId, props.propertySlug, isLiveEditor]);
 
   // تحديث الصورة الرئيسية عند تحميل العقار
   useEffect(() => {

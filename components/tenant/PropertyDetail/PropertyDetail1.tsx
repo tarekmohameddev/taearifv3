@@ -139,7 +139,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 
-interface PropertyDetailProps {
+interface propertyDetailProps {
   propertySlug: string;
 }
 
@@ -164,7 +164,7 @@ const getTransactionTypeLabel = (
   return "للبيع";
 };
 
-export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
+export default function propertyDetail({ propertySlug }: propertyDetailProps) {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [bookingForm, setBookingForm] = useState({
@@ -327,6 +327,86 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
+
+  // Check if we're in Live Editor
+  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+
+  // Mock data for Live Editor
+  const mockProperty: Property = {
+    id: "mock-property-1",
+    slug: "mock-property",
+    title: "عقار فاخر للبيع",
+    district: "حي النرجس",
+    price: "1,250,000",
+    views: 1250,
+    bedrooms: 3,
+    bathrooms: 2,
+    area: "150",
+    type: "شقة",
+    transactionType: "للبيع",
+    transactionType_en: "sale",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800",
+    ],
+    floor_planning_image: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    ],
+    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    status: "available",
+    location: {
+      lat: 24.7136,
+      lng: 46.6753,
+      address: "الرياض، حي النرجس، شارع الملك فهد",
+    },
+    contact: {
+      name: "شركة تعاريف العقارية",
+      phone: "+966501234567",
+      email: "info@example.com",
+    },
+    payment_method: "quarterly",
+    pricePerMeter: "8,333",
+    building_age: 5,
+    floors: 10,
+    floor_number: 5,
+    kitchen: 1,
+    living_room: 1,
+    majlis: 1,
+    dining_room: 1,
+    maid_room: 1,
+    driver_room: 1,
+    storage_room: 1,
+    basement: 0,
+    swimming_pool: 1,
+    balcony: 2,
+    garden: 0,
+    elevator: 1,
+    private_parking: 2,
+    length: "15",
+    width: "10",
+    rooms: 4,
+    annex: 0,
+    video_url: "https://example.com/video.mp4",
+    virtual_tour: "https://example.com/virtual-tour",
+    faqs: [
+      {
+        id: 1,
+        question: "ما هي مساحة العقار؟",
+        answer: "مساحة العقار 150 متر مربع",
+        displayOnPage: true,
+      },
+      {
+        id: 2,
+        question: "هل يوجد موقف سيارات؟",
+        answer: "نعم، يوجد موقفان للسيارات",
+        displayOnPage: true,
+      },
+    ],
+  };
 
   // Handle create reservation
   const handleCreateReservation = async () => {
@@ -576,6 +656,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // جلب بيانات العقار
   const fetchProperty = async () => {
+    // ⭐ NEW: Use mock data in Live Editor
+    if (isLiveEditor) {
+      setProperty(mockProperty);
+      setLoadingProperty(false);
+      setMainImage(mockProperty.image || "");
+      return;
+    }
+
     try {
       setLoadingProperty(true);
       setPropertyError(null);
@@ -607,6 +695,18 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // جلب العقارات المشابهة
   const fetchSimilarProperties = async () => {
+    // ⭐ NEW: Use mock data in Live Editor
+    if (isLiveEditor) {
+      const mockSimilarProperties: Property[] = [
+        { ...mockProperty, id: "mock-2", title: "عقار فاخر ثاني", district: "حي العليا", price: "1,500,000" },
+        { ...mockProperty, id: "mock-3", title: "عقار فاخر ثالث", district: "حي المطار", price: "2,000,000" },
+        { ...mockProperty, id: "mock-4", title: "عقار فاخر رابع", district: "حي الياسمين", price: "1,800,000" },
+      ];
+      setSimilarProperties(mockSimilarProperties);
+      setLoadingSimilar(false);
+      return;
+    }
+
     try {
       setLoadingSimilar(true);
 
@@ -623,11 +723,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
       if (response.data && response.data.properties) {
         setSimilarProperties(response.data.properties);
         console.log(
-          `PropertyDetail: ✅ Similar properties loaded: ${response.data.properties.length} items`,
+          `propertyDetail: ✅ Similar properties loaded: ${response.data.properties.length} items`,
         );
       } else {
         console.log(
-          "PropertyDetail: ⚠️ No similar properties found in response",
+          "propertyDetail: ⚠️ No similar properties found in response",
         );
         setSimilarProperties([]);
       }
@@ -686,11 +786,18 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // جلب بيانات العقار والعقارات المشابهة عند تحميل المكون
   useEffect(() => {
+    // ⭐ NEW: In Live Editor, always use mock data
+    if (isLiveEditor) {
+      fetchProperty();
+      fetchSimilarProperties();
+      return;
+    }
+
     if (tenantId) {
       fetchProperty();
       fetchSimilarProperties();
     }
-  }, [tenantId, propertySlug]);
+  }, [tenantId, propertySlug, isLiveEditor]);
 
   // تحديث الصورة الرئيسية عند تحميل العقار
   useEffect(() => {

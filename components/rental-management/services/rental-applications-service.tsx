@@ -854,7 +854,7 @@ export function RentalApplicationsService({
   };
 
   // دالة للحصول على تفاصيل العقار مع معالجة البيانات المفقودة
-  const getPropertyDetails = (rental: RentalData) => {
+  const getpropertyDetails = (rental: RentalData) => {
     if (!rental.property) {
       return { beds: "غير محدد", bath: "غير محدد", area: "غير محدد" };
     }
@@ -1742,8 +1742,8 @@ export function RentalApplicationsService({
                       </div>
                       {rental.property && (
                         <div className="text-xs text-gray-400 mt-1">
-                          {getPropertyDetails(rental).beds} غرف •{" "}
-                          {getPropertyDetails(rental).bath} حمام
+                          {getpropertyDetails(rental).beds} غرف •{" "}
+                          {getpropertyDetails(rental).bath} حمام
                         </div>
                       )}
                     </td>

@@ -1,7 +1,7 @@
 import { ComponentStructure } from "./types";
 
 export const propertyDetailStructure: ComponentStructure = {
-  componentType: "PropertyDetail",
+  componentType: "propertyDetail",
   variants: [
     {
       id: "propertyDetail2",

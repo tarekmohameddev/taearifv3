@@ -5,7 +5,7 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 // DEFAULT DATA - Define your component's data structure
 // ═══════════════════════════════════════════════════════════
 
-export const getDefaultPropertyDetail2Data = (): ComponentData => ({
+export const getDefaultpropertyDetail2Data = (): ComponentData => ({
   visible: true,
 
   // Layout configuration
@@ -88,7 +88,7 @@ export const getDefaultPropertyDetail2Data = (): ComponentData => ({
 // COMPONENT FUNCTIONS - Standard 4 functions
 // ═══════════════════════════════════════════════════════════
 
-export const PropertyDetailFunctions = {
+export const propertyDetailFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    *
@@ -107,7 +107,7 @@ export const PropertyDetailFunctions = {
     }
 
     // Determine default data
-    const defaultData = getDefaultPropertyDetail2Data();
+    const defaultData = getDefaultpropertyDetail2Data();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
@@ -126,7 +126,7 @@ export const PropertyDetailFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.propertyDetailStates[variantId] || getDefaultPropertyDetail2Data(),
+    state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data(),
 
   /**
    * setData - Set/replace component data completely
@@ -150,7 +150,7 @@ export const PropertyDetailFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.propertyDetailStates[variantId] || getDefaultPropertyDetail2Data();
+    const source = state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data();
     const newData = updateDataByPath(source, path, value);
 
     return {
