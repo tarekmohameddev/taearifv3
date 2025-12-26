@@ -678,15 +678,19 @@ export const COMPONENTS: Record<string, any> = {
     description: "Property detail page with hero layout",
     category: "content",
     section: "property",
-    subPath: "propertyDetail",
+    subPath: "property",
     icon: "🏠",
     hasStore: true,
     hasStructure: true,
     defaultTheme: "propertyDetail2",
-    variants: propertyDetailStructure.variants.map((variant) => ({
-      ...variant,
-      componentPath: `components/tenant/property/${variant.id}.tsx`,
-    })),
+    variants: propertyDetailStructure.variants.map((variant) => {
+      // Convert propertyDetail1 -> PropertyDetail1, propertyDetail2 -> PropertyDetail2
+      const fileName = variant.id.replace(/^propertyDetail/, 'PropertyDetail');
+      return {
+        ...variant,
+        componentPath: `components/tenant/property/${fileName}.tsx`,
+      };
+    }),
     ...propertyDetailStructure,
   },
   propertiesShowcase: {

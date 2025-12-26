@@ -700,6 +700,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   stepsSectionStates: {},
         testimonialsStates: {},
         projectDetailsStates: {},
+        propertyDetailStates: {},
         propertiesShowcaseStates: {},
         card4States: {},
   card5States: {},

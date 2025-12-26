@@ -252,7 +252,7 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
-  const storeData = propertyDetailStates[uniqueId];
+  const storeData = propertyDetailStates?.[uniqueId];
   const currentStoreData = getComponentData("propertyDetail", uniqueId);
 
   // ─────────────────────────────────────────────────────────
@@ -286,6 +286,116 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [mainImage, setMainImage] = useState<string>("");
+
+  // Form states
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  // Form handlers
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(false);
+
+    try {
+      if (!finalTenantId) {
+        setFormError("لم يتم العثور على معرف المستأجر");
+        return;
+      }
+
+      if (!property?.slug) {
+        setFormError("لم يتم العثور على معرف العقار");
+        return;
+      }
+
+      // Validation
+      if (!formData.name.trim()) {
+        setFormError("يرجى إدخال اسمك");
+        return;
+      }
+
+      if (!formData.phone.trim()) {
+        setFormError("يرجى إدخال رقم الهاتف");
+        return;
+      }
+
+      // Validate phone format
+      const phoneRegex = /^\+?\d{7,15}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
+        setFormError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)");
+        return;
+      }
+
+      const payload: any = {
+        propertySlug: property.slug,
+        customerName: formData.name.trim(),
+        customerPhone: formData.phone.trim(),
+      };
+
+      if (formData.email.trim()) {
+        payload.customerEmail = formData.email.trim();
+      }
+      if (formData.message.trim()) {
+        payload.message = formData.message.trim();
+      }
+
+      const response = await axiosInstance.post(
+        `/api/v1/tenant-website/${finalTenantId}/reservations`,
+        payload,
+      );
+
+      if (response.data.success) {
+        setFormSuccess(true);
+        // Reset form
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          message: "",
+        });
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setFormSuccess(false);
+        }, 3000);
+      }
+    } catch (err: any) {
+      // Handle validation errors from backend
+      if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        const errorMessage =
+          errors.customerName?.[0] ||
+          errors.customerPhone?.[0] ||
+          errors.message?.[0] ||
+          err.response?.data?.message ||
+          "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى";
+        setFormError(errorMessage);
+      } else {
+        setFormError(
+          err.response?.data?.message ||
+            "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى",
+        );
+      }
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   // جلب بيانات العقار
   const fetchProperty = async () => {
@@ -433,6 +543,62 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
   const formButtonTextColor =
     mergedData.styling?.formButtonTextColor || "#7a5c43";
 
+  // Show skeleton loading while tenant or property is loading
+  if (tenantLoading || loadingProperty) {
+    return (
+      <main className="w-full" dir="rtl">
+        <section
+          className="relative w-full overflow-hidden animate-pulse"
+          style={{ height: mergedData.hero?.height || "500px" }}
+        >
+          <div className="w-full h-full bg-gray-200" />
+        </section>
+        <div className="container mx-auto px-4 py-12">
+          <div className="animate-pulse space-y-8">
+            <div className="h-8 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 rounded w-full" />
+            <div className="h-4 bg-gray-200 rounded w-5/6" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Show error if property failed to load
+  if (propertyError || !property) {
+    return (
+      <main className="w-full" dir="rtl">
+        <section className="py-12">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <p className="text-lg text-red-600 font-medium">
+                {propertyError || "العقار غير موجود"}
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                تأكد من صحة رابط العقار
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="w-full" dir="rtl">
       {/* BEGIN: Top Hero Image Section - Full Width */}
@@ -441,8 +607,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         style={{ height: mergedData.hero?.height || "500px" }}
       >
         <Image
-          src={property.image || "/placeholder.jpg"}
-          alt={property.title || "صورة خلفية"}
+          src="/images/placeholders/projectDetails2/hero.jpg"
+          alt={property?.title || "صورة خلفية"}
           fill
           priority
           sizes="100vw"
@@ -452,7 +618,8 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
         <div
           className="absolute inset-0"
           style={{
-            backgroundColor: `rgba(54, 28, 22, ${mergedData.hero?.overlayOpacity || 0.8})`,
+            backgroundColor: "#361c16",
+            opacity: 0.8,
           }}
         />
       </section>
@@ -859,15 +1026,28 @@ export default function PropertyDetail2(props: PropertyDetail2Props) {
                       onChange={handleChange}
                     ></textarea>
                   </div>
+                  {formError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                      {formError}
+                    </div>
+                  )}
+                  {formSuccess && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                      تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.
+                    </div>
+                  )}
                   <button
-                    className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg"
+                    className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     type="submit"
+                    disabled={formLoading}
                     style={{
                       backgroundColor: formButtonBackgroundColor,
                       color: formButtonTextColor,
                     }}
                   >
-                    {mergedData.content?.submitButtonText || "أرسل استفسارك"}
+                    {formLoading
+                      ? "جاري الإرسال..."
+                      : mergedData.content?.submitButtonText || "أرسل استفسارك"}
                   </button>
                 </form>
               </section>

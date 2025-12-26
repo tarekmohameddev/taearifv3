@@ -206,7 +206,12 @@ const loadComponent = (section: string, componentName: string) => {
   }
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
-  const fullPath = `${subPath}/${componentName}`;
+  // Handle special case for propertyDetail components (PropertyDetail1, PropertyDetail2)
+  let fileName = componentName;
+  if (baseName === "propertyDetail") {
+    fileName = componentName.replace(/^propertyDetail/, 'PropertyDetail');
+  }
+  const fullPath = `${subPath}/${fileName}`;
 
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
