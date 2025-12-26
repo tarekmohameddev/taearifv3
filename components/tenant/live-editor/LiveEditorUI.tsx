@@ -552,20 +552,24 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // Get global header variant with smart priority logic
   // ⭐ IMPORTANT: Use tenantData/globalHeaderData on initial load, but use store for immediate updates
   const globalHeaderVariant = useMemo(() => {
+    // ⭐ CRITICAL: If theme was recently changed, prioritize store variant
+    const hasRecentThemeChange = themeChangeTimestamp > 0;
+    
     // If globalHeaderVariantFromStore is the default value, prioritize tenantData/globalHeaderData
     // This handles the case when Live Editor first opens
     const isDefaultVariant = globalHeaderVariantFromStore === "StaticHeader1";
 
     // Priority logic:
-    // 1. If store variant is NOT default, use it (for immediate updates)
-    // 2. Otherwise, use tenantData/globalHeaderData (for initial load)
-    const variant =
-      (!isDefaultVariant && globalHeaderVariantFromStore) || // ⭐ Use store if not default
-      globalHeaderData?.variant ||
-      tenantData?.globalComponentsData?.globalHeaderVariant ||
-      globalHeaderVariantFromStore || // Fallback to store
-      "StaticHeader1";
-
+    // 1. If theme was recently changed, use store variant (highest priority)
+    // 2. If store variant is NOT default, use it (for immediate updates)
+    // 3. Otherwise, use tenantData/globalHeaderData (for initial load)
+    const variant = hasRecentThemeChange
+      ? globalHeaderVariantFromStore || "StaticHeader1" // ⭐ Force use store variant after theme change
+      : (!isDefaultVariant && globalHeaderVariantFromStore) ||
+        globalHeaderData?.variant ||
+        tenantData?.globalComponentsData?.globalHeaderVariant ||
+        globalHeaderVariantFromStore || // Fallback to store
+        "StaticHeader1";
 
     return variant;
   }, [
@@ -573,6 +577,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     globalHeaderData?.variant,
     tenantData?.globalComponentsData?.globalHeaderVariant,
     tenantData,
+    themeChangeTimestamp, // ⭐ NEW: Force re-compute when theme changes
   ]);
 
   // Get global footer variant with smart priority logic
@@ -689,7 +694,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     }
 
     return HeaderComponent;
-  }, [globalHeaderVariant]);
+  }, [
+    globalHeaderVariant,
+    themeChangeTimestamp, // ⭐ NEW: Force re-load when theme changes
+    globalHeaderData, // ⭐ NEW: Force re-load when header data changes
+  ]);
 
   // Load footer component dynamically based on globalFooterVariant
   const FooterComponent = useMemo(() => {
