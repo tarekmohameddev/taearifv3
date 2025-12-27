@@ -12,6 +12,8 @@ import {
   ExternalLink,
   RefreshCw,
   CreditCard,
+  Power,
+  PowerOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +36,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -41,6 +50,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { WhatsappIcon } from "@/components/icons";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -112,6 +127,8 @@ export function WhatsAppCenterPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [numberToDelete, setNumberToDelete] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [togglingNumberId, setTogglingNumberId] = useState<number | null>(null);
+  const [increaseLimitDialogOpen, setIncreaseLimitDialogOpen] = useState(false);
   const { userData } = useAuthStore();
   // Fetch WhatsApp data on component mount
   useEffect(() => {
@@ -185,15 +202,78 @@ export function WhatsAppCenterPage() {
     }
   };
 
-  const handleDeleteNumber = (id: number) => {
+  const handleDeleteNumber = async (id: number) => {
+    try {
+      await axiosInstance.delete(`/whatsapp/${id}`);
     setConnectedNumbers((prev) => prev.filter((num) => num.id !== id));
+      setShowSuccessAlert(true);
+      setTimeout(() => setShowSuccessAlert(false), 5000);
+    } catch (err: any) {
+      console.error("Error deleting number:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء حذف الرقم");
+    } finally {
     setDeleteDialogOpen(false);
     setNumberToDelete(null);
+    }
   };
 
   const confirmDelete = (id: number) => {
     setNumberToDelete(String(id));
     setDeleteDialogOpen(true);
+  };
+
+  const handleUnlinkNumber = async (id: number) => {
+    try {
+      setTogglingNumberId(id);
+      setError(null);
+      
+      const response = await axiosInstance.post(`/whatsapp/${id}/unlink`);
+      
+      if (response.data.success) {
+        // Refresh the numbers list
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        if (fetchResponse.data.success && fetchResponse.data.data) {
+          setConnectedNumbers(fetchResponse.data.data.numbers || []);
+        }
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        setError("فشل في إلغاء تفعيل الرقم");
+      }
+    } catch (err: any) {
+      console.error("Error unlinking number:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء إلغاء تفعيل الرقم");
+    } finally {
+      setTogglingNumberId(null);
+    }
+  };
+
+  const handleActivateNumber = async (id: number) => {
+    try {
+      setTogglingNumberId(id);
+      setError(null);
+      
+      // Use the redirect endpoint with existing mode to reactivate
+      const response = await axiosInstance.get("/whatsapp/meta/redirect", {
+        params: {
+          mode: "existing",
+        },
+      });
+
+      if (response.data.success && response.data.redirect_url) {
+        // Open redirect URL in new tab for reactivation
+        window.open(response.data.redirect_url, "_blank");
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        setError("فشل في الحصول على رابط التفعيل");
+      }
+    } catch (err: any) {
+      console.error("Error activating number:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء تفعيل الرقم");
+    } finally {
+      setTogglingNumberId(null);
+    }
   };
 
   const handlePurchaseAddon = async () => {
@@ -503,13 +583,25 @@ export function WhatsAppCenterPage() {
             {/* Connected Numbers Table */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
-                  الأرقام المتصلة
-                </CardTitle>
-                <CardDescription>
-                  جميع أرقام الواتساب المرتبطة بحسابك
-                </CardDescription>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
+                      الأرقام المتصلة
+                    </CardTitle>
+                    <CardDescription>
+                      جميع أرقام الواتساب المرتبطة بحسابك
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={() => setIncreaseLimitDialogOpen(true)}
+                    variant="outline"
+                    className="gap-2 w-full md:w-auto border-green-700 text-green-700 hover:bg-green-50 hover:border-green-800 hover:text-green-800"
+                  >
+                    <Plus className="h-4 w-4" />
+                    زيادة الحد الحالي
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -611,9 +703,42 @@ export function WhatsAppCenterPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="icon">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    disabled={togglingNumberId === number.id}
+                                  >
+                                    {togglingNumberId === number.id ? (
+                                      <RefreshCw className="h-4 w-4 animate-spin" />
+                                    ) : (
                                 <Settings className="h-4 w-4" />
+                                    )}
                               </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="rtl">
+                                  {number.status === "active" ? (
+                                    <DropdownMenuItem
+                                      onClick={() => handleUnlinkNumber(number.id)}
+                                      disabled={togglingNumberId === number.id}
+                                      className="cursor-pointer"
+                                    >
+                                      <PowerOff className="h-4 w-4 ml-2" />
+                                      إلغاء التفعيل
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem
+                                      onClick={() => handleActivateNumber(number.id)}
+                                      disabled={togglingNumberId === number.id}
+                                      className="cursor-pointer"
+                                    >
+                                      <Power className="h-4 w-4 ml-2" />
+                                      تفعيل
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -693,6 +818,55 @@ export function WhatsAppCenterPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Increase Limit Dialog */}
+      <CustomDialog
+        open={increaseLimitDialogOpen}
+        onOpenChange={setIncreaseLimitDialogOpen}
+        maxWidth="max-w-md"
+      >
+        <CustomDialogContent>
+          <CustomDialogClose onClose={() => setIncreaseLimitDialogOpen(false)} />
+          <CustomDialogHeader>
+            <CustomDialogTitle>زيادة الحد</CustomDialogTitle>
+          </CustomDialogHeader>
+          <div className="space-y-4 p-4 sm:p-6">
+            {/* Limit Display */}
+            <div className="bg-muted rounded-lg p-4 text-center">
+              <p className="text-sm text-muted-foreground mb-2">الحد الحالي</p>
+              <div className="text-2xl font-bold text-green-600">
+                {isLoading ? "..." : `${usage} / ${quota}`}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                أرقام مستخدمة من أصل المتاحة
+              </p>
+            </div>
+
+            {/* Add Number Button */}
+            <Button
+              onClick={() => {
+                setIncreaseLimitDialogOpen(false);
+                handleFacebookLogin();
+              }}
+              disabled={isConnecting}
+              className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white gap-2"
+              size="lg"
+            >
+              {isConnecting ? (
+                <>
+                  <RefreshCw className="h-5 w-5 animate-spin" />
+                  جاري الربط...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-5 w-5" />
+                  إضافة رقم
+                </>
+              )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
     </div>
   );
 }
