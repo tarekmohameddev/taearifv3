@@ -842,25 +842,25 @@ export function WhatsAppCenterPage() {
               </p>
             </div>
 
-            {/* Add Number Button */}
+            {/* Increase Limit Button */}
             <Button
               onClick={() => {
                 setIncreaseLimitDialogOpen(false);
-                handleFacebookLogin();
+                handlePurchaseAddon();
               }}
-              disabled={isConnecting}
-              className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white gap-2"
+              disabled={isPurchasing || isLoading || connectedNumbers.length === 0 || !selectedPlan}
+              className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
               size="lg"
             >
-              {isConnecting ? (
+              {isPurchasing ? (
                 <>
                   <RefreshCw className="h-5 w-5 animate-spin" />
-                  جاري الربط...
+                  جاري المعالجة...
                 </>
               ) : (
                 <>
                   <Plus className="h-5 w-5" />
-                  إضافة رقم
+                  زيادة الحد
                 </>
               )}
             </Button>
