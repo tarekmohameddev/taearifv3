@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Edit,
   Users,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 // Types
 interface Permission {
@@ -72,6 +72,7 @@ interface Employee {
 export default function EditEmployeePage() {
   const router = useRouter();
   const params = useParams();
+  const { userData } = useAuthStore();
   const employeeId = params?.id ? parseInt(params.id as string) : null;
 
   const [editFormData, setEditFormData] = useState<UpdateEmployeeRequest>({
@@ -140,6 +141,11 @@ export default function EditEmployeePage() {
 
   // Fetch permissions
   useEffect(() => {
+    // التحقق من وجود token قبل إرسال الطلب
+    if (!userData?.token) {
+      return;
+    }
+
     const fetchPermissions = async () => {
       setPermissionsLoading(true);
       try {
@@ -154,7 +160,7 @@ export default function EditEmployeePage() {
     };
 
     fetchPermissions();
-  }, []);
+  }, [userData?.token]);
 
   // Handle permission change
   const handlePermissionChange = (permissionName: string, checked: boolean) => {
@@ -275,8 +281,9 @@ export default function EditEmployeePage() {
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <ScrollArea className="max-h-[calc(100vh-300px)] ">
+            <div className="bg-white rounded-lg shadow-sm flex flex-col h-[calc(100vh-200px)] sm:h-auto">
+              {/* Scrollable Content - Mobile Only */}
+              <div className="overflow-y-auto flex-1 sm:overflow-visible">
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 md:space-y-8">
                   {/* Success Message */}
                   {editSuccess && (
@@ -449,7 +456,6 @@ export default function EditEmployeePage() {
                         >
                           الصلاحيات
                         </Label>
-                      <div className="pb-[20rem]">
                       <PermissionsDropdown
                           permissions={permissions}
                           selectedPermissions={selectedPermissions}
@@ -458,15 +464,14 @@ export default function EditEmployeePage() {
                           isLoading={permissionsLoading}
                         />
                       </div>
-                      </div>
                     </div>
                   </div>
                 </div>
-              </ScrollArea>
+              </div>
 
-              {/* Footer Actions */}
-                <div className="w-full pt-3 sm:pt-[10rem] "/>
-              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3  pt-3 px-4 sm:px-6 pb-3 sm:pb-4 ">
+              {/* Footer Actions - Fixed at bottom on mobile */}
+              <div className="flex-shrink-0 bg-white sm:pt-[300px] border-t border-gray-200 sm:border-none">
+                <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-3 px-4 sm:px-6 pb-3 sm:pb-4">
                 <Button
                   variant="outline"
                   onClick={() => router.back()}
@@ -497,6 +502,7 @@ export default function EditEmployeePage() {
                     </>
                   )}
                 </Button>
+                </div>
               </div>
             </div>
           </div>

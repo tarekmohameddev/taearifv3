@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   UserPlus,
   Users,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 // Types
 interface Permission {
@@ -59,6 +59,7 @@ interface CreateEmployeeRequest {
 
 export default function CreateEmployeePage() {
   const router = useRouter();
+  const { userData } = useAuthStore();
   const [formData, setFormData] = useState<CreateEmployeeRequest>({
     first_name: "",
     last_name: "",
@@ -82,11 +83,16 @@ export default function CreateEmployeePage() {
 
   // Fetch permissions
   useEffect(() => {
+    // التحقق من وجود token قبل إرسال الطلب
+    if (!userData?.token) {
+      return;
+    }
+
     const fetchPermissions = async () => {
       setPermissionsLoading(true);
       try {
         const response =
-          await axiosInstance.get<PermissionsResponse>("/v1/permissions");
+          await axiosInstance.get("/v1/permissions");
         setPermissions(response.data);
       } catch (err: any) {
         console.error("Error fetching permissions:", err);
@@ -96,7 +102,7 @@ export default function CreateEmployeePage() {
     };
 
     fetchPermissions();
-  }, []);
+  }, [userData?.token]);
 
   // Handle permission change
   const handlePermissionChange = (permissionName: string, checked: boolean) => {
@@ -204,8 +210,9 @@ export default function CreateEmployeePage() {
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <ScrollArea className="max-h-[calc(100vh-300px)]">
+            <div className="bg-white rounded-lg shadow-sm flex flex-col h-[calc(100vh-200px)] sm:h-auto">
+              {/* Scrollable Content - Mobile Only */}
+              <div className="overflow-y-auto flex-1 sm:overflow-visible">
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 md:space-y-8">
                   {/* Success Message */}
                   {createSuccess && (
@@ -371,14 +378,15 @@ export default function CreateEmployeePage() {
                         </div>
                       </div>
 
-                      <div className="space-y-2 sm:col-span-2">
+                      <div className="space-y-2 sm:col-span-2 ">
                         <Label
                           htmlFor="permissions"
                           className="text-sm font-medium text-gray-700"
                         >
                           الصلاحيات
                         </Label>
-                      <div className="pb-[20rem]">
+
+                      <div className="">
                       <PermissionsDropdown
                           permissions={permissions}
                           selectedPermissions={selectedPermissions}
@@ -391,11 +399,11 @@ export default function CreateEmployeePage() {
                     </div>
                   </div>
                 </div>
-              </ScrollArea>
+              </div>
 
-              {/* Footer Actions */}
-                <div className="w-full pt-3 sm:pt-[10rem] "/>
-              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3  pt-3 px-4 sm:px-6 pb-3 sm:pb-4 ">
+              {/* Footer Actions - Fixed at bottom on mobile */}
+              <div className="flex-shrink-0 bg-white sm:pt-[300px] border-t border-gray-200 sm:border-none">
+                <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-3 px-4 sm:px-6 pb-3 sm:pb-4">
                 <Button
                   variant="outline"
                   onClick={() => router.back()}
@@ -427,6 +435,7 @@ export default function CreateEmployeePage() {
                     </>
                   )}
                 </Button>
+                </div>
               </div>
             </div>
           </div>

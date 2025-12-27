@@ -172,6 +172,7 @@ export function PermissionsDropdown({
     menu: (provided) => ({
       ...provided,
       zIndex: 9999,
+      maxHeight: "300px", // تحديد الحد الأقصى لارتفاع القائمة
     }),
     menuPortal: (provided) => ({
       ...provided,
@@ -377,6 +378,7 @@ export function PermissionsDropdown({
         menuPortalTarget={menuPortalTarget}
         menuPosition="fixed"
         menuShouldScrollIntoView={false}
+        maxMenuHeight={300}
         components={{
           Option: CustomOption,
         }}
