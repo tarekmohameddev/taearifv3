@@ -44,9 +44,17 @@ export const useStoreSyncEffect = ({
       .join(",");
   };
 
+  // ⭐ CRITICAL: Use ref to track if we're currently updating to prevent loops
+  const isUpdatingRef = useRef(false);
+  
   useEffect(() => {
     // Only sync if already initialized to avoid conflicts with initial load
     if (!initialized) return;
+    
+    // ⭐ CRITICAL: Prevent recursive updates
+    if (isUpdatingRef.current) {
+      return;
+    }
 
     // ⭐ NEW: For static pages, always check staticPagesData first
     // ⭐ CRITICAL: Also check if theme was recently changed to force update
@@ -69,8 +77,13 @@ export const useStoreSyncEffect = ({
         const shouldUpdate = hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
         
         if (shouldUpdate) {
+          isUpdatingRef.current = true;
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
+          // Reset flag after a short delay to allow state update to complete
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 0);
           return; // Skip normal sync logic for static pages
         } else {
           // Already synced, skip to avoid infinite loop
@@ -99,16 +112,28 @@ export const useStoreSyncEffect = ({
           const staticComponents = formatStaticPageComponents(staticPageComponents, slug);
           
           const staticSignature = createSignature(staticComponents);
-          setPageComponents(staticComponents);
-          lastSyncedRef.current = staticSignature;
+          if (lastSyncedRef.current !== staticSignature) {
+            isUpdatingRef.current = true;
+            setPageComponents(staticComponents);
+            lastSyncedRef.current = staticSignature;
+            setTimeout(() => {
+              isUpdatingRef.current = false;
+            }, 0);
+          }
           return;
         }
       }
       
       if (freshStorePageComponents !== undefined) {
         const storeSignature = createSignature(freshStorePageComponents);
-        setPageComponents(freshStorePageComponents || []);
-        lastSyncedRef.current = storeSignature;
+        if (lastSyncedRef.current !== storeSignature) {
+          isUpdatingRef.current = true;
+          setPageComponents(freshStorePageComponents || []);
+          lastSyncedRef.current = storeSignature;
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 0);
+        }
         return;
       } else {
         // If storePageComponents is undefined, set to empty array to clear iframe
@@ -122,8 +147,14 @@ export const useStoreSyncEffect = ({
             return;
           }
         }
-        setPageComponents([]);
-        lastSyncedRef.current = "empty";
+        if (lastSyncedRef.current !== "empty") {
+          isUpdatingRef.current = true;
+          setPageComponents([]);
+          lastSyncedRef.current = "empty";
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 0);
+        }
         return;
       }
     }
@@ -145,8 +176,12 @@ export const useStoreSyncEffect = ({
           (storePageComponents.length === 0 && pageComponents.length > 0));
 
       if (shouldUpdate) {
+        isUpdatingRef.current = true;
         lastSyncedRef.current = storeSignature;
         setPageComponents(storePageComponents || []);
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 0);
       }
     } else {
       // ⭐ NEW: For static pages, check staticPagesData before clearing
@@ -163,8 +198,12 @@ export const useStoreSyncEffect = ({
           
           const staticSignature = createSignature(staticComponents);
           if (lastSyncedRef.current !== staticSignature) {
+            isUpdatingRef.current = true;
             setPageComponents(staticComponents);
             lastSyncedRef.current = staticSignature;
+            setTimeout(() => {
+              isUpdatingRef.current = false;
+            }, 0);
             return;
           }
         }
@@ -173,9 +212,13 @@ export const useStoreSyncEffect = ({
       // ⭐ NEW: If storePageComponents is undefined but we have pageComponents, clear them
       // This handles the case where clearAllStates() was called but pageComponents wasn't updated
       // BUT: Skip this for static pages if they have components in staticPagesData
-      if (pageComponents.length > 0) {
+      if (pageComponents.length > 0 && lastSyncedRef.current !== "empty") {
+        isUpdatingRef.current = true;
         setPageComponents([]);
         lastSyncedRef.current = "empty";
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 0);
       }
     }
   }, [initialized, slug, storePageComponents, setPageComponents, currentTheme, themeChangeTimestamp, staticPagesData, tenantData, pageComponents, lastSyncedRef]);

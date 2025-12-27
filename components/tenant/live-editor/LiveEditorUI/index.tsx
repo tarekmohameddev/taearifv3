@@ -96,6 +96,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     useState<PositionValidation | null>(null);
   const [showDebugControls, setShowDebugControls] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // ⭐ CRITICAL: Use ref to track previous pageComponents to prevent infinite loops
+  const prevPageComponentsRef = useRef<string>("");
 
   // Component handlers
   const {
@@ -187,6 +190,18 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
   // Update position validation when components change
   useEffect(() => {
+    // ⭐ CRITICAL: Check if pageComponents actually changed using JSON.stringify
+    // This prevents infinite loops from reference changes
+    const currentPageComponentsStr = JSON.stringify(pageComponents);
+    
+    // If pageComponents didn't actually change, skip update
+    if (prevPageComponentsRef.current === currentPageComponentsStr) {
+      return; // No actual changes, skip update
+    }
+    
+    // Update ref
+    prevPageComponentsRef.current = currentPageComponentsStr;
+    
     if (pageComponents.length > 0) {
       const componentsWithCorrectPositions = pageComponents.map(
         (comp: any, index: number) => {
@@ -224,7 +239,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       const validation = validateComponentPositions(pageComponents);
       setPositionValidation(validation);
     }
-  }, [pageComponents, state]);
+    // ⭐ CRITICAL: Only depend on pageComponents
+    // state object changes on every render, causing infinite loops
+    // Use stable dependency array with fixed size
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageComponents]);
 
   const { selectedComponent, pageTitle } = computed;
 

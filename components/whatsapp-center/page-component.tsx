@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ExternalLink,
   RefreshCw,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,19 +63,33 @@ interface WhatsAppNumber {
   };
 }
 
+interface WhatsAppPlan {
+  id: number;
+  name: string;
+  price: number;
+  duration: number;
+  duration_unit: string;
+  is_active: boolean;
+}
+
 interface WhatsAppResponse {
   success: boolean;
   data: {
-    status: string;
+    plans: WhatsAppPlan[];
     numbers: WhatsAppNumber[];
-    total: number;
-    active_count: number;
-    pending_count: number;
+    quota: number;
+    usage: number;
   };
-  message: string;
 }
 
 interface RedirectResponse {
+  success: boolean;
+  redirect_url: string;
+  mode: string;
+  config_id: string;
+}
+
+interface AddonPurchaseResponse {
   success: boolean;
   redirect_url: string;
   mode: string;
@@ -85,9 +100,14 @@ export function WhatsAppCenterPage() {
   const [connectedNumbers, setConnectedNumbers] = useState<WhatsAppNumber[]>(
     [],
   );
+  const [plans, setPlans] = useState<WhatsAppPlan[]>([]);
   const [totalMessages, setTotalMessages] = useState(0);
+  const [quota, setQuota] = useState(0);
+  const [usage, setUsage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [numberToDelete, setNumberToDelete] = useState<string | null>(null);
@@ -95,19 +115,27 @@ export function WhatsAppCenterPage() {
   const { userData } = useAuthStore();
   // Fetch WhatsApp data on component mount
   useEffect(() => {
+    // Wait for userData to be available before making the request
+    if (!userData?.token) {
+      return;
+    }
+
     const fetchWhatsAppData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await axiosInstance.get("/whatsapp", {
-          headers: {
-            Authorization: `Bearer ${userData?.token}`,
-          },
-        });
+        // axiosInstance interceptor will automatically add the Authorization header
+        const response = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
 
         if (response.data.success && response.data.data) {
-          setConnectedNumbers(response.data.data.numbers || []);
-          setTotalMessages(response.data.data.total || 0);
+          const numbers = response.data.data.numbers || [];
+          const plansData = response.data.data.plans || [];
+          
+          setConnectedNumbers(numbers);
+          setPlans(plansData);
+          
+          setQuota(response.data.data.quota || 0);
+          setUsage(response.data.data.usage || 0);
         } else {
           setError("فشل في تحميل البيانات");
         }
@@ -120,7 +148,17 @@ export function WhatsAppCenterPage() {
     };
 
     fetchWhatsAppData();
-  }, []);
+  }, [userData?.token]);
+
+  // Set default selected plan when plans are loaded
+  useEffect(() => {
+    if (plans.length > 0 && !selectedPlan) {
+      const activePlan = plans.find(plan => plan.is_active) || plans[0];
+      if (activePlan) {
+        setSelectedPlan(activePlan.id);
+      }
+    }
+  }, [plans, selectedPlan]);
 
   const handleFacebookLogin = async () => {
     try {
@@ -156,6 +194,56 @@ export function WhatsAppCenterPage() {
   const confirmDelete = (id: number) => {
     setNumberToDelete(String(id));
     setDeleteDialogOpen(true);
+  };
+
+  const handlePurchaseAddon = async () => {
+    try {
+      setIsPurchasing(true);
+      setError(null);
+
+      if (!selectedPlan) {
+        setError("يرجى اختيار خطة أولاً");
+        setIsPurchasing(false);
+        return;
+      }
+
+      // Get first active WhatsApp number
+      const firstActiveNumber = connectedNumbers.find(
+        (num) => num.status === "active",
+      );
+
+      if (!firstActiveNumber) {
+        setError("لا يوجد رقم واتساب نشط. يرجى إضافة رقم أولاً");
+        setIsPurchasing(false);
+        return;
+      }
+
+      // Call the addon purchase API
+      const response = await axiosInstance.post<AddonPurchaseResponse>(
+        "/whatsapp/addons",
+        {
+          whatsapp_number_id: firstActiveNumber.id,
+          qty: 1,
+          plan_id: selectedPlan,
+          payment_method: "test",
+        },
+      );
+
+      if (response.data.success && response.data.redirect_url) {
+        // Redirect to payment gateway
+        window.location.href = response.data.redirect_url;
+      } else {
+        setError("فشل في إنشاء طلب الشراء");
+      }
+    } catch (err: any) {
+      console.error("Error purchasing addon:", err);
+      setError(
+        err.response?.data?.message ||
+          "حدث خطأ أثناء محاولة الشراء. يرجى المحاولة مرة أخرى",
+      );
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (
@@ -254,6 +342,101 @@ export function WhatsAppCenterPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Purchase Addon Card */}
+            <Card className="border-2 border-green-200 bg-green-50/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-green-600" />
+                  شراء رقم واتساب إضافي
+                </CardTitle>
+                <CardDescription>
+                  قم بشراء رقم واتساب إضافي لتوسيع قنوات التواصل الخاصة بك
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Usage Display */}
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      الحد الحالي
+                    </p>
+                    <div className="text-3xl font-bold text-green-600">
+                      {isLoading ? "..." : `${usage} / ${quota}`}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      أرقام مستخدمة من أصل المتاحة
+                    </p>
+                  </div>
+                </div>
+
+                {/* Plan Selection */}
+                {plans.length > 0 && (
+                  <div className="bg-white rounded-lg p-4 border">
+                    <p className="text-sm font-medium mb-3">اختر خطة الاشتراك</p>
+                    <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
+                      {plans
+                        .filter(plan => plan.is_active)
+                        .map((plan) => (
+                          <Button
+                            key={plan.id}
+                            variant={selectedPlan === plan.id ? "default" : "outline"}
+                            onClick={() => setSelectedPlan(plan.id)}
+                            className="flex flex-col items-start h-auto py-3 px-4"
+                            disabled={isPurchasing}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-medium">{plan.name}</span>
+                              <span className="text-sm font-bold">
+                                ${plan.price}
+                              </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground mt-1">
+                              {plan.duration} {plan.duration_unit === "year" ? "سنة" : "شهر"}
+                            </span>
+                          </Button>
+                        ))}
+                    </div>
+                    {selectedPlan && (
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        {plans.find(p => p.id === selectedPlan)?.name || "خطة محددة"}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Purchase Button */}
+                <Button
+                  onClick={handlePurchaseAddon}
+                  disabled={isPurchasing || isLoading || connectedNumbers.length === 0 || !selectedPlan}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  size="lg"
+                >
+                  {isPurchasing ? (
+                    <>
+                      <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+                      جاري المعالجة...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      شراء رقم إضافي
+                    </>
+                  )}
+                </Button>
+
+                {connectedNumbers.length === 0 && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    يرجى إضافة رقم واتساب أولاً قبل الشراء
+                  </p>
+                )}
+                {!selectedPlan && plans.length > 0 && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    يرجى اختيار خطة أولاً
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Add New Number Card */}
             <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
