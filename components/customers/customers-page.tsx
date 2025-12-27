@@ -56,6 +56,12 @@ interface Customer {
   updated_at: string;
   interested_categories: any[];
   interested_properties: any[];
+  responsible_employee: {
+    id: number;
+    name: string;
+    email: string;
+    whatsapp_number: string;
+  } | null;
 }
 // Customer data (same as CRM page for consistency)
 const customers: Customer[] = [
