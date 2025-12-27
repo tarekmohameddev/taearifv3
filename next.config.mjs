@@ -14,34 +14,25 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    // تعطيل الميزات التجريبية صراحة لمنع تعليق البناء
-    optimizeCss: false, // معطل - يسبب تعليق البناء
-    scrollRestoration: false, // معطل - يسبب تعليق البناء
+    // في Next.js 16، Turbopack هو الافتراضي
+    // تحسينات للأداء
+    optimizeCss: true,
+    scrollRestoration: true,
   },
   // تحسينات للأداء
   compiler: {
-    // تعطيل removeConsole مؤقتاً لتجنب مشاكل البناء
-    // removeConsole: process.env.NODE_ENV === "production" ? {
-    //   exclude: ["error", "warn"], // احتفظ بالأخطاء والتحذيرات
-    // } : false,
+    removeConsole: process.env.NODE_ENV === "production",
   },
   // تحسين cache
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // إزالة standalone output - يسبب تعليق البناء على Windows
-  // output: process.env.VERCEL ? undefined : process.platform === "win32" ? undefined : "standalone",
-  // إعدادات Turbopack (Next.js 16)
-  // إضافة turbopack فارغة لإيقاف تحذير webpack config
-  turbopack: {},
-};
-
-// إضافة webpack config فقط عند استخدام --webpack flag
-// استخدم: npm run build:webpack
-if (process.env.NEXT_BUILD_WEBPACK === "true") {
-  nextConfig.webpack = (config, { isServer }) => {
-    // استبعاد مجلدات كبيرة من المراقبة والبناء
+  // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
+  output: process.platform === "win32" ? undefined : "standalone",
+  // استبعاد مجلدات trash و docs من البناء
+  webpack: (config, { isServer }) => {
+    // استبعاد مجلدات trash و docs من المراقبة أثناء التطوير
     config.watchOptions = {
       ...config.watchOptions,
       ignored: [
@@ -50,12 +41,9 @@ if (process.env.NEXT_BUILD_WEBPACK === "true") {
           : config.watchOptions?.ignored
             ? [config.watchOptions.ignored]
             : []),
-        "**/node_modules/**",
-        "**/.next/**",
         "**/trash/**",
         "**/docs/**",
-        "**/out/**",
-        "**/build/**",
+        "**/README.md",
       ],
     };
 
@@ -63,6 +51,7 @@ if (process.env.NEXT_BUILD_WEBPACK === "true") {
     if (config.module?.rules) {
       config.module.rules.forEach((rule) => {
         if (rule && typeof rule === "object" && !Array.isArray(rule)) {
+          // إضافة exclude للقواعد الموجودة
           if (rule.test && !rule.exclude) {
             rule.exclude = [];
           }
@@ -73,17 +62,28 @@ if (process.env.NEXT_BUILD_WEBPACK === "true") {
             if (!rule.exclude.some((ex) => ex?.toString().includes("docs"))) {
               rule.exclude.push(/docs/);
             }
-            if (!rule.exclude.some((ex) => ex?.toString().includes("node_modules"))) {
-              rule.exclude.push(/node_modules/);
+            // استبعاد ملفات README.md
+            if (!rule.exclude.some((ex) => ex?.toString().includes("README"))) {
+              rule.exclude.push(/README\.md$/);
             }
           }
         }
       });
     }
 
+    // إضافة قاعدة جديدة لاستبعاد ملفات README.md من المعالجة
+    // إرجاع module فارغ عند محاولة استيراد README.md
+    config.module.rules.push({
+      test: /README\.md$/,
+      type: "asset/source",
+    });
+
     return config;
-  };
-}
+  },
+  // إعدادات Turbopack (Next.js 16)
+  // إضافة turbopack فارغة لإيقاف تحذير webpack config
+  turbopack: {},
+};
 
 mergeConfig(nextConfig, userConfig);
 
