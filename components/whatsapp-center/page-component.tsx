@@ -253,24 +253,22 @@ export function WhatsAppCenterPage() {
       setTogglingNumberId(id);
       setError(null);
       
-      // Use the redirect endpoint with existing mode to reactivate
-      const response = await axiosInstance.get("/whatsapp/meta/redirect", {
-        params: {
-          mode: "existing",
-        },
-      });
-
-      if (response.data.success && response.data.redirect_url) {
-        // Open redirect URL in new tab for reactivation
-        window.open(response.data.redirect_url, "_blank");
+      const response = await axiosInstance.post(`/whatsapp/${id}/link`);
+      
+      if (response.data.success) {
+        // Refresh the numbers list
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        if (fetchResponse.data.success && fetchResponse.data.data) {
+          setConnectedNumbers(fetchResponse.data.data.numbers || []);
+        }
         setShowSuccessAlert(true);
         setTimeout(() => setShowSuccessAlert(false), 5000);
       } else {
-        setError("فشل في الحصول على رابط التفعيل");
+        setError("فشل في ربط الرقم");
       }
     } catch (err: any) {
-      console.error("Error activating number:", err);
-      setError(err.response?.data?.message || "حدث خطأ أثناء تفعيل الرقم");
+      console.error("Error linking number:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم");
     } finally {
       setTogglingNumberId(null);
     }
