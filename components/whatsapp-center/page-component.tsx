@@ -564,7 +564,9 @@ export function WhatsAppCenterPage() {
                                 ? "نشط"
                                 : number.status === "inactive"
                                   ? "غير نشط"
-                                  : number.status}
+                                  : number.status === "not_linked"
+                                    ? "غير مرتبط"
+                                    : number.status}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -639,7 +641,7 @@ export function WhatsAppCenterPage() {
                                       className="cursor-pointer"
                                     >
                                       <Power className="h-4 w-4 ml-2" />
-                                      تفعيل
+                                      {number.status === "not_linked" ? "ربط" : "تفعيل"}
                                     </DropdownMenuItem>
                                   )}
                                 </DropdownMenuContent>
