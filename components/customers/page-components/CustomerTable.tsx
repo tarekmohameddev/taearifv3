@@ -328,8 +328,8 @@ export const CustomerTable = ({
                       ))}
                   </Button>
                 </TableHead>
-                <TableHead className="text-right">الموظف المسؤول</TableHead>
                 <TableHead className="text-right">معلومات الاتصال</TableHead>
+                <TableHead className="text-right">الموظف المسؤول</TableHead>
                 <TableHead className="text-right">نوع العقار</TableHead>
                 <TableHead className="text-right">نوع الطلب</TableHead>
                 <TableHead className="text-right">الرسالة</TableHead>
@@ -362,22 +362,6 @@ export const CustomerTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
-                    {customer.responsible_employee ? (
-                      <div className="space-y-1 text-right">
-                        <div className="font-medium text-sm">
-                          {customer.responsible_employee.name}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {customer.responsible_employee.whatsapp_number}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-muted-foreground text-right italic">
-                        لا يوجد موظف مسؤول
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
                     <div className="space-y-1">
                       {/* Email */}
                       {customer.email && (
@@ -402,6 +386,22 @@ export const CustomerTable = ({
                         </div>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {customer.responsible_employee ? (
+                      <div className="space-y-1 text-right">
+                        <div className="font-medium text-sm">
+                          {customer.responsible_employee.name}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {customer.responsible_employee.whatsapp_number}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground text-right italic">
+                        لا يوجد موظف مسؤول
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge
