@@ -1379,7 +1379,7 @@ function PropertyCard({
   setReorderPopup,
 }: PropertyCardProps & { setReorderPopup: any }) {
   const router = useRouter();
-
+  const { userData } = useAuthStore();
   return (
     <Card className="overflow-hidden" dir="rtl">
       <div className="relative">
@@ -1560,7 +1560,11 @@ function PropertyCard({
           {property.status === "منشور" && property.creator && (
             <div className="flex flex-col items-end justify-center">
               <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white mt-1">
-                {property.creator.name}
+                {property.creator.name === "User"
+                    ? userData?.first_name && userData?.last_name
+                      ? `${userData.first_name} ${userData.last_name}`
+                      : userData?.username || userData?.first_name || "User"
+                    : property.creator.name}
               </div>
             </div>
           )}

@@ -619,7 +619,11 @@ function ProjectCard({ project }: { project: IProject }) {
             project.published === true) &&
             project.creator && (
               <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
-                {project.creator.name}
+                {project.creator.name === "User"
+                  ? userData?.first_name && userData?.last_name
+                    ? `${userData.first_name} ${userData.last_name}`
+                    : userData?.username || userData?.first_name || "User"
+                  : project.creator.name}
               </div>
             )}
         </div>
@@ -688,6 +692,7 @@ function ProjectCard({ project }: { project: IProject }) {
 
 function ProjectListItem({ project }: { project: IProject }) {
   const router = useRouter();
+  const { userData } = useAuthStore();
 
   return (
     <Card>
@@ -741,7 +746,11 @@ function ProjectListItem({ project }: { project: IProject }) {
               <div className="text-lg font-semibold">{project.price_range}</div>
               {project.published === true && project.creator && (
                 <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
-                  {project.creator.name}
+                  {project.creator.name === "User"
+                    ? userData?.first_name && userData?.last_name
+                      ? `${userData.first_name} ${userData.last_name}`
+                      : userData?.username || userData?.first_name || "User"
+                    : project.creator.name}
                 </div>
               )}
             </div>
