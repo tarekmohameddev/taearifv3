@@ -19,7 +19,7 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // تحسينات للأداء
+  // تحسينات للأداء 
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
@@ -29,22 +29,17 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
-  // Vercel لا يحتاج إلى standalone output - هذا قد يسبب تعليق البناء
-  output: process.env.VERCEL ? undefined : process.platform === "win32" ? undefined : "standalone",
-};
-
-// إضافة webpack config فقط عند الحاجة (للتطوير المحلي مع webpack)
-// ملاحظة: في Next.js 16 مع Turbopack (الافتراضي على Vercel)، webpack config لا يُستخدم
-if (process.env.NEXT_BUILD_WEBPACK === "true") {
-  nextConfig.webpack = (config, { isServer }) => {
+  output: process.platform === "win32" ? undefined : "standalone",
+  // استبعاد مجلدات trash و docs من البناء
+  webpack: (config, { isServer }) => {
     // استبعاد مجلدات trash و docs من المراقبة أثناء التطوير
     config.watchOptions = {
       ...config.watchOptions,
       ignored: [
-        ...(Array.isArray(config.watchOptions?.ignored)
-          ? config.watchOptions.ignored
-          : config.watchOptions?.ignored
-            ? [config.watchOptions.ignored]
+        ...(Array.isArray(config.watchOptions?.ignored) 
+          ? config.watchOptions.ignored 
+          : config.watchOptions?.ignored 
+            ? [config.watchOptions.ignored] 
             : []),
         "**/trash/**",
         "**/docs/**",
@@ -72,8 +67,11 @@ if (process.env.NEXT_BUILD_WEBPACK === "true") {
     }
 
     return config;
-  };
-}
+  },
+  // إعدادات Turbopack (Next.js 16)
+  // إضافة turbopack فارغة لإيقاف تحذير webpack config
+  turbopack: {},
+};
 
 mergeConfig(nextConfig, userConfig);
 
