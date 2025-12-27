@@ -79,6 +79,11 @@ export interface IProject {
   }>;
   specifications: any[];
   types: any[];
+  creator?: {
+    id: number;
+    name: string;
+    type: string;
+  } | null;
 }
 
 export interface IPagination {
@@ -608,7 +613,16 @@ function ProjectCard({ project }: { project: IProject }) {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold">{project.price_range || ""}</div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-lg font-semibold">{project.price_range || ""}</div>
+          {((typeof project.published === "number" && project.published == 1) ||
+            project.published === true) &&
+            project.creator && (
+              <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
+                {project.creator.name}
+              </div>
+            )}
+        </div>
         <p className="text-sm text-muted-foreground line-clamp-2">
           {project.contents?.[0]?.description || ""}
         </p>
@@ -723,7 +737,14 @@ function ProjectListItem({ project }: { project: IProject }) {
                 {project.contents?.[0]?.address}
               </p>
             </div>
-            <div className="text-lg font-semibold">{project.price_range}</div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-lg font-semibold">{project.price_range}</div>
+              {project.published === true && project.creator && (
+                <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
+                  {project.creator.name}
+                </div>
+              )}
+            </div>
           </div>
           <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
             {project.contents?.[0]?.description}
