@@ -42,7 +42,7 @@ function getTenantIdFromCustomDomain(host: string): string | null {
 
   // إذا كان الدومين الأساسي، لا نعتبره custom domain
   if (isOnBaseDomain) {
-    console.log("🔍 Middleware: Host is base domain, not custom domain:", host);
+    console.log("🔍 Proxy: Host is base domain, not custom domain:", host);
     return null;
   }
 
@@ -50,12 +50,12 @@ function getTenantIdFromCustomDomain(host: string): string | null {
   const isCustomDomain = /\.([a-z]{2,})$/i.test(host);
 
   if (!isCustomDomain) {
-    console.log("🔍 Middleware: Host is not a custom domain:", host);
+    console.log("🔍 Proxy: Host is not a custom domain:", host);
     return null;
   }
 
   // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain (بدون API call)
-  console.log("✅ Middleware: Custom domain detected:", host);
+  console.log("✅ Proxy: Custom domain detected:", host);
   return host;
 }
 
@@ -87,11 +87,11 @@ function getTenantIdFromHost(host: string): string | null {
     "register",
   ];
 
-  console.log("🔍 Middleware: Checking host:", host);
-  console.log("🔍 Middleware: Local domain:", localDomain);
-  console.log("🔍 Middleware: Production domain:", productionDomain);
-  console.log("🔍 Middleware: Is development:", isDevelopment);
-  console.log("🔍 Middleware: NODE_ENV:", process.env.NODE_ENV);
+  console.log("🔍 Proxy: Checking host:", host);
+  console.log("🔍 Proxy: Local domain:", localDomain);
+  console.log("🔍 Proxy: Production domain:", productionDomain);
+  console.log("🔍 Proxy: Is development:", isDevelopment);
+  console.log("🔍 Proxy: NODE_ENV:", process.env.NODE_ENV);
 
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (isDevelopment && host.includes(localDomain)) {
@@ -99,19 +99,19 @@ function getTenantIdFromHost(host: string): string | null {
     if (parts.length > 1 && parts[0] !== localDomain) {
       const potentialTenantId = parts[0];
       console.log(
-        "🔍 Middleware: Potential tenant ID (local):",
+        "🔍 Proxy: Potential tenant ID (local):",
         potentialTenantId,
       );
 
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
         console.log(
-          "✅ Middleware: Valid tenant ID (local):",
+          "✅ Proxy: Valid tenant ID (local):",
           potentialTenantId,
         );
         return potentialTenantId;
       } else {
-        console.log("❌ Middleware: Reserved word (local):", potentialTenantId);
+        console.log("❌ Proxy: Reserved word (local):", potentialTenantId);
       }
     }
   }
@@ -127,42 +127,42 @@ function getTenantIdFromHost(host: string): string | null {
       // التحقق من أن الـ domain هو productionDomain بالضبط
       if (domainPart === productionDomain) {
         console.log(
-          "🔍 Middleware: Potential tenant ID (production):",
+          "🔍 Proxy: Potential tenant ID (production):",
           potentialTenantId,
         );
 
         // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
         if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
           console.log(
-            "✅ Middleware: Valid tenant ID (production):",
+            "✅ Proxy: Valid tenant ID (production):",
             potentialTenantId,
           );
           return potentialTenantId;
         } else {
           console.log(
-            "❌ Middleware: Reserved word (production):",
+            "❌ Proxy: Reserved word (production):",
             potentialTenantId,
           );
         }
       } else {
         console.log(
-          "❌ Middleware: Invalid subdomain - not for production domain:",
+          "❌ Proxy: Invalid subdomain - not for production domain:",
           domainPart,
         );
       }
     }
   }
 
-  console.log("❌ Middleware: No valid tenant ID found");
+  console.log("❌ Proxy: No valid tenant ID found");
   return null;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get("host") || "";
 
   // DEBUG: Log all requests
-  console.log("🔍 Middleware Debug - Request:", {
+  console.log("🔍 Proxy Debug - Request:", {
     pathname,
     host,
     url: request.url,
@@ -202,7 +202,7 @@ export function middleware(request: NextRequest) {
   // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant
   if (isCustomDomain) {
     console.log(
-      "🔍 Middleware: Custom domain detected, treating all pages (including system pages) as tenant-specific:",
+      "🔍 Proxy: Custom domain detected, treating all pages (including system pages) as tenant-specific:",
       host,
     );
     // لا نحتاج لإعادة توجيه، فقط نمرر للخطوة التالية
@@ -216,7 +216,7 @@ export function middleware(request: NextRequest) {
     tenantId = getTenantIdFromCustomDomain(host);
   }
 
-  // Skip middleware for API routes, static files, and Next.js internals
+  // Skip proxy for API routes, static files, and Next.js internals
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
@@ -310,7 +310,7 @@ export function middleware(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  console.log("🔍 Middleware Debug - Locale Check:", {
+  console.log("🔍 Proxy Debug - Locale Check:", {
     pathname,
     pathnameHasLocale,
     tenantId,
@@ -325,7 +325,7 @@ export function middleware(request: NextRequest) {
     // Redirect for all pages that don't have locale (including homepage, solutions, etc.)
     const shouldRedirect = true;
 
-    console.log("🔍 Middleware Debug - Redirect Decision:", {
+    console.log("🔍 Proxy Debug - Redirect Decision:", {
       pathname,
       locale,
       tenantId,
@@ -340,7 +340,7 @@ export function middleware(request: NextRequest) {
         `/${locale}${pathname}${searchParams}`,
         request.url,
       );
-      console.log("🔄 Middleware Debug - Redirecting:", {
+      console.log("🔄 Proxy Debug - Redirecting:", {
         from: request.url,
         to: newUrl.toString(),
         preservedParams: searchParams,
@@ -354,7 +354,7 @@ export function middleware(request: NextRequest) {
   const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
 
   // 🔍 Debug logging for rewrite process
-  console.log("🔍 Middleware - Rewrite Debug:", {
+  console.log("🔍 Proxy - Rewrite Debug:", {
     originalPathname: pathname,
     locale,
     pathnameWithoutLocale,
@@ -388,7 +388,7 @@ export function middleware(request: NextRequest) {
     const ownerToken = request.cookies.get("owner_token")?.value;
 
     if (!ownerToken) {
-      console.log("🔒 Middleware: No owner token found, redirecting to login");
+      console.log("🔒 Proxy: No owner token found, redirecting to login");
       const loginUrl = new URL(`/${locale}/owner/login`, request.url);
       return NextResponse.redirect(loginUrl);
     }
@@ -398,7 +398,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = pathnameWithoutLocale;
 
-  console.log("🔍 Middleware - Before Rewrite:", {
+  console.log("🔍 Proxy - Before Rewrite:", {
     originalUrl: request.url,
     rewriteUrl: url.toString(),
     pathnameWithoutLocale,
@@ -406,7 +406,7 @@ export function middleware(request: NextRequest) {
 
   response = NextResponse.rewrite(url);
 
-  console.log("🔍 Middleware - After Rewrite:", {
+  console.log("🔍 Proxy - After Rewrite:", {
     responseUrl: response.url,
     headers: {
       "x-locale": response.headers.get("x-locale"),
@@ -422,16 +422,16 @@ export function middleware(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
-    console.log("✅ Middleware: Setting tenant ID header:", tenantId);
+    console.log("✅ Proxy: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
 
     // تحديد نوع الـ domain
     const domainType = isCustomDomain ? "custom" : "subdomain";
     response.headers.set("x-domain-type", domainType);
 
-    console.log("✅ Middleware: Domain type:", domainType);
+    console.log("✅ Proxy: Domain type:", domainType);
   } else {
-    console.log("❌ Middleware: No tenant ID found for host:", host);
+    console.log("❌ Proxy: No tenant ID found for host:", host);
   }
 
   return response;
@@ -440,3 +440,4 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
+
