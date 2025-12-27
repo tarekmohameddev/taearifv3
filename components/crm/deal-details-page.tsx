@@ -51,6 +51,12 @@ interface DealDetailsData {
     stage_id: number | null;
     priority_id: number | null;
     type_id: number | null;
+    responsible_employee: {
+      id: number;
+      name: string;
+      email: string;
+      whatsapp_number: string;
+    } | null;
   };
   cards: Array<{
     id: number;
@@ -595,6 +601,30 @@ export default function DealDetailsPage() {
                       </div>
                     ) : null}
                   </div>
+
+                  {customer.responsible_employee ? (
+                    <div className="pt-4 border-t space-y-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <User className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-semibold text-muted-foreground">
+                          الموظف المسؤول:
+                        </span>
+                      </div>
+                      <div className="space-y-2 pr-6">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">
+                            {customer.responsible_employee.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {customer.responsible_employee.whatsapp_number}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
 
                   {request.stage_id ? (
                     <div className="pt-4 border-t">
