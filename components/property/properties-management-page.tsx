@@ -1408,6 +1408,7 @@ function PropertyCard({
         >
           {property.status}
         </div>
+      
       </div>
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
@@ -1536,7 +1537,7 @@ function PropertyCard({
             </>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-2 text-sm ">
+        <div className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-4" : "grid-cols-3"}`}>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">مشاهدات</span>
             <span className="font-medium flex items-center gap-1">
@@ -1556,6 +1557,13 @@ function PropertyCard({
               <Bath className="h-3 w-3" /> {property.bath || 0}
             </span>
           </div>
+          {property.status === "منشور" && property.creator && (
+            <div className="flex flex-col items-end justify-center">
+              <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white mt-1">
+                {property.creator.name}
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
           {Array.isArray(property.features) && property.features.length > 0 ? (
@@ -1652,6 +1660,11 @@ function PropertyListItem({
           >
             {property.status}
           </div>
+          {property.status === "منشور" && property.creator && (
+            <div className="absolute right-2 top-12 rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
+              {property.creator.name}
+            </div>
+          )}
         </div>
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-row-reverse items-start justify-between">
