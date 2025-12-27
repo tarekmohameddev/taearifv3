@@ -444,6 +444,7 @@ export default function CrmPage() {
                 procedure_id: null,
                 city_id: null,
                 district_id: null,
+                responsible_employee: customer.responsible_employee || null,
 
                 // Backward compatibility fields
                 nameEn: customer.name || "",

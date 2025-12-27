@@ -24,6 +24,7 @@ import {
   MessageSquare,
   GripVertical,
   MapPin,
+  User,
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
 import useStore from "@/context/Store";
@@ -264,6 +265,23 @@ export default function CustomerCard({
           </div>
         </div>
 
+        {customer.responsible_employee && (
+          <div className="space-y-1 text-xs border-t pt-2">
+            <div className="flex items-center gap-1">
+              <User className="h-3 w-3 flex-shrink-0 text-blue-600" />
+              <span className="font-medium truncate">
+                {customer.responsible_employee.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Phone className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                {customer.responsible_employee.whatsapp_number}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between flex-wrap gap-2">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
             <Badge
@@ -398,6 +416,23 @@ export default function CustomerCard({
             <div className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />
               <span className="truncate">{customer.email}</span>
+            </div>
+          </div>
+        )}
+
+        {customer.responsible_employee && (
+          <div className="space-y-1 text-xs border-t pt-2">
+            <div className="flex items-center gap-1">
+              <User className="h-3 w-3 flex-shrink-0 text-blue-600" />
+              <span className="font-medium truncate">
+                {customer.responsible_employee.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Phone className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                {customer.responsible_employee.whatsapp_number}
+              </span>
             </div>
           </div>
         )}
@@ -541,6 +576,21 @@ export default function CustomerCard({
             <div className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />
               <span>{customer.email}</span>
+            </div>
+          </div>
+        )}
+
+        {customer.responsible_employee && (
+          <div className="space-y-1 text-xs border-t pt-2">
+            <div className="flex items-center gap-1">
+              <User className="h-3 w-3 flex-shrink-0 text-blue-600" />
+              <span className="font-medium">
+                {customer.responsible_employee.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Phone className="h-3 w-3 flex-shrink-0" />
+              <span>{customer.responsible_employee.whatsapp_number}</span>
             </div>
           </div>
         )}

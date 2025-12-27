@@ -109,6 +109,7 @@ export default function DataHandler({
               email: "",
               whatsapp: "",
               customerType: null,
+              responsible_employee: customer.responsible_employee || null,
               city: propertyBasic.address
                 ? propertyBasic.address.split(",")[1]?.trim() || ""
                 : "",

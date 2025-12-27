@@ -53,6 +53,12 @@ export interface Customer {
     area?: string | number | null;
     featured_image?: string | null;
   };
+  responsible_employee?: {
+    id: number;
+    name: string;
+    email: string;
+    whatsapp_number: string;
+  } | null;
   property_specifications?: {
     basic_information?: {
       address?: string | null;
