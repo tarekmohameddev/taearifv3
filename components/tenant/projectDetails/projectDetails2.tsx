@@ -8,9 +8,14 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultProjectDetails2Data } from "@/context/editorStoreFunctions/projectDetailsFunctions";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { MapPinIcon } from "lucide-react";
+import {
+  MapPinIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
+import PropertyCard3 from "@/components/tenant/cards/card3";
 
 interface Project {
   id: string;
@@ -41,6 +46,39 @@ interface Project {
   bathrooms?: number;
   area?: string;
   features?: string[];
+  properties?: Array<{
+    id: number;
+    project_id?: number;
+    title: string;
+    slug: string;
+    address?: string;
+    description?: string;
+    price: string;
+    pricePerMeter?: string;
+    purpose?: string;
+    type?: string;
+    beds?: number;
+    bath?: number;
+    area?: string;
+    size?: string;
+    featured_image: string;
+    gallery?: string[];
+    location?: {
+      latitude: string;
+      longitude: string;
+    };
+    status?: boolean;
+    featured?: boolean;
+    property_status?: string;
+    features?: string[];
+    faqs?: any[];
+    category_id?: number;
+    payment_method?: string | null;
+    video_url?: string | null;
+    virtual_tour?: string | null;
+    created_at?: string;
+    updated_at?: string;
+  }>;
 }
 
 interface ProjectDetails2Props {
@@ -345,6 +383,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // UI state
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [mainImage, setMainImage] = useState<string>("");
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -411,6 +450,74 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       { name: "فلل", value: "villas" },
     ],
     features: ["إطلالة رائعة", "تصميم عصري", "مواصلات قريبة"],
+    properties: [
+      {
+        id: 1,
+        project_id: 1,
+        title: "عقار فاخر للبيع",
+        slug: "luxury-property-1",
+        address: "الرياض، حي النرجس",
+        description: "عقار فاخر في موقع ممتاز",
+        price: "1,250,000",
+        pricePerMeter: "8,333",
+        purpose: "sale",
+        type: "residential",
+        beds: 3,
+        bath: 2,
+        area: "150",
+        size: "150",
+        featured_image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+        gallery: [],
+        location: {
+          latitude: "24.7136",
+          longitude: "46.6753",
+        },
+        status: true,
+        featured: true,
+        property_status: "available",
+        features: [],
+        faqs: [],
+        category_id: 1,
+        payment_method: null,
+        video_url: null,
+        virtual_tour: null,
+        created_at: "2024-01-15",
+        updated_at: "2024-12-01",
+      },
+      {
+        id: 2,
+        project_id: 1,
+        title: "شقة للإيجار",
+        slug: "apartment-rent-1",
+        address: "الرياض، حي العليا",
+        description: "شقة حديثة للإيجار",
+        price: "5,000",
+        pricePerMeter: "33",
+        purpose: "rent",
+        type: "residential",
+        beds: 2,
+        bath: 1,
+        area: "120",
+        size: "120",
+        featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+        gallery: [],
+        location: {
+          latitude: "24.7136",
+          longitude: "46.6753",
+        },
+        status: true,
+        featured: false,
+        property_status: "available",
+        features: [],
+        faqs: [],
+        category_id: 1,
+        payment_method: "monthly",
+        video_url: null,
+        virtual_tour: null,
+        created_at: "2024-01-15",
+        updated_at: "2024-12-01",
+      },
+    ],
   };
 
   // جلب بيانات المشروع
@@ -419,6 +526,8 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     if (isLiveEditor) {
       setProject(mockProject);
       setLoadingProject(false);
+      setMainImage(mockProject.image || "");
+      setMainImageIndex(0);
       setSelectedImage(mockProject.image || "");
       return;
     }
@@ -481,35 +590,55 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     }
   }, [hookTenantId, tenantId, props.projectSlug, isLiveEditor]);
 
-  // تحديث الصورة المختارة عند تحميل المشروع
+  // تحديث الصورة الرئيسية عند تحميل المشروع
   useEffect(() => {
     if (project?.image) {
       setMainImage(project.image);
+      setMainImageIndex(0);
       setSelectedImage(project.image);
     }
   }, [project]);
 
-  // صور المشروع
+  // صور المشروع - computed value (includes main images + floor planning images)
   const projectImages =
     project && project.image
-      ? [project.image, ...(project.images || [])].filter(
-          (img) => img && img.trim() !== "",
-        )
-      : [];
+      ? [
+          project.image,
+          // Filter out the main image if it exists in images array to avoid duplicates
+          ...(project.images || []).filter(
+            (img) => img && img.trim() !== "" && img !== project.image,
+          ),
+          // Filter out the main image if it exists in floor planning images to avoid duplicates
+          ...(project.floorplans || []).filter(
+            (img) => img && img.trim() !== "" && img !== project.image,
+          ),
+        ].filter((img) => img && img.trim() !== "")
+      : []; // Filter out empty images
 
   // Get all images (main images + floor planning images)
   const getAllImages = () => {
     const allImages = [];
-    if (project?.images) {
-      allImages.push(...project.images);
-    }
     if (project?.image) {
-      allImages.unshift(project.image);
+      allImages.push(project.image);
+    }
+    if (project?.images) {
+      // Filter out the main image if it exists in images array to avoid duplicates
+      const additionalImages = project.images.filter(
+        (img) => img && img.trim() !== "" && img !== project.image,
+      );
+      allImages.push(...additionalImages);
     }
     if (project?.floorplans) {
-      allImages.push(...project.floorplans);
+      // Filter out the main image if it exists in floor planning images to avoid duplicates
+      const floorImages = project.floorplans.filter(
+        (img) => img && img.trim() !== "" && img !== project.image,
+      );
+      allImages.push(...floorImages);
     }
-    return allImages;
+    // Filter out empty images and remove duplicates
+    const filtered = allImages.filter((img) => img && img.trim() !== "");
+    // Remove duplicates by converting to Set and back to array
+    return Array.from(new Set(filtered));
   };
 
   // Navigation functions for dialog
@@ -544,7 +673,34 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   };
 
   const handleThumbnailClick = (imageSrc: string, index: number) => {
+    // Update main image and index when clicking thumbnail
+    setMainImage(imageSrc);
+    setMainImageIndex(index);
+    // Also open dialog
     handleImageClick(imageSrc, index);
+  };
+
+  // Navigation functions for main image (same logic as dialog)
+  const handleMainImagePrevious = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      setMainImage(allImages[previousIndex]);
+      setMainImageIndex(previousIndex);
+    }
+  };
+
+  const handleMainImageNext = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setMainImage(allImages[nextIndex]);
+      setMainImageIndex(nextIndex);
+    }
   };
 
   // Show loading skeleton
@@ -684,15 +840,52 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
           data-purpose="property-hero"
         >
           {/* Main Featured Image */}
-          <div className="relative h-[600px] w-full">
+          <div className="relative h-[600px] w-full group">
             {mainImage && project ? (
-              <Image
-                src={mainImage}
-                alt={project.title || "صورة المشروع"}
-                fill
-                className="w-full h-full object-cover cursor-pointer rounded-lg"
-                onClick={() => handleImageClick(mainImage, 0)}
-              />
+              <>
+                <Image
+                  src={mainImage}
+                  alt={project.title || "صورة المشروع"}
+                  fill
+                  className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer rounded-lg"
+                  priority
+                  onClick={() => {
+                    handleImageClick(mainImage, mainImageIndex);
+                  }}
+                />
+
+                {/* Navigation arrows - show only if there's more than one image */}
+                {getAllImages().length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImagePrevious();
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة السابقة"
+                    >
+                      <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImageNext();
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة التالية"
+                    >
+                      <ChevronRightIcon className="w-6 h-6" />
+                    </button>
+
+                    {/* Image counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {mainImageIndex + 1} / {getAllImages().length}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="text-gray-500 text-center">
@@ -731,91 +924,73 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* END: Hero Section */}
 
         {/* BEGIN: Gallery Thumbnails */}
-        {mergedData.gallery?.showThumbnails && projectImages.length > 0 && (
-          <section className="mt-4" data-purpose="image-gallery">
-            {projectImages.length > 1 && (
-              <p className="text-xs text-gray-500 mb-2 text-center">
-                اضغط على أي صورة لفتحها في نافذة منبثقة
-              </p>
-            )}
-            <SwiperCarousel
-              items={projectImages
-                .filter((imageSrc) => imageSrc && imageSrc.trim() !== "")
-                .map((imageSrc, index) => (
-                  <div key={index} className="relative h-[10rem] md:h-24">
-                    <Image
-                      src={imageSrc}
-                      alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
-                      fill
-                      className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
-                        mainImage === imageSrc ? "" : "border-transparent"
-                      }`}
-                      style={
-                        mainImage === imageSrc
-                          ? {
-                              borderColor: primaryColor,
-                              borderWidth: "2px",
-                            }
-                          : {}
-                      }
-                      onClick={() => {
-                        setMainImage(imageSrc);
-                        handleThumbnailClick(imageSrc, index);
-                      }}
-                    />
-                    {logoImage && (
-                      <div className="absolute bottom-2 right-2 opacity-80">
-                        <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                          <Image
-                            src={logoImage}
-                            alt="Logo"
-                            width={160}
-                            height={80}
-                            className="object-contain"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              space={16}
-              autoplay={true}
-              desktopCount={4}
-              slideClassName="!h-[10rem] md:!h-[96px]"
-            />
-          </section>
-        )}
+        {mergedData.gallery?.showThumbnails !== false &&
+          projectImages.length > 0 && project && (
+            <section
+              className="pt-10"
+              data-purpose="image-gallery"
+            >
+              <SwiperCarousel
+                items={projectImages
+                  .filter((imageSrc) => imageSrc && imageSrc.trim() !== "") // Filter out empty images
+                  .map((imageSrc, index) => (
+                    <div key={index} className="relative h-[12rem] md:h-[180px]">
+                      <Image
+                        src={imageSrc}
+                        alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
+                        fill
+                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                          mainImage === imageSrc ? "" : "border-transparent"
+                        }`}
+                        style={
+                          mainImage === imageSrc
+                            ? {
+                                borderColor: primaryColor,
+                                borderWidth: "2px",
+                              }
+                            : {}
+                        }
+                        onClick={() => handleThumbnailClick(imageSrc, index)}
+                      />
+                    </div>
+                  ))}
+                space={16}
+                autoplay={true}
+                desktopCount={4}
+                slideClassName="!h-[12rem] md:!h-[180px]"
+              />
+            </section>
+          )}
         {/* END: Gallery Thumbnails */}
 
-        {/* BEGIN: Property Description */}
-        {mergedData.displaySettings?.showDescription && (
-          <section
-            className="bg-transparent py-10 rounded-lg"
-            data-purpose="description-block"
-            dir="rtl"
-          >
-            <h2
-              className="text-3xl font-bold mb-6 text-right"
-              style={{ color: mergedData.styling?.textColor || primaryColor }}
-            >
-              {mergedData.content?.descriptionTitle || "وصف المشروع"}
-            </h2>
-            <p
-              className="leading-relaxed text-right text-lg"
-              style={{ color: mergedData.styling?.textColor }}
-            >
-              {project.description || "لا يوجد وصف متاح لهذا المشروع"}
-            </p>
-          </section>
-        )}
-        {/* END: Property Description */}
+        {/* BEGIN: Main Grid Layout - Two Columns (Description & Specs | Video & Map) */}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10"
+          style={{ gap: mergedData.layout?.gap || "3rem" }}
+          dir="rtl"
+        >
+          {/* Right Column: Description & Specs */}
+          <div className="space-y-12">
+            {/* Property Description */}
+            {mergedData.displaySettings?.showDescription !== false && (
+              <section className="bg-transparent rounded-lg" data-purpose="description-block">
+                <h2
+                  className="text-3xl font-bold mb-6 text-right"
+                  style={{ color: mergedData.styling?.textColor || primaryColor }}
+                >
+                  {mergedData.content?.descriptionTitle || "وصف المشروع"}
+                </h2>
+                <p
+                  className="leading-relaxed text-right text-lg whitespace-pre-line"
+                  style={{ color: mergedData.styling?.textColor }}
+                >
+                  {project.description || "لا يوجد وصف متاح لهذا المشروع"}
+                </p>
+              </section>
+            )}
 
-        {/* BEGIN: Main Grid Layout (Specs & Video / Map & Form) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Right Column: Specs & Form */}
-          <div className="space-y-12 order-2 lg:order-1">
             {/* Specs Section */}
-            {mergedData.displaySettings?.showSpecs && (
+            {mergedData.displaySettings?.showSpecs !== false ? (
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
                   className="text-3xl font-bold mb-8 text-right"
@@ -827,7 +1002,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
                   {/* Developer */}
-                  {project.developer && project.developer.trim() !== "" && (
+                  {project.developer && project.developer.trim() !== "" ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -855,10 +1030,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         المطور: {project.developer}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Units */}
-                  {project.units && project.units > 0 && (
+                  {project.units && project.units > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -886,46 +1061,46 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         عدد الوحدات: {project.units}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Completion Date */}
                   {project.completionDate &&
-                    project.completionDate.trim() !== "" && (
-                      <div className="flex flex-col items-center justify-center">
-                        <div style={{ color: primaryColor }} className="mb-3">
-                          <svg
-                            className="h-8 w-8"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.5"
-                            ></path>
-                          </svg>
-                        </div>
-                        <span
-                          className="font-bold text-lg"
-                          style={{
-                            color:
-                              mergedData.styling?.textColor || primaryColor,
-                          }}
+                  project.completionDate.trim() !== "" ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <div style={{ color: primaryColor }} className="mb-3">
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                          تاريخ التسليم:{" "}
-                          {new Date(project.completionDate).toLocaleDateString(
-                            "ar-US",
-                          )}
-                        </span>
+                          <path
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
                       </div>
-                    )}
+                      <span
+                        className="font-bold text-lg"
+                        style={{
+                          color:
+                            mergedData.styling?.textColor || primaryColor,
+                        }}
+                      >
+                        تاريخ التسليم:{" "}
+                        {new Date(project.completionDate).toLocaleDateString(
+                          "ar-US",
+                        )}
+                      </span>
+                    </div>
+                  ) : null}
 
                   {/* Address */}
-                  {project.address && project.address.trim() !== "" && (
+                  {project.address && project.address.trim() !== "" ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -959,10 +1134,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         {project.address}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Amenities */}
-                  {project.amenities && project.amenities.length > 0 && (
+                  {project.amenities && project.amenities.length > 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-2 md:col-span-3">
                       <div className="flex flex-wrap gap-2 justify-center">
                         {project.amenities.slice(0, 6).map((amenity, index) => (
@@ -980,13 +1155,147 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         ))}
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </section>
-            )}
+            ) : null}
+          </div>
+          {/* END Right Column */}
 
-            {/* Contact Form */}
-            {/* {mergedData.displaySettings?.showContactForm && (
+          {/* Left Column: Video & Map */}
+          <div className="space-y-12">
+            {/* Video */}
+            {mergedData.displaySettings?.showVideoUrl &&
+              project.videoUrl &&
+              project.videoUrl.trim() !== "" && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md bg-black relative h-64"
+                  data-purpose="video-section"
+                >
+                  <div className="w-full h-full rounded-lg overflow-hidden">
+                    <video
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={project.image || undefined}
+                    >
+                      <source src={project.videoUrl} type="video/mp4" />
+                      متصفحك لا يدعم عرض الفيديو.
+                    </video>
+                  </div>
+                </section>
+              )}
+
+            {/* Map */}
+            {mergedData.displaySettings?.showMap &&
+              project.location &&
+              project.location.lat &&
+              project.location.lng && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
+                  data-purpose="map-section"
+                >
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="موقع المشروع"
+                  />
+                  <div className="mt-4 text-center">
+                    <a
+                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColor;
+                      }}
+                    >
+                      <MapPinIcon className="w-4 h-4" />
+                      فتح في خرائط جوجل
+                    </a>
+                  </div>
+                </section>
+              )}
+          </div>
+          {/* END Left Column */}
+        </div>
+        {/* END: Main Grid Layout */}
+
+        {/* BEGIN: Related Properties Grid */}
+        {project.properties && project.properties.length > 0 ? (
+          <section className="mt-16" data-purpose="related-properties">
+            <h2
+              className="text-3xl font-bold mb-8 text-right"
+              style={{
+                color: mergedData.styling?.textColor || primaryColor,
+              }}
+            >
+              العقارات المرتبطة بهذا المشروع
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {project.properties.map((property) => {
+                // Transform API property data to PropertyCard3 format
+                // Format price: remove .00 but keep other decimals
+                const formatPrice = (price: string | undefined): string => {
+                  if (!price) return "0";
+                  // Remove .00 at the end, but keep other decimal values
+                  return price.replace(/\.00$/, "");
+                };
+
+                const cardProperty = {
+                  id: String(property.id),
+                  slug: property.slug,
+                  title: property.title,
+                  district: property.address || "",
+                  price: property.price ? `${formatPrice(property.price)} ريال` : "0 ريال",
+                  views: 0,
+                  bedrooms: property.beds || 0,
+                  bathrooms: property.bath || 0,
+                  area: property.area || property.size || "",
+                  type: property.type || "",
+                  transactionType: property.purpose === "sale" ? "للبيع" : property.purpose === "rent" ? "للإيجار" : "",
+                  image: property.featured_image || "",
+                  status: property.property_status === "available" || property.status === true ? "متاح" : property.property_status || "غير متاح",
+                  createdAt: property.created_at,
+                  description: property.description,
+                  features: property.features || [],
+                  location: property.location
+                    ? {
+                        lat: parseFloat(property.location.latitude),
+                        lng: parseFloat(property.location.longitude),
+                        address: property.address || "",
+                      }
+                    : undefined,
+                };
+
+                return (
+                  <PropertyCard3
+                    key={property.id}
+                    property={cardProperty}
+                    showImage={true}
+                    showPrice={true}
+                    showDetails={false}
+                    showViews={false}
+                    showStatus={false}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+        {/* END: Related Properties Grid */}
+
+        {/* BEGIN: Contact Form - COMMENTED OUT */}
+        {/* {mergedData.displaySettings?.showContactForm && (
               <section
                 className="text-white p-8 rounded-lg h-fit"
                 data-purpose="contact-form"
@@ -1101,134 +1410,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 </form>
               </section>
             )} */}
-          </div>
-          {/* END Right Column */}
-          {/* Left Column: Video & Map */}
-          <div className="space-y-12 order-1 lg:order-2">
-            {/* Floor Plans */}
-            {project.floorplans && project.floorplans.length > 0 && (
-              <div className="mb-8">
-                <h3
-                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  مخططات الأرضية
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {project.floorplans.map((planImage, index) => (
-                    <div
-                      key={index}
-                      className="relative group"
-                      onClick={() =>
-                        handleThumbnailClick(
-                          planImage,
-                          projectImages.length + index,
-                        )
-                      }
-                    >
-                      <Image
-                        src={planImage}
-                        alt={`مخطط الأرضية ${index + 1}`}
-                        width={400}
-                        height={200}
-                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <svg
-                            className="w-8 h-8 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Video */}
-            {mergedData.displaySettings?.showVideoUrl &&
-              project.videoUrl &&
-              project.videoUrl.trim() !== "" && (
-                <div className="mb-8">
-                  <h3
-                    className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    فيديو المشروع
-                  </h3>
-                  <div className="w-full rounded-lg overflow-hidden shadow-lg">
-                    <video
-                      controls
-                      className="w-full h-auto"
-                      poster={project.image || undefined}
-                    >
-                      <source src={project.videoUrl} type="video/mp4" />
-                      متصفحك لا يدعم عرض الفيديو.
-                    </video>
-                  </div>
-                </div>
-              )}
-
-            {/* Map */}
-            {mergedData.displaySettings?.showMap &&
-              project.location &&
-              project.location.lat &&
-              project.location.lng && (
-                <div className="mb-8">
-                  <h3
-                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    موقع المشروع
-                  </h3>
-                  <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
-                    <iframe
-                      src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="موقع المشروع"
-                    />
-                  </div>
-                  <div className="mt-4 text-center">
-                    <a
-                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-                      style={{ backgroundColor: primaryColor }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          primaryColorHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = primaryColor;
-                      }}
-                    >
-                      <MapPinIcon className="w-4 h-4" />
-                      فتح في خرائط جوجل
-                    </a>
-                  </div>
-                </div>
-              )}
-          </div>
-          {/* END Left Column */}
-        </div>
-        {/* END: Main Grid Layout */}
       </div>
       {/* END: Main Content Container */}
 

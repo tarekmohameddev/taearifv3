@@ -115,6 +115,12 @@ interface Property {
   createdAt?: string;
   created_at?: string;
   updated_at?: string;
+  project?: {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image: string;
+  } | null;
 }
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
@@ -427,6 +433,12 @@ export default function propertyDetail({
         displayOnPage: true,
       },
     ],
+    project: {
+      id: 1,
+      title: "مشروع سكني فاخر",
+      slug: "luxury-residential-project",
+      featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    },
   };
 
   // Handle create reservation
@@ -2165,6 +2177,30 @@ export default function propertyDetail({
                 </div>
               </div>
             ) : null}
+
+            {/* المشروع المرتبط */}
+            {property.project && (
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-right">
+                  <span className="text-gray-600 text-base">
+                    المشروع التابع له :
+                  </span>
+                  <Link
+                    href={`/project/${property.project.slug}`}
+                    className="inline-flex items-center gap-2 hover:underline transition-all group"
+                    style={{ color: primaryColor }}
+                  >
+                    <span className="font-semibold text-base">
+                      {property.project.title}
+                    </span>
+                    <ChevronLeftIcon
+                      className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                      style={{ color: primaryColor }}
+                    />
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* نموذج الحجز */}
             {/* انه مخفي فقط الان ولا اريد ازالته */}

@@ -158,7 +158,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Purpose Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                     {
                       key: "options",
                       label: "Options",
@@ -178,7 +178,7 @@ export const heroStructure: ComponentStructure = {
                   label: "City Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "icon", label: "Icon", type: "text" },
                   ],
@@ -188,7 +188,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Type Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "icon", label: "Icon", type: "text" },
                     {
@@ -206,7 +206,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Price Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "icon", label: "Icon", type: "text" },
                     {
@@ -227,7 +227,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Keywords Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                     { key: "placeholder", label: "Placeholder", type: "text" },
                   ],
                 },
@@ -733,17 +733,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Type Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                   ],
                 },
                 {
@@ -751,17 +741,7 @@ export const heroStructure: ComponentStructure = {
                   label: "City Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                   ],
                 },
                 {
@@ -769,17 +749,7 @@ export const heroStructure: ComponentStructure = {
                   label: "Status Field",
                   type: "object",
                   fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
+                    // { key: "enabled", label: "Enabled", type: "boolean" }, // COMMENTED: Fields are always visible now
                   ],
                 },
               ],
@@ -852,7 +822,7 @@ export const heroStructure: ComponentStructure = {
           key: "title",
           label: "Title",
           type: "text",
-          placeholder: "عن تعاريفالعقارية",
+          placeholder: "عن تعاريف العقارية",
         },
         {
           key: "backgroundImage",

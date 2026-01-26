@@ -188,13 +188,14 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
     property.location?.address ||
     "غير محدد";
 
-  // Parse status
+  // Parse status - use transactionType directly if available (Arabic), otherwise check transactionType_en (English)
   const status =
-    property.status || property.transactionType === "rent"
-      ? "للإيجار"
-      : property.transactionType === "sale"
-        ? "للبيع"
-        : "غير محدد";
+    property.transactionType || // Use Arabic transactionType directly if available
+    (property.transactionType_en === "rent" ? "للإيجار" : null) ||
+    (property.transactionType_en === "sale" ? "للبيع" : null) ||
+    (property.status === "rent" || property.status === "للإيجار" ? "للإيجار" : null) ||
+    (property.status === "sale" || property.status === "للبيع" ? "للبيع" : null) ||
+    "غير محدد";
 
   // Parse floors - try to extract from property data
   const floorsMin = property.floors?.min || property.minFloors || 1;
@@ -473,9 +474,12 @@ function ProjectCard({ property }: { property: Property }) {
             >
               {property.title}
             </h4>
-            <div className="text-green-600 font-semibold text-lg">
-              {property.status}
-            </div>
+            {/* عرض الحالة فقط للمشاريع (مكتمل/قيد الإنشاء) وليس للعقارات (للبيع/للإيجار) */}
+            {property.url?.includes('/project/') && property.status && (
+              <div className="text-green-600 font-semibold text-lg">
+                {property.status}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2 text-sm text-black">
             <span>في {property.city}</span>

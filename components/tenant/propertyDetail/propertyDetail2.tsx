@@ -77,6 +77,7 @@ interface Property {
   street_width_east?: string;
   street_width_west?: string;
   facade_id?: number;
+  facade_name?: string;
   building?: string | null;
   size?: string;
   floor_planning_image?: string[];
@@ -89,6 +90,12 @@ interface Property {
     answer: string;
     displayOnPage: boolean;
   }>;
+  project?: {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image: string;
+  } | null;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -408,6 +415,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         displayOnPage: true,
       },
     ],
+    project: {
+      id: 1,
+      title: "مشروع سكني فاخر",
+      slug: "luxury-residential-project",
+      featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    },
   };
 
   // Property data state
@@ -971,36 +984,35 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           )}
         {/* END: Gallery Thumbnails */}
 
-        {/* BEGIN: Property Description */}
-        {mergedData.displaySettings?.showDescription !== false && (
-          <section
-            className="bg-transparent py-10 rounded-lg"
-            data-purpose="description-block"
-            dir="rtl"
-          >
-            <h2
-              className="text-3xl font-bold mb-6 text-right"
-              style={{ color: textColor }}
-            >
-              {mergedData.content?.descriptionTitle || "وصف العقار"}
-            </h2>
-            <p
-              className="leading-relaxed text-right text-lg whitespace-pre-line"
-              style={{ color: textColor }}
-            >
-              {property.description || "لا يوجد وصف متاح لهذا العقار"}
-            </p>
-          </section>
-        )}
-        {/* END: Property Description */}
-
-        {/* BEGIN: Main Grid Layout (Specs & Video / Map & Form) */}
+        {/* BEGIN: Main Grid Layout - Two Columns (Description & Specs | Video & Map) */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10"
           style={{ gap: mergedData.layout?.gap || "3rem" }}
+          dir="rtl"
         >
-          {/* Right Column: Specs & Form */}
-          <div className="space-y-12 order-2 lg:order-1">
+          {/* Right Column: Description & Specs */}
+          <div className="space-y-12">
+            {/* Property Description */}
+            {mergedData.displaySettings?.showDescription !== false && (
+              <section
+                className="bg-transparent rounded-lg"
+                data-purpose="description-block"
+              >
+                <h2
+                  className="text-3xl font-bold mb-6 text-right"
+                  style={{ color: textColor }}
+                >
+                  {mergedData.content?.descriptionTitle || "وصف العقار"}
+                </h2>
+                <p
+                  className="leading-relaxed text-right text-lg whitespace-pre-line"
+                  style={{ color: textColor }}
+                >
+                  {property.description || "لا يوجد وصف متاح لهذا العقار"}
+                </p>
+              </section>
+            )}
+
             {/* Specs Section */}
             {mergedData.displaySettings?.showSpecs !== false ? (
               <section className="bg-transparent" data-purpose="property-specs">
@@ -1895,8 +1907,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                     ): null}
 
                   {/* نوع الواجهة */}
-                  {property.facade_id !== undefined &&
-                    property.facade_id !== null ? (
+                  {property.facade_name &&
+                    property.facade_name.trim() !== "" ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1919,7 +1931,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           className="font-bold text-lg"
                           style={{ color: textColor }}
                         >
-                          نوع الواجهة: {property.facade_id}
+                          نوع الواجهة: {property.facade_name}
                         </span>
                       </div>
                     ) : null}
@@ -2055,6 +2067,30 @@ export default function propertyDetail2(props: propertyDetail2Props) {
               </section>
             )}
 
+            {/* المشروع المرتبط */}
+            {property.project && (
+              <section className="bg-transparent py-4" data-purpose="project-section">
+                <div className="flex items-center gap-2 text-right">
+                  <span className="text-base" style={{ color: textColor }}>
+                    المشروع التابع له :
+                  </span>
+                  <Link
+                    href={`/project/${property.project.slug}`}
+                    className="inline-flex items-center gap-2 hover:underline transition-all group"
+                    style={{ color: primaryColor }}
+                  >
+                    <span className="font-semibold text-base">
+                      {property.project.title}
+                    </span>
+                    <ChevronLeftIcon
+                      className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                      style={{ color: primaryColor }}
+                    />
+                  </Link>
+                </div>
+              </section>
+            )}
+
             {/* Contact Form - COMMENTED OUT */}
             {/* {mergedData.displaySettings?.showContactForm !== false && (
               <section
@@ -2152,7 +2188,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           {/* END Right Column */}
 
           {/* Left Column: Video & Map */}
-          <div className="space-y-12 order-1 lg:order-2">
+          <div className="space-y-12">
             {/* Video Section */}
             {mergedData.displaySettings?.showVideoUrl !== false &&
               property.video_url && (

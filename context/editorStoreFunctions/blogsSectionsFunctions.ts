@@ -14,39 +14,13 @@ export const getDefaultBlogsSectionsData = (): ComponentData => ({
   paragraph2:
     "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
 
-  // Cards array
-  cards: [
-    {
-      id: "1",
-      image:
-        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
-      title: "حلول عقارية سريعة وموثوقة",
-      description:
-        "نقدّم لك خدمات عقارية متكاملة بمرونة وسرعة، مع فريق يتمتع بالكفاءة والخبرة لتلبية جميع احتياجاتك بسهولة واحترافية",
-      readMoreUrl: "#",
-      date: "مايو 29, 2023",
-    },
-    {
-      id: "2",
-      image:
-        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
-      title: "استثمر بثقة… وابدأ حياة جديدة",
-      description:
-        "في تعاريفللعقارات، نضع بين يديك مجموعة مختارة من العقارات بعناية فائقة، لنمنحك تجربة فريدة ومضمونة من البداية حتى التملّك.",
-      readMoreUrl: "#",
-      date: "يوليو 9, 2025",
-    },
-    {
-      id: "3",
-      image:
-        "https://baheya.co/wp-content/uploads/2023/05/62387dd75873914c8bbfe94a9e047b9f3b771b1b.png",
-      title: "اختيارك الأول للسكن والاستثمار",
-      description:
-        "سواء كنت تبحث عن منزل الأحلام أو فرصة استثمارية رابحة، فريقنا المختص يساعدك في اتخاذ القرار الصحيح بكل شفافية ومصداقية",
-      readMoreUrl: "#",
-      date: "يوليو 9, 2025",
-    },
-  ],
+  // API Settings - Always enabled, data comes from API only
+  apiSettings: {
+    enabled: true,
+    endpoint: "/api/posts",
+    limit: 10,
+    page: 1,
+  },
 
   // Styling
   styling: {

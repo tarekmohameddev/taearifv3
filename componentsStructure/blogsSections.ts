@@ -33,50 +33,24 @@ export const blogsSectionsStructure: ComponentStructure = {
         },
 
         // ═══════════════════════════════════════════════════════════
-        // CARDS ARRAY
+        // API SETTINGS
         // ═══════════════════════════════════════════════════════════
         {
-          key: "cards",
-          label: "Blog Cards",
-          type: "array",
-          addLabel: "Add Card",
-          itemLabel: "Card",
-          of: [
+          key: "apiSettings",
+          label: "API Settings",
+          type: "object",
+          fields: [
             {
-              key: "id",
-              label: "Card ID",
-              type: "text",
+              key: "limit",
+              label: "Posts Limit",
+              type: "number",
+              placeholder: "10",
+            },
+            {
+              key: "page",
+              label: "Page Number",
+              type: "number",
               placeholder: "1",
-            },
-            {
-              key: "image",
-              label: "Card Image",
-              type: "image",
-              placeholder: "Image URL",
-            },
-            {
-              key: "title",
-              label: "Card Title",
-              type: "text",
-              placeholder: "Card title",
-            },
-            {
-              key: "description",
-              label: "Card Description",
-              type: "textarea",
-              placeholder: "Card description",
-            },
-            {
-              key: "readMoreUrl",
-              label: "Read More URL",
-              type: "text",
-              placeholder: "#",
-            },
-            {
-              key: "date",
-              label: "Date",
-              type: "text",
-              placeholder: "Date text",
             },
           ],
         },
@@ -230,7 +204,6 @@ export const blogsSectionsStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "paragraph1", label: "First Paragraph", type: "textarea" },
         { key: "paragraph2", label: "Second Paragraph", type: "textarea" },
-        { key: "cards", label: "Blog Cards", type: "array" },
       ],
     },
   ],
