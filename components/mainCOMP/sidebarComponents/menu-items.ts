@@ -11,6 +11,7 @@ import {
   Download,
   Grid,
   BookOpen,
+  UsersRound,
 } from "lucide-react";
 
 export type MainNavItem = {
@@ -51,6 +52,13 @@ export const staticMenuItems: MainNavItem[] = [
     description: "تكوين اعدادات ادارة علاقات العملاء",
     icon: UserCog,
     path: "/dashboard/crm",
+  },
+  {
+    id: "customers-hub",
+    label: "العملاء الموحد",
+    description: "إدارة شاملة لدورة حياة العملاء مع AI",
+    icon: UsersRound,
+    path: "/dashboard/customers-hub",
   },
   {
     id: "projects",
