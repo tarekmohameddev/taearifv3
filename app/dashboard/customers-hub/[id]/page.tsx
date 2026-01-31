@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { CustomerDetailPage } from "@/components/customers-hub/detail/CustomerDetailPage";
+import { CustomerDetailPageSimple } from "@/components/customers-hub/detail/CustomerDetailPageSimple";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import mockCustomers from "@/lib/mock/customers-hub-data";
 import { useParams } from "next/navigation";
@@ -30,5 +30,5 @@ export default function CustomerDetailPageRoute() {
     }
   }, [customerId, customers.length, getCustomerById, setSelectedCustomer]);
 
-  return <CustomerDetailPage customerId={customerId} />;
+  return <CustomerDetailPageSimple customerId={customerId} />;
 }
