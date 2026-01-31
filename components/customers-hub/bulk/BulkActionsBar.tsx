@@ -41,6 +41,7 @@ import {
   Download,
 } from "lucide-react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
+import useAssignmentRulesStore from "@/context/store/assignment-rules";
 import { LIFECYCLE_STAGES } from "@/types/unified-customer";
 import type { CustomerLifecycleStage, Priority } from "@/types/unified-customer";
 import { toast } from "sonner";
@@ -52,6 +53,7 @@ interface BulkActionsBarProps {
 
 export function BulkActionsBar({ selectedIds, onClearSelection }: BulkActionsBarProps) {
   const { customers, updateCustomer } = useUnifiedCustomersStore();
+  const { employees, assignCustomerManually } = useAssignmentRulesStore();
   const [showStageDialog, setShowStageDialog] = useState(false);
   const [showPriorityDialog, setShowPriorityDialog] = useState(false);
   const [showTagDialog, setShowTagDialog] = useState(false);
@@ -149,17 +151,23 @@ export function BulkActionsBar({ selectedIds, onClearSelection }: BulkActionsBar
   };
 
   // Bulk assign
-  const handleBulkAssign = () => {
+  const handleBulkAssign = async () => {
     if (!assignToEmployee) return;
 
-    selectedIds.forEach((id) => {
-      updateCustomer(id, { assignedEmployeeId: assignToEmployee });
-    });
+    try {
+      await assignCustomerManually({
+        customerIds: selectedIds,
+        employeeId: assignToEmployee,
+        reason: "Bulk assignment",
+      });
 
-    toast.success(`تم تعيين ${selectedIds.length} عميل`);
-    setShowAssignDialog(false);
-    setAssignToEmployee("");
-    onClearSelection();
+      toast.success(`تم تعيين ${selectedIds.length} عميل`);
+      setShowAssignDialog(false);
+      setAssignToEmployee("");
+      onClearSelection();
+    } catch (error) {
+      toast.error("حدث خطأ أثناء التعيين");
+    }
   };
 
   // Export selected
@@ -491,10 +499,16 @@ export function BulkActionsBar({ selectedIds, onClearSelection }: BulkActionsBar
                   <SelectValue placeholder="اختر الموظف" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="emp_1">أحمد محمد</SelectItem>
-                  <SelectItem value="emp_2">فاطمة علي</SelectItem>
-                  <SelectItem value="emp_3">محمد خالد</SelectItem>
-                  <SelectItem value="emp_4">سارة أحمد</SelectItem>
+                  {employees.filter((e) => e.isActive).map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{employee.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({employee.loadPercentage}% تحميل)
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

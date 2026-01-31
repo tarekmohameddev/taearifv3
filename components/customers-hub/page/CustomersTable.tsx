@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { getStageNameAr, getStageColor, LIFECYCLE_STAGES } from "@/types/unified-customer";
 import Link from "next/link";
+import { AssignmentDropdown } from "../assignment";
 
 export function CustomersTable() {
   const {
@@ -220,13 +221,11 @@ export function CustomersTable() {
                   <TableCell>{getPriorityBadge(customer.priority)}</TableCell>
                   <TableCell>{getSourceBadge(customer.source)}</TableCell>
                   <TableCell>
-                    {customer.assignedEmployee ? (
-                      <div className="text-sm">
-                        <div>{customer.assignedEmployee.name}</div>
-                      </div>
-                    ) : (
-                      <span className="text-gray-400 text-sm">غير محدد</span>
-                    )}
+                    <AssignmentDropdown
+                      customerId={customer.id}
+                      currentEmployeeId={customer.assignedEmployeeId}
+                      currentEmployeeName={customer.assignedEmployee?.name}
+                    />
                   </TableCell>
                   <TableCell>
                     {customer.lastContactAt ? (

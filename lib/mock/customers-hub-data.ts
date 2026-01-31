@@ -2196,8 +2196,7 @@ export const mockCustomers: UnifiedCustomer[] = [
     priority: "medium",
     customerType: "individual",
     tags: ["imported", "land_buyer"],
-    assignedEmployee: mockEmployees[2],
-    assignedEmployeeId: "emp_003",
+    // No assignment - unassigned customer
     properties: [],
     interactions: [
       {
@@ -2309,8 +2308,7 @@ export const mockCustomers: UnifiedCustomer[] = [
     priority: "high",
     customerType: "individual",
     tags: ["referral", "hot_lead", "professional"],
-    assignedEmployee: mockEmployees[1],
-    assignedEmployeeId: "emp_002",
+    // No assignment - unassigned customer
     properties: [],
     interactions: [
       {
@@ -2409,8 +2407,7 @@ export const mockCustomers: UnifiedCustomer[] = [
     priority: "low",
     customerType: "individual",
     tags: ["new", "needs_qualification"],
-    assignedEmployee: mockEmployees[2],
-    assignedEmployeeId: "emp_003",
+    // No assignment - unassigned customer
     properties: [],
     interactions: [
       {

@@ -8,6 +8,7 @@ import { CustomersMap } from "./CustomersMap";
 import { CustomersGrid } from "./CustomersGrid";
 import { QuickActions } from "./QuickActions";
 import { AdvancedFilters } from "../filters/AdvancedFilters";
+import { AssignmentPanel } from "../assignment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LayoutGrid, List, KanbanSquare, Map } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +32,8 @@ export function CustomersHubPage() {
         </div>
         
         <div className="flex items-center gap-3">
+          <AssignmentPanel />
+          
           <Link href="/ar/dashboard/customers-hub/pipeline">
             <Button variant="outline" className="gap-2">
               <KanbanSquare className="h-4 w-4" />

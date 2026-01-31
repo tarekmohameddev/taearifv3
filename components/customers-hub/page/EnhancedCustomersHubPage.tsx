@@ -10,6 +10,7 @@ import { QuickActions } from "./QuickActions";
 import { AdvancedFilters } from "../filters/AdvancedFilters";
 import { SavedFilters } from "../filters/SavedFilters";
 import { BulkActionsBar } from "../bulk/BulkActionsBar";
+import { AssignmentPanel } from "../assignment";
 import { ExportDialog } from "../export/ExportDialog";
 import { NotificationsCenter } from "../notifications/NotificationsCenter";
 import { KeyboardShortcuts, useKeyboardShortcuts } from "../keyboard/KeyboardShortcuts";
@@ -24,7 +25,7 @@ import type { CustomerFilters } from "@/types/unified-customer";
 
 export function EnhancedCustomersHubPage() {
   const router = useRouter();
-  const { viewMode, setViewMode, setAddDialogOpen, customers, filters, setFilters } =
+  const { viewMode, setViewMode, setShowAddCustomerDialog, customers, filters, setFilters } =
     useUnifiedCustomersStore();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -41,7 +42,7 @@ export function EnhancedCustomersHubPage() {
       console.log("Search triggered");
     },
     onAddCustomer: () => {
-      setAddDialogOpen(true);
+      setShowAddCustomerDialog(true);
     },
     onExport: () => {
       setShowExportDialog(true);
@@ -86,6 +87,9 @@ export function EnhancedCustomersHubPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Assignment Panel */}
+          <AssignmentPanel />
+
           {/* Notifications */}
           <NotificationsCenter />
 
@@ -98,7 +102,7 @@ export function EnhancedCustomersHubPage() {
                   console.log("Search");
                   break;
                 case "add-customer":
-                  setAddDialogOpen(true);
+                  setShowAddCustomerDialog(true);
                   break;
                 case "export":
                   setShowExportDialog(true);
@@ -223,17 +227,11 @@ export function EnhancedCustomersHubPage() {
         </div>
 
         <TabsContent value="table" className="mt-4">
-          <CustomersTable
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
-          />
+          <CustomersTable />
         </TabsContent>
 
         <TabsContent value="grid" className="mt-4">
-          <CustomersGrid
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
-          />
+          <CustomersGrid />
         </TabsContent>
 
         <TabsContent value="map" className="mt-4">
@@ -249,7 +247,7 @@ export function EnhancedCustomersHubPage() {
 
       {/* Quick Add FAB */}
       <QuickAddFAB
-        onAddCustomer={() => setAddDialogOpen(true)}
+        onAddCustomer={() => setShowAddCustomerDialog(true)}
         onAddAppointment={() => {
           // TODO: Implement
           console.log("Add appointment");
