@@ -11,6 +11,9 @@ import type {
   Reminder,
   Interaction,
   StageChange,
+  CustomerAction,
+  CustomerActionStatus,
+  CustomerActionType,
 } from "@/types/unified-customer";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -21,6 +24,10 @@ interface UnifiedCustomersStore {
   filteredCustomers: UnifiedCustomer[];
   selectedCustomer: UnifiedCustomer | null;
   statistics: CustomerStatistics | null;
+  
+  // Actions Data
+  actions: CustomerAction[];
+  filteredActions: CustomerAction[];
   
   // Filters & Search
   filters: CustomerFilters;
@@ -62,6 +69,17 @@ interface UnifiedCustomersStore {
   removeCustomer: (customerId: string) => void;
   setSelectedCustomer: (customer: UnifiedCustomer | null) => void;
   getCustomerById: (customerId: string) => UnifiedCustomer | undefined;
+  
+  // Actions - Customer Actions Management
+  setActions: (actions: CustomerAction[]) => void;
+  addAction: (action: CustomerAction) => void;
+  updateAction: (actionId: string, updates: Partial<CustomerAction>) => void;
+  updateActionStatus: (actionId: string, status: CustomerActionStatus) => void;
+  snoozeAction: (actionId: string, until: string) => void;
+  dismissAction: (actionId: string) => void;
+  completeAction: (actionId: string) => void;
+  getActionsByCustomerId: (customerId: string) => CustomerAction[];
+  getPendingActionsCount: () => number;
   
   // Actions - Filters & Search
   setFilters: (filters: Partial<CustomerFilters>) => void;
@@ -147,6 +165,10 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
       selectedCustomer: null,
       statistics: null,
       
+      // Initial Actions Data
+      actions: [],
+      filteredActions: [],
+      
       // Initial Filters & Search
       filters: {},
       searchTerm: '',
@@ -212,6 +234,75 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
         
         get().applyFilters();
         get().calculateStatistics();
+      },
+      
+      // Customer Actions Management
+      setActions: (actions) => {
+        set({ 
+          actions,
+          filteredActions: actions,
+        });
+      },
+      
+      addAction: (action) => {
+        const { actions } = get();
+        const updatedActions = [...actions, action];
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      updateAction: (actionId, updates) => {
+        const { actions } = get();
+        const updatedActions = actions.map((action) =>
+          action.id === actionId
+            ? { ...action, ...updates }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      updateActionStatus: (actionId, status) => {
+        get().updateAction(actionId, { 
+          status,
+          ...(status === 'completed' ? { completedAt: new Date().toISOString() } : {})
+        });
+      },
+      
+      snoozeAction: (actionId, until) => {
+        get().updateAction(actionId, {
+          status: 'snoozed',
+          snoozedUntil: until,
+        });
+      },
+      
+      dismissAction: (actionId) => {
+        get().updateActionStatus(actionId, 'dismissed');
+      },
+      
+      completeAction: (actionId) => {
+        const userData = useAuthStore.getState().userData;
+        get().updateAction(actionId, {
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          completedBy: userData?.user?.name || 'Unknown',
+        });
+      },
+      
+      getActionsByCustomerId: (customerId) => {
+        const { actions } = get();
+        return actions.filter((action) => action.customerId === customerId);
+      },
+      
+      getPendingActionsCount: () => {
+        const { actions } = get();
+        return actions.filter((action) => 
+          action.status === 'pending' || action.status === 'in_progress'
+        ).length;
       },
       
       updateCustomer: (customerId, updates) => {

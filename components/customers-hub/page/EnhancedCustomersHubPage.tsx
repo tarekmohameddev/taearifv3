@@ -16,6 +16,7 @@ import { NotificationsCenter } from "../notifications/NotificationsCenter";
 import { KeyboardShortcuts, useKeyboardShortcuts } from "../keyboard/KeyboardShortcuts";
 import { QuickAddFAB } from "../fab/QuickAddFAB";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { LayoutGrid, List, KanbanSquare, Map, Download } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,15 @@ import type { CustomerFilters } from "@/types/unified-customer";
 
 export function EnhancedCustomersHubPage() {
   const router = useRouter();
-  const { viewMode, setViewMode, setShowAddCustomerDialog, customers, filters, setFilters } =
+  const { viewMode, setViewMode, setShowAddCustomerDialog, customers, filters, setFilters, getPendingActionsCount } =
     useUnifiedCustomersStore();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Get pending actions count
+  const pendingActionsCount = getPendingActionsCount();
 
   // Get filtered customers
   const filteredCustomers = customers; // Already filtered by store
@@ -87,6 +91,21 @@ export function EnhancedCustomersHubPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Actions Hub Link */}
+          <Link href="/ar/dashboard/customers-hub/actions">
+            <Button variant="default" className="gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              مركز الإجراءات
+              {pendingActionsCount > 0 && (
+                <Badge className="bg-red-500 text-white ml-1 animate-pulse">
+                  {pendingActionsCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+          
           {/* Assignment Panel */}
           <AssignmentPanel />
 

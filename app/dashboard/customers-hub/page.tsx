@@ -1,22 +1,23 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { EnhancedCustomersHubPage } from "@/components/customers-hub/page/EnhancedCustomersHubPage";
-import useUnifiedCustomersStore from "@/context/store/unified-customers";
-import mockCustomers from "@/lib/mock/customers-hub-data";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CustomersHubMainPage() {
-  const { setCustomers, customers } = useUnifiedCustomersStore();
+  const router = useRouter();
 
-  // Load mock data on mount - force reload with coordinates
   useEffect(() => {
-    // Always reload to ensure we have the latest data with coordinates
-    console.log("🗺️ Loading mock customers data...");
-    console.log(`📊 Total mock customers: ${mockCustomers.length}`);
-    console.log(`🌍 Customers with coordinates: ${mockCustomers.filter(c => c.latitude && c.longitude).length}`);
-    
-    setCustomers(mockCustomers);
-  }, [setCustomers]);
+    // Redirect to actions page as the new entry point
+    router.replace('/ar/dashboard/customers-hub/actions');
+  }, [router]);
 
-  return <EnhancedCustomersHubPage />;
+  // Show loading state while redirecting
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري التحميل...</p>
+      </div>
+    </div>
+  );
 }

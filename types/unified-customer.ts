@@ -8,6 +8,39 @@ export type CustomerSource =
   | 'import'       // Bulk import
   | 'referral';    // Customer referral
 
+export type CustomerActionType = 
+  | 'new_inquiry'        // New customer interested in property
+  | 'callback_request'   // Customer requested callback
+  | 'property_match'     // New property matches customer preferences
+  | 'follow_up'          // Scheduled follow-up
+  | 'document_required'  // Documents pending
+  | 'payment_due'        // Payment reminder
+  | 'site_visit'         // Site visit to schedule/confirm
+  | 'whatsapp_incoming'  // New WhatsApp message
+  | 'ai_recommended';    // AI-generated recommendation
+
+export type CustomerActionStatus = 'pending' | 'in_progress' | 'completed' | 'dismissed' | 'snoozed';
+
+export interface CustomerAction {
+  id: string;
+  customerId: string;
+  customerName: string;
+  type: CustomerActionType;
+  title: string;
+  description?: string;
+  priority: Priority;
+  status: CustomerActionStatus;
+  source: CustomerSource;
+  dueDate?: string;
+  snoozedUntil?: string;
+  assignedTo?: string;
+  assignedToName?: string;
+  createdAt: string;
+  completedAt?: string;
+  completedBy?: string;
+  metadata?: Record<string, any>;
+}
+
 export type CustomerLifecycleStage =
   | 'new_lead'           // عميل جديد
   | 'qualified'          // مؤهل
