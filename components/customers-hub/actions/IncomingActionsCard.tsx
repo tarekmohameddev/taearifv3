@@ -300,14 +300,6 @@ export function IncomingActionsCard({
 
           <ActionQuickPanel
             action={action}
-            onCall={() => {
-              // TODO: Implement call functionality
-              console.log("Call:", action.customerName);
-            }}
-            onWhatsApp={() => {
-              // TODO: Implement WhatsApp functionality
-              console.log("WhatsApp:", action.customerName);
-            }}
             onSchedule={() => {
               // TODO: Implement schedule functionality
               console.log("Schedule:", action.customerName);

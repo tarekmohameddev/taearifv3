@@ -13,7 +13,7 @@ import {
   type UnifiedCustomer 
 } from "@/types/unified-customer";
 import { 
-  Phone, MessageSquare, Eye, DollarSign, 
+  Eye, DollarSign, 
   TrendingUp, ChevronLeft, ChevronRight
 } from "lucide-react";
 import Link from "next/link";
@@ -241,22 +241,6 @@ export function EnhancedPipelineBoard() {
                                     عرض
                                   </Button>
                                 </Link>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-7 w-7 p-0"
-                                  onClick={() => window.open(`tel:${customer.phone}`)}
-                                >
-                                  <Phone className="h-3 w-3" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-7 w-7 p-0"
-                                  onClick={() => window.open(`https://wa.me/${customer.whatsapp || customer.phone}`)}
-                                >
-                                  <MessageSquare className="h-3 w-3" />
-                                </Button>
                               </div>
                             </div>
                           </CardContent>
@@ -279,7 +263,6 @@ export function EnhancedPipelineBoard() {
             <div>• اسحب البطاقات بين الأعمدة لتغيير المرحلة</div>
             <div>• انقر على "عرض" لفتح صفحة التفاصيل</div>
             <div>• الألوان تمثل جودة العميل (الأحمر: ممتاز، الأزرق: جيد)</div>
-            <div>• استخدم الأيقونات للاتصال السريع</div>
           </div>
         </CardContent>
       </Card>

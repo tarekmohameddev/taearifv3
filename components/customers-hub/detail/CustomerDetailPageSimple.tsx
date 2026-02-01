@@ -18,7 +18,6 @@ import {
   ChevronDown,
   ChevronUp,
   Building,
-  Star,
   DollarSign,
   Calendar,
   Clock,
@@ -295,19 +294,6 @@ function PropertiesSection({ customer }: { customer: UnifiedCustomer }) {
           <div className="flex items-center gap-1 text-sm font-bold text-green-600">
             <DollarSign className="h-3.5 w-3.5" />
             {(property.propertyPrice / 1000).toFixed(0)}k ريال
-          </div>
-        )}
-
-        {property.rating && (
-          <div className="flex items-center gap-0.5 mt-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 ${
-                  i < property.rating! ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                }`}
-              />
-            ))}
           </div>
         )}
 
@@ -1098,14 +1084,6 @@ export function CustomerDetailPageSimple({ customerId }: CustomerDetailPageSimpl
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Phone className="h-4 w-4" />
-            <span className="hidden sm:inline">اتصال</span>
-          </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">واتساب</span>
-          </Button>
           <Button size="sm" className="gap-2">
             <Edit className="h-4 w-4" />
             <span className="hidden sm:inline">تعديل</span>

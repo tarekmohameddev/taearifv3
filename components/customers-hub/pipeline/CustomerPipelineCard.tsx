@@ -5,7 +5,7 @@ import type { UnifiedCustomer } from "@/types/unified-customer";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, MessageSquare, Eye, Calendar, DollarSign } from "lucide-react";
+import { Phone, Eye, Calendar, DollarSign } from "lucide-react";
 import Link from "next/link";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 
@@ -110,23 +110,6 @@ export function CustomerPipelineCard({
               <Eye className="h-3 w-3" />
             </Button>
           </Link>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Phone className="h-3 w-3" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MessageSquare className="h-3 w-3" />
-          </Button>
-          
           {customer.assignedEmployee && (
             <div className="mr-auto text-xs text-gray-500 truncate">
               {customer.assignedEmployee.name}

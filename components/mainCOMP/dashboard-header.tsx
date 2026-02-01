@@ -26,7 +26,6 @@ import {
   Briefcase,
   Download,
   Grid,
-  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +44,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
-import useStore from "@/context/Store";
 import axiosInstance from "@/lib/axiosInstance";
 import { cn } from "@/lib/utils";
 import {
@@ -56,7 +54,7 @@ import {
   markPlanFetchedInSession,
   type PlanData,
 } from "@/lib/planCookie";
-import { MobileSidebar } from "./sidebarComponents/MobileSidebar";
+import { DashboardTopNav } from "./DashboardTopNav";
 
 
 interface DashboardHeaderProps {
@@ -67,23 +65,12 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const { sidebarData, fetchSideMenus } = useStore();
-  const { mainNavItems, loading, error } = sidebarData;
   const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
   // استخدام useRef لمنع إعادة الجلب عند التنقل
   const hasFetchedPlanRef = useRef(false);
   const isFetchingRef = useRef(false);
   const lastTokenRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
-    // fetchUserData();
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token) {
-      fetchSideMenus();
-    }
-  }, [fetchSideMenus, userData?.token]);
 
   // جلب بيانات الخطة مرة واحدة وحفظها في كوكي
   useEffect(() => {
@@ -194,22 +181,11 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
 
   return (
-    <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
+    <header className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
       {/* الـ navbar الأول مع المحتوى الحالي */}
-      <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex">
-        <div className="flex items-center gap-4">
-          {/* زر القائمة للجوال */}
-          {useAuthStore.getState().UserIslogged && (
-            <div className="min-[1200px]:hidden">
-              <MobileSidebar>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-7 w-7" />
-                </Button>
-              </MobileSidebar>
-            </div>
-          )}
-
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+      <div className="h-16 items-center justify-between px-4 md:px-6 flex gap-4">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <Link href="/" className="flex items-center gap-2 font-semibold shrink-0">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -218,6 +194,12 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               className=""
             />
           </Link>
+
+          {useAuthStore.getState().UserIslogged && (
+            <div className="flex-1 flex justify-center min-[900px]:justify-start min-w-0">
+              <DashboardTopNav />
+            </div>
+          )}
 
           {/* <div className="hidden md:flex items-center gap-1 mr-6">
             
@@ -252,7 +234,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
         </div>
 
         {/* أزرار تسجيل الدخول والمستخدم */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

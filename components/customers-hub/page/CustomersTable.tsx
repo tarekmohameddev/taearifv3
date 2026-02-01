@@ -28,7 +28,6 @@ import {
   ChevronRight,
   Eye,
   Phone,
-  MessageSquare,
 } from "lucide-react";
 import { getStageNameAr, getStageColor, LIFECYCLE_STAGES } from "@/types/unified-customer";
 import Link from "next/link";
@@ -245,19 +244,11 @@ export function CustomersTable() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Link href={`/ar/dashboard/customers-hub/${customer.id}`}>
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                    <Link href={`/ar/dashboard/customers-hub/${customer.id}`}>
                       <Button variant="ghost" size="sm">
-                        <Phone className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))

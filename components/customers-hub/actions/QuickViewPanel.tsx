@@ -139,19 +139,11 @@ export function QuickViewPanel({
             <div className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-gray-400" />
               <span dir="ltr">{customer.phone}</span>
-              <Button variant="ghost" size="sm" className="mr-auto h-7 px-2">
-                <Phone className="h-3 w-3 ml-1" />
-                اتصال
-              </Button>
             </div>
             {customer.whatsapp && (
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-4 w-4 text-green-500" />
                 <span dir="ltr">{customer.whatsapp}</span>
-                <Button variant="ghost" size="sm" className="mr-auto h-7 px-2 text-green-600">
-                  <MessageSquare className="h-3 w-3 ml-1" />
-                  واتساب
-                </Button>
               </div>
             )}
             {customer.email && (

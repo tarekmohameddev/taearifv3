@@ -279,10 +279,6 @@ export function EnhancedCustomersHubPage() {
           // TODO: Implement
           console.log("Add note");
         }}
-        onSendMessage={() => {
-          // TODO: Implement
-          console.log("Send message");
-        }}
         onAddProperty={() => {
           // TODO: Implement
           console.log("Add property");

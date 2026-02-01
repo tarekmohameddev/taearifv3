@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { UnifiedCustomer } from "@/types/unified-customer";
-import { Home, DollarSign, MapPin, Star, Eye } from "lucide-react";
+import { Home, DollarSign, MapPin, Eye } from "lucide-react";
 
 interface PropertyInterestsProps {
   customer: UnifiedCustomer;
@@ -66,21 +66,6 @@ export function PropertyInterests({ customer }: PropertyInterestsProps) {
                   <div className="flex items-center gap-1 text-lg font-bold text-green-600">
                     <DollarSign className="h-4 w-4" />
                     {(property.propertyPrice / 1000).toFixed(0)}k ريال
-                  </div>
-                )}
-
-                {property.rating && (
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-3 w-3 ${
-                          i < property.rating!
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
                   </div>
                 )}
 

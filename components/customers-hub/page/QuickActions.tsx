@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, UserPlus, Upload, MessageSquare, FileDown } from "lucide-react";
+import { Plus, UserPlus, Upload, FileDown } from "lucide-react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 
 export function QuickActions() {
@@ -33,12 +33,6 @@ export function QuickActions() {
         <DropdownMenuItem>
           <Upload className="ml-2 h-4 w-4" />
           استيراد من ملف
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>اتصال سريع</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <MessageSquare className="ml-2 h-4 w-4" />
-          إرسال رسالة جماعية
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>تصدير</DropdownMenuLabel>

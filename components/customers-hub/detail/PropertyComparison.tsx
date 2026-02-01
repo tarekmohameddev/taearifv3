@@ -65,13 +65,6 @@ export function PropertyComparison({ customer }: PropertyComparisonProps) {
       },
     },
     {
-      id: "rating",
-      label: "التقييم",
-      icon: Star,
-      getValue: (p) => p.rating ? `${p.rating}/5` : "لم يُقيّم",
-      isHighlight: true,
-    },
-    {
       id: "addedDate",
       label: "تاريخ الإضافة",
       icon: Calendar,
@@ -127,12 +120,6 @@ export function PropertyComparison({ customer }: PropertyComparisonProps) {
       score += 15;
     } else if (property.status === "interested") {
       score += 10;
-    }
-
-    // Rating match
-    if (property.rating) {
-      total += 20;
-      score += (property.rating / 5) * 20;
     }
 
     // Timeline match

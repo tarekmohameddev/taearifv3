@@ -16,7 +16,6 @@ import {
   Calendar,
   Bell,
   FileText,
-  MessageSquare,
   Home,
 } from "lucide-react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
@@ -26,7 +25,6 @@ interface QuickAddFABProps {
   onAddAppointment?: () => void;
   onAddReminder?: () => void;
   onAddNote?: () => void;
-  onSendMessage?: () => void;
   onAddProperty?: () => void;
 }
 
@@ -35,7 +33,6 @@ export function QuickAddFAB({
   onAddAppointment,
   onAddReminder,
   onAddNote,
-  onSendMessage,
   onAddProperty,
 }: QuickAddFABProps) {
   const [open, setOpen] = useState(false);
@@ -119,17 +116,6 @@ export function QuickAddFAB({
             <div>
               <div className="font-medium">ملاحظة</div>
               <div className="text-xs text-gray-500">تسجيل ملاحظة سريعة</div>
-            </div>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => handleAction(onSendMessage)}
-            className="cursor-pointer py-3"
-          >
-            <MessageSquare className="h-5 w-5 ml-3 text-cyan-600" />
-            <div>
-              <div className="font-medium">رسالة</div>
-              <div className="text-xs text-gray-500">إرسال واتساب أو بريد</div>
             </div>
           </DropdownMenuItem>
 

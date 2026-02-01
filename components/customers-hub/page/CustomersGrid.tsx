@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  Phone, MessageSquare, Mail, MapPin, TrendingUp, 
+  Phone, MapPin, TrendingUp, 
   Calendar, Home, DollarSign, Star, Clock, Target
 } from "lucide-react";
 import Link from "next/link";
@@ -202,36 +202,6 @@ export function CustomersGrid() {
                     {customer.aiInsights.conversionProbability}%
                   </span>
                 </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="grid grid-cols-3 gap-1 pt-3 border-t">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 text-xs"
-                onClick={() => window.open(`tel:${customer.phone}`)}
-              >
-                <Phone className="h-3 w-3" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 text-xs"
-                onClick={() => window.open(`https://wa.me/${customer.whatsapp || customer.phone}`)}
-              >
-                <MessageSquare className="h-3 w-3" />
-              </Button>
-              {customer.email && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 text-xs"
-                  onClick={() => window.open(`mailto:${customer.email}`)}
-                >
-                  <Mail className="h-3 w-3" />
-                </Button>
               )}
             </div>
 

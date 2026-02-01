@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import {
-  Phone,
-  MessageSquare,
   Mail,
   MoreVertical,
   ChevronRight,
@@ -19,8 +17,6 @@ import { getStageNameAr } from "@/types/unified-customer";
 
 interface SwipeActionsProps {
   children: React.ReactNode;
-  onCall?: () => void;
-  onMessage?: () => void;
   onEmail?: () => void;
   onFavorite?: () => void;
   disabled?: boolean;
@@ -28,8 +24,6 @@ interface SwipeActionsProps {
 
 export function SwipeActions({
   children,
-  onCall,
-  onMessage,
   onEmail,
   onFavorite,
   disabled = false,
@@ -83,24 +77,6 @@ export function SwipeActions({
     <div className="relative overflow-hidden" ref={containerRef}>
       {/* Action Buttons (hidden behind) */}
       <div className="absolute inset-y-0 left-0 flex items-center gap-1 px-2">
-        {onCall && (
-          <Button
-            size="sm"
-            className="h-full rounded-none bg-blue-600 hover:bg-blue-700"
-            onClick={() => handleAction(onCall)}
-          >
-            <Phone className="h-5 w-5" />
-          </Button>
-        )}
-        {onMessage && (
-          <Button
-            size="sm"
-            className="h-full rounded-none bg-green-600 hover:bg-green-700"
-            onClick={() => handleAction(onMessage)}
-          >
-            <MessageSquare className="h-5 w-5" />
-          </Button>
-        )}
         {onEmail && (
           <Button
             size="sm"
@@ -138,16 +114,12 @@ export function SwipeActions({
 interface MobileCustomerCardProps {
   customer: UnifiedCustomer;
   onClick?: () => void;
-  onCall?: () => void;
-  onMessage?: () => void;
   onEmail?: () => void;
 }
 
 export function MobileCustomerCard({
   customer,
   onClick,
-  onCall,
-  onMessage,
   onEmail,
 }: MobileCustomerCardProps) {
   const [showActions, setShowActions] = useState(false);
@@ -174,7 +146,7 @@ export function MobileCustomerCard({
   };
 
   return (
-    <SwipeActions onCall={onCall} onMessage={onMessage} onEmail={onEmail}>
+    <SwipeActions onEmail={onEmail}>
       <div
         className="bg-white dark:bg-gray-900 border rounded-lg p-4 active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
         onClick={onClick}

@@ -17,8 +17,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Phone,
-  MessageSquare,
   Calendar,
   Clock,
   UserPlus,
@@ -29,8 +27,6 @@ import type { CustomerAction } from "@/types/unified-customer";
 
 interface ActionQuickPanelProps {
   action: CustomerAction;
-  onCall?: () => void;
-  onWhatsApp?: () => void;
   onSchedule?: () => void;
   onSnooze?: (duration: string) => void;
   onAssign?: () => void;
@@ -40,8 +36,6 @@ interface ActionQuickPanelProps {
 
 export function ActionQuickPanel({
   action,
-  onCall,
-  onWhatsApp,
   onSchedule,
   onSnooze,
   onAssign,
@@ -51,36 +45,6 @@ export function ActionQuickPanel({
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
-        {/* Call */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={onCall}
-            >
-              <Phone className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>اتصال</TooltipContent>
-        </Tooltip>
-
-        {/* WhatsApp */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={onWhatsApp}
-            >
-              <MessageSquare className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>واتساب</TooltipContent>
-        </Tooltip>
-
         {/* Schedule */}
         <Tooltip>
           <TooltipTrigger asChild>
