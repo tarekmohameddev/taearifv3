@@ -35,3 +35,5 @@ test.js
 
 # large profiler data
 /docs/ExcessFiles/profiler/
+.env
+.env.example
