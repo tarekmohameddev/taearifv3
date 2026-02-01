@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
+import { ScheduleAppointmentDialog } from "./ScheduleAppointmentDialog";
 import type { CustomerAction } from "@/types/unified-customer";
 import { Clock, AlertTriangle, User, GripVertical, StickyNote, Send, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ export function IncomingActionsCard({
 }: IncomingActionsCardProps) {
   const [showNoteInput, setShowNoteInput] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   
   const isOverdue =
     action.dueDate && new Date(action.dueDate) < new Date();
@@ -300,10 +302,7 @@ export function IncomingActionsCard({
 
           <ActionQuickPanel
             action={action}
-            onSchedule={() => {
-              // TODO: Implement schedule functionality
-              console.log("Schedule:", action.customerName);
-            }}
+            onSchedule={() => setShowScheduleDialog(true)}
             onSnooze={(until) => onSnooze?.(action.id, until)}
             onAssign={() => {
               // TODO: Implement assign functionality
@@ -313,6 +312,14 @@ export function IncomingActionsCard({
             onDismiss={() => onDismiss?.(action.id)}
           />
         </div>
+
+        <ScheduleAppointmentDialog
+          open={showScheduleDialog}
+          onOpenChange={setShowScheduleDialog}
+          customerId={action.customerId}
+          customerName={action.customerName}
+          onScheduled={() => onComplete?.(action.id)}
+        />
 
         {/* Quick Notes Section */}
         {showNoteInput && onAddNote && (

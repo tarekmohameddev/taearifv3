@@ -70,7 +70,7 @@ export function getActionDescriptionAr(
     document_required: `مستندات مطلوبة من العميل ${customer.name}.`,
     payment_due: `تذكير بالدفعة المستحقة للعميل ${customer.name}.`,
     site_visit: `جدولة معاينة عقار للعميل ${customer.name}.`,
-    whatsapp_incoming: `رسالة واتساب جديدة من ${customer.name} تتطلب الرد.`,
+    whatsapp_incoming: `طلب عقاري من ${customer.name} يتتطلب الرد او جدولة موعد.`,
     ai_recommended: `إجراء موصى به للعميل ${customer.name}.`,
   };
   
