@@ -81,6 +81,23 @@ interface UnifiedCustomersStore {
   getActionsByCustomerId: (customerId: string) => CustomerAction[];
   getPendingActionsCount: () => number;
   
+  // Bulk Action Methods
+  completeMultipleActions: (actionIds: string[]) => void;
+  dismissMultipleActions: (actionIds: string[]) => void;
+  snoozeMultipleActions: (actionIds: string[], until: string) => void;
+  assignMultipleActions: (actionIds: string[], assignedTo: string, assignedToName: string) => void;
+  updateMultipleActionsPriority: (actionIds: string[], priority: Priority) => void;
+  
+  // Undo & History
+  undoStack: { actionIds: string[]; previousStates: CustomerAction[] }[];
+  restoreAction: (actionId: string) => void;
+  undoLastAction: () => void;
+  getCompletedActions: () => CustomerAction[];
+  addToUndoStack: (actionIds: string[], previousStates: CustomerAction[]) => void;
+  
+  // Action Notes
+  addActionNote: (actionId: string, note: string) => void;
+  
   // Actions - Filters & Search
   setFilters: (filters: Partial<CustomerFilters>) => void;
   clearFilters: () => void;
@@ -168,6 +185,7 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
       // Initial Actions Data
       actions: [],
       filteredActions: [],
+      undoStack: [],
       
       // Initial Filters & Search
       filters: {},
@@ -281,11 +299,24 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
       },
       
       dismissAction: (actionId) => {
-        get().updateActionStatus(actionId, 'dismissed');
+        const { actions, addToUndoStack } = get();
+        const action = actions.find(a => a.id === actionId);
+        if (action) {
+          addToUndoStack([actionId], [action]);
+        }
+        get().updateAction(actionId, {
+          status: 'dismissed',
+          completedAt: new Date().toISOString(),
+        });
       },
       
       completeAction: (actionId) => {
         const userData = useAuthStore.getState().userData;
+        const { actions, addToUndoStack } = get();
+        const action = actions.find(a => a.id === actionId);
+        if (action) {
+          addToUndoStack([actionId], [action]);
+        }
         get().updateAction(actionId, {
           status: 'completed',
           completedAt: new Date().toISOString(),
@@ -303,6 +334,181 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
         return actions.filter((action) => 
           action.status === 'pending' || action.status === 'in_progress'
         ).length;
+      },
+      
+      // Bulk Action Implementations
+      completeMultipleActions: (actionIds: string[]) => {
+        const userData = useAuthStore.getState().userData;
+        const { actions, addToUndoStack } = get();
+        
+        // Save previous states for undo
+        const previousStates = actions.filter(a => actionIds.includes(a.id));
+        addToUndoStack(actionIds, previousStates);
+        
+        const updatedActions = actions.map((action) =>
+          actionIds.includes(action.id)
+            ? {
+                ...action,
+                status: 'completed' as CustomerActionStatus,
+                completedAt: new Date().toISOString(),
+                completedBy: userData?.user?.name || 'Unknown',
+              }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      dismissMultipleActions: (actionIds: string[]) => {
+        const { actions, addToUndoStack } = get();
+        
+        // Save previous states for undo
+        const previousStates = actions.filter(a => actionIds.includes(a.id));
+        addToUndoStack(actionIds, previousStates);
+        
+        const updatedActions = actions.map((action) =>
+          actionIds.includes(action.id)
+            ? { 
+                ...action, 
+                status: 'dismissed' as CustomerActionStatus,
+                completedAt: new Date().toISOString(),
+              }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      snoozeMultipleActions: (actionIds: string[], until: string) => {
+        const { actions, addToUndoStack } = get();
+        
+        // Save previous states for undo
+        const previousStates = actions.filter(a => actionIds.includes(a.id));
+        addToUndoStack(actionIds, previousStates);
+        
+        const updatedActions = actions.map((action) =>
+          actionIds.includes(action.id)
+            ? {
+                ...action,
+                status: 'snoozed' as CustomerActionStatus,
+                snoozedUntil: until,
+              }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      assignMultipleActions: (actionIds: string[], assignedTo: string, assignedToName: string) => {
+        const { actions } = get();
+        const updatedActions = actions.map((action) =>
+          actionIds.includes(action.id)
+            ? { ...action, assignedTo, assignedToName }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      updateMultipleActionsPriority: (actionIds: string[], priority: Priority) => {
+        const { actions } = get();
+        const updatedActions = actions.map((action) =>
+          actionIds.includes(action.id)
+            ? { ...action, priority }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      // Undo & History Implementation
+      addToUndoStack: (actionIds: string[], previousStates: CustomerAction[]) => {
+        const { undoStack } = get();
+        // Keep last 20 undo operations
+        const newStack = [...undoStack, { actionIds, previousStates }].slice(-20);
+        set({ undoStack: newStack });
+      },
+      
+      restoreAction: (actionId: string) => {
+        const { actions } = get();
+        const updatedActions = actions.map((action) =>
+          action.id === actionId
+            ? {
+                ...action,
+                status: 'pending' as CustomerActionStatus,
+                completedAt: undefined,
+                completedBy: undefined,
+                snoozedUntil: undefined,
+              }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
+      },
+      
+      undoLastAction: () => {
+        const { undoStack, actions } = get();
+        if (undoStack.length === 0) return;
+        
+        const lastAction = undoStack[undoStack.length - 1];
+        const previousStatesMap = new Map(lastAction.previousStates.map(a => [a.id, a]));
+        
+        const updatedActions = actions.map((action) =>
+          previousStatesMap.has(action.id)
+            ? previousStatesMap.get(action.id)!
+            : action
+        );
+        
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+          undoStack: undoStack.slice(0, -1),
+        });
+      },
+      
+      getCompletedActions: () => {
+        const { actions } = get();
+        return actions.filter((a) => 
+          a.status === 'completed' || a.status === 'dismissed'
+        ).sort((a, b) => {
+          const aDate = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+          const bDate = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+          return bDate - aDate;
+        });
+      },
+      
+      addActionNote: (actionId: string, note: string) => {
+        const { actions } = get();
+        const updatedActions = actions.map((action) =>
+          action.id === actionId
+            ? {
+                ...action,
+                metadata: {
+                  ...action.metadata,
+                  notes: [...(action.metadata?.notes || []), {
+                    text: note,
+                    createdAt: new Date().toISOString(),
+                  }],
+                },
+              }
+            : action
+        );
+        set({
+          actions: updatedActions,
+          filteredActions: updatedActions,
+        });
       },
       
       updateCustomer: (customerId, updates) => {
