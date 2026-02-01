@@ -32,3 +32,6 @@ test.js
 /pagebuildDashboard/
 /code/
 /trash/vareonsProject
+
+# large profiler data
+/docs/ExcessFiles/profiler/
