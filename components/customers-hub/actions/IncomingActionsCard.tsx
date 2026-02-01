@@ -9,13 +9,86 @@ import { Input } from "@/components/ui/input";
 import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
 import { ScheduleAppointmentDialog } from "./ScheduleAppointmentDialog";
-import type { CustomerAction } from "@/types/unified-customer";
-import { Clock, AlertTriangle, User, GripVertical, StickyNote, Send, Eye } from "lucide-react";
+import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
+import { Clock, AlertTriangle, User, GripVertical, StickyNote, Send, Eye, Phone, Building2, MapPin, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+type PropertyBlock = {
+  title?: string;
+  type?: string;
+  price?: number;
+  location?: string;
+  /** When true, this is from customer preferences (request summary) not a specific listing */
+  fromPreferences?: boolean;
+};
+
+/** Minimal property data that may be stored in action.metadata for property requests */
+function getPropertyFromMetadata(metadata: Record<string, unknown> | undefined): PropertyBlock | null {
+  if (!metadata || typeof metadata !== "object") return null;
+  try {
+    const title =
+      (metadata.propertyTitle as string) ??
+      (metadata.property_title as string) ??
+      (metadata.title as string);
+    const type =
+      (metadata.propertyType as string) ??
+      (metadata.property_type as string) ??
+      (metadata.type as string);
+    const price =
+      (metadata.propertyPrice as number) ??
+      (metadata.property_price as number) ??
+      (metadata.price as number);
+    const location =
+      (metadata.propertyLocation as string) ??
+      (metadata.property_location as string) ??
+      (metadata.location as string) ??
+      (metadata.address as string);
+    if (!title && !type && price == null && !location) return null;
+    return { title, type, price, location, fromPreferences: false };
+  } catch {
+    return null;
+  }
+}
+
+/** Build minimal property/request summary from customer preferences when no metadata property */
+function getPropertyFromPreferences(customer: UnifiedCustomer | undefined): PropertyBlock | null {
+  if (!customer?.preferences) return null;
+  const p = customer.preferences;
+  const type =
+    p.propertyType?.length
+      ? p.propertyType.join("، ")
+      : undefined;
+  const price =
+    p.budgetMin != null || p.budgetMax != null
+      ? (p.budgetMin ?? p.budgetMax)!
+      : undefined;
+  const priceRange =
+    p.budgetMin != null && p.budgetMax != null && p.budgetMin !== p.budgetMax
+      ? `${(p.budgetMin / 1_000_000).toFixed(1)}–${(p.budgetMax / 1_000_000).toFixed(1)} م.ر`
+      : p.budgetMin != null
+        ? `${(p.budgetMin / 1_000_000).toFixed(1)} م.ر`
+        : undefined;
+  const location =
+    p.preferredAreas?.length
+      ? p.preferredAreas.slice(0, 2).join(" · ")
+      : p.preferredCities?.length
+        ? p.preferredCities.slice(0, 2).join("، ")
+        : undefined;
+  if (!type && !priceRange && !location) return null;
+  return {
+    title: priceRange ?? undefined,
+    type,
+    price: p.budgetMin ?? p.budgetMax,
+    location,
+    fromPreferences: true,
+  };
+}
+
 interface IncomingActionsCardProps {
   action: CustomerAction;
+  /** When provided, customer phone (and WhatsApp) are shown on the card for quick contact */
+  customer?: UnifiedCustomer;
   onComplete?: (actionId: string) => void;
   onDismiss?: (actionId: string) => void;
   onSnooze?: (actionId: string, until: string) => void;
@@ -44,6 +117,7 @@ const priorityLabels = {
 
 export function IncomingActionsCard({
   action,
+  customer,
   onComplete,
   onDismiss,
   onSnooze,
@@ -58,7 +132,13 @@ export function IncomingActionsCard({
   const [showNoteInput, setShowNoteInput] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
-  
+
+  const propertyFromMeta = getPropertyFromMetadata(action.metadata);
+  const propertyFromPrefs = getPropertyFromPreferences(customer);
+  /** Prefer specific property from metadata; fallback to request summary from customer preferences */
+  const property = propertyFromMeta ?? propertyFromPrefs;
+  const showPropertyBlock = property && (property.title || property.type || property.price != null || property.location);
+
   const isOverdue =
     action.dueDate && new Date(action.dueDate) < new Date();
 
@@ -109,30 +189,66 @@ export function IncomingActionsCard({
             data-interactive="true"
           />
         )}
-        <div className="flex-1 min-w-0 flex items-center gap-3">
-          <Link
-            href={`/ar/dashboard/customers-hub/${action.customerId}`}
-            className="font-medium text-sm hover:text-blue-600 transition-colors truncate max-w-[150px]"
-            data-interactive="true"
-          >
-            {action.customerName}
-          </Link>
-          <span className="text-sm text-gray-600 truncate flex-1">{action.title}</span>
-          <SourceBadge source={action.source} className="text-xs" />
-          <Badge
-            variant="outline"
-            className={cn(
-              "text-xs",
-              action.priority === "urgent" && "bg-red-100 text-red-700 border-red-200",
-              action.priority === "high" && "bg-orange-100 text-orange-700 border-orange-200"
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link
+              href={`/ar/dashboard/customers-hub/${action.customerId}`}
+              className="font-medium text-sm hover:text-blue-600 transition-colors truncate max-w-[150px]"
+              data-interactive="true"
+            >
+              {action.customerName}
+            </Link>
+            {customer?.phone && (
+              <a
+                href={`tel:${customer.phone}`}
+                className="text-xs text-gray-600 hover:text-blue-600 flex items-center gap-1 dir-ltr"
+                dir="ltr"
+                data-interactive="true"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                {customer.phone}
+              </a>
             )}
-          >
-            {priorityLabels[action.priority]}
-          </Badge>
-          {isOverdue && (
-            <Badge variant="destructive" className="text-xs">
-              متأخر
+            <span className="text-sm text-gray-600 truncate flex-1">{action.title}</span>
+            <SourceBadge source={action.source} className="text-xs" />
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-xs",
+                action.priority === "urgent" && "bg-red-100 text-red-700 border-red-200",
+                action.priority === "high" && "bg-orange-100 text-orange-700 border-orange-200"
+              )}
+            >
+              {priorityLabels[action.priority]}
             </Badge>
+            {isOverdue && (
+              <Badge variant="destructive" className="text-xs">
+                متأخر
+              </Badge>
+            )}
+          </div>
+          {showPropertyBlock && (
+            <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
+              {property?.title && (
+                <span className="flex items-center gap-1 truncate max-w-[100px]">
+                  <DollarSign className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  <span className="truncate">{property.title}</span>
+                </span>
+              )}
+              {property?.type && (
+                <span className="flex items-center gap-1">
+                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  {property.type}
+                </span>
+              )}
+              {property?.location && (
+                <span className="flex items-center gap-1 truncate max-w-[90px]">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  <span className="truncate">{property.location}</span>
+                </span>
+              )}
+            </div>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -242,6 +358,53 @@ export function IncomingActionsCard({
               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                 {action.description}
               </p>
+            )}
+            {/* Customer phone for quick contact */}
+            {customer?.phone && (
+              <a
+                href={`tel:${customer.phone}`}
+                className="inline-flex items-center gap-1.5 mt-2 text-sm text-gray-600 hover:text-blue-600 dir-ltr"
+                dir="ltr"
+                data-interactive="true"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Phone className="h-4 w-4 shrink-0" />
+                {customer.phone}
+                {customer.whatsapp && customer.whatsapp !== customer.phone && (
+                  <span className="text-gray-400"> / واتساب: {customer.whatsapp}</span>
+                )}
+              </a>
+            )}
+            {/* Minimal property data: icon-first, simple layout */}
+            {showPropertyBlock && property && (
+              <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  {property.title && (
+                    <span className="flex items-center gap-1.5 min-w-0">
+                      <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
+                      <span className="truncate">{property.title}</span>
+                    </span>
+                  )}
+                  {property.type && (
+                    <span className="flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4 shrink-0 text-gray-500" />
+                      <span>{property.type}</span>
+                    </span>
+                  )}
+                  {property.price != null && property.price > 0 && !property.fromPreferences && (
+                    <span className="flex items-center gap-1.5">
+                      <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
+                      {property.price.toLocaleString("ar-SA")} ر.س
+                    </span>
+                  )}
+                  {property.location && (
+                    <span className="flex items-center gap-1.5 min-w-0 max-w-[220px]">
+                      <MapPin className="h-4 w-4 shrink-0 text-gray-500" />
+                      <span className="truncate">{property.location}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>

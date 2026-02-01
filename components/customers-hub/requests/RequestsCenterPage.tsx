@@ -178,6 +178,18 @@ export function RequestsCenterPage() {
 
   const completedActions = useMemo(() => getCompletedActions(), [actions]);
 
+  /** Stable map for customer lookup so cards get phone without store calls during list render */
+  const customerByIdMap = useMemo(() => {
+    const map = new Map<string, UnifiedCustomer>();
+    customers.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [customers]);
+
+  const getCustomerForCard = useCallback(
+    (id: string) => customerByIdMap.get(id),
+    [customerByIdMap]
+  );
+
   const uniqueAssignees = useMemo(() => {
     const assignees = new Map<string, string>();
     allPendingActions.forEach((a) => {
@@ -893,6 +905,7 @@ export function RequestsCenterPage() {
           <TabsContent value="inbox" className="mt-6">
             <RequestsList
               actions={inboxRequests}
+              getCustomerById={getCustomerForCard}
               isCompactView={isCompactView}
               selectedActionIds={selectedActionIds}
               onSelect={handleSelectAction}
@@ -906,6 +919,7 @@ export function RequestsCenterPage() {
           <TabsContent value="followups" className="mt-6">
             <RequestsList
               actions={followupRequests}
+              getCustomerById={getCustomerForCard}
               isCompactView={isCompactView}
               selectedActionIds={selectedActionIds}
               onSelect={handleSelectAction}
@@ -919,6 +933,7 @@ export function RequestsCenterPage() {
           <TabsContent value="all" className="mt-6">
             <RequestsList
               actions={filteredActions}
+              getCustomerById={getCustomerForCard}
               isCompactView={isCompactView}
               selectedActionIds={selectedActionIds}
               onSelect={handleSelectAction}
@@ -969,6 +984,7 @@ export function RequestsCenterPage() {
 
 function RequestsList({
   actions,
+  getCustomerById,
   isCompactView,
   selectedActionIds,
   onSelect,
@@ -979,6 +995,7 @@ function RequestsList({
   onQuickView,
 }: {
   actions: CustomerAction[];
+  getCustomerById: (id: string) => UnifiedCustomer | undefined;
   isCompactView: boolean;
   selectedActionIds: Set<string>;
   onSelect: (id: string, selected: boolean) => void;
@@ -1006,6 +1023,7 @@ function RequestsList({
         <IncomingActionsCard
           key={action.id}
           action={action}
+          customer={getCustomerById(action.customerId)}
           onComplete={onComplete}
           onDismiss={onDismiss}
           onSnooze={onSnooze}
