@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 import useAuthStore from "@/context/AuthContext";
 
 const TOP_NAV_ITEMS = [
-  { id: "dashboard", label: "لوحة التحكم", path: "/dashboard", icon: Home },
-  { id: "properties", label: "العقارات", path: "/dashboard/properties", icon: Home },
-  { id: "customers", label: "العملاء", path: "/dashboard/customers-hub", icon: Users },
+  { id: "dashboard", label: "لوحة التحكم", path: "/dashboard" },
+  { id: "properties", label: "العقارات", path: "/dashboard/properties" },
+  { id: "customers", label: "العملاء", path: "/dashboard/customers-hub" },
 ] as const;
 
 const VIEW_WEBSITE_LABEL = "معاينة الموقع";
@@ -122,7 +122,6 @@ export function DashboardTopNav() {
               </div>
               <nav className="flex flex-col gap-0.5 p-3">
                 {TOP_NAV_ITEMS.map((item) => {
-                  const Icon = item.icon;
                   const active = isActive(item.path);
                   return (
                     <Link
@@ -136,7 +135,6 @@ export function DashboardTopNav() {
                           : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}
                     >
-                      <Icon className="h-5 w-5 shrink-0" />
                       {item.label}
                     </Link>
                   );

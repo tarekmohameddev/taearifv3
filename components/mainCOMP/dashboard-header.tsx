@@ -31,19 +31,8 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       style={{ height: "var(--header-height)" }}
     >
       <div className="h-full flex items-center justify-between px-4 md:px-6 gap-4">
-        {/* Right side (RTL start): Logo and Navigation */}
+        {/* Right side (RTL start): Dashboard Navigation */}
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          <Link href="/" className="flex items-center shrink-0 transition-transform duration-200 hover:scale-105">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={120}
-              height={40}
-              className="h-auto w-auto max-h-10"
-              priority
-            />
-          </Link>
-
           {UserIslogged && (
             <div className="hidden lg:flex">
               <DashboardTopNav />

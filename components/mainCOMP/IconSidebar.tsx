@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
   Users,
   Home,
   Grid,
@@ -23,12 +23,6 @@ import { cn } from "@/lib/utils";
 import useAuthStore from "@/context/AuthContext";
 
 const SIDEBAR_ITEMS = [
-  { 
-    id: "dashboard", 
-    path: "/dashboard", 
-    icon: LayoutDashboard,
-    label: "لوحة التحكم"
-  },
   { 
     id: "customers", 
     path: "/dashboard/customers-hub", 
@@ -181,7 +175,21 @@ export function IconSidebar() {
       )}
       style={{ width: "var(--sidebar-width)" }}
     >
-      {/* Top Navigation Items */}
+      {/* Logo at the top */}
+      <div className="flex items-center justify-center py-4 px-2 border-b border-border/40">
+        <Link href="/" className="flex items-center transition-transform duration-200 hover:scale-110">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={48}
+            height={48}
+            className="h-auto w-auto max-h-12"
+            priority
+          />
+        </Link>
+      </div>
+
+      {/* Navigation Items */}
       <nav className="flex-1 flex flex-col items-center gap-2 py-6 px-2">
         {SIDEBAR_ITEMS.map((item) => (
           <IconButton key={item.id} item={item} />
