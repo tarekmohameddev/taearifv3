@@ -18,11 +18,9 @@ import { cn } from "@/lib/utils";
 import useAuthStore from "@/context/AuthContext";
 
 const TOP_NAV_ITEMS = [
+  { id: "dashboard", label: "لوحة التحكم", path: "/dashboard", icon: Home },
   { id: "properties", label: "العقارات", path: "/dashboard/properties", icon: Home },
   { id: "customers", label: "العملاء", path: "/dashboard/customers-hub", icon: Users },
-  { id: "live-editor", label: "تعديل التصميم", path: "/live-editor", icon: LayoutTemplate },
-  { id: "apps", label: "التطبيقات", path: "/dashboard/apps", icon: Grid },
-  { id: "settings", label: "إعدادات الموقع", path: "/dashboard/settings", icon: Settings },
 ] as const;
 
 const VIEW_WEBSITE_LABEL = "معاينة الموقع";
@@ -55,26 +53,24 @@ function openViewWebsite() {
 function NavLink({
   href,
   label,
-  icon: Icon,
   isActive,
 }: {
   href: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
   isActive: boolean;
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+        "px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out whitespace-nowrap",
+        "hover:scale-105 active:scale-95",
         isActive
-          ? "bg-primary text-primary-foreground shadow-sm"
-          : "text-muted-foreground hover:text-foreground hover:bg-muted/80",
+          ? "bg-success text-success-foreground shadow-md hover:shadow-lg"
+          : "text-foreground hover:bg-muted/60 hover:shadow-sm",
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
-      <span>{label}</span>
+      {label}
     </Link>
   );
 }
@@ -92,26 +88,16 @@ export function DashboardTopNav() {
 
   return (
     <>
-      {/* Desktop: horizontal nav */}
-      <nav className="hidden min-[900px]:flex items-center gap-0.5 bg-muted/40 rounded-xl px-1 py-1">
+      {/* Desktop: horizontal nav with pill-style tabs */}
+      <nav className="hidden min-[900px]:flex items-center gap-1">
         {TOP_NAV_ITEMS.map((item) => (
           <NavLink
             key={item.id}
             href={item.path}
             label={item.label}
-            icon={item.icon}
             isActive={isActive(item.path)}
           />
         ))}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={openViewWebsite}
-          className="gap-2 ms-1 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground"
-        >
-          <ExternalLink className="h-4 w-4 shrink-0" />
-          <span>{VIEW_WEBSITE_LABEL}</span>
-        </Button>
       </nav>
 
       {/* Mobile: hamburger + sheet */}

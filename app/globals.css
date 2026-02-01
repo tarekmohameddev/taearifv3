@@ -29,6 +29,10 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --sidebar-width: 64px;
+    --header-height: 64px;
   }
 
   .dark {
@@ -56,6 +60,10 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --sidebar-width: 64px;
+    --header-height: 64px;
   }
 }
 
@@ -65,6 +73,23 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Dashboard UI Enhancements */
+@layer components {
+  /* Smooth transitions for interactive elements */
+  .dashboard-transition {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  /* Enhanced hover states */
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-md;
   }
 }
 
@@ -98,4 +123,11 @@
 
 .leaflet-marker-icon {
   animation: marker-bounce 2s ease-in-out;
+}
+
+/* Hide reCAPTCHA badge */
+.grecaptcha-badge {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

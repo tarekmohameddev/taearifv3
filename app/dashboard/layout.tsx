@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { IconSidebar } from "@/components/mainCOMP/IconSidebar";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -235,11 +236,17 @@ export default function DashboardLayout({
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
         <PermissionWrapper>
-          <div className="flex min-h-screen flex-col" dir="rtl">
-            <DashboardHeader />
-            <main className="flex-1 p-4 md:p-6">
-            {children}
-          </main>
+          <div className="flex min-h-screen" dir="rtl">
+            {/* Icon Sidebar - positioned on right for RTL */}
+            <IconSidebar />
+            
+            {/* Main content area with header and page content */}
+            <div className="flex-1 flex flex-col min-w-0">
+              <DashboardHeader />
+              <main className="flex-1 p-4 md:p-6 bg-muted/30">
+                {children}
+              </main>
+            </div>
           </div>
         </PermissionWrapper>
       </div>
