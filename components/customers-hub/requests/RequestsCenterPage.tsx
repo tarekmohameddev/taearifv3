@@ -33,6 +33,9 @@ import {
   LayoutGrid,
   LayoutList,
   X,
+  MapPin,
+  Building2,
+  DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -73,6 +76,51 @@ const actionTypeLabels: Record<CustomerActionType, string> = {
   ai_recommended: "موصى به",
 };
 
+// Property type filter options (Arabic labels)
+const PROPERTY_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "villa", label: "فيلا" },
+  { value: "apartment", label: "شقة" },
+  { value: "land", label: "أرض" },
+  { value: "commercial", label: "تجاري" },
+];
+
+// Saudi regions (states) for filter
+const SAUDI_REGIONS = [
+  "الرياض",
+  "مكة المكرمة",
+  "المدينة المنورة",
+  "الشرقية",
+  "القصيم",
+  "عسير",
+  "تبوك",
+  "حائل",
+  "الحدود الشمالية",
+  "جازان",
+  "نجران",
+  "الباحة",
+  "الجوف",
+] as const;
+
+// Map city name to region (state) for filtering
+const CITY_TO_REGION: Record<string, string> = {
+  الرياض: "الرياض",
+  جدة: "مكة المكرمة",
+  مكة: "مكة المكرمة",
+  الدمام: "الشرقية",
+  الخبر: "الشرقية",
+  الظهران: "الشرقية",
+  أبها: "عسير",
+  "خميس مشيط": "عسير",
+  المدينة: "المدينة المنورة",
+  بريدة: "القصيم",
+  حائل: "حائل",
+  تبوك: "تبوك",
+  نجران: "نجران",
+  جازان: "جازان",
+  الباحة: "الباحة",
+  الجوف: "الجوف",
+};
+
 // Request types: customer-originated (inbound)
 const REQUEST_TYPES: CustomerActionType[] = [
   "new_inquiry",
@@ -109,6 +157,11 @@ export function RequestsCenterPage() {
   const [dueDateFilter, setDueDateFilter] = useState<
     "all" | "overdue" | "today" | "week" | "no_date"
   >("all");
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [budgetMin, setBudgetMin] = useState<string>("");
+  const [budgetMax, setBudgetMax] = useState<string>("");
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [selectedActionIds, setSelectedActionIds] = useState<Set<string>>(new Set());
   const [isCompactView, setIsCompactView] = useState(false);
   const [quickViewAction, setQuickViewAction] = useState<CustomerAction | null>(null);
@@ -132,6 +185,14 @@ export function RequestsCenterPage() {
     });
     return Array.from(assignees.entries()).map(([id, name]) => ({ id, name }));
   }, [allPendingActions]);
+
+  const uniqueCities = useMemo(() => {
+    const cities = new Set<string>();
+    customers.forEach((c) => {
+      if (c.city?.trim()) cities.add(c.city.trim());
+    });
+    return Array.from(cities).sort((a, b) => a.localeCompare(b, "ar"));
+  }, [customers]);
 
   const filteredActions = useMemo(() => {
     let filtered = allPendingActions;
@@ -180,6 +241,38 @@ export function RequestsCenterPage() {
       });
     }
 
+    // Customer-based filters: city, state (region), budget range, property type
+    if (
+      selectedCities.length > 0 ||
+      selectedStates.length > 0 ||
+      budgetMin !== "" ||
+      budgetMax !== "" ||
+      selectedPropertyTypes.length > 0
+    ) {
+      const filterMin = budgetMin ? Number(budgetMin) : undefined;
+      const filterMax = budgetMax ? Number(budgetMax) : undefined;
+      filtered = filtered.filter((a) => {
+        const customer = getCustomerById(a.customerId);
+        if (!customer) return false;
+        if (selectedCities.length > 0 && (!customer.city || !selectedCities.includes(customer.city))) return false;
+        if (selectedStates.length > 0) {
+          const customerRegion = customer.city ? CITY_TO_REGION[customer.city] : undefined;
+          if (!customerRegion || !selectedStates.includes(customerRegion)) return false;
+        }
+        if (filterMin !== undefined || filterMax !== undefined) {
+          const cMin = customer.preferences?.budgetMin;
+          const cMax = customer.preferences?.budgetMax;
+          if (filterMin !== undefined && cMax !== undefined && cMax < filterMin) return false;
+          if (filterMax !== undefined && cMin !== undefined && cMin > filterMax) return false;
+        }
+        if (selectedPropertyTypes.length > 0) {
+          const types = customer.preferences?.propertyType ?? [];
+          if (!types.some((t) => selectedPropertyTypes.includes(t))) return false;
+        }
+        return true;
+      });
+    }
+
     return filtered;
   }, [
     allPendingActions,
@@ -189,6 +282,12 @@ export function RequestsCenterPage() {
     selectedTypes,
     selectedAssignees,
     dueDateFilter,
+    selectedCities,
+    selectedStates,
+    budgetMin,
+    budgetMax,
+    selectedPropertyTypes,
+    getCustomerById,
   ]);
 
   const inboxRequests = useMemo(
@@ -322,6 +421,11 @@ export function RequestsCenterPage() {
     setSelectedTypes([]);
     setSelectedAssignees([]);
     setDueDateFilter("all");
+    setSelectedCities([]);
+    setSelectedStates([]);
+    setBudgetMin("");
+    setBudgetMax("");
+    setSelectedPropertyTypes([]);
   };
 
   const hasActiveFilters =
@@ -330,7 +434,12 @@ export function RequestsCenterPage() {
     selectedPriorities.length > 0 ||
     selectedTypes.length > 0 ||
     selectedAssignees.length > 0 ||
-    dueDateFilter !== "all";
+    dueDateFilter !== "all" ||
+    selectedCities.length > 0 ||
+    selectedStates.length > 0 ||
+    budgetMin !== "" ||
+    budgetMax !== "" ||
+    selectedPropertyTypes.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900" dir="rtl">
@@ -595,6 +704,145 @@ export function RequestsCenterPage() {
                       <DropdownMenuItem onClick={() => setDueDateFilter("no_date")}>
                         بدون تاريخ
                       </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {uniqueCities.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <MapPin className="h-4 w-4" />
+                          المدينة
+                          {selectedCities.length > 0 && (
+                            <Badge variant="secondary" className="mr-1">
+                              {selectedCities.length}
+                            </Badge>
+                          )}
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>المدينة</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {uniqueCities.map((city) => (
+                          <DropdownMenuCheckboxItem
+                            key={city}
+                            checked={selectedCities.includes(city)}
+                            onCheckedChange={(checked) =>
+                              setSelectedCities((prev) =>
+                                checked ? [...prev, city] : prev.filter((c) => c !== city)
+                              )
+                            }
+                          >
+                            {city}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <MapPin className="h-4 w-4" />
+                        المنطقة
+                        {selectedStates.length > 0 && (
+                          <Badge variant="secondary" className="mr-1">
+                            {selectedStates.length}
+                          </Badge>
+                        )}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>المنطقة (الولاية)</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {SAUDI_REGIONS.map((region) => (
+                        <DropdownMenuCheckboxItem
+                          key={region}
+                          checked={selectedStates.includes(region)}
+                          onCheckedChange={(checked) =>
+                            setSelectedStates((prev) =>
+                              checked ? [...prev, region] : prev.filter((r) => r !== region)
+                            )
+                          }
+                        >
+                          {region}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <DollarSign className="h-4 w-4" />
+                        الميزانية
+                        {(budgetMin !== "" || budgetMax !== "") && (
+                          <Badge variant="secondary" className="mr-1">
+                            1
+                          </Badge>
+                        )}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64 p-3">
+                      <DropdownMenuLabel>نطاق الميزانية (ر.س)</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <div className="grid grid-cols-2 gap-2 py-2">
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">من</label>
+                          <Input
+                            type="number"
+                            placeholder="الحد الأدنى"
+                            value={budgetMin}
+                            onChange={(e) => setBudgetMin(e.target.value)}
+                            className="h-8"
+                            min={0}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">إلى</label>
+                          <Input
+                            type="number"
+                            placeholder="الحد الأقصى"
+                            value={budgetMax}
+                            onChange={(e) => setBudgetMax(e.target.value)}
+                            className="h-8"
+                            min={0}
+                          />
+                        </div>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Building2 className="h-4 w-4" />
+                        نوع العقار
+                        {selectedPropertyTypes.length > 0 && (
+                          <Badge variant="secondary" className="mr-1">
+                            {selectedPropertyTypes.length}
+                          </Badge>
+                        )}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>نوع العقار</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {PROPERTY_TYPE_OPTIONS.map((opt) => (
+                        <DropdownMenuCheckboxItem
+                          key={opt.value}
+                          checked={selectedPropertyTypes.includes(opt.value)}
+                          onCheckedChange={(checked) =>
+                            setSelectedPropertyTypes((prev) =>
+                              checked
+                                ? [...prev, opt.value]
+                                : prev.filter((t) => t !== opt.value)
+                            )
+                          }
+                        >
+                          {opt.label}
+                        </DropdownMenuCheckboxItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   {hasActiveFilters && (
