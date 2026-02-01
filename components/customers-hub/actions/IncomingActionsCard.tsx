@@ -1,16 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
-import { ScheduleAppointmentDialog } from "./ScheduleAppointmentDialog";
+import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
-import { Clock, AlertTriangle, User, GripVertical, StickyNote, Send, Eye, Phone, Building2, MapPin, DollarSign } from "lucide-react";
+import type { Appointment } from "@/types/unified-customer";
+import { AlertTriangle, User, GripVertical, Eye, Phone, Building2, MapPin, DollarSign, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -115,6 +125,15 @@ const priorityLabels = {
   low: "منخفض",
 };
 
+const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
+  { value: "site_visit", label: "معاينة عقار" },
+  { value: "office_meeting", label: "اجتماع مكتب" },
+  { value: "phone_call", label: "مكالمة هاتفية" },
+  { value: "video_call", label: "مكالمة فيديو" },
+  { value: "contract_signing", label: "توقيع عقد" },
+  { value: "other", label: "أخرى" },
+];
+
 export function IncomingActionsCard({
   action,
   customer,
@@ -129,9 +148,13 @@ export function IncomingActionsCard({
   isCompact = false,
   className,
 }: IncomingActionsCardProps) {
-  const [showNoteInput, setShowNoteInput] = useState(false);
-  const [noteText, setNoteText] = useState("");
-  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const { addAppointment } = useUnifiedCustomersStore();
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
+  const [aptDate, setAptDate] = useState("");
+  const [aptTime, setAptTime] = useState("10:00");
+  const [aptNotes, setAptNotes] = useState("");
+  const [isSubmittingApt, setIsSubmittingApt] = useState(false);
 
   const propertyFromMeta = getPropertyFromMetadata(action.metadata);
   const propertyFromPrefs = getPropertyFromPreferences(customer);
@@ -142,13 +165,6 @@ export function IncomingActionsCard({
   const isOverdue =
     action.dueDate && new Date(action.dueDate) < new Date();
 
-  const timeUntilDue = action.dueDate
-    ? Math.round(
-        (new Date(action.dueDate).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60)
-      )
-    : null;
-
   const handleCardClick = (e: React.MouseEvent) => {
     // Only toggle selection if clicking on the card background, not on interactive elements
     const target = e.target as HTMLElement;
@@ -158,15 +174,52 @@ export function IncomingActionsCard({
     }
   };
 
-  const handleAddNote = () => {
-    if (noteText.trim() && onAddNote) {
-      onAddNote(action.id, noteText.trim());
-      setNoteText("");
-      setShowNoteInput(false);
+  // Set default date when opening schedule form
+  React.useEffect(() => {
+    if (showScheduleForm && !aptDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setAptDate(tomorrow.toISOString().slice(0, 10));
+      setAptTime("10:00");
     }
+  }, [showScheduleForm, aptDate]);
+
+  const resetScheduleForm = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setAptType("office_meeting");
+    setAptDate(tomorrow.toISOString().slice(0, 10));
+    setAptTime("10:00");
+    setAptNotes("");
   };
 
-  const existingNotes = action.metadata?.notes || [];
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aptDate || !aptTime) return;
+    setIsSubmittingApt(true);
+    const now = new Date().toISOString();
+    const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
+    const appointment: Appointment = {
+      id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+      title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
+      type: aptType,
+      date: datetime,
+      time: aptTime,
+      datetime,
+      duration: 30,
+      location: undefined,
+      status: "scheduled",
+      priority: "medium",
+      notes: aptNotes.trim() || undefined,
+      createdAt: now,
+      updatedAt: now,
+    };
+    addAppointment(action.customerId, appointment);
+    setIsSubmittingApt(false);
+    setShowScheduleForm(false);
+    resetScheduleForm();
+    onComplete?.(action.id);
+  };
 
   // Compact view for dense mode
   if (isCompact) {
@@ -210,7 +263,6 @@ export function IncomingActionsCard({
                 {customer.phone}
               </a>
             )}
-            <span className="text-sm text-gray-600 truncate flex-1">{action.title}</span>
             <SourceBadge source={action.source} className="text-xs" />
             <Badge
               variant="outline"
@@ -226,6 +278,24 @@ export function IncomingActionsCard({
               <Badge variant="destructive" className="text-xs">
                 متأخر
               </Badge>
+            )}
+            {action.dueDate && (
+              <span
+                className={cn(
+                  "text-xs flex items-center gap-1 shrink-0",
+                  isOverdue ? "text-red-600 font-medium" : "text-gray-500"
+                )}
+              >
+                <Clock className="h-3.5 w-3.5" />
+                {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             )}
           </div>
           {showPropertyBlock && (
@@ -353,7 +423,6 @@ export function IncomingActionsCard({
                 </Badge>
               )}
             </div>
-            <CardTitle className="text-base mb-1">{action.title}</CardTitle>
             {action.description && (
               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                 {action.description}
@@ -411,28 +480,27 @@ export function IncomingActionsCard({
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
             {action.dueDate && (
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                {timeUntilDue !== null && (
-                  <span
-                    className={cn(
-                      isOverdue && "text-red-600 font-medium",
-                      timeUntilDue <= 2 &&
-                        !isOverdue &&
-                        "text-orange-600 font-medium"
-                    )}
-                  >
-                    {isOverdue
-                      ? `متأخر ${Math.abs(timeUntilDue)} ساعة`
-                      : timeUntilDue === 0
-                      ? "خلال ساعة"
-                      : timeUntilDue < 24
-                      ? `خلال ${timeUntilDue} ساعة`
-                      : `خلال ${Math.round(timeUntilDue / 24)} يوم`}
-                  </span>
+              <div
+                className={cn(
+                  "flex items-center gap-1.5",
+                  isOverdue && "text-red-600 font-medium"
                 )}
+              >
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>
+                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
             )}
             {action.assignedToName && (
@@ -441,91 +509,90 @@ export function IncomingActionsCard({
                 <span>{action.assignedToName}</span>
               </div>
             )}
-            {/* Quick Note Toggle */}
-            {onAddNote && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 gap-1 text-gray-500 hover:text-blue-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowNoteInput(!showNoteInput);
-                }}
-                data-interactive="true"
-              >
-                <StickyNote className="h-4 w-4" />
-                {existingNotes.length > 0 && (
-                  <Badge variant="secondary" className="h-4 px-1 text-xs">
-                    {existingNotes.length}
-                  </Badge>
-                )}
-              </Button>
-            )}
           </div>
 
           <ActionQuickPanel
             action={action}
-            onSchedule={() => setShowScheduleDialog(true)}
-            onSnooze={(until) => onSnooze?.(action.id, until)}
-            onAssign={() => {
-              // TODO: Implement assign functionality
-              console.log("Assign:", action.customerName);
-            }}
-            onComplete={() => onComplete?.(action.id)}
-            onDismiss={() => onDismiss?.(action.id)}
+            onSchedule={() => setShowScheduleForm((prev) => !prev)}
           />
         </div>
 
-        <ScheduleAppointmentDialog
-          open={showScheduleDialog}
-          onOpenChange={setShowScheduleDialog}
-          customerId={action.customerId}
-          customerName={action.customerName}
-          onScheduled={() => onComplete?.(action.id)}
-        />
-
-        {/* Quick Notes Section */}
-        {showNoteInput && onAddNote && (
-          <div 
+        {/* Inline جدولة موعد form (expand in card) */}
+        {showScheduleForm && (
+          <div
             className="border-t pt-3 mt-2"
             onClick={(e) => e.stopPropagation()}
             data-interactive="true"
           >
-            {/* Existing Notes */}
-            {existingNotes.length > 0 && (
-              <div className="mb-2 space-y-1">
-                {existingNotes.slice(-3).map((note: { text: string; createdAt: string }, idx: number) => (
-                  <div key={idx} className="text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 rounded px-2 py-1">
-                    <span>{note.text}</span>
-                    <span className="text-gray-400 mr-2">
-                      - {new Date(note.createdAt).toLocaleDateString("ar-SA")}
-                    </span>
-                  </div>
-                ))}
+            <form onSubmit={handleScheduleSubmit} className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="apt-type" className="text-sm">نوع الموعد</Label>
+                <Select value={aptType} onValueChange={(v) => setAptType(v as Appointment["type"])}>
+                  <SelectTrigger id="apt-type" className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {APPOINTMENT_TYPES.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-            {/* Add Note Input */}
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder="أضف ملاحظة سريعة..."
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                className="h-8 text-sm"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleAddNote();
-                  }
-                }}
-              />
-              <Button
-                size="sm"
-                className="h-8 px-3"
-                onClick={handleAddNote}
-                disabled={!noteText.trim()}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="apt-date" className="text-sm">التاريخ</Label>
+                  <Input
+                    id="apt-date"
+                    type="date"
+                    value={aptDate}
+                    onChange={(e) => setAptDate(e.target.value)}
+                    required
+                    className="h-9"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="apt-time" className="text-sm">الوقت</Label>
+                  <Input
+                    id="apt-time"
+                    type="time"
+                    value={aptTime}
+                    onChange={(e) => setAptTime(e.target.value)}
+                    required
+                    className="h-9"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="apt-notes" className="text-sm">ملاحظات (اختياري)</Label>
+                <Textarea
+                  id="apt-notes"
+                  value={aptNotes}
+                  onChange={(e) => setAptNotes(e.target.value)}
+                  placeholder="تفاصيل إضافية"
+                  rows={3}
+                  className="resize-none text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => {
+                    setShowScheduleForm(false);
+                    resetScheduleForm();
+                  }}
+                >
+                  إلغاء
+                </Button>
+                <Button type="submit" size="sm" className="h-8" disabled={isSubmittingApt}>
+                  {isSubmittingApt ? "جاري الحفظ..." : "جدولة الموعد"}
+                </Button>
+              </div>
+            </form>
           </div>
         )}
       </CardContent>

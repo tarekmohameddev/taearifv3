@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Appointment, Priority } from "@/types/unified-customer";
+import type { Appointment } from "@/types/unified-customer";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Calendar } from "lucide-react";
 
@@ -30,13 +31,6 @@ const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
   { value: "video_call", label: "مكالمة فيديو" },
   { value: "contract_signing", label: "توقيع عقد" },
   { value: "other", label: "أخرى" },
-];
-
-const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
-  { value: "urgent", label: "عاجل" },
-  { value: "high", label: "مهم" },
-  { value: "medium", label: "متوسط" },
-  { value: "low", label: "منخفض" },
 ];
 
 interface ScheduleAppointmentDialogProps {
@@ -55,27 +49,19 @@ export function ScheduleAppointmentDialog({
   onScheduled,
 }: ScheduleAppointmentDialogProps) {
   const { addAppointment } = useUnifiedCustomersStore();
-  const [title, setTitle] = useState("");
   const [type, setType] = useState<Appointment["type"]>("office_meeting");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [duration, setDuration] = useState(30);
-  const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
-  const [priority, setPriority] = useState<Priority>("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    setTitle("");
     setType("office_meeting");
     setDate(tomorrow.toISOString().slice(0, 10));
     setTime("10:00");
-    setDuration(30);
-    setLocation("");
     setNotes("");
-    setPriority("medium");
   };
 
   const handleOpenChange = (next: boolean) => {
@@ -91,15 +77,15 @@ export function ScheduleAppointmentDialog({
     const datetime = new Date(`${date}T${time}`).toISOString();
     const appointment: Appointment = {
       id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-      title: title.trim() || (APPOINTMENT_TYPES.find((t) => t.value === type)?.label ?? "موعد"),
+      title: APPOINTMENT_TYPES.find((t) => t.value === type)?.label ?? "موعد",
       type,
       date: datetime,
       time,
       datetime,
-      duration,
-      location: location.trim() || undefined,
+      duration: 30,
+      location: undefined,
       status: "scheduled",
-      priority,
+      priority: "medium",
       notes: notes.trim() || undefined,
       createdAt: now,
       updatedAt: now,
@@ -133,46 +119,20 @@ export function ScheduleAppointmentDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="apt-type">نوع الموعد</Label>
-              <Select value={type} onValueChange={(v) => setType(v as Appointment["type"])}>
-                <SelectTrigger id="apt-type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {APPOINTMENT_TYPES.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apt-priority">الأولوية</Label>
-              <Select value={priority} onValueChange={(v) => setPriority(v as Priority)}>
-                <SelectTrigger id="apt-priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRIORITY_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
           <div className="space-y-2">
-            <Label htmlFor="apt-title">عنوان (اختياري)</Label>
-            <Input
-              id="apt-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="مثال: معاينة فيلا الرياض"
-            />
+            <Label htmlFor="apt-type">نوع الموعد</Label>
+            <Select value={type} onValueChange={(v) => setType(v as Appointment["type"])}>
+              <SelectTrigger id="apt-type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {APPOINTMENT_TYPES.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -196,42 +156,15 @@ export function ScheduleAppointmentDialog({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="apt-duration">المدة (دقيقة)</Label>
-              <Select
-                value={String(duration)}
-                onValueChange={(v) => setDuration(Number(v))}
-              >
-                <SelectTrigger id="apt-duration">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[15, 30, 45, 60, 90, 120].map((m) => (
-                    <SelectItem key={m} value={String(m)}>
-                      {m} دقيقة
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apt-location">المكان (اختياري)</Label>
-              <Input
-                id="apt-location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="العنوان أو الرابط"
-              />
-            </div>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="apt-notes">ملاحظات (اختياري)</Label>
-            <Input
+            <Textarea
               id="apt-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="تفاصيل إضافية"
+              rows={4}
+              className="resize-none"
             />
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
