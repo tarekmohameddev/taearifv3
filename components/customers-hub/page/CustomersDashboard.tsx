@@ -12,13 +12,10 @@ import {
   Clock,
   Zap,
   AlertTriangle,
-  ArrowLeft
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { getStageNameAr, LIFECYCLE_STAGES } from "@/types/unified-customer";
-import Link from "next/link";
 
 export function CustomersDashboard() {
   const { statistics, customers } = useUnifiedCustomersStore();
@@ -175,16 +172,10 @@ export function CustomersDashboard() {
 
           {/* Top Actions */}
           <div className="mt-4 p-3 bg-white dark:bg-gray-900 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2">
               <div className="font-semibold text-sm">
                 الإجراءات الموصى بها اليوم:
               </div>
-              <Link href="/ar/dashboard/customers-hub/actions">
-                <Button variant="outline" size="sm" className="gap-1 text-xs">
-                  عرض الكل
-                  <ArrowLeft className="h-3 w-3" />
-                </Button>
-              </Link>
             </div>
             <div className="space-y-2">
               {customers

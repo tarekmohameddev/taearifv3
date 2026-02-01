@@ -19,10 +19,29 @@ import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
+import {
+  getStageNameAr,
+  getStageColor,
+  LIFECYCLE_STAGES,
+  type CustomerLifecycleStage,
+} from "@/types/unified-customer";
 import type { Appointment } from "@/types/unified-customer";
-import { AlertTriangle, User, GripVertical, Eye, Phone, Building2, MapPin, DollarSign, Clock } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type PropertyBlock = {
   title?: string;
@@ -95,6 +114,44 @@ function getPropertyFromPreferences(customer: UnifiedCustomer | undefined): Prop
   };
 }
 
+/** Required data for AI property matching: property type/purpose + budget or location */
+const AI_MATCHING_REQUIRED = {
+  propertyType: "نوع العقار",
+  budget: "الميزانية",
+  location: "المنطقة أو المدينة",
+} as const;
+
+function getAIMatchingStatus(customer: UnifiedCustomer | undefined): {
+  canMatch: boolean;
+  matchCount: number;
+  missingFields: string[];
+} {
+  const matchCount = customer?.aiInsights?.propertyMatches?.length ?? 0;
+  if (!customer?.preferences) {
+    return {
+      canMatch: false,
+      matchCount,
+      missingFields: [AI_MATCHING_REQUIRED.propertyType, AI_MATCHING_REQUIRED.budget, AI_MATCHING_REQUIRED.location],
+    };
+  }
+  const p = customer.preferences;
+  const hasPropertyType = (p.propertyType?.length ?? 0) > 0;
+  const hasPurpose = !!p.purpose;
+  const hasBudget = p.budgetMin != null || p.budgetMax != null;
+  const hasLocation =
+    (p.preferredAreas?.length ?? 0) > 0 || (p.preferredCities?.length ?? 0) > 0;
+  const canMatch = (hasPropertyType || hasPurpose) && (hasBudget || hasLocation);
+  const missingFields: string[] = [];
+  if (!hasPropertyType && !hasPurpose) missingFields.push(AI_MATCHING_REQUIRED.propertyType);
+  if (!hasBudget) missingFields.push(AI_MATCHING_REQUIRED.budget);
+  if (!hasLocation) missingFields.push(AI_MATCHING_REQUIRED.location);
+  return {
+    canMatch,
+    matchCount,
+    missingFields,
+  };
+}
+
 interface IncomingActionsCardProps {
   action: CustomerAction;
   /** When provided, customer phone (and WhatsApp) are shown on the card for quick contact */
@@ -148,7 +205,8 @@ export function IncomingActionsCard({
   isCompact = false,
   className,
 }: IncomingActionsCardProps) {
-  const { addAppointment } = useUnifiedCustomersStore();
+  const router = useRouter();
+  const { addAppointment, updateCustomerStage } = useUnifiedCustomersStore();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
   const [aptDate, setAptDate] = useState("");
@@ -161,16 +219,18 @@ export function IncomingActionsCard({
   /** Prefer specific property from metadata; fallback to request summary from customer preferences */
   const property = propertyFromMeta ?? propertyFromPrefs;
   const showPropertyBlock = property && (property.title || property.type || property.price != null || property.location);
+  const aiMatching = getAIMatchingStatus(customer);
 
   const isOverdue =
     action.dueDate && new Date(action.dueDate) < new Date();
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only toggle selection if clicking on the card background, not on interactive elements
+    // Only navigate if clicking on the card background, not on interactive elements
     const target = e.target as HTMLElement;
     const isInteractive = target.closest('button, a, [role="checkbox"], input, [data-interactive]');
-    if (!isInteractive && onSelect && showCheckbox) {
-      onSelect(action.id, !isSelected);
+    if (!isInteractive) {
+      // Navigate to request details page
+      router.push(`/ar/dashboard/customers-hub/requests/${action.id}`);
     }
   };
 
@@ -296,6 +356,84 @@ export function IncomingActionsCard({
                   minute: "2-digit",
                 })}
               </span>
+            )}
+            {customer && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-xs flex items-center gap-1 shrink-0 rounded hover:bg-gray-100 dark:hover:bg-gray-800 px-1 -mx-1 py-0.5 transition-colors cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                    data-interactive="true"
+                  >
+                    {customer.stage ? (
+                      <>
+                        <span
+                          className="size-1.5 rounded-full shrink-0"
+                          style={{ backgroundColor: getStageColor(customer.stage) }}
+                          aria-hidden
+                        />
+                        <span style={{ color: getStageColor(customer.stage) }} className="font-medium">
+                          {getStageNameAr(customer.stage)}
+                        </span>
+                        <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
+                      </>
+                    ) : (
+                      <span className="text-gray-500 font-medium">تعيين المرحلة</span>
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[180px]">
+                  {LIFECYCLE_STAGES.map((stage) => (
+                    <DropdownMenuItem
+                      key={stage.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateCustomerStage(action.customerId, stage.id as CustomerLifecycleStage);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <span
+                        className="size-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: stage.color }}
+                        aria-hidden
+                      />
+                      {stage.nameAr}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {customer && (
+              <div className="flex items-center gap-1.5 text-xs shrink-0">
+                {aiMatching.canMatch ? (
+                  <>
+                    <Sparkles className="h-3 w-3 text-violet-500 shrink-0" />
+                    <span className="text-violet-600 dark:text-violet-400 font-medium">
+                      {aiMatching.matchCount} مطابق
+                    </span>
+                  </>
+                ) : (
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400/90 cursor-help">
+                          <Sparkles className="h-3 w-3 shrink-0 opacity-70" />
+                          <span>أكمِل الحقول</span>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs text-xs">
+                        <p className="font-medium mb-1">لتفعيل المطابقة بالذكاء الاصطناعي:</p>
+                        <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
+                          {aiMatching.missingFields.map((f) => (
+                            <li key={f}>{f}</li>
+                          ))}
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             )}
           </div>
           {showPropertyBlock && (
@@ -480,33 +618,119 @@ export function IncomingActionsCard({
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
-            {action.dueDate && (
-              <div
-                className={cn(
-                  "flex items-center gap-1.5",
-                  isOverdue && "text-red-600 font-medium"
-                )}
-              >
-                <Clock className="h-4 w-4 shrink-0" />
-                <span>
-                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+              {action.dueDate && (
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5",
+                    isOverdue && "text-red-600 font-medium"
+                  )}
+                >
+                  <Clock className="h-4 w-4 shrink-0" />
+                  <span>
+                    {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                      weekday: "short",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+              )}
+              {action.assignedToName && (
+                <div className="flex items-center gap-1.5">
+                  <User className="h-4 w-4" />
+                  <span>{action.assignedToName}</span>
+                </div>
+              )}
+            </div>
+            {customer && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-800 px-1 -mx-1 py-0.5 transition-colors cursor-pointer text-right w-fit"
+                    onClick={(e) => e.stopPropagation()}
+                    data-interactive="true"
+                  >
+                    {customer.stage ? (
+                      <>
+                        <span
+                          className="size-2 rounded-full shrink-0"
+                          style={{ backgroundColor: getStageColor(customer.stage) }}
+                          aria-hidden
+                        />
+                        <span style={{ color: getStageColor(customer.stage) }} className="font-medium">
+                          {getStageNameAr(customer.stage)}
+                        </span>
+                        <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
+                      </>
+                    ) : (
+                      <span className="text-gray-500 font-medium">تعيين المرحلة</span>
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[180px]">
+                  {LIFECYCLE_STAGES.map((stage) => (
+                    <DropdownMenuItem
+                      key={stage.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateCustomerStage(action.customerId, stage.id as CustomerLifecycleStage);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <span
+                        className="size-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: stage.color }}
+                        aria-hidden
+                      />
+                      {stage.nameAr}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            {action.assignedToName && (
-              <div className="flex items-center gap-1.5">
-                <User className="h-4 w-4" />
-                <span>{action.assignedToName}</span>
+            {/* AI property matching indicator */}
+            {customer && (
+              <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
+                {aiMatching.canMatch ? (
+                  <div className="flex items-center gap-2 text-xs">
+                    <Sparkles className="h-3.5 w-3.5 text-violet-500 shrink-0" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      مطابقة الذكاء الاصطناعي:
+                    </span>
+                    <span className="font-semibold text-violet-600 dark:text-violet-400">
+                      {aiMatching.matchCount} عقار مطابق
+                    </span>
+                  </div>
+                ) : (
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0 opacity-70" />
+                          <span>
+                            أكمِل الحقول المطلوبة لتفعيل المطابقة بالذكاء الاصطناعي
+                          </span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs text-xs">
+                        <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
+                        <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
+                          {aiMatching.missingFields.map((f) => (
+                            <li key={f}>{f}</li>
+                          ))}
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </div>
             )}
           </div>

@@ -7,8 +7,8 @@ export default function CustomersHubMainPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to actions page as the new entry point
-    router.replace('/ar/dashboard/customers-hub/actions');
+    // Redirect to requests page as the new entry point
+    router.replace('/ar/dashboard/customers-hub/requests');
   }, [router]);
 
   // Show loading state while redirecting

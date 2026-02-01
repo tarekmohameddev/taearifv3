@@ -29,7 +29,6 @@ import {
   Timer,
   UserPlus,
   MessageSquare,
-  Zap,
   LayoutGrid,
   LayoutList,
   X,
@@ -489,12 +488,6 @@ export function RequestsCenterPage() {
                 <LayoutGrid className="h-4 w-4" />
               )}
             </Button>
-            <Link href="/ar/dashboard/customers-hub/actions">
-              <Button variant="outline" className="gap-2">
-                <Zap className="h-4 w-4" />
-                مركز الإجراءات الكامل
-              </Button>
-            </Link>
           </div>
         </div>
 
