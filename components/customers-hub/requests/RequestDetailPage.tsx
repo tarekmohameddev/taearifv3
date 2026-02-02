@@ -41,7 +41,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SourceBadge } from "../actions/SourceBadge";
-import type { CustomerAction, UnifiedCustomer, Appointment } from "@/types/unified-customer";
+import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 
 interface RequestDetailPageProps {
@@ -209,6 +209,11 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
         matchCount: customer.aiInsights?.propertyMatches?.length ?? 0,
       }
     : { canMatch: false, matchCount: 0 };
+
+  // Resolve AI-matched properties (full details from customer.properties)
+  const matchedProperties: PropertyInterest[] = customer?.properties?.filter((p) =>
+    customer.aiInsights?.propertyMatches?.includes(p.propertyId)
+  ) ?? [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900" dir="rtl">
@@ -436,26 +441,123 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                       )
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  {/* AI Matching Status */}
-                  {customer && (
-                    <div className="mt-4 pt-4 border-t">
-                      {aiMatching.canMatch ? (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Sparkles className="h-4 w-4 text-violet-500" />
-                          <span className="text-gray-600 dark:text-gray-400">
-                            مطابقة الذكاء الاصطناعي:
-                          </span>
-                          <span className="font-semibold text-violet-600 dark:text-violet-400">
-                            {aiMatching.matchCount} عقار مطابق
-                          </span>
+            {/* مطابقة الذكاء الاصطناعي - Separate section with full matched property details */}
+            {customer && (
+              <Card className="border-violet-200 dark:border-violet-800/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-violet-500" />
+                    مطابقة الذكاء الاصطناعي
+                    {aiMatching.matchCount > 0 && (
+                      <Badge variant="secondary" className="text-violet-600 dark:text-violet-400">
+                        {aiMatching.matchCount} عقار
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {aiMatching.canMatch ? (
+                    matchedProperties.length > 0 ? (
+                      <div className="space-y-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          عقارات مطابقة لتفضيلات العميل حسب الذكاء الاصطناعي:
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {matchedProperties.map((property) => (
+                            <Card
+                              key={property.id}
+                              className="overflow-hidden hover:shadow-md transition-shadow border-violet-100 dark:border-violet-900/30"
+                            >
+                              {property.propertyImage && (
+                                <div
+                                  className="h-36 bg-cover bg-center"
+                                  style={{
+                                    backgroundImage: `url(${property.propertyImage})`,
+                                  }}
+                                />
+                              )}
+                              <CardContent className="p-4 space-y-3">
+                                <div>
+                                  <h4 className="font-semibold text-base">{property.propertyTitle}</h4>
+                                  {property.propertyLocation && (
+                                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                                      {property.propertyLocation}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {property.propertyType && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {property.propertyType}
+                                    </Badge>
+                                  )}
+                                  {property.status && (
+                                    <Badge
+                                      variant={
+                                        property.status === "viewing_scheduled" || property.status === "liked"
+                                          ? "default"
+                                          : "secondary"
+                                      }
+                                      className="text-xs"
+                                    >
+                                      {property.status === "interested"
+                                        ? "مهتم"
+                                        : property.status === "viewing_scheduled"
+                                          ? "معاينة مجدولة"
+                                          : property.status === "viewed"
+                                            ? "تمت المعاينة"
+                                            : property.status === "liked"
+                                              ? "معجب"
+                                              : property.status === "rejected"
+                                                ? "مرفوض"
+                                                : property.status === "offer_made"
+                                                  ? "عرض مقدم"
+                                                  : property.status}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {property.propertyPrice != null && (
+                                  <div className="flex items-center gap-1.5 text-base font-bold text-green-600 dark:text-green-400">
+                                    <DollarSign className="h-4 w-4" />
+                                    {(property.propertyPrice / 1000).toFixed(0)}k ر.س
+                                  </div>
+                                )}
+                                {property.addedAt && (
+                                  <p className="text-xs text-gray-500">
+                                    أضيف:{" "}
+                                    {new Date(property.addedAt).toLocaleDateString("ar-SA", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </p>
+                                )}
+                                <Button variant="outline" size="sm" className="w-full gap-1.5">
+                                  <Eye className="h-3.5 w-3.5" />
+                                  عرض التفاصيل
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-                          <Sparkles className="h-4 w-4 opacity-70" />
-                          <span>أكمِل تفضيلات العميل لتفعيل المطابقة بالذكاء الاصطناعي</span>
-                        </div>
-                      )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 py-2">
+                        <Sparkles className="h-4 w-4" />
+                        <span>
+                          {aiMatching.matchCount} عقار مطابق — أضف العقارات للعميل لعرض التفاصيل هنا
+                        </span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 py-2">
+                      <Sparkles className="h-4 w-4 opacity-70" />
+                      <span>أكمِل تفضيلات العميل لتفعيل المطابقة بالذكاء الاصطناعي</span>
                     </div>
                   )}
                 </CardContent>
