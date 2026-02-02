@@ -156,7 +156,7 @@ export function LeadScoringDashboard() {
       {/* Scoring Factors */}
       <Card>
         <CardHeader>
-          <CardTitle>عوامل تقييم جودة العميل</CardTitle>
+          <CardTitle>عوامل التقييم</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">

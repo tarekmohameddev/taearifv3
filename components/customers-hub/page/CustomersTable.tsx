@@ -53,13 +53,6 @@ export function CustomersTable() {
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
-  const getLeadScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 bg-green-50";
-    if (score >= 60) return "text-blue-600 bg-blue-50";
-    if (score >= 40) return "text-yellow-600 bg-yellow-50";
-    return "text-red-600 bg-red-50";
-  };
-
   const getPriorityBadge = (priority: string) => {
     const variants: Record<string, { variant: any; text: string }> = {
       urgent: { variant: "destructive", text: "عاجل" },
@@ -166,7 +159,6 @@ export function CustomersTable() {
             <TableRow>
               <TableHead className="text-right">العميل</TableHead>
               <TableHead className="text-right">المرحلة</TableHead>
-              <TableHead className="text-right">جودة العميل</TableHead>
               <TableHead className="text-right">الأولوية</TableHead>
               <TableHead className="text-right">المصدر</TableHead>
               <TableHead className="text-right">الموظف المسؤول</TableHead>
@@ -177,7 +169,7 @@ export function CustomersTable() {
           <TableBody>
             {paginatedCustomers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   لا توجد نتائج
                 </TableCell>
               </TableRow>
@@ -204,18 +196,6 @@ export function CustomersTable() {
                     >
                       {getStageNameAr(customer.stage)}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`px-2 py-1 rounded font-semibold text-sm ${getLeadScoreColor(customer.leadScore)}`}
-                      >
-                        {customer.leadScore}
-                      </div>
-                      {customer.leadScore >= 80 && (
-                        <span className="text-xs text-gray-500">🔥</span>
-                      )}
-                    </div>
                   </TableCell>
                   <TableCell>{getPriorityBadge(customer.priority)}</TableCell>
                   <TableCell>{getSourceBadge(customer.source)}</TableCell>

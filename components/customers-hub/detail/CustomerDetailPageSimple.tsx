@@ -5,7 +5,6 @@ import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowRight,
   Phone,
@@ -113,13 +112,6 @@ function CollapsibleSection({
 
 // Customer Info Card (Always visible at top)
 function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
-  const getLeadScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-blue-600";
-    if (score >= 40) return "text-yellow-600";
-    return "text-red-600";
-  };
-
   return (
     <Card>
       <CardContent className="p-6">
@@ -200,15 +192,8 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
             </div>
           </div>
 
-          {/* Lead Score & Stats */}
+          {/* Stats */}
           <div className="flex items-center gap-6 lg:border-r lg:pr-6">
-            <div className="text-center">
-              <div className={`text-3xl font-bold ${getLeadScoreColor(customer.leadScore)}`}>
-                {customer.leadScore}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">جودة العميل</div>
-              <Progress value={customer.leadScore} className="h-1.5 w-20 mt-1" />
-            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="text-lg font-bold">{customer.totalInteractions || 0}</div>

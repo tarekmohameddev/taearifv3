@@ -262,7 +262,6 @@ export function EnhancedPipelineBoard() {
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 dark:text-gray-300">
             <div>• اسحب البطاقات بين الأعمدة لتغيير المرحلة</div>
             <div>• انقر على "عرض" لفتح صفحة التفاصيل</div>
-            <div>• الألوان تمثل جودة العميل (الأحمر: ممتاز، الأزرق: جيد)</div>
           </div>
         </CardContent>
       </Card>

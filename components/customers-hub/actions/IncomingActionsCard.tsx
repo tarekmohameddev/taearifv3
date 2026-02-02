@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown, Sparkles } from "lucide-react";
+import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -407,23 +407,17 @@ export function IncomingActionsCard({
             {customer && (
               <div className="flex items-center gap-1.5 text-xs shrink-0">
                 {aiMatching.canMatch ? (
-                  <>
-                    <Sparkles className="h-3 w-3 text-violet-500 shrink-0" />
-                    <span className="text-violet-600 dark:text-violet-400 font-medium">
-                      {aiMatching.matchCount} مطابق
-                    </span>
-                  </>
+                  <span className="text-violet-600 dark:text-violet-400 font-medium" title="مطابقة الذكاء الاصطناعي">
+                    ✨ {aiMatching.matchCount}
+                  </span>
                 ) : (
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400/90 cursor-help">
-                          <Sparkles className="h-3 w-3 shrink-0 opacity-70" />
-                          <span>أكمِل الحقول</span>
-                        </span>
+                        <span className="text-amber-600 dark:text-amber-400/90 cursor-help">✨ —</span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs text-xs">
-                        <p className="font-medium mb-1">لتفعيل المطابقة بالذكاء الاصطناعي:</p>
+                        <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
                         <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
                           {aiMatching.missingFields.map((f) => (
                             <li key={f}>{f}</li>
@@ -700,24 +694,15 @@ export function IncomingActionsCard({
             {customer && (
               <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
                 {aiMatching.canMatch ? (
-                  <div className="flex items-center gap-2 text-xs">
-                    <Sparkles className="h-3.5 w-3.5 text-violet-500 shrink-0" />
-                    <span className="text-gray-600 dark:text-gray-400">
-                      مطابقة الذكاء الاصطناعي:
-                    </span>
-                    <span className="font-semibold text-violet-600 dark:text-violet-400">
-                      {aiMatching.matchCount} عقار مطابق
-                    </span>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                    ✨ {aiMatching.matchCount}
                   </div>
                 ) : (
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
-                          <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0 opacity-70" />
-                          <span>
-                            أكمِل الحقول المطلوبة لتفعيل المطابقة بالذكاء الاصطناعي
-                          </span>
+                        <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
+                          ✨ —
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs text-xs">

@@ -3,7 +3,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import type { UnifiedCustomer } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { User, Phone, Mail, MapPin, Briefcase, Users, Tag, MessageSquare } from "lucide-react";
@@ -13,13 +12,6 @@ interface CustomerProfileProps {
 }
 
 export function CustomerProfile({ customer }: CustomerProfileProps) {
-  const getLeadScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-blue-600";
-    if (score >= 40) return "text-yellow-600";
-    return "text-red-600";
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -39,19 +31,6 @@ export function CustomerProfile({ customer }: CustomerProfileProps) {
           >
             {getStageNameAr(customer.stage)}
           </Badge>
-        </div>
-
-        {/* Lead Score */}
-        <div>
-          <div className="text-sm text-gray-600 mb-2">جودة العميل</div>
-          <div className="flex items-center gap-3">
-            <div className={`text-3xl font-bold ${getLeadScoreColor(customer.leadScore)}`}>
-              {customer.leadScore}
-            </div>
-            <div className="flex-1">
-              <Progress value={customer.leadScore} className="h-2" />
-            </div>
-          </div>
         </div>
 
         {/* Contact Info */}

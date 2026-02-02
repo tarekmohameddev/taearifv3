@@ -712,15 +712,9 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="text-xl font-bold">{customer.leadScore}</div>
-                      <div className="text-xs text-gray-500">جودة العميل</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="text-xl font-bold">{customer.totalInteractions || 0}</div>
-                      <div className="text-xs text-gray-500">تفاعلات</div>
-                    </div>
+                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg max-w-[8rem]">
+                    <div className="text-xl font-bold">{customer.totalInteractions || 0}</div>
+                    <div className="text-xs text-gray-500">تفاعلات</div>
                   </div>
                 </CardContent>
               </Card>

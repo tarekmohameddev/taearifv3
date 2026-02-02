@@ -543,28 +543,6 @@ export function CustomersMap() {
                     )}
                   </div>
 
-                  {/* Lead Score */}
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-gray-600">جودة العميل</span>
-                      <span className="font-semibold">{customer.leadScore}/100</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full"
-                        style={{
-                          width: `${customer.leadScore}%`,
-                          backgroundColor:
-                            customer.leadScore >= 80
-                              ? "#22c55e"
-                              : customer.leadScore >= 60
-                              ? "#f59e0b"
-                              : "#ef4444",
-                        }}
-                      />
-                    </div>
-                  </div>
-
                   {/* Property Preferences */}
                   {customer.preferences && (
                     <div className="mb-3 text-xs">
