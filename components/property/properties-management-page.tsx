@@ -22,6 +22,7 @@ import {
   Heart,
   List,
   MapPin,
+  Map,
   MoreHorizontal,
   Plus,
   Ruler,
@@ -97,6 +98,8 @@ import { AdvancedFilterDialog } from "@/components/property/advanced-filter-dial
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
 import { PropertyStatisticsCards } from "@/components/property/property-statistics-cards";
 import { Badge } from "@/components/ui/badge";
+import { PropertiesMapView } from "@/components/property/properties-map-view";
+import { addDemoProperties } from "@/utils/demoPropertiesHelper";
 import {
   Table,
   TableBody,
@@ -1375,13 +1378,18 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     }
   };
   const normalizedProperties = useMemo(() => {
-    return properties.map((property: any) => ({
+    // Add demo properties when in map view to ensure there's always something to display
+    const propertiesWithDemo = viewMode === "map" 
+      ? addDemoProperties(properties, true)
+      : properties;
+
+    return propertiesWithDemo.map((property: any) => ({
       ...property,
       status: normalizeStatus(property.status),
     }));
-  }, [properties]);
+  }, [properties, viewMode]);
 
-  const setViewMode = (mode: "grid" | "list") => {
+  const setViewMode = (mode: "grid" | "list" | "map") => {
     setPropertiesManagement({ viewMode: mode });
   };
 
@@ -1861,6 +1869,17 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   >
                     <List className="h-4 w-4" />
                     <span className="sr-only">List view</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setViewMode("map")}
+                    className={`flex-1 md:flex-none ${
+                      viewMode === "map" ? "bg-muted" : ""
+                    }`}
+                  >
+                    <Map className="h-4 w-4" />
+                    <span className="sr-only">Map view</span>
                   </Button>
                 </div>
                 <Dialog>
@@ -2745,7 +2764,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                             />
                           ))}
                         </div>
-                      ) : (
+                      ) : viewMode === "list" ? (
                         <div className="space-y-4">
                           {normalizedProperties.map((property: any) => (
                             <PropertyListItem
@@ -2764,9 +2783,16 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                             />
                           ))}
                         </div>
+                      ) : (
+                        <PropertiesMapView
+                          properties={normalizedProperties}
+                          onToggleFavorite={toggleFavorite}
+                          onShare={handleShare}
+                          favorites={favorites}
+                        />
                       )}
 
-                      {pagination && pagination.last_page > 1 && (
+                      {viewMode !== "map" && pagination && pagination.last_page > 1 && (
                         <Pagination
                           currentPage={pagination.current_page}
                           totalPages={pagination.last_page}

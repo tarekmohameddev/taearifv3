@@ -8,7 +8,7 @@ import {
 
 export default (set) => ({
   propertiesManagement: {
-    viewMode: "grid",
+    viewMode: "grid", // Can be "grid", "list", or "map"
     priceRange: [200000, 1000000],
     favorites: [],
     properties: [],
