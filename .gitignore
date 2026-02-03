@@ -37,3 +37,4 @@ test.js
 /docs/ExcessFiles/profiler/
 .env
 .env.example
+.cursor/rules/front-end-cursor-rules.mdc
