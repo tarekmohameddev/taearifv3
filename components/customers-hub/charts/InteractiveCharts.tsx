@@ -28,9 +28,6 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
   const stageMetrics = LIFECYCLE_STAGES.map((stage) => {
     const stageCustomers = customers.filter((c) => c.stage === stage.id);
     const totalValue = stageCustomers.reduce((sum, c) => sum + (c.totalDealValue || 0), 0);
-    const avgScore = stageCustomers.length > 0
-      ? stageCustomers.reduce((sum, c) => sum + c.leadScore, 0) / stageCustomers.length
-      : 0;
     const avgDays = stageCustomers.length > 0
       ? stageCustomers.reduce((sum, c) => {
           const days = Math.floor(
@@ -46,7 +43,6 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
       count: stageCustomers.length,
       percentage: customers.length > 0 ? (stageCustomers.length / customers.length) * 100 : 0,
       totalValue,
-      avgScore: Math.round(avgScore),
       avgDays: Math.round(avgDays),
       customers: stageCustomers,
     };
@@ -123,10 +119,6 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
                     <div className="absolute left-0 right-0 top-full mt-1 p-3 bg-white dark:bg-gray-900 rounded-lg shadow-lg z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                       <div className="grid grid-cols-3 gap-4 text-xs">
                         <div>
-                          <div className="text-gray-500 mb-1">متوسط التقييم</div>
-                          <div className="font-semibold">{metric.avgScore}/100</div>
-                        </div>
-                        <div>
                           <div className="text-gray-500 mb-1">متوسط المدة</div>
                           <div className="font-semibold">{metric.avgDays} يوم</div>
                         </div>
@@ -135,6 +127,10 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
                           <div className="font-semibold">
                             {(metric.totalValue / 1000000).toFixed(1)}م
                           </div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500 mb-1">عدد العملاء</div>
+                          <div className="font-semibold">{metric.count}</div>
                         </div>
                       </div>
                     </div>
@@ -297,16 +293,6 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                      <TrendingUp className="h-4 w-4" />
-                      متوسط التقييم
-                    </div>
-                    <div className="text-2xl font-bold">{selectedMetrics.avgScore}</div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                       <Clock className="h-4 w-4" />
                       متوسط المدة
                     </div>
@@ -340,7 +326,6 @@ export function InteractiveCharts({ customers }: InteractiveChartsProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <Badge>{customer.leadScore}/100</Badge>
                         <Badge variant="secondary">
                           {(customer.totalDealValue || 0).toLocaleString()} ريال
                         </Badge>

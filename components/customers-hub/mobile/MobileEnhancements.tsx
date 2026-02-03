@@ -124,12 +124,6 @@ export function MobileCustomerCard({
 }: MobileCustomerCardProps) {
   const [showActions, setShowActions] = useState(false);
 
-  const getLeadScoreColor = (score: number) => {
-    if (score >= 80) return "bg-red-500";
-    if (score >= 60) return "bg-orange-500";
-    return "bg-blue-500";
-  };
-
   const getPriorityEmoji = (priority: string) => {
     switch (priority) {
       case "urgent":
@@ -154,9 +148,7 @@ export function MobileCustomerCard({
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div
-            className={`w-12 h-12 rounded-full ${getLeadScoreColor(
-              customer.leadScore
-            )} flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}
+            className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
           >
             {customer.name.charAt(0)}
           </div>
@@ -175,9 +167,6 @@ export function MobileCustomerCard({
 
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-2">
-              <Badge variant="secondary" className="text-xs">
-                {customer.leadScore}/100
-              </Badge>
               <Badge variant="outline" className="text-xs">
                 {getStageNameAr(customer.stage)}
               </Badge>
@@ -270,7 +259,6 @@ export function MobileBottomSheet({
               <h3 className="text-xl font-bold">{customer.name}</h3>
               <p className="text-sm text-gray-500">{customer.phone}</p>
               <div className="flex gap-2 mt-2">
-                <Badge>{customer.leadScore}/100</Badge>
                 <Badge variant="outline">{getStageNameAr(customer.stage)}</Badge>
               </div>
             </div>

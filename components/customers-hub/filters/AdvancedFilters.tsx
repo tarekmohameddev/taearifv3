@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { 
   Filter, X, Search, DollarSign, Calendar,
-  MapPin, Home, Star, Users, Clock
+  MapPin, Home, Users, Clock
 } from "lucide-react";
 import {
   Select,
@@ -151,38 +151,6 @@ export function AdvancedFilters() {
                       <span className="text-sm">{getStageNameAr(stage.id)}</span>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* Lead Score Range */}
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2">
-                  <Star className="h-4 w-4" />
-                  نطاق النقاط
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <Label className="text-xs">من</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      placeholder="0"
-                      value={filters.leadScoreMin || ""}
-                      onChange={(e) => setFilters({ leadScoreMin: e.target.value ? parseInt(e.target.value) : undefined })}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">إلى</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      placeholder="100"
-                      value={filters.leadScoreMax || ""}
-                      onChange={(e) => setFilters({ leadScoreMax: e.target.value ? parseInt(e.target.value) : undefined })}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -363,16 +331,6 @@ export function AdvancedFilters() {
             <X 
               className="h-3 w-3 cursor-pointer" 
               onClick={() => setFilters({ propertyType: undefined })}
-            />
-          </Badge>
-        )}
-
-        {(filters.leadScoreMin || filters.leadScoreMax) && (
-          <Badge variant="secondary" className="gap-1">
-            النقاط: {filters.leadScoreMin || 0}-{filters.leadScoreMax || 100}
-            <X 
-              className="h-3 w-3 cursor-pointer" 
-              onClick={() => setFilters({ leadScoreMin: undefined, leadScoreMax: undefined })}
             />
           </Badge>
         )}

@@ -18,7 +18,6 @@ import {
   Clock,
   User,
   Building,
-  Target,
   AlertTriangle,
   ExternalLink,
 } from "lucide-react";
@@ -104,14 +103,7 @@ export function QuickViewPanel({
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200">
-            <CardContent className="p-3 text-center">
-              <TrendingUp className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-              <div className="text-2xl font-bold text-blue-700">{customer.leadScore}</div>
-              <div className="text-xs text-blue-600">نقاط العميل</div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="bg-green-50 dark:bg-green-950/30 border-green-200">
             <CardContent className="p-3 text-center">
               <DollarSign className="h-5 w-5 mx-auto mb-1 text-green-600" />

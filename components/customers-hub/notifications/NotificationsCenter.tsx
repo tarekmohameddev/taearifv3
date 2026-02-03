@@ -155,24 +155,6 @@ export function NotificationsCenter() {
         }
       }
 
-      // Hot leads (score > 85) in early stages
-      if (
-        customer.leadScore > 85 &&
-        (customer.stage === "new_lead" || customer.stage === "qualified")
-      ) {
-        notifs.push({
-          id: `hotlead_${customer.id}`,
-          type: "alert",
-          title: "عميل محتمل قوي",
-          message: `${customer.name} - تقييم ${customer.leadScore}/100، يحتاج اهتمام سريع`,
-          customerId: customer.id,
-          customerName: customer.name,
-          timestamp: customer.createdAt,
-          read: false,
-          priority: "high",
-          actionUrl: `/ar/dashboard/customers-hub/${customer.id}`,
-        });
-      }
     });
 
     // Sort by priority and timestamp

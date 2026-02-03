@@ -369,7 +369,7 @@ export function CustomersMap() {
                         }}
                         className="text-xs shrink-0"
                       >
-                        {customer.leadScore}
+                        {getStageNameAr(customer.stage)}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 mt-2">

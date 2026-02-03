@@ -126,8 +126,6 @@ export function ActionsPage() {
   // Additional Filters
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [dueDateFilter, setDueDateFilter] = useState<'all' | 'overdue' | 'today' | 'week' | 'no_date'>('all');
-  const [leadScoreMin, setLeadScoreMin] = useState<number | null>(null);
-  const [leadScoreMax, setLeadScoreMax] = useState<number | null>(null);
   const [hasNotesFilter, setHasNotesFilter] = useState<boolean | null>(null);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
@@ -165,7 +163,6 @@ export function ActionsPage() {
         assignedToName: customer.assignedEmployee?.name,
         createdAt: customer.createdAt,
         metadata: {
-          leadScore: customer.leadScore,
           dealValue: customer.totalDealValue,
         },
       }));
@@ -249,18 +246,6 @@ export function ActionsPage() {
       });
     }
 
-    // Lead score filter
-    if (leadScoreMin !== null || leadScoreMax !== null) {
-      filtered = filtered.filter((a) => {
-        const customer = getCustomerById(a.customerId);
-        if (!customer) return true;
-        const score = customer.leadScore;
-        if (leadScoreMin !== null && score < leadScoreMin) return false;
-        if (leadScoreMax !== null && score > leadScoreMax) return false;
-        return true;
-      });
-    }
-
     // Has notes filter
     if (hasNotesFilter !== null) {
       filtered = filtered.filter((a) => {
@@ -270,7 +255,7 @@ export function ActionsPage() {
     }
 
     return sortActionsByPriority(filtered);
-  }, [allActions, searchQuery, selectedSources, selectedPriorities, selectedTypes, selectedAssignees, dueDateFilter, leadScoreMin, leadScoreMax, hasNotesFilter, getCustomerById]);
+  }, [allActions, searchQuery, selectedSources, selectedPriorities, selectedTypes, selectedAssignees, dueDateFilter, hasNotesFilter, getCustomerById]);
 
   // Categorize actions
   const incomingActions = useMemo(() => {
@@ -576,8 +561,6 @@ export function ActionsPage() {
     setSearchQuery(filter.searchQuery);
     setSelectedAssignees(filter.assignees || []);
     setDueDateFilter(filter.dueDateFilter || 'all');
-    setLeadScoreMin(filter.leadScoreMin ?? null);
-    setLeadScoreMax(filter.leadScoreMax ?? null);
     setHasNotesFilter(filter.hasNotesFilter ?? null);
   }, []);
 
@@ -588,8 +571,6 @@ export function ActionsPage() {
     setSelectedTypes([]);
     setSelectedAssignees([]);
     setDueDateFilter('all');
-    setLeadScoreMin(null);
-    setLeadScoreMax(null);
     setHasNotesFilter(null);
   };
 
@@ -600,8 +581,6 @@ export function ActionsPage() {
     selectedTypes.length > 0 ||
     selectedAssignees.length > 0 ||
     dueDateFilter !== 'all' ||
-    leadScoreMin !== null ||
-    leadScoreMax !== null ||
     hasNotesFilter !== null;
   
   const activeFilterCount = [
@@ -611,7 +590,6 @@ export function ActionsPage() {
     selectedTypes.length,
     selectedAssignees.length,
     dueDateFilter !== 'all' ? 1 : 0,
-    (leadScoreMin !== null || leadScoreMax !== null) ? 1 : 0,
     hasNotesFilter !== null ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
@@ -978,7 +956,7 @@ export function ActionsPage() {
                     className="relative"
                   >
                     <Filter className="h-4 w-4" />
-                    {(leadScoreMin !== null || leadScoreMax !== null || hasNotesFilter !== null) && (
+                    {hasNotesFilter !== null && (
                       <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full" />
                     )}
                   </Button>
@@ -988,47 +966,6 @@ export function ActionsPage() {
               {/* Advanced Filters Panel */}
               {showAdvancedFilters && (
                 <div className="border-t pt-4 mt-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Lead Score Range */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      نقاط العميل (Lead Score)
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="number"
-                        placeholder="من"
-                        min={0}
-                        max={100}
-                        value={leadScoreMin ?? ''}
-                        onChange={(e) => setLeadScoreMin(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-20 h-9"
-                      />
-                      <span className="text-gray-400">-</span>
-                      <Input
-                        type="number"
-                        placeholder="إلى"
-                        min={0}
-                        max={100}
-                        value={leadScoreMax ?? ''}
-                        onChange={(e) => setLeadScoreMax(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-20 h-9"
-                      />
-                      {(leadScoreMin !== null || leadScoreMax !== null) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setLeadScoreMin(null);
-                            setLeadScoreMax(null);
-                          }}
-                          className="h-9 px-2"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
                   {/* Has Notes Filter */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1083,17 +1020,6 @@ export function ActionsPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setLeadScoreMin(70);
-                          setLeadScoreMax(null);
-                        }}
-                        className="h-8 text-xs text-green-600 border-green-200 hover:bg-green-50"
-                      >
-                        عملاء مميزون
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
                           setSelectedAssignees([]);
                           setDueDateFilter('today');
                         }}
@@ -1116,8 +1042,6 @@ export function ActionsPage() {
                     searchQuery,
                     assignees: selectedAssignees,
                     dueDateFilter,
-                    leadScoreMin,
-                    leadScoreMax,
                     hasNotesFilter,
                   }}
                   onApplyFilter={handleApplySavedFilter}
@@ -1192,18 +1116,6 @@ export function ActionsPage() {
                         'بدون تاريخ'
                       }
                       <X className="h-3 w-3 cursor-pointer" onClick={() => setDueDateFilter('all')} />
-                    </Badge>
-                  )}
-                  {(leadScoreMin !== null || leadScoreMax !== null) && (
-                    <Badge variant="secondary" className="gap-1">
-                      نقاط: {leadScoreMin ?? 0} - {leadScoreMax ?? 100}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
-                        onClick={() => {
-                          setLeadScoreMin(null);
-                          setLeadScoreMax(null);
-                        }} 
-                      />
                     </Badge>
                   )}
                   {hasNotesFilter !== null && (

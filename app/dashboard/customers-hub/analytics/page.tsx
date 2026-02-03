@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { AnalyticsDashboard } from "@/components/customers-hub/analytics/AnalyticsDashboard";
-import { KSAComplianceKPIs } from "@/components/customers-hub/analytics/KSAComplianceKPIs";
 
 export default function AnalyticsPage() {
   return (
@@ -31,9 +30,6 @@ export default function AnalyticsPage() {
 
       {/* Analytics Dashboard */}
       <AnalyticsDashboard />
-      
-      {/* KSA Compliance KPIs */}
-      <KSAComplianceKPIs />
     </div>
   );
 }

@@ -23,11 +23,6 @@ export function LifecycleStage({
   onSelect,
 }: LifecycleStageProps) {
   const totalValue = customers.reduce((sum, c) => sum + (c.totalDealValue || 0), 0);
-  const avgLeadScore =
-    customers.length > 0
-      ? Math.round(customers.reduce((sum, c) => sum + c.leadScore, 0) / customers.length)
-      : 0;
-
   const urgentCount = customers.filter((c) => c.priority === "urgent").length;
 
   return (
@@ -62,9 +57,6 @@ export function LifecycleStage({
             <div className="text-xs text-gray-600 dark:text-gray-400">
               القيمة: {(totalValue / 1000).toFixed(0)}k ريال
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              متوسط الجودة: {avgLeadScore}/100
-            </div>
           </div>
         </CardHeader>
 
@@ -76,13 +68,12 @@ export function LifecycleStage({
           ) : (
             customers
               .sort((a, b) => {
-                // Sort by priority first (urgent first), then by lead score
+                // Sort by priority first (urgent first), then by name
                 const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
                 const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder];
                 const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder];
-                
                 if (aPriority !== bPriority) return aPriority - bPriority;
-                return b.leadScore - a.leadScore;
+                return (a.name || "").localeCompare(b.name || "");
               })
               .map((customer) => (
                 <CustomerPipelineCard

@@ -34,7 +34,6 @@ const EXPORT_FIELDS = [
   { id: "phone", label: "الهاتف", checked: true },
   { id: "email", label: "البريد الإلكتروني", checked: true },
   { id: "stage", label: "المرحلة", checked: true },
-  { id: "leadScore", label: "تقييم العميل", checked: true },
   { id: "priority", label: "الأولوية", checked: false },
   { id: "source", label: "المصدر", checked: false },
   { id: "propertyType", label: "نوع العقار", checked: true },
@@ -97,9 +96,6 @@ export function ExportDialog({ open, onOpenChange, customers }: ExportDialogProp
             break;
           case "stage":
             row["المرحلة"] = customer.stage;
-            break;
-          case "leadScore":
-            row["تقييم العميل"] = customer.leadScore;
             break;
           case "priority":
             row["الأولوية"] = customer.priority;

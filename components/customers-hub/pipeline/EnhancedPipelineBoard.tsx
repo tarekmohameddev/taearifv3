@@ -186,17 +186,6 @@ export function EnhancedPipelineBoard() {
                                     </p>
                                   </div>
                                 </div>
-                                
-                                <Badge
-                                  className={`text-xs ${
-                                    customer.leadScore >= 80 ? "bg-red-600" :
-                                    customer.leadScore >= 60 ? "bg-blue-600" :
-                                    customer.leadScore >= 40 ? "bg-yellow-600" :
-                                    "bg-gray-600"
-                                  }`}
-                                >
-                                  {customer.leadScore}
-                                </Badge>
                               </div>
 
                               {/* Deal Value */}

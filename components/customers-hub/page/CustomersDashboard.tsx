@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, 
   TrendingUp, 
-  Target, 
   DollarSign,
   UserCheck,
   Clock,
@@ -27,8 +26,6 @@ export function CustomersDashboard() {
       (c.stage === "negotiation" || c.stage === "closing" || c.stage === "down_payment")
   ).length;
 
-  const highLeadScoreCustomers = customers.filter((c) => c.leadScore >= 80).length;
-  
   const churnRiskHigh = customers.filter(
     (c) => c.aiInsights.churnRisk === "high"
   ).length;
@@ -78,23 +75,6 @@ export function CustomersDashboard() {
             <Badge variant="secondary" className="text-xs">
               {statistics.closedThisMonth} صفقة مغلقة
             </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average Lead Score */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">
-            متوسط جودة العملاء
-          </CardTitle>
-          <Target className="h-4 w-4 text-purple-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{statistics.avgLeadScore}/100</div>
-          <Progress value={statistics.avgLeadScore} className="mt-2" />
-          <div className="text-xs text-gray-500 mt-1">
-            {highLeadScoreCustomers} عميل بجودة عالية (80+)
           </div>
         </CardContent>
       </Card>

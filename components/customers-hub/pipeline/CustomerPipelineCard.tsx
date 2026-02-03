@@ -20,13 +20,6 @@ export function CustomerPipelineCard({
 }: CustomerPipelineCardProps) {
   const { setSelectedCustomer, setShowCustomerDetailDialog } = useUnifiedCustomersStore();
 
-  const getLeadScoreEmoji = (score: number) => {
-    if (score >= 80) return "🔥";
-    if (score >= 60) return "⭐";
-    if (score >= 40) return "👍";
-    return "⚠️";
-  };
-
   const handleCardClick = () => {
     setSelectedCustomer(customer);
     setShowCustomerDetailDialog(true);
@@ -52,12 +45,6 @@ export function CustomerPipelineCard({
             </div>
           </div>
           
-          <div className="flex items-center gap-1">
-            <div className="text-lg">{getLeadScoreEmoji(customer.leadScore)}</div>
-            <div className="text-xs font-semibold text-gray-600">
-              {customer.leadScore}
-            </div>
-          </div>
         </div>
 
         {/* Property Interest */}

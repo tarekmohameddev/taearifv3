@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { 
   Users, TrendingUp, DollarSign, Calendar, 
-  Clock, Target, Award, AlertCircle,
+  Clock, Target, AlertCircle,
   ArrowUp, ArrowDown, Minus, Building,
   Phone, MessageSquare, Mail, CheckCircle
 } from "lucide-react";
@@ -22,11 +22,6 @@ export function AnalyticsDashboard() {
     conversionRate: statistics?.conversionRate || 0,
     avgDaysInPipeline: statistics?.avgDaysInPipeline || 0,
     closingRatio: customers.filter(c => c.stage === "closing").length / Math.max(customers.length, 1) * 100,
-    
-    // Lead quality
-    hotLeads: customers.filter(c => c.leadScore >= 80).length,
-    warmLeads: customers.filter(c => c.leadScore >= 60 && c.leadScore < 80).length,
-    coldLeads: customers.filter(c => c.leadScore < 60).length,
     
     // Timeline distribution
     urgentClients: customers.filter(c => c.preferences.timeline === "immediate").length,
@@ -126,61 +121,6 @@ export function AnalyticsDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Lead Quality Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Award className="h-5 w-5 text-yellow-600" />
-            توزيع جودة العملاء
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  عملاء ساخنون (80-100)
-                </span>
-                <span className="font-bold">{analytics.hotLeads}</span>
-              </div>
-              <Progress 
-                value={(analytics.hotLeads / Math.max(customers.length, 1)) * 100} 
-                className="h-2"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  عملاء دافئون (60-79)
-                </span>
-                <span className="font-bold">{analytics.warmLeads}</span>
-              </div>
-              <Progress 
-                value={(analytics.warmLeads / Math.max(customers.length, 1)) * 100} 
-                className="h-2"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  عملاء باردون (&lt;60)
-                </span>
-                <span className="font-bold">{analytics.coldLeads}</span>
-              </div>
-              <Progress 
-                value={(analytics.coldLeads / Math.max(customers.length, 1)) * 100} 
-                className="h-2"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Timeline Distribution */}

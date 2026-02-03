@@ -31,16 +31,16 @@ export function CustomerSegments() {
   const segments: Segment[] = [
     {
       id: "hot_leads",
-      name: "عملاء ساخنون",
-      nameEn: "Hot Leads",
-      description: "عملاء ذوو احتمالية عالية للتحويل (نقاط 80+)",
+      name: "عملاء أولوية عالية",
+      nameEn: "High Priority",
+      description: "عملاء بعناية عاجلة أو مهمة",
       icon: Zap,
       color: "red",
       count: 0,
       avgLeadScore: 0,
       conversionRate: 0,
       avgDealValue: 0,
-      filter: (custs) => custs.filter(c => c.leadScore >= 80),
+      filter: (custs) => custs.filter(c => c.priority === "urgent" || c.priority === "high"),
     },
     {
       id: "urgent_buyers",
@@ -179,9 +179,7 @@ export function CustomerSegments() {
     return {
       ...segment,
       count: segmentCustomers.length,
-      avgLeadScore: segmentCustomers.length > 0
-        ? Math.round(segmentCustomers.reduce((sum, c) => sum + c.leadScore, 0) / segmentCustomers.length)
-        : 0,
+      avgLeadScore: 0,
       conversionRate: segmentCustomers.length > 0
         ? Math.round((converted / segmentCustomers.length) * 100)
         : 0,
@@ -265,11 +263,7 @@ export function CustomerSegments() {
                 </div>
 
                 {/* Metrics */}
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <div className="text-center p-2 bg-white dark:bg-gray-900 rounded">
-                    <div className="font-bold text-lg">{segment.avgLeadScore}</div>
-                    <div className="text-gray-600">نقاط</div>
-                  </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-center p-2 bg-white dark:bg-gray-900 rounded">
                     <div className="font-bold text-lg">{segment.conversionRate}%</div>
                     <div className="text-gray-600">تحويل</div>

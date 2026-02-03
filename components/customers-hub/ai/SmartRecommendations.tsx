@@ -28,7 +28,7 @@ export function SmartRecommendations() {
 
   const highValueNoContact = customers.filter(
     (c) =>
-      c.leadScore >= 80 &&
+      (c.priority === "high" || c.priority === "urgent") &&
       (!c.lastContactAt ||
         new Date().getTime() - new Date(c.lastContactAt).getTime() >
           7 * 24 * 60 * 60 * 1000)
@@ -45,8 +45,7 @@ export function SmartRecommendations() {
 
   const readyToClose = customers.filter(
     (c) =>
-      c.stage === "down_payment" ||
-      (c.stage === "contract_prep" && c.leadScore >= 85)
+      c.stage === "down_payment" || c.stage === "contract_prep"
   );
 
   const recommendations = [

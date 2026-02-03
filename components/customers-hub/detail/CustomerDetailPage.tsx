@@ -16,7 +16,6 @@ import { FinancialTab } from "./FinancialTab";
 import { CommunicationHub } from "./CommunicationHub";
 import { RemindersTab } from "./RemindersTab";
 import { ActivitiesTab } from "./ActivitiesTab";
-import { KSAComplianceTab } from "./KSAComplianceTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CustomerDetailPageProps {
@@ -93,7 +92,7 @@ export function CustomerDetailPage({ customerId }: CustomerDetailPageProps) {
         {/* Right Column - Tabs with Timeline, Properties, etc. */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="timeline">
-            <TabsList className="grid w-full grid-cols-10 text-[10px] md:text-xs">
+            <TabsList className="grid w-full grid-cols-9 text-[10px] md:text-xs">
               <TabsTrigger value="timeline">الجدول</TabsTrigger>
               <TabsTrigger value="activities">الأنشطة</TabsTrigger>
               <TabsTrigger value="properties">العقارات</TabsTrigger>
@@ -103,7 +102,6 @@ export function CustomerDetailPage({ customerId }: CustomerDetailPageProps) {
               <TabsTrigger value="documents">المستندات</TabsTrigger>
               <TabsTrigger value="financial">المالية</TabsTrigger>
               <TabsTrigger value="communication">التواصل</TabsTrigger>
-              <TabsTrigger value="ksa">KSA</TabsTrigger>
             </TabsList>
 
             <TabsContent value="timeline" className="mt-6">
@@ -140,10 +138,6 @@ export function CustomerDetailPage({ customerId }: CustomerDetailPageProps) {
 
             <TabsContent value="communication" className="mt-6">
               <CommunicationHub customer={customer} />
-            </TabsContent>
-
-            <TabsContent value="ksa" className="mt-6">
-              <KSAComplianceTab customer={customer} />
             </TabsContent>
           </Tabs>
         </div>

@@ -42,8 +42,6 @@ export interface SavedFilter {
   searchQuery: string;
   assignees: string[];
   dueDateFilter: DueDateFilterType;
-  leadScoreMin: number | null;
-  leadScoreMax: number | null;
   hasNotesFilter: boolean | null;
   createdAt: string;
 }
@@ -56,8 +54,6 @@ interface SavedFiltersPanelProps {
     searchQuery: string;
     assignees: string[];
     dueDateFilter: DueDateFilterType;
-    leadScoreMin: number | null;
-    leadScoreMax: number | null;
     hasNotesFilter: boolean | null;
   };
   onApplyFilter: (filter: SavedFilter) => void;
@@ -106,8 +102,6 @@ export function SavedFiltersPanel({
       searchQuery: currentFilters.searchQuery,
       assignees: currentFilters.assignees,
       dueDateFilter: currentFilters.dueDateFilter,
-      leadScoreMin: currentFilters.leadScoreMin,
-      leadScoreMax: currentFilters.leadScoreMax,
       hasNotesFilter: currentFilters.hasNotesFilter,
       createdAt: new Date().toISOString(),
     };
@@ -136,8 +130,6 @@ export function SavedFiltersPanel({
     currentFilters.searchQuery ||
     currentFilters.assignees.length > 0 ||
     currentFilters.dueDateFilter !== 'all' ||
-    currentFilters.leadScoreMin !== null ||
-    currentFilters.leadScoreMax !== null ||
     currentFilters.hasNotesFilter !== null;
 
   const dueDateLabels: Record<DueDateFilterType, string> = {
@@ -156,7 +148,6 @@ export function SavedFiltersPanel({
     if (filter.searchQuery) parts.push(`بحث`);
     if (filter.assignees?.length) parts.push(`${filter.assignees.length} موظف`);
     if (filter.dueDateFilter && filter.dueDateFilter !== 'all') parts.push(dueDateLabels[filter.dueDateFilter]);
-    if (filter.leadScoreMin !== null || filter.leadScoreMax !== null) parts.push('نقاط');
     if (filter.hasNotesFilter !== null) parts.push(filter.hasNotesFilter ? 'مع ملاحظات' : 'بدون ملاحظات');
     return parts.join(" • ") || "بدون فلاتر";
   };

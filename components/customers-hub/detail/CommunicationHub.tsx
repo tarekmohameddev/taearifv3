@@ -267,12 +267,6 @@ export function CommunicationHub({ customer }: CommunicationHubProps) {
                         <span>العميل لديه جدول زمني عاجل - يفضل الاتصال الفوري</span>
                       </div>
                     )}
-                    {customer.leadScore >= 80 && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-purple-600">•</span>
-                        <span>عميل ذو أولوية عالية - يُنصح بالمتابعة الحثيثة</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

@@ -4,9 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { LeadScoringDashboard } from "./LeadScoringDashboard";
 import { SmartRecommendations } from "./SmartRecommendations";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function AIAssistantPage() {
   return (
@@ -31,21 +29,7 @@ export function AIAssistantPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="scoring">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="scoring">تقييم العملاء</TabsTrigger>
-          <TabsTrigger value="recommendations">التوصيات الذكية</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="scoring" className="mt-6">
-          <LeadScoringDashboard />
-        </TabsContent>
-
-        <TabsContent value="recommendations" className="mt-6">
-          <SmartRecommendations />
-        </TabsContent>
-      </Tabs>
+      <SmartRecommendations />
     </div>
   );
 }

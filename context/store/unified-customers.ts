@@ -32,7 +32,7 @@ interface UnifiedCustomersStore {
   // Filters & Search
   filters: CustomerFilters;
   searchTerm: string;
-  sortBy: 'name' | 'createdAt' | 'leadScore' | 'lastContactAt' | 'dealValue';
+  sortBy: 'name' | 'createdAt' | 'lastContactAt' | 'dealValue';
   sortOrder: 'asc' | 'desc';
   
   // Pagination
@@ -634,14 +634,6 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           );
         }
         
-        // Apply lead score range
-        if (filters.leadScoreMin !== undefined) {
-          filtered = filtered.filter((c) => c.leadScore >= filters.leadScoreMin!);
-        }
-        if (filters.leadScoreMax !== undefined) {
-          filtered = filtered.filter((c) => c.leadScore <= filters.leadScoreMax!);
-        }
-        
         // Apply budget range
         if (filters.budgetMin !== undefined) {
           filtered = filtered.filter(
@@ -757,10 +749,6 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
             case 'createdAt':
               aVal = new Date(a.createdAt).getTime();
               bVal = new Date(b.createdAt).getTime();
-              break;
-            case 'leadScore':
-              aVal = a.leadScore;
-              bVal = b.leadScore;
               break;
             case 'lastContactAt':
               aVal = a.lastContactAt ? new Date(a.lastContactAt).getTime() : 0;
@@ -975,7 +963,6 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           closedThisMonth: 0,
         };
         
-        let totalLeadScore = 0;
         let totalDays = 0;
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -992,9 +979,6 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           // By priority
           statistics.byPriority[customer.priority] =
             (statistics.byPriority[customer.priority] || 0) + 1;
-          
-          // Lead score
-          totalLeadScore += customer.leadScore;
           
           // Deal value
           statistics.totalDealValue += customer.totalDealValue || 0;
@@ -1029,7 +1013,6 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           }
         });
         
-        statistics.avgLeadScore = Math.round(totalLeadScore / customers.length);
         statistics.avgDaysInPipeline = Math.round(totalDays / customers.length);
         statistics.conversionRate =
           statistics.newThisMonth > 0

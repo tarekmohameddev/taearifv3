@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Phone, MapPin, TrendingUp, 
-  Calendar, Home, DollarSign, Star, Clock, Target
+  Calendar, Home, DollarSign, Clock, Target
 } from "lucide-react";
 import Link from "next/link";
 import { getStageColor, getStageNameAr } from "@/types/unified-customer";
@@ -19,13 +19,6 @@ export function CustomersGrid() {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
-
-  const getLeadScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 bg-green-50 dark:bg-green-950";
-    if (score >= 60) return "text-blue-600 bg-blue-50 dark:bg-blue-950";
-    if (score >= 40) return "text-yellow-600 bg-yellow-50 dark:bg-yellow-950";
-    return "text-red-600 bg-red-50 dark:bg-red-950";
-  };
 
   const getInitials = (name: string) => {
     return name
@@ -87,12 +80,6 @@ export function CustomersGrid() {
                   {getInitials(customer.name)}
                 </AvatarFallback>
               </Avatar>
-            </div>
-            <div className="absolute top-2 right-2">
-              <div className={`px-2 py-1 rounded-full text-xs font-bold ${getLeadScoreColor(customer.leadScore)}`}>
-                {customer.leadScore}
-                <Star className="inline h-3 w-3 ml-0.5" />
-              </div>
             </div>
             <div className="absolute top-2 left-2 text-xl">
               {getPriorityIcon(customer.priority)}
