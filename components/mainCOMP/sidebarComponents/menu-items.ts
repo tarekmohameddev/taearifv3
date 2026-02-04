@@ -12,6 +12,7 @@ import {
   Grid,
   BookOpen,
   UsersRound,
+  MessageCircle,
 } from "lucide-react";
 
 export type MainNavItem = {
@@ -59,6 +60,13 @@ export const staticMenuItems: MainNavItem[] = [
     description: "إدارة شاملة لدورة حياة العملاء مع AI",
     icon: UsersRound,
     path: "/dashboard/customers-hub",
+  },
+  {
+    id: "whatsapp-management",
+    label: "إدارة الواتساب",
+    description: "إدارة المحادثات والحملات والرسائل الآلية",
+    icon: MessageCircle,
+    path: "/dashboard/whatsapp-management",
   },
   {
     id: "projects",

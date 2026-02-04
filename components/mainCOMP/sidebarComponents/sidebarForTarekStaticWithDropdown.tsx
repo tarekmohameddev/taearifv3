@@ -14,6 +14,8 @@ import {
   MessageSquare,
   Home,
   ExternalLink,
+  MessageCircle,
+  UsersRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -267,6 +269,18 @@ export function EnhancedSidebar({
               title="CRM"
               description="تكوين اعدادات ادارة علاقات العملاء"
               icon={<UserCog className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/customers-hub"
+              title="العملاء الموحد"
+              description="إدارة شاملة لدورة حياة العملاء مع AI"
+              icon={<UsersRound className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/whatsapp-management"
+              title="إدارة الواتساب"
+              description="إدارة المحادثات والحملات والرسائل الآلية"
+              icon={<MessageCircle className="h-5 w-5 text-muted-foreground" />}
             />
             <StaticLink
               href="/dashboard/projects"

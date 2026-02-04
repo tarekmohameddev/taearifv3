@@ -21,6 +21,7 @@ const TOP_NAV_ITEMS = [
   { id: "dashboard", label: "لوحة التحكم", path: "/dashboard" },
   { id: "properties", label: "العقارات", path: "/dashboard/properties" },
   { id: "customers", label: "العملاء", path: "/dashboard/customers-hub" },
+  { id: "whatsapp", label: "إدارة الواتساب", path: "/dashboard/whatsapp-management" },
 ] as const;
 
 const VIEW_WEBSITE_LABEL = "معاينة الموقع";

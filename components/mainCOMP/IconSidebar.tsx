@@ -11,6 +11,7 @@ import {
   Settings,
   HelpCircle,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,12 @@ const SIDEBAR_ITEMS = [
     path: "/dashboard/customers-hub", 
     icon: Users,
     label: "العملاء"
+  },
+  { 
+    id: "whatsapp", 
+    path: "/dashboard/whatsapp-management", 
+    icon: MessageCircle,
+    label: "إدارة الواتساب"
   },
   { 
     id: "properties", 
