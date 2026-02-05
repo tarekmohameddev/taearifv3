@@ -424,7 +424,8 @@ export default (set, get) => ({
     error: null,
   },
 
-  fetchCreditBalance: async () => {
+  fetchCreditBalance: async (options = {}) => {
+    const { silent = false } = typeof options === "boolean" ? { silent: options } : options;
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
@@ -432,7 +433,7 @@ export default (set, get) => ({
     }
 
     const { creditBalance } = get();
-    if (creditBalance.data && !creditBalance.loading) {
+    if (!silent && creditBalance.data && !creditBalance.loading) {
       return;
     }
 
@@ -444,7 +445,7 @@ export default (set, get) => ({
       },
     }));
 
-    const loadingToast = toast.loading("جاري تحميل بيانات الرصيد...");
+    const loadingToast = silent ? null : toast.loading("جاري تحميل بيانات الرصيد...");
 
     try {
       const response = await axiosInstance.get(
@@ -458,7 +459,7 @@ export default (set, get) => ({
           loading: false,
         },
       }));
-      toast.success("تم تحميل بيانات الرصيد بنجاح", { id: loadingToast });
+      if (!silent) toast.success("تم تحميل بيانات الرصيد بنجاح", { id: loadingToast });
     } catch (error) {
       set((state) => ({
         creditBalance: {
@@ -467,9 +468,10 @@ export default (set, get) => ({
           loading: false,
         },
       }));
-      toast.error(error.message || "حدث خطأ أثناء تحميل بيانات الرصيد", {
-        id: loadingToast,
-      });
+      if (!silent)
+        toast.error(error.message || "حدث خطأ أثناء تحميل بيانات الرصيد", {
+          id: loadingToast,
+        });
     }
   },
 

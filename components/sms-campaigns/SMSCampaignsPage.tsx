@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, Send, Users, CheckCircle2, XCircle, Clock, FileText, Plus } from "lucide-react";
+import { MessageSquare, Send, CheckCircle2, XCircle, Clock, FileText, Plus, Coins, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { mockCampaigns, mockTemplates, mockStats, mockLogs } from "./mock-data";
+import { SMSCreditBalance, CREDITS_PER_SMS } from "./SMSCreditBalance";
+import useStore from "@/context/Store";
 
 export function SMSCampaignsPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  const creditBalance = useStore((s) => s.creditBalance);
+  const availableCredits = creditBalance.data?.available_credits ?? 0;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -41,6 +46,23 @@ export function SMSCampaignsPage() {
       <div>
         <h1 className="text-3xl font-bold">حملات الرسائل النصية</h1>
         <p className="text-muted-foreground mt-1">إنشاء وإدارة حملات الرسائل النصية</p>
+      </div>
+
+      {/* Credit balance & low credit warning */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="lg:col-span-1">
+          <SMSCreditBalance />
+        </div>
+        {!creditBalance.loading && availableCredits < 50 && (
+          <Alert variant={availableCredits === 0 ? "destructive" : "default"} className="lg:col-span-3 flex items-center">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {availableCredits === 0
+                ? "رصيدك انتهى. شراء كريديت لإرسال رسائل."
+                : `رصيدك منخفض (${availableCredits} كريديت). يُنصح بشحن الرصيد قبل إطلاق حملات جديدة.`}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -252,6 +274,20 @@ export function SMSCampaignsPage() {
                           <p className="text-2xl font-bold text-red-600">{campaign.failedCount}</p>
                         </div>
                       </div>
+                      {campaign.recipientCount > 0 && (
+                        <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
+                          <Coins className="h-4 w-4" />
+                          <span>
+                            تكلفة الإرسال: {campaign.recipientCount * CREDITS_PER_SMS} كريديت
+                            {availableCredits < campaign.recipientCount * CREDITS_PER_SMS &&
+                              (campaign.status === "draft" || campaign.status === "scheduled") && (
+                                <Badge variant="destructive" className="mr-2">
+                                  رصيد غير كافٍ
+                                </Badge>
+                              )}
+                          </span>
+                        </div>
+                      )}
 
                       {campaign.status === 'in-progress' && campaign.recipientCount > 0 && (
                         <div className="mb-4">
