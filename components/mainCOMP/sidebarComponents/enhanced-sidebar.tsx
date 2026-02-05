@@ -18,6 +18,7 @@ import {
   Briefcase,
   MessageCircle,
   UsersRound,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -283,6 +284,18 @@ export function EnhancedSidebar({
               title="إدارة الواتساب"
               description="إدارة المحادثات والحملات والرسائل الآلية"
               icon={<MessageCircle className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/call-center"
+              title="مركز الاتصال"
+              description="إدارة المكالمات وتتبع أداء الوكلاء"
+              icon={<Phone className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/sms-campaigns"
+              title="حملات الرسائل النصية"
+              description="إنشاء وإدارة حملات الرسائل النصية"
+              icon={<MessageSquare className="h-5 w-5 text-muted-foreground" />}
             />
             <StaticLink
               href="/dashboard/projects"
