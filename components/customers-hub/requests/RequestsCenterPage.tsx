@@ -453,100 +453,137 @@ export function RequestsCenterPage() {
     selectedPropertyTypes.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900" dir="rtl">
+    <div className="min-h-screen" dir="rtl" style={{ background: "#F4F5F7" }}>
       <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <Link href="/ar/dashboard/customers-hub/list">
-              <Button variant="outline" className="gap-2">
+              <Button
+                variant="outline"
+                className="gap-2"
+                style={{ borderRadius: 20, borderColor: "#E5E7EB", fontSize: 13, color: "#374151" }}
+              >
                 <ArrowLeft className="h-4 w-4" />
                 العملاء
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-white">
-                  <MessageSquare className="h-6 w-6" />
+              <h1 className="flex items-center gap-3" style={{ fontSize: 22, fontWeight: 700, color: "#1A1A1A" }}>
+                <div
+                  className="flex items-center justify-center"
+                  style={{ width: 40, height: 40, background: "#1A3C34", borderRadius: 12 }}
+                >
+                  <MessageSquare className="h-5 w-5" style={{ color: "#FFFFFF" }} />
                 </div>
                 مركز طلبات العملاء
               </h1>
-              <p className="text-gray-500 text-sm mt-1">
+              <p style={{ fontSize: 13, color: "#6B7280", marginTop: 4 }}>
                 إدارة الطلبات الواردة والإجراءات في مكان واحد
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant={isCompactView ? "default" : "outline"}
-              size="icon"
+            <button
               onClick={() => setIsCompactView(!isCompactView)}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                border: "1px solid #E5E7EB",
+                background: isCompactView ? "#1A3C34" : "#FFFFFF",
+                color: isCompactView ? "#FFFFFF" : "#9CA3AF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
             >
               {isCompactView ? (
                 <LayoutList className="h-4 w-4" />
               ) : (
                 <LayoutGrid className="h-4 w-4" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
 
-        {/* Stats */}
-        <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <Inbox className="h-6 w-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{stats.inbox}</div>
-                <div className="text-xs text-white/80">طلبات واردة</div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          {[
+            { icon: Inbox,         value: stats.inbox,     label: "طلبات واردة",    iconColor: "#1A3C34", bg: "#E8F5EF" },
+            { icon: CalendarClock, value: stats.followups, label: "متابعات",        iconColor: "#4A90A4", bg: "#E3F2FD" },
+            { icon: ListTodo,      value: stats.pending,   label: "إجمالي المعلق", iconColor: "#6B7280", bg: "#F4F5F7" },
+            { icon: AlertTriangle, value: stats.overdue,   label: "متأخر",          iconColor: "#E07A3A", bg: "#FFF3E0" },
+            { icon: Timer,         value: stats.today,     label: "اليوم",          iconColor: "#5BC4C0", bg: "#E0F7F6" },
+            { icon: CheckCircle2,  value: stats.completed, label: "مكتمل",          iconColor: "#4CAF82", bg: "#E8F5EF" },
+          ].map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={i}
+                style={{
+                  background: "#FFFFFF",
+                  borderRadius: 16,
+                  padding: "16px 20px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: stat.bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 8px",
+                  }}
+                >
+                  <Icon style={{ width: 20, height: 20, color: stat.iconColor }} />
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.2 }}>{stat.value}</div>
+                <div style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>{stat.label}</div>
               </div>
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <CalendarClock className="h-6 w-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{stats.followups}</div>
-                <div className="text-xs text-white/80">متابعات</div>
-              </div>
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <ListTodo className="h-6 w-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{stats.pending}</div>
-                <div className="text-xs text-white/80">إجمالي المعلق</div>
-              </div>
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <AlertTriangle className="h-6 w-6 mx-auto mb-1 text-red-200" />
-                <div className="text-2xl font-bold">{stats.overdue}</div>
-                <div className="text-xs text-white/80">متأخر</div>
-              </div>
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <Timer className="h-6 w-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{stats.today}</div>
-                <div className="text-xs text-white/80">اليوم</div>
-              </div>
-              <div className="text-center p-3 bg-white/10 rounded-xl">
-                <CheckCircle2 className="h-6 w-6 mx-auto mb-1" />
-                <div className="text-2xl font-bold">{stats.completed}</div>
-                <div className="text-xs text-white/80">مكتمل</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            );
+          })}
+        </div>
 
         {/* Filters */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="البحث في الطلبات..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10"
-                  />
-                </div>
+        <div style={{ background: "#FFFFFF", borderRadius: 16, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+              <div className="relative flex-1 max-w-md">
+                <Search
+                  className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ width: 16, height: 16, color: "#9CA3AF" }}
+                />
+                <input
+                  type="text"
+                  placeholder="البحث في الطلبات..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    paddingRight: 40,
+                    paddingLeft: 16,
+                    background: "#F4F5F7",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 20,
+                    fontSize: 13,
+                    color: "#1A1A1A",
+                    outline: "none",
+                  }}
+                />
+              </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2" style={{ borderRadius: 20, borderColor: "#E5E7EB", fontSize: 12 }}>
                         <Filter className="h-4 w-4" />
                         المصدر
                         {selectedSources.length > 0 && (
@@ -859,37 +896,36 @@ export function RequestsCenterPage() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
         {/* Tabs & List */}
         <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)}>
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
-            <TabsTrigger value="inbox" className="gap-2">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl" style={{ background: "#FFFFFF", borderRadius: 20, padding: "3px 4px", border: "1px solid #E5E7EB" }}>
+            <TabsTrigger value="inbox" className="gap-2" style={{ borderRadius: 16, fontSize: 13 }}>
               <Inbox className="h-4 w-4" />
               طلبات واردة
-              <Badge variant="secondary" className="mr-1">
+              <Badge variant="secondary" className="mr-1" style={{ background: "#E8F5EF", color: "#1A3C34", fontSize: 11 }}>
                 {stats.inbox}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="followups" className="gap-2">
+            <TabsTrigger value="followups" className="gap-2" style={{ borderRadius: 16, fontSize: 13 }}>
               <CalendarClock className="h-4 w-4" />
               متابعات
-              <Badge variant="secondary" className="mr-1">
+              <Badge variant="secondary" className="mr-1" style={{ background: "#E3F2FD", color: "#4A90A4", fontSize: 11 }}>
                 {stats.followups}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="all" className="gap-2">
+            <TabsTrigger value="all" className="gap-2" style={{ borderRadius: 16, fontSize: 13 }}>
               <ListTodo className="h-4 w-4" />
               الكل
-              <Badge variant="secondary" className="mr-1">
+              <Badge variant="secondary" className="mr-1" style={{ fontSize: 11 }}>
                 {stats.pending}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="completed" className="gap-2">
+            <TabsTrigger value="completed" className="gap-2" style={{ borderRadius: 16, fontSize: 13 }}>
               <CheckCircle2 className="h-4 w-4" />
               مكتمل
-              <Badge variant="secondary" className="mr-1">
+              <Badge variant="secondary" className="mr-1" style={{ background: "#E8F5EF", color: "#4CAF82", fontSize: 11 }}>
                 {stats.completed}
               </Badge>
             </TabsTrigger>

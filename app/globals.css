@@ -1,69 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --sidebar-width: 64px;
-    --header-height: 64px;
+    /* ── Design Spec Color Palette ── */
+    --color-primary:        #1A3C34;
+    --color-primary-light:  #E8F5EF;
+    --color-accent-green:   #4CAF82;
+    --color-accent-teal:    #5BC4C0;
+    --color-accent-orange:  #E07A3A;
+    --color-accent-blue:    #4A90A4;
+    --color-accent-yellow:  #D4E157;
+
+    /* Neutral */
+    --color-bg-page:        #F4F5F7;
+    --color-bg-card:        #FFFFFF;
+    --color-border:         #E5E7EB;
+    --color-text-primary:   #1A1A1A;
+    --color-text-secondary: #6B7280;
+    --color-text-caption:   #9CA3AF;
+    --color-progress-track: #E0E0E0;
+
+    /* Semantic */
+    --color-positive:       #4CAF82;
+    --color-negative:       #E07A3A;
+    --color-tooltip-bg:     #1F2937;
+    --color-tooltip-text:   #FFFFFF;
+
+    /* ── Shadcn / Tailwind HSL Tokens ── */
+    --background:           0 0% 96.1%;      /* #F4F5F7 page bg */
+    --foreground:           0 0% 10%;        /* #1A1A1A */
+    --card:                 0 0% 100%;
+    --card-foreground:      0 0% 10%;
+    --popover:              0 0% 100%;
+    --popover-foreground:   0 0% 10%;
+    --primary:              160 38% 17%;     /* #1A3C34 Forest Green */
+    --primary-foreground:   0 0% 100%;
+    --secondary:            150 50% 94%;     /* #E8F5EF Mint Green */
+    --secondary-foreground: 160 38% 17%;
+    --muted:                210 20% 96%;
+    --muted-foreground:     215 16% 47%;
+    --accent:               150 50% 94%;
+    --accent-foreground:    160 38% 17%;
+    --destructive:          0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border:               220 13% 91%;     /* #E5E7EB */
+    --input:                220 13% 91%;
+    --ring:                 160 38% 17%;
+    --radius:               0.5rem;
+
+    /* Chart colors */
+    --chart-1: 160 55% 30%;  /* Income - #2D6A4F */
+    --chart-2: 28 73% 55%;   /* Expenses - #E07A3A */
+    --chart-3: 178 46% 56%;  /* Profit - #5BC4C0 */
+    --chart-4: 152 44% 49%;  /* #4CAF82 */
+    --chart-5: 200 38% 46%;  /* #4A90A4 */
+
+    /* Success */
+    --success:              152 44% 49%;     /* #4CAF82 */
+    --success-foreground:   0 0% 100%;
+
+    /* Layout */
+    --sidebar-width:          64px;
+    --sidebar-width-expanded: 220px;
+    --header-height:          64px;
+
+    /* Shadows */
+    --shadow-card:    0 2px 8px rgba(0,0,0,0.06);
+    --shadow-tooltip: 0 4px 12px rgba(0,0,0,0.15);
+    --shadow-nav:     0 1px 4px rgba(0,0,0,0.04);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --background:         222 84% 5%;
+    --foreground:         210 40% 98%;
+    --card:               222 84% 7%;
+    --card-foreground:    210 40% 98%;
+    --popover:            222 84% 7%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary:            152 44% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary:          217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --muted:              217 33% 17%;
+    --muted-foreground:   215 20% 65%;
+    --accent:             217 33% 17%;
+    --accent-foreground:  210 40% 98%;
+    --destructive:        0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --success: 142 76% 36%;
+    --border:             217 33% 17%;
+    --input:              217 33% 17%;
+    --ring:               152 44% 49%;
+    --success:            152 44% 49%;
     --success-foreground: 0 0% 100%;
-    --sidebar-width: 64px;
-    --header-height: 64px;
+    --sidebar-width:      64px;
+    --header-height:      64px;
   }
 }
 
@@ -73,23 +107,43 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', 'Poppins', 'DM Sans', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Dashboard UI Enhancements */
+/* ── Design Token Utilities ── */
 @layer components {
+  /* Card shadow matching spec */
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-tooltip {
+    box-shadow: var(--shadow-tooltip);
+  }
+  .shadow-nav {
+    box-shadow: var(--shadow-nav);
+  }
+
   /* Smooth transitions for interactive elements */
   .dashboard-transition {
     @apply transition-all duration-200 ease-in-out;
   }
-  
-  /* Enhanced hover states */
+
   .hover-lift {
     @apply transition-all duration-200;
   }
-  
   .hover-lift:hover {
-    @apply -translate-y-0.5 shadow-md;
+    @apply -translate-y-0.5;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Progress bar base */
+  .progress-track {
+    background-color: var(--color-progress-track);
+    @apply rounded-sm h-[5px] w-full overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full rounded-sm transition-all duration-500;
   }
 }
 
@@ -97,15 +151,12 @@
 .leaflet-popup-content-wrapper {
   @apply rounded-lg shadow-xl border-0;
 }
-
 .leaflet-popup-content {
   @apply m-0;
 }
-
 .leaflet-popup-tip {
   @apply shadow-md;
 }
-
 .custom-popup .leaflet-popup-content {
   width: auto !important;
   min-width: 280px;
@@ -113,14 +164,9 @@
 
 /* Map marker animation */
 @keyframes marker-bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
-
 .leaflet-marker-icon {
   animation: marker-bounce 2s ease-in-out;
 }
@@ -131,3 +177,7 @@
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Scrollbar styling for listing board */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

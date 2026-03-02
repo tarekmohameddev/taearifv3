@@ -42,6 +42,10 @@ import {
   Calendar as CalendarIcon,
   Home,
   Search,
+  SlidersHorizontal,
+  Tag,
+  ArrowLeftRight,
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -1800,15 +1804,24 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   }
 
   return (
-    <div className="flex min-h-screen flex-col" dir="rtl">
+    <div className="flex min-h-screen flex-col" dir="rtl" style={{ background: "#F4F5F7" }}>
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            {/* Page header card */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #1A3C34 0%, #2D5E4E 100%)",
+                borderRadius: 16,
+                padding: "22px 28px",
+                boxShadow: "0 4px 20px rgba(26,60,52,0.25)",
+              }}
+              className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
+            >
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
+                <h1 style={{ fontSize: 22, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>
                   {isIncompletePage ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
                 </h1>
-                <p className="text-muted-foreground">
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.70)" }}>
                   {isIncompletePage 
                     ? "إكمال الوحدات الغير مكتملة وإضافة البيانات المطلوبة"
                     : "أضف وأدرج قوائم الوحدات لموقعك على الويب"}
@@ -1819,11 +1832,12 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   <Button
                     variant="outline"
                     className="gap-1 w-full md:w-auto relative"
+                    style={{ borderRadius: 20, borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", fontSize: 13, color: "#FFFFFF" }}
                     onClick={() => router.push("/dashboard/properties/incomplete")}
                   >
-                    <AlertCircle className="h-4 w-4" />
+                    <AlertCircle className="h-4 w-4" style={{ color: "#FCD34D" }} />
                     الوحدات الغير مكتملة
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" style={{ background: "#E07A3A" }}>
                       {incompleteCount}
                     </span>
                   </Button>
@@ -1832,6 +1846,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   <Button
                     variant="outline"
                     className="gap-1 w-full md:w-auto"
+                    style={{ borderRadius: 20, borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", fontSize: 13, color: "#FFFFFF" }}
                     onClick={() => setImportDialogOpen(true)}
                   >
                     <Upload className="h-4 w-4" />
@@ -1840,6 +1855,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   <Button
                     variant="outline"
                     className="gap-1 w-full md:w-auto"
+                    style={{ borderRadius: 20, borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", fontSize: 13, color: "#FFFFFF" }}
                     onClick={() => setExportDialogOpen(true)}
                     disabled={isExporting || loading}
                   >
@@ -1847,36 +1863,48 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                     {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
                   </Button>
                 </>
-                <div className="flex gap-2 w-full md:w-auto">
+                <div className="flex gap-1 w-full md:w-auto" style={{ background: "rgba(255,255,255,0.15)", borderRadius: 20, border: "1px solid rgba(255,255,255,0.2)", padding: "3px 6px" }}>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={() => setViewMode("grid")}
-                    className={`flex-1 md:flex-none ${
-                      viewMode === "grid" ? "bg-muted" : ""
-                    }`}
+                    style={{
+                      borderRadius: 16,
+                      background: viewMode === "grid" ? "rgba(255,255,255,0.95)" : "transparent",
+                      color: viewMode === "grid" ? "#1A3C34" : "rgba(255,255,255,0.7)",
+                      width: 32,
+                      height: 32,
+                    }}
                   >
                     <Grid3X3 className="h-4 w-4" />
                     <span className="sr-only">Grid view</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={() => setViewMode("list")}
-                    className={`flex-1 md:flex-none ${
-                      viewMode === "list" ? "bg-muted" : ""
-                    }`}
+                    style={{
+                      borderRadius: 16,
+                      background: viewMode === "list" ? "rgba(255,255,255,0.95)" : "transparent",
+                      color: viewMode === "list" ? "#1A3C34" : "rgba(255,255,255,0.7)",
+                      width: 32,
+                      height: 32,
+                    }}
                   >
                     <List className="h-4 w-4" />
                     <span className="sr-only">List view</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={() => setViewMode("map")}
-                    className={`flex-1 md:flex-none ${
-                      viewMode === "map" ? "bg-muted" : ""
-                    }`}
+                    style={{
+                      borderRadius: 16,
+                      background: viewMode === "map" ? "rgba(255,255,255,0.95)" : "transparent",
+                      color: viewMode === "map" ? "#1A3C34" : "rgba(255,255,255,0.7)",
+                      width: 32,
+                      height: 32,
+                    }}
                   >
                     <Map className="h-4 w-4" />
                     <span className="sr-only">Map view</span>
@@ -2006,6 +2034,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
 
                 <Button
                   className="gap-1 w-full md:w-auto"
+                  style={{ background: "#FFFFFF", color: "#1A3C34", borderRadius: 20, fontSize: 13, fontWeight: 700, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
                   onClick={() => {
                     const propertiesLength = pagination?.total || 0;
                     const limit =
@@ -2022,7 +2051,6 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   إضافة وحدة
                 </Button>
               </div>
-              
             </div>
 
             {/* نافذة منبثقة عند الوصول للحد الأقصى */}
@@ -2455,265 +2483,414 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
             <PropertyStatisticsCards />
 
             {/* الفلاتر */}
-            <Card className="border-0 shadow-none">
-              <CardContent className="p-0 space-y-4">
-                {/* السطر الأول: باقي الفلاتر */}
-                <div className="flex flex-wrap gap-4">
-                  {/* المدينة */}
-                  <div className="space-y-2 w-[180px]">
-                    <Label>المدينة</Label>
-                    <Select
-                      value={filterCityId || undefined}
-                      onValueChange={(value) => {
-                        setFilterCityId(value || null);
-                        setFilterDistrictId(null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                      disabled={loadingCities}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المدينة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city.id} value={city.id.toString()}>
-                            {city.name_ar || city.name_en || city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            {(() => {
+              const activeCount = [
+                filterCityId,
+                filterDistrictId,
+                filterType,
+                filterPurpose,
+                filterBeds,
+                filterPriceFrom || filterPriceTo,
+                localSearchValue,
+              ].filter(Boolean).length;
+              const hasAny = activeCount > 0;
 
-                  {/* الحي */}
-                  <div className="space-y-2 w-[180px]">
-                    <Label>الحي</Label>
-                    <Select
-                      value={filterDistrictId || undefined}
-                      onValueChange={(value) => {
-                        setFilterDistrictId(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                      disabled={loadingDistricts || !filterCityId}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الحي" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {districts.map((district) => (
-                          <SelectItem key={district.id} value={district.id.toString()}>
-                            {district.name_ar || district.name_en || district.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+              const filterLabelStyle = (active: boolean): React.CSSProperties => ({
+                fontSize: 11,
+                fontWeight: 600,
+                color: active ? "#1A3C34" : "#6B7280",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                marginBottom: 6,
+                letterSpacing: "0.03em",
+                textTransform: "uppercase",
+              });
 
-                  {/* نوع العقار */}
-                  <div className="space-y-2 w-[150px]">
-                    <Label>نوع العقار</Label>
-                    <Select
-                      value={filterType || undefined}
-                      onValueChange={(value) => {
-                        setFilterType(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="شقة">شقة</SelectItem>
-                        <SelectItem value="فيلا">فيلا</SelectItem>
-                        <SelectItem value="منزل">منزل</SelectItem>
-                        <SelectItem value="أرض">أرض</SelectItem>
-                        <SelectItem value="محل">محل</SelectItem>
-                        <SelectItem value="مكتب">مكتب</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              const triggerStyle = (active: boolean): React.CSSProperties => ({
+                borderRadius: 10,
+                height: 40,
+                borderColor: active ? "#1A3C34" : "#E5E7EB",
+                background: active ? "#F0FAF5" : "#FAFAFA",
+                fontSize: 13,
+                fontWeight: active ? 500 : 400,
+                color: active ? "#1A3C34" : "#6B7280",
+                transition: "all 0.15s",
+              });
 
-                  {/* إيجار أو بيع */}
-                  <div className="space-y-2 w-[150px]">
-                    <Label>نوع المعاملة</Label>
-                    <Select
-                      value={filterPurpose || undefined}
-                      onValueChange={(value) => {
-                        setFilterPurpose(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sale">للبيع</SelectItem>
-                        <SelectItem value="rent">للإيجار</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* عدد الغرف */}
-                  <div className="space-y-2 w-[140px]">
-                    <Label>عدد الغرف</Label>
-                    <Select
-                      value={filterBeds || undefined}
-                      onValueChange={(value) => {
-                        setFilterBeds(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر عدد الغرف" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="5">5+</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* السعر */}
-                  <div className="space-y-2 w-[200px]">
-                    <Label>السعر</Label>
-                    <Popover open={isPricePopoverOpen} onOpenChange={(open) => {
-                      setIsPricePopoverOpen(open);
-                      if (open) {
-                        setTempPriceFrom(filterPriceFrom);
-                        setTempPriceTo(filterPriceTo);
-                      }
-                    }}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={`w-full justify-between ${
-                            filterPriceFrom || filterPriceTo
-                              ? "text-primary border-primary"
-                              : "text-muted-foreground"
-                          }`}
+              return (
+                <div
+                  style={{
+                    background: "#FFFFFF",
+                    borderRadius: 16,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+                    border: "1px solid #F0F0F0",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* ─── Header ─── */}
+                  <div
+                    style={{
+                      padding: "14px 20px",
+                      borderBottom: "1px solid #F3F4F6",
+                      background: "#FAFAFA",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          background: "#E8F5EF",
+                          borderRadius: 8,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <SlidersHorizontal style={{ width: 15, height: 15, color: "#1A3C34" }} />
+                      </div>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>فلاتر البحث</span>
+                      {hasAny && (
+                        <span
+                          style={{
+                            background: "#1A3C34",
+                            color: "#FFFFFF",
+                            borderRadius: 20,
+                            padding: "2px 9px",
+                            fontSize: 11,
+                            fontWeight: 600,
+                          }}
                         >
-                          {filterPriceFrom || filterPriceTo ? (
-                            <span className="truncate">
-                              {filterPriceFrom && filterPriceTo
-                                ? `${Number(filterPriceFrom).toLocaleString()} - ${Number(filterPriceTo).toLocaleString()}`
-                                : filterPriceFrom
-                                ? `من ${Number(filterPriceFrom).toLocaleString()}`
-                                : `إلى ${Number(filterPriceTo).toLocaleString()}`}
-                            </span>
-                          ) : (
-                            "تحديد السعر"
-                          )}
-                          <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 p-4" align="start">
-                        <div className="space-y-4">
-                          <h4 className="font-medium leading-none">نطاق السعر</h4>
-                          <div className="flex gap-2">
-                            <div className="flex-1 space-y-2">
-                              <Label htmlFor="price-from">من</Label>
-                              <Input
-                                id="price-from"
-                                type="number"
-                                placeholder="0"
-                                value={tempPriceFrom}
-                                onChange={(e) =>
-                                  setTempPriceFrom(e.target.value)
-                                }
-                              />
-                            </div>
-                            <div className="flex-1 space-y-2">
-                              <Label htmlFor="price-to">إلى</Label>
-                              <Input
-                                id="price-to"
-                                type="number"
-                                placeholder="Any"
-                                value={tempPriceTo}
-                                onChange={(e) =>
-                                  setTempPriceTo(e.target.value)
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div className="flex justify-end pt-2">
-                            <Button
-                              size="sm"
-                              className="w-full"
-                              onClick={() => {
-                                setFilterPriceFrom(tempPriceFrom);
-                                setFilterPriceTo(tempPriceTo);
-                                setIsPricePopoverOpen(false);
-                              }}
-                            >
-                              تطبيق
-                            </Button>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                          {activeCount} نشط
+                        </span>
+                      )}
+                    </div>
+
+                    {hasAny && (
+                      <button
+                        onClick={handleClearFilters}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 5,
+                          fontSize: 12,
+                          color: "#DC2626",
+                          fontWeight: 600,
+                          background: "#FEF2F2",
+                          border: "1px solid #FECACA",
+                          borderRadius: 8,
+                          padding: "5px 12px",
+                          cursor: "pointer",
+                          transition: "all 0.15s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#FEE2E2";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "#FEF2F2";
+                        }}
+                      >
+                        <FilterX style={{ width: 13, height: 13 }} />
+                        مسح الكل
+                      </button>
+                    )}
                   </div>
 
-                  {/* زر إعادة التعيين */}
-                  <div className="space-y-2 w-[130px]">
-                    <Label className="opacity-0 text-[1px]">ازالة الفلاتر</Label>
-                    <Label className="opacity-0 text-[1px]">إعادة تعيين</Label>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleClearFilters} 
-                      className={`w-full text-sm ${
-                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || localSearchValue
-                          ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
-                          : ""
-                      }`}
-                    >
-                      <FilterX className="h-3.5 w-3.5 mr-1.5" />
-                      إعادة تعيين
-                    </Button>
-                  </div>
-                </div>
+                  {/* ─── Body ─── */}
+                  <div style={{ padding: "18px 20px 16px" }}>
 
-                {/* السطر الثاني: البحث والفلاتر النشطة */}
-                <div className="flex flex-wrap items-start gap-4">
-                  {/* البحث */}
-                  <div className="space-y-2 w-[300px] shrink-0">
-                    <Label>البحث</Label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    {/* Search — full width */}
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ position: "relative" }}>
+                        <Search
+                          style={{
+                            position: "absolute",
+                            right: 12,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: 16,
+                            height: 16,
+                            color: localSearchValue ? "#1A3C34" : "#9CA3AF",
+                            pointerEvents: "none",
+                          }}
+                        />
                         <Input
                           type="text"
-                          placeholder="كود الوحدة أو العنوان"
+                          placeholder="ابحث بكود الوحدة أو العنوان..."
                           value={localSearchValue}
-                          onChange={(e) => {
-                            setLocalSearchValue(e.target.value); // Only update local state
-                          }}
+                          onChange={(e) => setLocalSearchValue(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleSearchOnly();
+                            if (e.key === "Enter") handleSearchOnly();
+                          }}
+                          style={{
+                            paddingRight: 38,
+                            paddingLeft: 90,
+                            borderRadius: 10,
+                            height: 42,
+                            borderColor: localSearchValue ? "#1A3C34" : "#E5E7EB",
+                            background: localSearchValue ? "#F0FAF5" : "#FAFAFA",
+                            fontSize: 13,
+                            transition: "all 0.15s",
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleSearchOnly}
+                          size="sm"
+                          style={{
+                            position: "absolute",
+                            left: 6,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            background: "#1A3C34",
+                            color: "#FFFFFF",
+                            borderRadius: 8,
+                            height: 30,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                            gap: 4,
+                          }}
+                        >
+                          <Search style={{ width: 13, height: 13 }} />
+                          بحث
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Filter grid */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))",
+                        gap: 12,
+                      }}
+                    >
+                      {/* المدينة */}
+                      <div>
+                        <p style={filterLabelStyle(!!filterCityId)}>
+                          <MapPin style={{ width: 11, height: 11 }} />
+                          المدينة
+                        </p>
+                        <Select
+                          value={filterCityId || undefined}
+                          onValueChange={(v) => {
+                            setFilterCityId(v || null);
+                            setFilterDistrictId(null);
+                          }}
+                          disabled={loadingCities}
+                        >
+                          <SelectTrigger style={triggerStyle(!!filterCityId)}>
+                            <SelectValue placeholder="اختر المدينة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cities.map((city) => (
+                              <SelectItem key={city.id} value={city.id.toString()}>
+                                {city.name_ar || city.name_en || city.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* الحي */}
+                      <div>
+                        <p style={filterLabelStyle(!!filterDistrictId)}>
+                          <Building style={{ width: 11, height: 11 }} />
+                          الحي
+                        </p>
+                        <Select
+                          value={filterDistrictId || undefined}
+                          onValueChange={(v) => setFilterDistrictId(v || null)}
+                          disabled={loadingDistricts || !filterCityId}
+                        >
+                          <SelectTrigger style={{ ...triggerStyle(!!filterDistrictId), opacity: !filterCityId ? 0.55 : 1 }}>
+                            <SelectValue placeholder="اختر الحي" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {districts.map((district) => (
+                              <SelectItem key={district.id} value={district.id.toString()}>
+                                {district.name_ar || district.name_en || district.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* نوع العقار */}
+                      <div>
+                        <p style={filterLabelStyle(!!filterType)}>
+                          <Home style={{ width: 11, height: 11 }} />
+                          نوع العقار
+                        </p>
+                        <Select
+                          value={filterType || undefined}
+                          onValueChange={(v) => setFilterType(v || null)}
+                        >
+                          <SelectTrigger style={triggerStyle(!!filterType)}>
+                            <SelectValue placeholder="اختر النوع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="شقة">شقة</SelectItem>
+                            <SelectItem value="فيلا">فيلا</SelectItem>
+                            <SelectItem value="منزل">منزل</SelectItem>
+                            <SelectItem value="أرض">أرض</SelectItem>
+                            <SelectItem value="محل">محل</SelectItem>
+                            <SelectItem value="مكتب">مكتب</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* نوع المعاملة */}
+                      <div>
+                        <p style={filterLabelStyle(!!filterPurpose)}>
+                          <ArrowLeftRight style={{ width: 11, height: 11 }} />
+                          نوع المعاملة
+                        </p>
+                        <Select
+                          value={filterPurpose || undefined}
+                          onValueChange={(v) => setFilterPurpose(v || null)}
+                        >
+                          <SelectTrigger style={triggerStyle(!!filterPurpose)}>
+                            <SelectValue placeholder="بيع أو إيجار" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sale">للبيع</SelectItem>
+                            <SelectItem value="rent">للإيجار</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* عدد الغرف */}
+                      <div>
+                        <p style={filterLabelStyle(!!filterBeds)}>
+                          <Bed style={{ width: 11, height: 11 }} />
+                          عدد الغرف
+                        </p>
+                        <Select
+                          value={filterBeds || undefined}
+                          onValueChange={(v) => setFilterBeds(v || null)}
+                        >
+                          <SelectTrigger style={triggerStyle(!!filterBeds)}>
+                            <SelectValue placeholder="عدد الغرف" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 غرف</SelectItem>
+                            <SelectItem value="2">2 غرف</SelectItem>
+                            <SelectItem value="3">3 غرف</SelectItem>
+                            <SelectItem value="4">4 غرف</SelectItem>
+                            <SelectItem value="5">5+ غرف</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* السعر */}
+                      <div>
+                        <p style={filterLabelStyle(!!(filterPriceFrom || filterPriceTo))}>
+                          <DollarSign style={{ width: 11, height: 11 }} />
+                          نطاق السعر
+                        </p>
+                        <Popover
+                          open={isPricePopoverOpen}
+                          onOpenChange={(open) => {
+                            setIsPricePopoverOpen(open);
+                            if (open) {
+                              setTempPriceFrom(filterPriceFrom);
+                              setTempPriceTo(filterPriceTo);
                             }
                           }}
-                          className="pr-10"
-                        />
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              style={{
+                                ...triggerStyle(!!(filterPriceFrom || filterPriceTo)),
+                                width: "100%",
+                                justifyContent: "space-between",
+                                paddingLeft: 12,
+                                paddingRight: 12,
+                              }}
+                            >
+                              <span className="truncate" style={{ fontSize: 13 }}>
+                                {filterPriceFrom || filterPriceTo
+                                  ? filterPriceFrom && filterPriceTo
+                                    ? `${Number(filterPriceFrom).toLocaleString()} – ${Number(filterPriceTo).toLocaleString()}`
+                                    : filterPriceFrom
+                                    ? `من ${Number(filterPriceFrom).toLocaleString()}`
+                                    : `إلى ${Number(filterPriceTo).toLocaleString()}`
+                                  : "تحديد السعر"}
+                              </span>
+                              <ChevronDown style={{ width: 14, height: 14, opacity: 0.5, flexShrink: 0 }} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0" style={{ width: 280, borderRadius: 12, overflow: "hidden" }} align="start">
+                            <div style={{ padding: "14px 16px", background: "#FAFAFA", borderBottom: "1px solid #F3F4F6" }}>
+                              <p style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>نطاق السعر (ريال)</p>
+                            </div>
+                            <div style={{ padding: 16 }}>
+                              <div className="flex gap-3">
+                                <div style={{ flex: 1 }}>
+                                  <p style={{ fontSize: 11, fontWeight: 600, color: "#6B7280", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>من</p>
+                                  <Input
+                                    type="number"
+                                    placeholder="0"
+                                    value={tempPriceFrom}
+                                    onChange={(e) => setTempPriceFrom(e.target.value)}
+                                    style={{ borderRadius: 8, height: 38, fontSize: 13 }}
+                                  />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <p style={{ fontSize: 11, fontWeight: 600, color: "#6B7280", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>إلى</p>
+                                  <Input
+                                    type="number"
+                                    placeholder="بلا حد"
+                                    value={tempPriceTo}
+                                    onChange={(e) => setTempPriceTo(e.target.value)}
+                                    style={{ borderRadius: 8, height: 38, fontSize: 13 }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex gap-2 mt-3">
+                                {(tempPriceFrom || tempPriceTo) && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    style={{ flex: 1, borderRadius: 8, fontSize: 12 }}
+                                    onClick={() => {
+                                      setTempPriceFrom("");
+                                      setTempPriceTo("");
+                                    }}
+                                  >
+                                    مسح
+                                  </Button>
+                                )}
+                                <Button
+                                  size="sm"
+                                  style={{ flex: 2, background: "#1A3C34", color: "#FFF", borderRadius: 8, fontSize: 12, fontWeight: 600 }}
+                                  onClick={() => {
+                                    setFilterPriceFrom(tempPriceFrom);
+                                    setFilterPriceTo(tempPriceTo);
+                                    setIsPricePopoverOpen(false);
+                                  }}
+                                >
+                                  تطبيق الفلتر
+                                </Button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <Button
-                        type="button"
-                        onClick={handleSearchOnly}
-                        size="default"
-                        className="shrink-0"
-                      >
-                        <Search className="h-4 w-4 ml-2" />
-                        بحث
-                      </Button>
                     </div>
-                  </div>
 
-                  {/* عرض الفلاتر النشطة */}
-                  <div className="flex-1 min-w-[300px] mt-0">
-                    <div className="pt-[20px]">
+                    {/* Active filters */}
+                    <div style={{ marginTop: 14 }}>
                       <ActiveFiltersDisplay
                         filters={newFilters}
                         onRemoveFilter={handleRemoveFilter}
@@ -2722,8 +2899,8 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              );
+            })()}
 
             {loading ? (
               renderSkeletons()
@@ -3089,281 +3266,456 @@ function PropertyCard({
   
   const isStackedFooter = hasStackedFooterInSameRow();
   
+  const isSale = property.transaction_type === "sale" || property.purpose === "sale";
+  const accentColor = property.status === "منشور"
+    ? (isSale ? "#D97706" : "#0891B2")
+    : "#9CA3AF";
+
+  const dropdownItems = (
+    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+      {property.featured && (
+        <DropdownMenuItem onClick={() => setReorderPopup({ open: true, type: "featured" })}>
+          <Grid3X3 className="ml-2 h-4 w-4" />
+          ترتيب الوحدة في الرئيسية
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem onClick={() => setReorderPopup({ open: true, type: "normal" })}>
+        <List className="ml-2 h-4 w-4" />
+        ترتيب الوحدة
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => router.push("/dashboard/properties/" + property.id + "/edit")}>
+        <Edit className="ml-2 h-4 w-4" />
+        تعديل
+      </DropdownMenuItem>
+      {showIncompleteOnly && onCompleteDraft && (
+        <DropdownMenuItem onClick={() => onCompleteDraft(property.id.toString())}>
+          <CheckCircle className="ml-2 h-4 w-4" />
+          إكمال المسودة
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem
+        onClick={() => {
+          let domain = useAuthStore.getState().userData?.domain || "";
+          if (process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN === "mandhoor.com") domain = domain.replace("taearif", "mandhoor");
+          if (process.env.NODE_ENV === "development") { domain = domain.replace("taearif.com", "localhost:3000"); domain = domain.replace("https://", "http://"); }
+          const url = domain.startsWith("http") ? `${domain}property/${property.slug}` : process.env.NODE_ENV === "development" ? `http://${domain}/property/${property.slug}` : `https://${domain}/property/${property.slug}`;
+          window.open(url, "_blank");
+        }}
+      >
+        <ExternalLink className="ml-2 h-4 w-4" />
+        معاينة
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => window.open(`/dashboard/activity-logs/property/${property.id}`, "_blank")}>
+        <Activity className="ml-2 h-4 w-4" />
+        سجل النشاطات
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => onDuplicate(property)}>
+        <Copy className="ml-2 h-4 w-4" />
+        مضاعفة
+      </DropdownMenuItem>
+      {property.status === "مسودة" ? (
+        <DropdownMenuItem onClick={() => onToggleStatus(property)}>
+          <ExternalLink className="ml-2 h-4 w-4" />
+          نشر
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuItem onClick={() => onToggleStatus(property)}>
+          <Edit className="ml-2 h-4 w-4" />
+          إلغاء النشر
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(property.id)}>
+        <Trash2 className="ml-2 h-4 w-4" />
+        حذف الوحدة
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  );
+
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" 
+    <div
       dir="rtl"
       onClick={handleCardClick}
+      style={{
+        background: "#FFFFFF",
+        borderRadius: 16,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+        border: "1px solid #E9EAEC",
+        overflow: "hidden",
+        cursor: "pointer",
+        transition: "box-shadow 0.22s, transform 0.22s",
+        display: "flex",
+        flexDirection: "column",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.14)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.08)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
     >
-      <div className="relative">
-        <div className="aspect-[16/9] w-full overflow-hidden">
+      {/* ── Image ── */}
+      <div style={{ position: "relative", flexShrink: 0 }}>
+        <div style={{ aspectRatio: "4/3", overflow: "hidden" }}>
           <img
-            src={
-              property.thumbnail ||
-              property.featured_image ||
-              "/placeholder.svg"
-            }
-            alt={property.title || property.contents[0].title}
-            className="h-full w-full object-cover transition-all hover:scale-105"
+            src={property.thumbnail || property.featured_image || "/placeholder.svg"}
+            alt={property.title || property.contents[0]?.title || "property"}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              transition: "transform 0.45s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.07)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           />
         </div>
-        {property.featured && (
-          <div className="absolute right-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-            مميز
-          </div>
-        )}
+
+        {/* Deep gradient overlay for text readability */}
         <div
-          className={`absolute left-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-            property.status === "منشور"
-              ? "bg-green-500 text-white"
-              : "bg-amber-500 text-white"
-          }`}
-        >
-          {property.status}
-        </div>
-      </div>
-      <CardHeader className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle
-              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "Untitled").length > 20 ? "text-sm " : ""}`}
-            >
-              {truncateTitle(property.title || property.contents?.[0]?.title || "Untitled")}
-            </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              {formattedAddress || "لا يوجد عنوان"}
-            </CardDescription>
-            {showIncompleteOnly && (
-              <div className="mt-2 space-y-1">
-                {property.missing_fields && property.missing_fields.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
-                      <Badge key={index} variant="destructive" className="text-xs">
-                        {field}
-                      </Badge>
-                    ))}
-                    {property.missing_fields.length > 3 && (
-                      <Badge variant="destructive" className="text-xs">
-                        +{property.missing_fields.length - 3} أكثر
-                      </Badge>
-                    )}
-                  </div>
-                )}
-                {property.validation_errors && property.validation_errors.length > 0 && (
-                  <div className="text-xs text-amber-600 dark:text-amber-400">
-                    <AlertTriangle className="inline h-3 w-3 ml-1" />
-                    {property.validation_errors[0]}
-                    {property.validation_errors.length > 1 && (
-                      <span> (+{property.validation_errors.length - 1} أخطاء أخرى)</span>
-                    )}
-                  </div>
-                )}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, transparent 38%, rgba(0,0,0,0.65) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Top badges row */}
+        <div style={{ position: "absolute", top: 10, right: 10, left: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          {/* Right: status */}
+          <div
+            style={{
+              background: property.status === "منشور" ? "rgba(5,150,105,0.92)" : "rgba(217,119,6,0.92)",
+              color: "#FFFFFF",
+              borderRadius: 20,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+              backdropFilter: "blur(6px)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {property.status}
+          </div>
+
+          {/* Left: featured + transaction type */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5 }}>
+            {property.featured && (
+              <div
+                style={{
+                  background: "rgba(26,60,52,0.92)",
+                  color: "#FFFFFF",
+                  borderRadius: 20,
+                  padding: "3px 10px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  backdropFilter: "blur(6px)",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                ★ مميز
               </div>
             )}
+            <div
+              style={{
+                background: isSale ? "rgba(180,83,9,0.90)" : "rgba(8,145,178,0.90)",
+                color: "#FFFFFF",
+                borderRadius: 20,
+                padding: "3px 10px",
+                fontSize: 11,
+                fontWeight: 700,
+                backdropFilter: "blur(6px)",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+              }}
+            >
+              {isSale ? "للبيع" : "للإيجار"}
+            </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="-mr-2 bg-muted hover:bg-muted/80"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal className="h-1 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              {/* ترتيب الوحدة في الرئيسية */}
-              {property.featured && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    /* TODO: ترتيب الوحدة في الرئيسية */
-                    setReorderPopup({ open: true, type: "featured" });
-                  }}
-                >
-                  <Grid3X3 className="ml-2 h-4 w-4" />
-                  ترتيب الوحدة في الرئيسية
-                </DropdownMenuItem>
-              )}
-              {/* ترتيب الوحدة */}
-              <DropdownMenuItem
-                onClick={() => {
-                  /* TODO: ترتيب الوحدة */
-                  setReorderPopup({ open: true, type: "normal" });
-                }}
-              >
-                <List className="ml-2 h-4 w-4" />
-                ترتيب الوحدة
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  router.push("/dashboard/properties/" + property.id + "/edit")
-                }
-              >
-                <Edit className="ml-2 h-4 w-4" />
-                تعديل
-              </DropdownMenuItem>
-              {showIncompleteOnly && onCompleteDraft && (
-                <DropdownMenuItem
-                  onClick={() => onCompleteDraft(property.id.toString())}
-                >
-                  <CheckCircle className="ml-2 h-4 w-4" />
-                  إكمال المسودة
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                onClick={() => {
-                  let domain = useAuthStore.getState().userData?.domain || "";
-                  if (process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN === "mandhoor.com") {
-                    domain = domain.replace("taearif", "mandhoor");
-                  }
-                  if (process.env.NODE_ENV === "development") {
-                    domain = domain.replace("taearif.com", "localhost:3000");
-                    domain = domain.replace("https://", "http://");
-                  }
-                  const url = domain.startsWith("http")
-                    ? `${domain}property/${property.slug}`
-                    : process.env.NODE_ENV === "development"
-                    ? `http://${domain}/property/${property.slug}`
-                    : `https://${domain}/property/${property.slug}`;
-                  window.open(url, "_blank");
-                }}
-              >
-                <ExternalLink className="ml-2 h-4 w-4" />
-                معاينة
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  const url = `/dashboard/activity-logs/property/${property.id}`;
-                  window.open(url, "_blank");
-                }}
-              >
-                <Activity className="ml-2 h-4 w-4" />
-                سجل النشاطات
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDuplicate(property)}>
-                <Copy className="ml-2 h-4 w-4" />
-                مضاعفة
-              </DropdownMenuItem>
-              {property.status === "مسودة" ? (
-                <DropdownMenuItem onClick={() => onToggleStatus(property)}>
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                  نشر
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => onToggleStatus(property)}>
-                  <Edit className="ml-2 h-4 w-4" />
-                  إلغاء النشر
-                </DropdownMenuItem>
-              )}
-              {/* <DropdownMenuItem onClick={() => onShare(property)}>
-                <Share2 className="ml-2 h-4 w-4" />
-                شارك
-              </DropdownMenuItem> */}
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => onDelete(property.id)}
-              >
-                <Trash2 className="ml-2 h-4 w-4" />
-                حذف الوحدة
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-2">
+
+        {/* Bottom: title + address overlaid on image */}
         <div
-          className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-3" : "grid-cols-2"}`}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: "10px 13px 11px",
+          }}
         >
-          <div className="flex flex-col items-center">
-            <span className="text-muted-foreground">مشاهدات</span>
-            <span className="font-medium flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {property.visits || 0}
+          <p
+            style={{
+              color: "#FFFFFF",
+              fontWeight: 700,
+              fontSize: 14,
+              lineHeight: 1.35,
+              textShadow: "0 1px 5px rgba(0,0,0,0.7)",
+              marginBottom: formattedAddress ? 3 : 0,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {truncateTitle(property.title || property.contents?.[0]?.title || "بلا عنوان")}
+          </p>
+          {formattedAddress && (
+            <p
+              style={{
+                color: "rgba(255,255,255,0.82)",
+                fontSize: 11,
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+              }}
+            >
+              <MapPin style={{ width: 10, height: 10, flexShrink: 0 }} />
+              {formattedAddress}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* ── Incomplete warnings ── */}
+      {showIncompleteOnly && property.missing_fields && property.missing_fields.length > 0 && (
+        <div style={{ padding: "8px 13px", background: "#FFFBEB", borderBottom: "1px solid #FDE68A", display: "flex", flexWrap: "wrap", gap: 4 }}>
+          {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
+            <span
+              key={index}
+              style={{ background: "#FEF3C7", border: "1px solid #FCD34D", color: "#92400E", borderRadius: 6, padding: "2px 7px", fontSize: 11, fontWeight: 600 }}
+            >
+              {field}
             </span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-muted-foreground">المساحة</span>
-            <span className="font-medium flex items-center gap-1">
-              <Ruler className="h-3 w-3" /> {property.size || property.area || 0} م²
+          ))}
+          {property.missing_fields.length > 3 && (
+            <span style={{ background: "#FEE2E2", border: "1px solid #FECACA", color: "#B91C1C", borderRadius: 6, padding: "2px 7px", fontSize: 11, fontWeight: 600 }}>
+              +{property.missing_fields.length - 3}
             </span>
-          </div>
-          {property.status === "منشور" && property.creator && (
-            <div className="flex flex-col items-end justify-center">
-              <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white mt-1">
-                {property.creator.name === "User"
-                  ? userData?.first_name && userData?.last_name
-                    ? `${userData.first_name} ${userData.last_name}`
-                    : userData?.username || userData?.first_name || "User"
-                  : property.creator.name}
-              </div>
+          )}
+          {property.validation_errors && property.validation_errors.length > 0 && (
+            <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+              <AlertTriangle style={{ width: 11, height: 11, color: "#D97706" }} />
+              <span style={{ fontSize: 11, color: "#92400E" }}>{property.validation_errors[0]}</span>
             </div>
           )}
         </div>
-        <div className={hasFeaturesInSameRow() ? "pt-2 min-h-[30px]" : ""}>
-          {Array.isArray(property.features) && property.features.length > 0 ? (
-            <div className="grid grid-cols-2 gap-1">
-              {property.features
-                .slice(0, 2)
-                .map((feature: string, index: number) => (
-                  <div key={index} className="flex justify-center">
-                    <Badge
-                      variant="outline"
-                      className="text-xs font-semibold justify-center max-w-[150px]"
-                    >
-                      {feature}
-                    </Badge>
-                  </div>
-                ))}
-            </div>
-          ) : hasFeaturesInSameRow() ? (
-            <div className="h-[30px]"></div>
-          ) : null}
+      )}
+
+      {/* ── Stats row ── */}
+      <div
+        style={{
+          display: "flex",
+          borderBottom: "1px solid #F3F4F6",
+          background: "#FAFAFA",
+        }}
+      >
+        {property.beds ? (
+          <div
+            style={{
+              flex: 1,
+              padding: "9px 0 8px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              borderLeft: "1px solid #F3F4F6",
+            }}
+          >
+            <Bed style={{ width: 13, height: 13, color: "#9CA3AF" }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#111827", lineHeight: 1 }}>{property.beds}</span>
+            <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 500, letterSpacing: "0.03em" }}>غرف</span>
+          </div>
+        ) : null}
+
+        <div
+          style={{
+            flex: 1,
+            padding: "9px 0 8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            borderLeft: property.beds ? "1px solid #F3F4F6" : undefined,
+          }}
+        >
+          <Ruler style={{ width: 13, height: 13, color: "#9CA3AF" }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#111827", lineHeight: 1 }}>
+            {property.size || property.area || 0}
+          </span>
+          <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 500, letterSpacing: "0.03em" }}>م²</span>
         </div>
-      </CardContent>
-      <CardFooter 
-        className="p-4 pt-0 flex flex-col gap-2" 
+
+        <div
+          style={{
+            flex: 1,
+            padding: "9px 0 8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            borderLeft: "1px solid #F3F4F6",
+          }}
+        >
+          <Eye style={{ width: 13, height: 13, color: "#9CA3AF" }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#111827", lineHeight: 1 }}>{property.visits || 0}</span>
+          <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 500, letterSpacing: "0.03em" }}>مشاهدة</span>
+        </div>
+
+        {property.creator && (
+          <div
+            style={{
+              flex: 1,
+              padding: "9px 0 8px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              borderLeft: "1px solid #F3F4F6",
+            }}
+          >
+            <div
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                background: "#3B82F6",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#FFF",
+                fontSize: 9,
+                fontWeight: 700,
+              }}
+            >
+              {(property.creator.name === "User"
+                ? userData?.first_name || "U"
+                : property.creator.name || "U"
+              ).charAt(0).toUpperCase()}
+            </div>
+            <span
+              style={{
+                fontSize: 9,
+                color: "#6B7280",
+                fontWeight: 600,
+                maxWidth: 52,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                lineHeight: 1,
+              }}
+            >
+              {property.creator.name === "User"
+                ? userData?.first_name || "User"
+                : property.creator.name}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Footer: price + actions ── */}
+      <div
+        style={{
+          padding: "11px 13px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          marginTop: "auto",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="font-semibold flex gap-1 text-lg w-full justify-center">
-          {property.transaction_type === "sale" ||
-          property.purpose === "sale" ? (
-            <>
-              <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-[1.35rem] h-[1.35rem] filter brightness-0 contrast-100 mt-0.5"
-              />
-            </>
-          ) : (
-            <>
-              <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className={`filter brightness-0 contrast-100 mt-0.5 ${getPaymentMethodText(property.payment_method) ? "w-[1.1rem] h-[1.1rem]" : "w-[1.35rem] h-[1.35rem]"}`}
-              />
-              {getPaymentMethodText(property.payment_method) && (
-                <span className="text-sm">/{getPaymentMethodText(property.payment_method)}</span>
-              )}
-            </>
+        {/* Price */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4, minWidth: 0, flex: 1 }}>
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              color: "#0F172A",
+              letterSpacing: "-0.03em",
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {Math.floor(parseFloat(property.price) || 0).toLocaleString()}
+          </span>
+          <img
+            src="/Saudi_Riyal_Symbol.svg"
+            alt="ريال"
+            style={{ width: 13, height: 13, filter: "brightness(0)", flexShrink: 0, marginBottom: 1 }}
+          />
+          {!isSale && getPaymentMethodText(property.payment_method) && (
+            <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 500, whiteSpace: "nowrap" }}>
+              /{getPaymentMethodText(property.payment_method)}
+            </span>
           )}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1 w-full"
-          onClick={() =>
-            router.push("/dashboard/properties/" + property.id + "/edit")
-          }
-        >
-          <Edit className="h-3.5 w-3.5" />
-          تعديل
-        </Button>
-      </CardFooter>
-    </Card>
 
+        {/* Actions */}
+        <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push("/dashboard/properties/" + property.id + "/edit");
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              background: "#F3F4F6",
+              border: "none",
+              borderRadius: 8,
+              padding: "6px 11px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#374151",
+              cursor: "pointer",
+              transition: "background 0.15s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#E5E7EB")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#F3F4F6")}
+          >
+            <Edit style={{ width: 13, height: 13 }} />
+            تعديل
+          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 32,
+                  height: 32,
+                  background: "#F3F4F6",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  color: "#6B7280",
+                  transition: "background 0.15s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#E5E7EB")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#F3F4F6")}
+              >
+                <MoreHorizontal style={{ width: 15, height: 15 }} />
+              </button>
+            </DropdownMenuTrigger>
+            {dropdownItems}
+          </DropdownMenu>
+        </div>
+      </div>
+    </div>
   );
 }
 

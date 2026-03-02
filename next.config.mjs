@@ -46,15 +46,19 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // تحسين cache
+  // تحسين cache - أقل صفحات في الذاكرة = أسرع في التطوير
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: process.env.NODE_ENV === "development" ? 3 : 2,
+    maxInactiveAge: 30 * 1000,
+    pagesBufferLength: 1,
   },
   output: process.platform === "win32" ? undefined : "standalone",
   
-  // ⬅️ Webpack configuration - فقط في PRODUCTION
+  // ⬅️ Webpack configuration
   webpack: (config, { isServer, dev, webpack }) => {
+    // في التطوير: تفعيل cache لتسريع إعادة التجميع
+    if (dev) {
+      config.cache = { type: 'filesystem' };
+    }
     // ⬅️ Webpack في PRODUCTION فقط
     if (!dev) {
       // Production webpack optimizations
@@ -138,10 +142,6 @@ const nextConfig = {
     return config;
   },
   
-  // ⬅️ Turbopack - فقط في DEVELOPMENT
-  ...(process.env.NODE_ENV === "development" && { 
-    turbopack: {} 
-  }),
 };
 
 mergeConfig(nextConfig, userConfig);

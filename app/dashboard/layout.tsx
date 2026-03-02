@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { IconSidebar } from "@/components/mainCOMP/IconSidebar";
+import { OnboardingAutoRedirect } from "@/components/onboarding/OnboardingAutoRedirect";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -44,6 +45,7 @@ const TenantPageWrapper = dynamic(() => import("@/app/TenantPageWrapper"), {
  * - To change language direction: Modify the direction CSS properties
  * - To add LTR support: Add conditional logic based on locale detection
  */
+
 
 export default function DashboardLayout({
   children,
@@ -243,11 +245,14 @@ export default function DashboardLayout({
             {/* Main content area with header and page content */}
             <div className="flex-1 flex flex-col min-w-0">
               <DashboardHeader />
-              <main className="flex-1 p-4 md:p-6 bg-muted/30">
+              <main className="flex-1" style={{ background: "#F4F5F7", minHeight: 0 }}>
                 {children}
               </main>
             </div>
           </div>
+
+          {/* Auto-redirect to onboarding page on first dashboard visit */}
+          <OnboardingAutoRedirect />
         </PermissionWrapper>
       </div>
     </GTMProvider>

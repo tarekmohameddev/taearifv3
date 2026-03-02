@@ -121,40 +121,11 @@ function getTenantIdFromHost(host: string): string | null {
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (IS_DEVELOPMENT && hostWithoutPort.includes(LOCAL_DOMAIN)) {
     const parts = hostWithoutPort.split(".");
-    // Debug logging
-    if (process.env.NODE_ENV === "development") {
-      console.log("🔍 getTenantIdFromHost - DEBUG:", {
-        host,
-        hostWithoutPort,
-        parts,
-        partsLength: parts.length,
-        firstPart: parts[0],
-        localDomain: LOCAL_DOMAIN,
-        isFirstPartNotLocalDomain: parts[0] !== LOCAL_DOMAIN,
-      });
-    }
-    
     if (parts.length > 1 && parts[0] !== LOCAL_DOMAIN) {
       const potentialTenantId = parts[0].toLowerCase();
 
-      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة (Set lookup is O(1))
       if (!RESERVED_WORDS.has(potentialTenantId)) {
-        if (process.env.NODE_ENV === "development") {
-          console.log("✅ getTenantIdFromHost - Found tenantId:", parts[0]);
-        }
-        return parts[0]; // Return original case
-      } else {
-        if (process.env.NODE_ENV === "development") {
-          console.log("❌ getTenantIdFromHost - Reserved word:", potentialTenantId);
-        }
-      }
-    } else {
-      if (process.env.NODE_ENV === "development") {
-        console.log("❌ getTenantIdFromHost - Invalid subdomain structure:", {
-          partsLength: parts.length,
-          firstPart: parts[0],
-          localDomain: LOCAL_DOMAIN,
-        });
+        return parts[0];
       }
     }
   }
@@ -222,17 +193,6 @@ export function proxy(request: NextRequest) {
     }
   }
   
-  // Debug logging
-  console.log("🔍 proxy.ts - Tenant detection:", {
-    host,
-    hostWithoutPort,
-    tenantId,
-    domainType,
-    isOnBaseDomain,
-    hasCustomDomainExtension,
-    isCustomDomain,
-    pathname,
-  });
 
   /*
    * ========================================
@@ -357,20 +317,11 @@ export function proxy(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
-    console.log("✅ proxy.ts - Setting headers:", {
-      tenantId,
-      domainType,
-      pathname: pathnameWithoutLocale,
-      locale,
-    });
     response.headers.set("x-tenant-id", tenantId);
 
-    // تحديد نوع الـ domain (استخدام domainType المحسوب مسبقاً)
     if (domainType) {
       response.headers.set("x-domain-type", domainType);
     }
-  } else {
-    console.log("❌ proxy.ts - No tenantId found, headers not set");
   }
 
   // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)

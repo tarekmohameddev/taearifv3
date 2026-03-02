@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Inter", "Poppins", "DM Sans", "system-ui", "-apple-system", "sans-serif"],
+      },
       zIndex: {
         "9999": "9999",
       },
@@ -27,20 +30,12 @@ const config = {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       colors: {
@@ -81,11 +76,37 @@ const config = {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        /* ── Design Spec Palette ── */
+        ds: {
+          primary:        "#1A3C34",
+          "primary-light": "#E8F5EF",
+          green:          "#4CAF82",
+          teal:           "#5BC4C0",
+          orange:         "#E07A3A",
+          blue:           "#4A90A4",
+          yellow:         "#D4E157",
+          "bg-page":      "#F4F5F7",
+          "bg-card":      "#FFFFFF",
+          border:         "#E5E7EB",
+          "text-primary": "#1A1A1A",
+          "text-secondary": "#6B7280",
+          "text-caption": "#9CA3AF",
+          "progress-track": "#E0E0E0",
+          tooltip:        "#1F2937",
+        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg:   "var(--radius)",
+        md:   "calc(var(--radius) - 2px)",
+        sm:   "calc(var(--radius) - 4px)",
+        xl:   "16px",
+        "2xl": "20px",
+        pill: "20px",
+      },
+      boxShadow: {
+        card:    "0 2px 8px rgba(0,0,0,0.06)",
+        tooltip: "0 4px 12px rgba(0,0,0,0.15)",
+        nav:     "0 1px 4px rgba(0,0,0,0.04)",
       },
     },
   },

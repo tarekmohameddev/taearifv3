@@ -2,21 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Home, Users, Grid, Settings, FileText, Building2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Search, Home, Users, Grid, Settings, FileText, Building2, MessageCircle, Phone, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SearchResult {
@@ -24,67 +10,18 @@ interface SearchResult {
   title: string;
   description?: string;
   path: string;
-  category: "page" | "setting" | "feature";
   icon: React.ComponentType<{ className?: string }>;
 }
 
 const SEARCH_DATA: SearchResult[] = [
-  {
-    id: "dashboard",
-    title: "لوحة التحكم",
-    description: "نظرة عامة على الموقع",
-    path: "/dashboard",
-    category: "page",
-    icon: FileText,
-  },
-  {
-    id: "properties",
-    title: "العقارات",
-    description: "إدارة العقارات",
-    path: "/dashboard/properties",
-    category: "page",
-    icon: Home,
-  },
-  {
-    id: "customers-hub",
-    title: "العملاء الموحد",
-    description: "إدارة شاملة لدورة حياة العملاء",
-    path: "/dashboard/customers-hub",
-    category: "page",
-    icon: Users,
-  },
-  {
-    id: "apps",
-    title: "التطبيقات",
-    description: "إدارة التطبيقات",
-    path: "/dashboard/apps",
-    category: "page",
-    icon: Grid,
-  },
-  {
-    id: "settings",
-    title: "إعدادات الموقع",
-    description: "تكوين إعدادات الموقع",
-    path: "/dashboard/settings",
-    category: "page",
-    icon: Settings,
-  },
-  {
-    id: "projects",
-    title: "المشاريع",
-    description: "إدارة المشاريع",
-    path: "/dashboard/projects",
-    category: "page",
-    icon: Building2,
-  },
-  {
-    id: "customers",
-    title: "إدارة العملاء",
-    description: "إدارة عملائك",
-    path: "/dashboard/customers",
-    category: "page",
-    icon: Users,
-  },
+  { id: "dashboard",      title: "لوحة التحكم",    description: "نظرة عامة على الموقع",          path: "/dashboard",                     icon: Home },
+  { id: "properties",     title: "العقارات",        description: "إدارة وعرض العقارات",           path: "/dashboard/properties",          icon: Building2 },
+  { id: "customers-hub",  title: "العملاء",         description: "إدارة شاملة لدورة حياة العملاء", path: "/dashboard/customers-hub",       icon: Users },
+  { id: "whatsapp",       title: "إدارة الواتساب",  description: "رسائل واتساب",                  path: "/dashboard/whatsapp-management", icon: MessageCircle },
+  { id: "call-center",    title: "مركز الاتصال",    description: "إدارة المكالمات",               path: "/dashboard/call-center",         icon: Phone },
+  { id: "sms-campaigns",  title: "حملات الرسائل",   description: "إرسال الرسائل النصية",          path: "/dashboard/sms-campaigns",       icon: MessageSquare },
+  { id: "apps",           title: "التطبيقات",       description: "إدارة التطبيقات",               path: "/dashboard/apps",                icon: Grid },
+  { id: "settings",       title: "الإعدادات",       description: "تكوين إعدادات الحساب",          path: "/dashboard/settings",            icon: Settings },
 ];
 
 export function DashboardSearch() {
@@ -99,7 +36,6 @@ export function DashboardSearch() {
       setFilteredResults([]);
       return;
     }
-
     const query = searchQuery.toLowerCase();
     const results = SEARCH_DATA.filter(
       (item) =>
@@ -113,13 +49,13 @@ export function DashboardSearch() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((prev) => !prev);
+        if (!open) inputRef.current?.focus();
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [open]);
 
   const handleSelect = (path: string) => {
     setOpen(false);
@@ -128,10 +64,14 @@ export function DashboardSearch() {
   };
 
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative" style={{ width: 300 }}>
+      {/* Search Input */}
       <div className="relative">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none transition-colors duration-200" />
-        <Input
+        <Search
+          className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ width: 16, height: 16, color: "#9CA3AF" }}
+        />
+        <input
           ref={inputRef}
           type="text"
           placeholder="البحث هنا..."
@@ -141,22 +81,43 @@ export function DashboardSearch() {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          className={cn(
-            "w-full pr-10 pl-4 h-10 rounded-full",
-            "bg-muted/40 border-border/60",
-            "focus-visible:ring-2 focus-visible:ring-success focus-visible:border-success",
-            "placeholder:text-muted-foreground",
-            "transition-all duration-200 ease-in-out",
-            "hover:bg-muted/60 hover:border-border"
-          )}
+          style={{
+            width: "100%",
+            height: 36,
+            paddingRight: 36,
+            paddingLeft: 16,
+            background: "#F4F5F7",
+            border: "1px solid #E5E7EB",
+            borderRadius: 20,
+            fontSize: 13,
+            color: "#1A1A1A",
+            outline: "none",
+            transition: "border-color 0.2s, box-shadow 0.2s",
+          }}
+          onFocusCapture={(e) => {
+            e.currentTarget.style.borderColor = "#1A3C34";
+            e.currentTarget.style.boxShadow = "0 0 0 2px rgba(26,60,52,0.12)";
+          }}
+          onBlurCapture={(e) => {
+            e.currentTarget.style.borderColor = "#E5E7EB";
+            e.currentTarget.style.boxShadow = "none";
+          }}
         />
-        <kbd className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
-        </kbd>
       </div>
 
+      {/* Dropdown Results */}
       {open && filteredResults.length > 0 && (
-        <div className="absolute top-full right-0 mt-2 w-full bg-popover border border-border rounded-lg shadow-lg z-50 max-h-[300px] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200">
+        <div
+          className="absolute top-full right-0 mt-2 w-full z-50 animate-in fade-in-0 zoom-in-95 duration-150"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.10)",
+            maxHeight: 280,
+            overflowY: "auto",
+          }}
+        >
           <div className="p-2">
             {filteredResults.map((result) => {
               const Icon = result.icon;
@@ -164,22 +125,20 @@ export function DashboardSearch() {
                 <button
                   key={result.id}
                   onClick={() => handleSelect(result.path)}
-                  className={cn(
-                    "w-full flex items-start gap-3 p-3 rounded-lg",
-                    "hover:bg-muted/80 transition-all duration-150",
-                    "text-right cursor-pointer",
-                    "hover:scale-[1.02] active:scale-[0.98]"
-                  )}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[#F4F5F7] transition-colors text-right"
                 >
-                  <div className="flex-shrink-0 mt-0.5">
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div
+                    className="flex-shrink-0 flex items-center justify-center rounded-lg"
+                    style={{ width: 32, height: 32, background: "#E8F5EF" }}
+                  >
+                    <Icon className="h-4 w-4 text-[#1A3C34]" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">
+                  <div className="flex-1 min-w-0 text-right">
+                    <div className="text-sm font-medium" style={{ color: "#1A1A1A" }}>
                       {result.title}
                     </div>
                     {result.description && (
-                      <div className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                      <div className="text-xs mt-0.5 line-clamp-1" style={{ color: "#9CA3AF" }}>
                         {result.description}
                       </div>
                     )}
@@ -192,8 +151,16 @@ export function DashboardSearch() {
       )}
 
       {open && searchQuery && filteredResults.length === 0 && (
-        <div className="absolute top-full right-0 mt-2 w-full bg-popover border border-border rounded-lg shadow-lg z-50 p-4 text-center animate-in fade-in-0 zoom-in-95 duration-200">
-          <p className="text-sm text-muted-foreground">لا توجد نتائج</p>
+        <div
+          className="absolute top-full right-0 mt-2 w-full z-50 p-4 text-center animate-in fade-in-0 zoom-in-95 duration-150"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.10)",
+          }}
+        >
+          <p className="text-sm" style={{ color: "#9CA3AF" }}>لا توجد نتائج</p>
         </div>
       )}
 
