@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import ColorPicker from "@/components/color-picker";
 import { saveBrandSettings } from "@/lib/mock/onboarding-api";
 import { useOnboardingStore } from "@/store/onboarding";
+import { ExplanationCard } from "@/components/onboarding/ExplanationCard";
+import { HelpBanner } from "@/components/onboarding/HelpBanner";
 import toast from "react-hot-toast";
 
 const PRESET_PALETTES = [
@@ -21,9 +23,10 @@ const PRESET_PALETTES = [
 
 interface BrandSetupStepProps {
   onNext: () => void;
+  isBeginnerMode?: boolean;
 }
 
-export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
+export function BrandSetupStep({ onNext, isBeginnerMode = false }: BrandSetupStepProps) {
   const { steps, markStepCompleted, skipStep } = useOnboardingStore();
   const stepData = steps.find((s) => s.id === "brand")?.data ?? {};
 
@@ -89,10 +92,16 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Beginner explanation */}
+      {isBeginnerMode && <ExplanationCard stepId="brand" />}
+
       {/* Header */}
       <div className="text-center space-y-1">
-        <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-2" style={{ background: "#E8F5EF" }}>
+        <div
+          className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-2"
+          style={{ background: "#E8F5EF" }}
+        >
           🏷️
         </div>
         <h2 className="text-xl font-bold text-[#1A1A1A]">هوية موقعك</h2>
@@ -101,22 +110,31 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
 
       {/* Website Name */}
       <div className="space-y-2">
-        <Label htmlFor="website-name" className="text-sm font-semibold text-[#1A1A1A]">
+        <Label htmlFor="website-name" className={isBeginnerMode ? "text-base font-semibold text-[#1A1A1A]" : "text-sm font-semibold text-[#1A1A1A]"}>
           اسم الموقع <span className="text-red-500">*</span>
         </Label>
+        {isBeginnerMode && (
+          <p className="text-xs text-[#6B7280]">اكتب اسم مكتبك أو شركتك هنا — هذا ما يشوفه عملاؤك أول شيء</p>
+        )}
         <Input
           id="website-name"
           placeholder="مثال: مكتب الأفق للعقارات"
           value={websiteName}
           onChange={(e) => setWebsiteName(e.target.value)}
-          className="h-12 text-base rounded-xl border-[#E5E7EB] focus:border-[#1A3C34] focus:ring-[#1A3C34]"
+          className="h-14 text-base rounded-xl border-[#E5E7EB] focus:border-[#1A3C34] focus:ring-[#1A3C34]"
           dir="rtl"
         />
       </div>
 
       {/* Logo Upload */}
       <div className="space-y-2">
-        <Label className="text-sm font-semibold text-[#1A1A1A]">شعار الموقع</Label>
+        <Label className={isBeginnerMode ? "text-base font-semibold text-[#1A1A1A]" : "text-sm font-semibold text-[#1A1A1A]"}>
+          شعار الموقع
+          <span className="text-[#9CA3AF] font-normal text-xs mr-1">(اختياري)</span>
+        </Label>
+        {isBeginnerMode && (
+          <p className="text-xs text-[#6B7280]">الشعار هو الصورة أو الرمز اللي يمثل موقعك — يمكنك تخطيه الآن وتضيفه لاحقاً</p>
+        )}
         <input type="file" ref={fileInputRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
 
         {!logoBase64 ? (
@@ -140,10 +158,22 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
               <p className="text-xs text-[#6B7280]">يمكنك تغييره أو حذفه</p>
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="rounded-lg text-xs h-8">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="rounded-lg text-xs h-9"
+              >
                 تغيير
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setLogoBase64(null)} className="rounded-lg text-xs h-8 text-red-500 hover:text-red-600">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setLogoBase64(null)}
+                className="rounded-lg text-xs h-9 text-red-500 hover:text-red-600"
+              >
                 <Trash2 className="w-3.5 h-3.5" />
               </Button>
             </div>
@@ -154,16 +184,21 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
       {/* Brand Colors */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-semibold text-[#1A1A1A]">ألوان الموقع</Label>
+          <Label className={isBeginnerMode ? "text-base font-semibold text-[#1A1A1A]" : "text-sm font-semibold text-[#1A1A1A]"}>
+            ألوان الموقع
+          </Label>
           <button
             type="button"
             onClick={() => setShowColorPickers(!showColorPickers)}
             className="flex items-center gap-1 text-xs text-[#4CAF82] font-medium hover:text-[#1A3C34] transition-colors"
           >
             <Palette className="w-3.5 h-3.5" />
-            {showColorPickers ? "إخفاء" : "تخصيص"}
+            {showColorPickers ? "إخفاء" : "تخصيص يدوي"}
           </button>
         </div>
+        {isBeginnerMode && (
+          <p className="text-xs text-[#6B7280]">اختر مجموعة ألوان جاهزة من الخيارات أدناه — يمكنك تغييرها في أي وقت</p>
+        )}
 
         {/* Preset palettes */}
         <div className="grid grid-cols-5 gap-2">
@@ -175,7 +210,9 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
                 type="button"
                 onClick={() => handlePreset(preset)}
                 title={preset.label}
-                className={`rounded-xl p-2 border-2 transition-all ${isSelected ? "border-[#1A3C34] scale-105 shadow-md" : "border-transparent hover:border-[#E5E7EB]"}`}
+                className={`rounded-xl p-2 border-2 transition-all ${
+                  isSelected ? "border-[#1A3C34] scale-105 shadow-md" : "border-transparent hover:border-[#E5E7EB]"
+                }`}
               >
                 <div className="flex gap-0.5 justify-center">
                   <div className="w-4 h-6 rounded-r-sm" style={{ background: preset.primary }} />
@@ -202,14 +239,19 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
           className="rounded-xl p-4 flex items-center gap-3 mt-2"
           style={{ background: primaryColor + "15", border: `1.5px solid ${primaryColor}30` }}
         >
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ background: primaryColor }}>
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+            style={{ background: primaryColor }}
+          >
             {websiteName ? websiteName[0] : "م"}
           </div>
           <div>
             <p className="text-sm font-bold" style={{ color: primaryColor }}>
               {websiteName || "اسم الموقع"}
             </p>
-            <p className="text-xs" style={{ color: secondaryColor }}>معاينة الألوان</p>
+            <p className="text-xs" style={{ color: secondaryColor }}>
+              معاينة الألوان
+            </p>
           </div>
           <div className="mr-auto flex gap-1">
             <div className="w-6 h-6 rounded-full" style={{ background: primaryColor }} />
@@ -219,12 +261,15 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
         </div>
       </div>
 
+      {/* Help banner for beginners */}
+      {isBeginnerMode && <HelpBanner />}
+
       {/* Actions */}
       <div className="flex gap-3 pt-2">
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="flex-1 h-12 rounded-[20px] text-white font-semibold text-sm"
+          className="flex-1 h-14 rounded-[20px] text-white font-semibold text-base"
           style={{ background: "#1A3C34" }}
         >
           {saving ? (
@@ -241,7 +286,7 @@ export function BrandSetupStep({ onNext }: BrandSetupStepProps) {
           variant="ghost"
           onClick={handleSkip}
           disabled={saving}
-          className="px-4 h-12 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
+          className="px-4 h-14 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
         >
           تخطي
         </Button>

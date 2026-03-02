@@ -7,11 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveContactInfo } from "@/lib/mock/onboarding-api";
 import { useOnboardingStore } from "@/store/onboarding";
+import { ExplanationCard } from "@/components/onboarding/ExplanationCard";
+import { HelpBanner } from "@/components/onboarding/HelpBanner";
 import toast from "react-hot-toast";
 
 interface ContactInfoStepProps {
   onNext: () => void;
   onPrev: () => void;
+  isBeginnerMode?: boolean;
 }
 
 const CITIES = [
@@ -30,15 +33,16 @@ const FIELD_CONFIG = [
   {
     id: "phone",
     label: "رقم الجوال",
+    hint: "الرقم اللي يتواصل معك فيه عملاؤك — تأكد أنه صحيح",
     placeholder: "05xxxxxxxx",
     type: "tel",
     icon: Phone,
-    prefix: "+966",
     required: true,
   },
   {
     id: "email",
     label: "البريد الإلكتروني",
+    hint: "بريدك المهني إن وجد — اختياري",
     placeholder: "info@yourcompany.sa",
     type: "email",
     icon: Mail,
@@ -47,6 +51,7 @@ const FIELD_CONFIG = [
   {
     id: "address",
     label: "العنوان",
+    hint: "حي ومدينة مكتبك — يساعد عملاءك يلقونك بسهولة",
     placeholder: "مثال: حي العليا، شارع الملك فهد، الرياض",
     type: "text",
     icon: MapPin,
@@ -55,6 +60,7 @@ const FIELD_CONFIG = [
   {
     id: "workingHours",
     label: "ساعات العمل",
+    hint: "متى تكون متاحاً للرد على عملاؤك؟",
     placeholder: "مثال: السبت - الخميس: 9 صباحاً - 6 مساءً",
     type: "text",
     icon: Clock,
@@ -62,7 +68,7 @@ const FIELD_CONFIG = [
   },
 ] as const;
 
-export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
+export function ContactInfoStep({ onNext, onPrev, isBeginnerMode = false }: ContactInfoStepProps) {
   const { steps, markStepCompleted, skipStep } = useOnboardingStore();
   const stepData = steps.find((s) => s.id === "contact")?.data ?? {};
 
@@ -107,10 +113,16 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Beginner explanation */}
+      {isBeginnerMode && <ExplanationCard stepId="contact" />}
+
       {/* Header */}
       <div className="text-center space-y-1">
-        <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-2" style={{ background: "#E8F5EF" }}>
+        <div
+          className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-2"
+          style={{ background: "#E8F5EF" }}
+        >
           📞
         </div>
         <h2 className="text-xl font-bold text-[#1A1A1A]">بيانات التواصل</h2>
@@ -121,17 +133,23 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
       <div className="space-y-4">
         {FIELD_CONFIG.map((field) => (
           <div key={field.id} className="space-y-1.5">
-            <Label htmlFor={field.id} className="text-sm font-semibold text-[#1A1A1A]">
+            <Label
+              htmlFor={field.id}
+              className={isBeginnerMode ? "text-base font-semibold text-[#1A1A1A]" : "text-sm font-semibold text-[#1A1A1A]"}
+            >
               {field.label}
               {field.required && <span className="text-red-500 mr-1">*</span>}
             </Label>
+            {isBeginnerMode && (
+              <p className="text-xs text-[#6B7280]">{field.hint}</p>
+            )}
             <div className="relative">
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
                 <field.icon className="w-4 h-4" />
               </div>
               {field.id === "phone" ? (
                 <div className="flex gap-2">
-                  <div className="flex items-center justify-center px-3 h-12 rounded-xl border border-[#E5E7EB] bg-[#F4F5F7] text-sm text-[#6B7280] font-medium flex-shrink-0">
+                  <div className="flex items-center justify-center px-3 h-14 rounded-xl border border-[#E5E7EB] bg-[#F4F5F7] text-sm text-[#6B7280] font-medium flex-shrink-0">
                     🇸🇦 +966
                   </div>
                   <Input
@@ -140,7 +158,7 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
                     placeholder={field.placeholder}
                     value={form[field.id]}
                     onChange={(e) => setField(field.id, e.target.value)}
-                    className="flex-1 h-12 rounded-xl border-[#E5E7EB] pr-9 text-base"
+                    className="flex-1 h-14 rounded-xl border-[#E5E7EB] pr-9 text-base"
                     dir="ltr"
                   />
                 </div>
@@ -152,7 +170,7 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
                     placeholder={field.placeholder}
                     value={form[field.id]}
                     onChange={(e) => setField(field.id, e.target.value)}
-                    className="h-12 rounded-xl border-[#E5E7EB] pr-9 text-sm"
+                    className="h-14 rounded-xl border-[#E5E7EB] pr-9 text-sm"
                     dir="rtl"
                   />
                   <button
@@ -172,7 +190,7 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
                             setField("workingHours", preset);
                             setShowPresets(false);
                           }}
-                          className="text-right text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] hover:border-[#4CAF82] hover:bg-[#E8F5EF] transition-colors text-[#374151]"
+                          className="text-right text-xs px-3 py-2.5 rounded-lg border border-[#E5E7EB] hover:border-[#4CAF82] hover:bg-[#E8F5EF] transition-colors text-[#374151]"
                         >
                           {preset}
                         </button>
@@ -187,7 +205,7 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
                   placeholder={field.placeholder}
                   value={form[field.id]}
                   onChange={(e) => setField(field.id, e.target.value)}
-                  className="h-12 rounded-xl border-[#E5E7EB] pr-9 text-base"
+                  className="h-14 rounded-xl border-[#E5E7EB] pr-9 text-base"
                   dir={field.type === "email" ? "ltr" : "rtl"}
                 />
               )}
@@ -227,6 +245,9 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
         </div>
       )}
 
+      {/* Help banner for beginners */}
+      {isBeginnerMode && <HelpBanner />}
+
       {/* Actions */}
       <div className="flex gap-3 pt-2">
         <Button
@@ -234,14 +255,14 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
           variant="outline"
           onClick={onPrev}
           disabled={saving}
-          className="h-12 px-5 rounded-[20px] border-[#E5E7EB] text-[#374151]"
+          className="h-14 px-5 rounded-[20px] border-[#E5E7EB] text-[#374151]"
         >
           → السابق
         </Button>
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="flex-1 h-12 rounded-[20px] text-white font-semibold text-sm"
+          className="flex-1 h-14 rounded-[20px] text-white font-semibold text-base"
           style={{ background: "#1A3C34" }}
         >
           {saving ? (
@@ -258,7 +279,7 @@ export function ContactInfoStep({ onNext, onPrev }: ContactInfoStepProps) {
           variant="ghost"
           onClick={handleSkip}
           disabled={saving}
-          className="px-4 h-12 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
+          className="px-4 h-14 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
         >
           تخطي
         </Button>

@@ -2,19 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ArrowLeft, ExternalLink, AlertCircle } from "lucide-react";
+import { CheckCircle2, ArrowLeft, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnboardingStore } from "@/store/onboarding";
 import { saveIntegrations } from "@/lib/mock/onboarding-api";
+import { ExplanationCard } from "@/components/onboarding/ExplanationCard";
+import { HelpBanner } from "@/components/onboarding/HelpBanner";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 interface IntegrationsStepProps {
   onNext: () => void;
   onPrev: () => void;
+  isBeginnerMode?: boolean;
 }
 
-export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
+export function IntegrationsStep({ onNext, onPrev, isBeginnerMode = false }: IntegrationsStepProps) {
   const { steps, markStepCompleted, skipStep } = useOnboardingStore();
   const stepData = steps.find((s) => s.id === "integrations")?.data ?? {};
 
@@ -52,6 +55,24 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
 
   return (
     <div className="space-y-4" dir="rtl">
+      {/* Beginner explanation */}
+      {isBeginnerMode && <ExplanationCard stepId="integrations" />}
+
+      {/* Header */}
+      <div className="text-center space-y-1">
+        <div
+          className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-2"
+          style={{ background: "#E8F5EF" }}
+        >
+          🔗
+        </div>
+        <h2 className="text-xl font-bold text-[#1A1A1A]">الربط والتكامل</h2>
+        <p className="text-sm text-[#6B7280]">
+          {isBeginnerMode
+            ? "خطوة اختيارية — تقدر تتجاوزها وتعود لاحقاً"
+            : "واتساب وميتا بيكسل — كلاهما اختياري"}
+        </p>
+      </div>
 
       {/* WhatsApp integration card */}
       <IntegrationRedirectCard
@@ -59,7 +80,11 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
         iconBg="#E7F8EE"
         color="#25D366"
         title="واتساب"
-        description="استقبل استفسارات العملاء مباشرة عبر واتساب. اضغط لإعداد الربط من صفحة إدارة واتساب."
+        description={
+          isBeginnerMode
+            ? "يضيف زر واتساب في موقعك عشان عملاؤك يرسلون لك مباشرة بضغطة زر واحدة — سهل جداً!"
+            : "استقبل استفسارات العملاء مباشرة عبر واتساب. اضغط لإعداد الربط من صفحة إدارة واتساب."
+        }
         buttonLabel="إعداد واتساب الآن"
         buttonColor="#25D366"
         href="/dashboard/whatsapp-management"
@@ -71,12 +96,16 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
       {/* Meta Pixel integration card */}
       <IntegrationRedirectCard
         icon="📊"
-        iconBg="#EEF2FF"
-        color="#1877F2"
-        title="Meta Pixel"
-        description="تتبع زوار موقعك وقِس نتائج إعلاناتك على فيسبوك وإنستغرام. أضف معرف Pixel من صفحة الإعدادات."
+        iconBg="#E8F5EF"
+        color="#1A3C34"
+        title="Meta Pixel (للمتقدمين)"
+        description={
+          isBeginnerMode
+            ? "يساعدك تتابع من يزور موقعك ويقيس نتائج إعلاناتك على فيسبوك وإنستغرام — يمكن تأجيله."
+            : "تتبع زوار موقعك وقِس نتائج إعلاناتك على فيسبوك وإنستغرام. أضف معرف Pixel من صفحة الإعدادات."
+        }
         buttonLabel="الذهاب إلى الإعدادات"
-        buttonColor="#1877F2"
+        buttonColor="#1A3C34"
         href="/dashboard/settings"
         isDone={pixelDone}
         onMarkDone={() => setPixelDone(true)}
@@ -84,12 +113,17 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
       />
 
       {/* Info tip */}
-      <div className="flex gap-2 p-3 rounded-xl bg-[#FFFBEB] border border-[#FDE68A]">
-        <AlertCircle className="w-4 h-4 text-[#D97706] flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-[#92400E] leading-relaxed">
-          هذه الخطوات اختيارية. يمكنك ربط هذه الخدمات لاحقاً في أي وقت من صفحاتها المخصصة.
+      <div className="flex gap-2 p-3 rounded-xl bg-[#E8F5EF] border border-[#4CAF8240]">
+        <AlertCircle className="w-4 h-4 text-[#4CAF82] flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-[#2D6A4F] leading-relaxed">
+          {isBeginnerMode
+            ? "هذه الخطوات اختيارية تماماً. الأهم الآن هو إطلاق موقعك — تقدر تربط الخدمات لاحقاً."
+            : "هذه الخطوات اختيارية. يمكنك ربط هذه الخدمات لاحقاً في أي وقت من صفحاتها المخصصة."}
         </p>
       </div>
+
+      {/* Help banner for beginners */}
+      {isBeginnerMode && <HelpBanner />}
 
       {/* Navigation */}
       <div className="flex gap-3 pt-1">
@@ -97,7 +131,7 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
           type="button"
           variant="outline"
           onClick={onPrev}
-          className="h-11 px-5 rounded-[20px] border-[#E5E7EB] text-[#374151]"
+          className="h-14 px-5 rounded-[20px] border-[#E5E7EB] text-[#374151]"
         >
           → السابق
         </Button>
@@ -106,19 +140,28 @@ export function IntegrationsStep({ onNext, onPrev }: IntegrationsStepProps) {
           <Button
             onClick={handleFinish}
             disabled={saving}
-            className="flex-1 h-11 rounded-[20px] text-white font-semibold text-sm"
+            className="flex-1 h-14 rounded-[20px] text-white font-semibold text-base"
             style={{ background: "#1A3C34" }}
           >
-            {saving ? "جاري الحفظ..." : bothDone ? "إنهاء الإعداد 🎉" : "حفظ والإنهاء ←"}
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                جاري الحفظ...
+              </>
+            ) : bothDone ? (
+              "إنهاء الإعداد 🎉"
+            ) : (
+              "حفظ والإنهاء ←"
+            )}
           </Button>
         ) : (
           <Button
             type="button"
             variant="ghost"
             onClick={handleSkip}
-            className="flex-1 h-11 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
+            className="flex-1 h-14 rounded-[20px] text-[#9CA3AF] hover:text-[#6B7280] text-sm"
           >
-            تخطي الكل
+            {isBeginnerMode ? "تخطي الآن وأكمل لاحقاً" : "تخطي الكل"}
           </Button>
         )}
       </div>
@@ -154,13 +197,13 @@ function IntegrationRedirectCard({
     >
       <div className="flex items-start gap-3 mb-3">
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+          className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
           style={{ background: iconBg }}
         >
           {icon}
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-sm font-bold text-[#1A1A1A]">{title}</h3>
             {isDone && (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-white bg-[#4CAF82] px-2 py-0.5 rounded-full">
@@ -174,10 +217,9 @@ function IntegrationRedirectCard({
 
       {!isDone ? (
         <div className="space-y-2">
-          {/* Redirect button */}
           <Link href={href} className="block">
             <Button
-              className="w-full h-11 rounded-[20px] text-white font-semibold text-sm gap-2 group"
+              className="w-full h-12 rounded-[20px] text-white font-semibold text-sm gap-2 group"
               style={{ background: buttonColor }}
             >
               {buttonLabel}
@@ -185,7 +227,6 @@ function IntegrationRedirectCard({
             </Button>
           </Link>
 
-          {/* Mark as done after returning */}
           <div className="flex items-center justify-between pt-1">
             <p className="text-xs text-[#9CA3AF]">أكملت الإعداد؟</p>
             <button

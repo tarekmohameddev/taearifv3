@@ -25,7 +25,12 @@ export interface OnboardingStepData {
   propertyCity?: string;
   propertyImageBase64?: string;
 
-  // Step 4 — Integrations
+  // Step 4 — Domain
+  domainType?: "custom";
+  customDomain?: string;
+  domainConnected?: boolean;
+
+  // Step 5 — Integrations
   whatsappNumber?: string;
   whatsappConnected?: boolean;
   metaPixelId?: string;
@@ -33,7 +38,7 @@ export interface OnboardingStepData {
 }
 
 export interface OnboardingStep {
-  id: "brand" | "contact" | "property" | "integrations";
+  id: "brand" | "contact" | "property" | "domain" | "integrations";
   title: string;
   subtitle: string;
   completed: boolean;
@@ -41,12 +46,15 @@ export interface OnboardingStep {
   data: OnboardingStepData;
 }
 
+export type ExperienceLevel = "beginner" | "experienced" | null;
+
 interface OnboardingStore {
   isOpen: boolean;
   currentStep: number;
   hasSeenWelcome: boolean;
   allCompleted: boolean;
   steps: OnboardingStep[];
+  experienceLevel: ExperienceLevel;
 
   // Computed
   completedCount: () => number;
@@ -58,10 +66,11 @@ interface OnboardingStore {
   goToStep: (index: number) => void;
   nextStep: () => void;
   prevStep: () => void;
-  markStepCompleted: (stepId: OnboardingStep["id"], data?: OnboardingStepData) => void;
+  markStepCompleted: (stepId: OnboardingStep["id"], data?: Partial<OnboardingStepData>) => void;
   skipStep: (stepId: OnboardingStep["id"]) => void;
   markAllCompleted: () => void;
   setHasSeenWelcome: () => void;
+  setExperienceLevel: (level: ExperienceLevel) => void;
   resetOnboarding: () => void;
 }
 
@@ -95,6 +104,14 @@ const DEFAULT_STEPS: OnboardingStep[] = [
     data: {},
   },
   {
+    id: "domain",
+    title: "رابط الموقع",
+    subtitle: "عنوان موقعك على الإنترنت",
+    completed: false,
+    skipped: false,
+    data: {},
+  },
+  {
     id: "integrations",
     title: "الربط والتكامل",
     subtitle: "واتساب وميتا بيكسل",
@@ -112,6 +129,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       hasSeenWelcome: false,
       allCompleted: false,
       steps: DEFAULT_STEPS,
+      experienceLevel: null as ExperienceLevel,
 
       completedCount: () =>
         get().steps.filter((s) => s.completed).length,
@@ -125,7 +143,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       closeOnboarding: () => set({ isOpen: false }),
 
       goToStep: (index) =>
-        set({ currentStep: Math.max(0, Math.min(index, DEFAULT_STEPS.length - 1)) }),
+        set((state) => ({ currentStep: Math.max(0, Math.min(index, state.steps.length - 1)) })),
 
       nextStep: () => {
         const { currentStep, steps } = get();
@@ -169,6 +187,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
       setHasSeenWelcome: () => set({ hasSeenWelcome: true }),
 
+      setExperienceLevel: (level) => set({ experienceLevel: level }),
+
       resetOnboarding: () =>
         set({
           isOpen: false,
@@ -176,6 +196,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
           hasSeenWelcome: false,
           allCompleted: false,
           steps: DEFAULT_STEPS,
+          experienceLevel: null,
         }),
     }),
     {
@@ -185,6 +206,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
         hasSeenWelcome: state.hasSeenWelcome,
         allCompleted: state.allCompleted,
         steps: state.steps,
+        experienceLevel: state.experienceLevel,
       }),
     }
   )

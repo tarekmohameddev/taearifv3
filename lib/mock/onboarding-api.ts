@@ -29,6 +29,11 @@ export interface FirstPropertyPayload {
   propertyImageBase64?: string;
 }
 
+export interface DomainPayload {
+  domainType: "custom";
+  customDomain: string;
+}
+
 export interface IntegrationsPayload {
   whatsappNumber?: string;
   metaPixelId?: string;
@@ -38,6 +43,7 @@ export interface OnboardingStatusResponse {
   brand: boolean;
   contact: boolean;
   property: boolean;
+  domain: boolean;
   integrations: boolean;
 }
 
@@ -65,6 +71,12 @@ export async function saveFirstProperty(data: FirstPropertyPayload): Promise<{ s
   };
 }
 
+export async function saveDomainSettings(data: DomainPayload): Promise<{ success: true; message: string; url: string }> {
+  await delay(700);
+  console.log("[Mock API] saveDomainSettings:", data);
+  return { success: true, message: "تم حفظ رابط الموقع", url: `https://${data.customDomain}` };
+}
+
 export async function saveIntegrations(data: IntegrationsPayload): Promise<{ success: true; message: string }> {
   await delay(800);
   console.log("[Mock API] saveIntegrations:", data);
@@ -89,6 +101,7 @@ export async function getOnboardingStatus(): Promise<OnboardingStatusResponse> {
     brand: false,
     contact: false,
     property: false,
+    domain: false,
     integrations: false,
   };
 }
