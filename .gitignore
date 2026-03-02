@@ -38,3 +38,7 @@ test.js
 .env
 .env.example
 .cursor/rules/front-end-cursor-rules.mdc
+.cursor/RULES_APPLIED.md
+.cursor/rules/code-quality.mdc
+.cursor/rules/react-typescript-standards.mdc
+.cursor/rules/nextjs-app-router.mdc
