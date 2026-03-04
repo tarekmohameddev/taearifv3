@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { CheckCircle2, DollarSign } from "lucide-react";
 
 interface SubMetricCardProps {
@@ -12,6 +14,9 @@ interface SubMetricCardProps {
 }
 
 function SubMetricCard({ icon, iconColor, label, value, percentage, fillColor }: SubMetricCardProps) {
+  const barRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(barRef, { once: true, margin: "-40px" });
+
   return (
     <div
       style={{
@@ -33,15 +38,12 @@ function SubMetricCard({ icon, iconColor, label, value, percentage, fillColor }:
         {value}
       </div>
       {/* Progress Bar */}
-      <div style={{ height: 5, background: "#E0E0E0", borderRadius: 4, overflow: "hidden" }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${percentage}%`,
-            background: fillColor,
-            borderRadius: 4,
-            transition: "width 0.5s ease",
-          }}
+      <div ref={barRef} style={{ height: 5, background: "#E0E0E0", borderRadius: 4, overflow: "hidden" }}>
+        <motion.div
+          style={{ height: "100%", background: fillColor, borderRadius: 4 }}
+          initial={{ width: 0 }}
+          animate={{ width: inView ? `${percentage}%` : 0 }}
+          transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
         />
       </div>
     </div>

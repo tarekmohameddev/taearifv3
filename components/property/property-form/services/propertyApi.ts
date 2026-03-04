@@ -96,6 +96,40 @@ export const completeDraft = async (
   return response;
 };
 
+export interface ImportPropertyResult {
+  success: boolean;
+  url: string;
+  property?: any;
+  error?: string;
+}
+
+export const importPropertiesFromUrls = async (
+  urls: string[],
+): Promise<ImportPropertyResult[]> => {
+  const response = await axiosInstance.post("/properties/import", { urls });
+
+  const currentState = useStore.getState();
+  const imported: any[] = response.data.properties ?? [];
+  if (imported.length > 0) {
+    const mapped = imported.map((p: any) => ({
+      ...p,
+      status: p.status === true || p.status === 1 ? "منشور" : "مسودة",
+    }));
+    const updatedProperties = [
+      ...mapped,
+      ...currentState.propertiesManagement.properties,
+    ];
+    useStore.getState().setPropertiesManagement({ properties: updatedProperties });
+
+    const setpOB = { step: "properties" };
+    await axiosInstance.post("/steps/complete", setpOB);
+    const { fetchSetupProgressData } = currentState.homepage;
+    await fetchSetupProgressData();
+  }
+
+  return response.data.results ?? urls.map((url) => ({ success: true, url }));
+};
+
 export const translateError = (errorMessage: string): string => {
   if (
     errorMessage.includes("City location is required") ||

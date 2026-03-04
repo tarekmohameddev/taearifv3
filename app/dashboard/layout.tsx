@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 import GTMProvider from "@/components/GTMProvider2";
 import PermissionWrapper from "@/components/PermissionWrapper";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
@@ -55,6 +55,7 @@ export default function DashboardLayout({
   // Token validation
   const { tokenValidation } = useTokenValidation();
   const router = useRouter();
+  const pathname = usePathname();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
   const fetchUserFromAPI = useAuthStore((state) => state.fetchUserFromAPI);
   const userData = useAuthStore((state) => state.userData);
@@ -232,6 +233,20 @@ export default function DashboardLayout({
   // إذا كان tenant domain (custom domain)، اعرض TenantPageWrapper
   if (isValidDomain === false) {
     return <TenantPageWrapper tenantId={null} slug="" domainType="custom" />;
+  }
+
+  // Onboarding page gets a full-screen distraction-free layout (no sidebar or header)
+  const isOnboardingPage = pathname?.includes("/dashboard/onboarding");
+  if (isOnboardingPage) {
+    return (
+      <GTMProvider containerId="GTM-KBL37C9T">
+        <div dir="rtl" style={{ direction: "rtl" }}>
+          <PermissionWrapper>
+            <main className="min-h-screen">{children}</main>
+          </PermissionWrapper>
+        </div>
+      </GTMProvider>
+    );
   }
 
   return (

@@ -1,9 +1,13 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { BarChart3 } from "lucide-react";
 
 export function SalesStatisticCard() {
   const profitProgress = 65;
+  const barRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(barRef, { once: true, margin: "-40px" });
 
   return (
     <div
@@ -53,15 +57,12 @@ export function SalesStatisticCard() {
 
           {/* Progress Bar */}
           <div style={{ marginTop: 10 }}>
-            <div style={{ height: 5, background: "#E0E0E0", borderRadius: 4, overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${profitProgress}%`,
-                  background: "#4CAF82",
-                  borderRadius: 4,
-                  transition: "width 0.5s ease",
-                }}
+            <div ref={barRef} style={{ height: 5, background: "#E0E0E0", borderRadius: 4, overflow: "hidden" }}>
+              <motion.div
+                style={{ height: "100%", background: "#4CAF82", borderRadius: 4 }}
+                initial={{ width: 0 }}
+                animate={{ width: inView ? `${profitProgress}%` : 0 }}
+                transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
               />
             </div>
           </div>

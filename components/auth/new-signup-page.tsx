@@ -58,22 +58,6 @@ function Spinner({ label }: { label?: string }) {
   );
 }
 
-function GoogleIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 488 512">
-      <path fill="#4285F4" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 300 300" fill="currentColor">
-      <path d="M178.57 127.15L290.27 0h-26.46l-97.03 110.38L89.34 0H0l117.13 166.93L0 300.25h26.46l102.4-116.59 81.8 116.59H300L178.57 127.15zm-36.31 41.09-11.87-16.63L36.12 19.88H76.7l76.28 106.96 11.87 16.63L263.87 280.9h-40.57l-81.04-112.66z" />
-    </svg>
-  );
-}
-
 // ─── Step 1 — Phone ──────────────────────────────────────────────────────────
 
 function PhoneStep({
@@ -84,28 +68,6 @@ function PhoneStep({
   const [phone, setPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [twitterLoading, setTwitterLoading] = useState(false);
-
-  const handleSocial = async (provider: "google" | "twitter") => {
-    const setL = provider === "google" ? setGoogleLoading : setTwitterLoading;
-    setL(true);
-    setError("");
-    try {
-      const { mockGoogleAuth, mockTwitterAuth } = await import("@/lib/mock/auth-mock");
-      const result = provider === "google" ? await mockGoogleAuth() : await mockTwitterAuth();
-      if (result.success && result.url) {
-        localStorage.setItem("oauth_return_page", "register");
-        window.location.href = result.url;
-      } else {
-        setError("تعذّر الاتصال بـ " + (provider === "google" ? "Google" : "X"));
-      }
-    } catch {
-      setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
-    } finally {
-      setL(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,39 +90,11 @@ function PhoneStep({
     }
   };
 
-  const anyLoading = isLoading || googleLoading || twitterLoading;
-
   return (
     <div>
       <div className="mb-6 text-center">
         <h2 className="text-[22px] font-bold" style={{ color: "#1A1A1A" }}>إنشاء حساب</h2>
         <p className="text-sm mt-1" style={{ color: "#6B7280" }}>ابدأ بتأكيد رقم جوالك</p>
-      </div>
-
-      {/* Social */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        {[
-          { provider: "google" as const, icon: <GoogleIcon />, label: "Google", loading: googleLoading },
-          { provider: "twitter" as const, icon: <XIcon />, label: "X", loading: twitterLoading },
-        ].map(({ provider, icon, label, loading }) => (
-          <button
-            key={provider}
-            type="button"
-            onClick={() => handleSocial(provider)}
-            disabled={anyLoading}
-            className="flex items-center justify-center gap-2 h-11 rounded-xl border text-sm font-medium transition-colors hover:bg-gray-50 disabled:opacity-60"
-            style={{ borderColor: "#E5E7EB", color: "#374151" }}
-          >
-            {loading ? <Spinner /> : icon}
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-3 mb-5">
-        <div className="flex-1 h-px" style={{ background: "#E5E7EB" }} />
-        <span className="text-xs" style={{ color: "#9CA3AF" }}>أو برقم الجوال</span>
-        <div className="flex-1 h-px" style={{ background: "#E5E7EB" }} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3" noValidate>
@@ -178,7 +112,7 @@ function PhoneStep({
             value={phone}
             onChange={(e) => { setPhone(e.target.value); setError(""); }}
             className="h-11 rounded-xl text-right text-sm pr-20"
-            disabled={anyLoading}
+            disabled={isLoading}
             maxLength={10}
           />
         </div>
@@ -187,7 +121,7 @@ function PhoneStep({
           type="submit"
           className="w-full h-11 rounded-[20px] text-sm font-semibold"
           style={{ background: "#1A3C34", color: "#FFFFFF" }}
-          disabled={anyLoading}
+          disabled={isLoading}
         >
           {isLoading ? <Spinner label="جاري الإرسال..." /> : "إرسال رمز التحقق"}
         </Button>

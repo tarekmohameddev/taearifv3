@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { TrendingUp } from "lucide-react";
 
 const BAR_DATA = [
@@ -15,6 +17,9 @@ const MAX_VALUE = Math.max(...BAR_DATA.map((d) => d.value));
 const CHART_HEIGHT = 70;
 
 export function NewVisitorsCard() {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(chartRef, { once: true, margin: "-40px" });
+
   return (
     <div
       style={{
@@ -58,21 +63,22 @@ export function NewVisitorsCard() {
       </div>
 
       {/* Bar Chart */}
-      <div style={{ height: CHART_HEIGHT, display: "flex", alignItems: "flex-end", gap: 8 }}>
-        {BAR_DATA.map((bar) => {
+      <div ref={chartRef} style={{ height: CHART_HEIGHT, display: "flex", alignItems: "flex-end", gap: 8 }}>
+        {BAR_DATA.map((bar, i) => {
           const barHeight = (bar.value / MAX_VALUE) * CHART_HEIGHT;
           return (
             <div key={bar.label} className="flex flex-col items-center gap-1 flex-1">
-              <div
+              <motion.div
                 style={{
                   width: "100%",
                   maxWidth: 16,
-                  height: barHeight,
                   background: bar.highlight ? "#4A90A4" : "#E0E0E0",
                   borderRadius: "4px 4px 0 0",
-                  transition: "height 0.3s ease",
                   margin: "0 auto",
                 }}
+                initial={{ height: 0 }}
+                animate={{ height: inView ? barHeight : 0 }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 + i * 0.07 }}
               />
               <span style={{ fontSize: 11, color: "#9CA3AF" }}>{bar.label}</span>
             </div>
