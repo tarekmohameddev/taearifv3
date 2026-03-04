@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 import { HeroStatsCard } from "./HeroStatsCard";
 import { RevenueChartCard } from "./RevenueChartCard";
 import { AIPromoCard } from "./AIPromoCard";
-import { SalesStatisticCard } from "./SalesStatisticCard";
-import { VisitStatisticCard } from "./VisitStatisticCard";
 import { NewVisitorsCard } from "./NewVisitorsCard";
-import { ListingBoard } from "./ListingBoard";
 import { SmartInsightsStrip } from "./SmartInsightsStrip";
+import { OnboardingProgressCard } from "./OnboardingProgressCard";
+import { MostVisitedPropertiesCard } from "./MostVisitedPropertiesCard";
 import useAuthStore from "@/context/AuthContext";
 
 const fadeUp = {
@@ -61,7 +60,7 @@ export function DashboardHome() {
       </motion.div>
 
       {/* Smart Insights Strip */}
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.07}>
+      <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.07} className="mb-5">
         <SmartInsightsStrip />
       </motion.div>
 
@@ -83,29 +82,25 @@ export function DashboardHome() {
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.21} whileHover={hoverLift}>
             <RevenueChartCard />
           </motion.div>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.28} whileHover={hoverLift}>
+            <MostVisitedPropertiesCard />
+          </motion.div>
         </div>
 
         {/* Right Column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.14}>
+            <OnboardingProgressCard />
+          </motion.div>
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.17} whileHover={hoverLift}>
             <AIPromoCard />
           </motion.div>
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.24} whileHover={hoverLift}>
-            <SalesStatisticCard />
-          </motion.div>
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.30} whileHover={hoverLift}>
-            <VisitStatisticCard />
-          </motion.div>
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.36} whileHover={hoverLift}>
             <NewVisitorsCard />
           </motion.div>
         </div>
       </div>
 
-      {/* Listing Board — Full Width */}
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.42}>
-        <ListingBoard />
-      </motion.div>
     </div>
   );
 }

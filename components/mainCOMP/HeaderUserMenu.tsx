@@ -219,7 +219,7 @@ export function HeaderUserMenu() {
         <DropdownMenuSeparator />
         
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="cursor-pointer">
+          <Link href="/dashboard/profile" className="cursor-pointer">
             <User className="ml-2 h-4 w-4" />
             <span>حسابي</span>
           </Link>
