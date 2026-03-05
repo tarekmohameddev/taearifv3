@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Bell, MessageSquare } from "lucide-react";
+import { Bell, MessageSquare, ExternalLink } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
 import { DashboardSearch } from "./DashboardSearch";
 import { HeaderUserMenu } from "./HeaderUserMenu";
@@ -13,7 +13,13 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ children }: DashboardHeaderProps) {
-  const { UserIslogged } = useAuthStore();
+  const { UserIslogged, userData } = useAuthStore();
+
+  const websiteUrl = userData?.domain
+    ? userData.domain.startsWith("http")
+      ? userData.domain
+      : `https://${userData.domain}`
+    : null;
 
   return (
     <header
@@ -36,6 +42,20 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
         <div className="flex items-center gap-2 shrink-0">
           {UserIslogged && (
             <>
+              {/* Visit Website */}
+              {websiteUrl && (
+                <a
+                  href={websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 active:scale-95 bg-[#E8F5EF] text-[#1A3C34] border-[#1A3C34]/25 hover:bg-[#1A3C34] hover:text-white hover:border-[#1A3C34]"
+                  title="زيارة الموقع"
+                >
+                  <ExternalLink size={13} />
+                  <span>زيارة الموقع</span>
+                </a>
+              )}
+
               {/* Messages */}
               <button
                 className="relative flex items-center justify-center rounded-xl transition-all duration-200 hover:bg-white/80 active:scale-95"
